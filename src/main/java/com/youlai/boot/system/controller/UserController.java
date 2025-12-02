@@ -195,24 +195,24 @@ public class UserController {
         return Result.judge(result);
     }
 
-    @Operation(summary = "重置用户密码")
+    @Operation(summary = "重置指定用户密码")
     @PutMapping(value = "/{userId}/password/reset")
     @PreAuthorize("@ss.hasPerm('sys:user:reset-password')")
-    public Result<?> resetPassword(
+    public Result<?> resetUserPassword(
             @Parameter(description = "用户ID") @PathVariable Long userId,
             @RequestParam String password
     ) {
-        boolean result = userService.resetPassword(userId, password);
+        boolean result = userService.resetUserPassword(userId, password);
         return Result.judge(result);
     }
 
-    @Operation(summary = "修改密码")
+    @Operation(summary = "当前用户修改密码")
     @PutMapping(value = "/password")
-    public Result<?> changePassword(
+    public Result<?> changeCurrentUserPassword(
             @RequestBody PasswordUpdateForm data
     ) {
         Long currUserId = SecurityUtils.getUserId();
-        boolean result = userService.changePassword(currUserId, data);
+        boolean result = userService.changeUserPassword(currUserId, data);
         return Result.judge(result);
     }
 

@@ -72,11 +72,9 @@ public class UserRoleServiceImpl extends ServiceImpl<UserRoleMapper, UserRole> i
         .in(UserRole::getRoleId, removedRoles));
     }
 
-    // 当权限变更时清除登录态
+    // 当权限变更时清除被修改用户的登录态
     if (rolesChanged) {
-      // 获取用户所有有效token（根据实际token存储实现）
-      String accessToken = SecurityUtils.getTokenFromRequest();
-      tokenManager.invalidateToken(accessToken);
+      tokenManager.invalidateUserSessions(userId);
     }
   }
 

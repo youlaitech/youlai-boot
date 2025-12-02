@@ -18,6 +18,7 @@ import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.stereotype.Service;
 
+import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
@@ -134,17 +135,16 @@ public class RedisTokenManager implements TokenManager {
      */
     @Override
     public AuthenticationToken refreshToken(String refreshToken) {
-        OnlineUser onlineUser = (OnlineUser) redisTemplate.opsForValue().get(StrUtil.format(RedisConstants.Auth.REFRESH_TOKEN_USER, refreshToken));
+        OnlineUser onlineUser = (OnlineUser) redisTemplate.opsForValue()
+                .get(StrUtil.format(RedisConstants.Auth.REFRESH_TOKEN_USER, refreshToken));
         if (onlineUser == null) {
             throw new BusinessException(ResultCode.REFRESH_TOKEN_INVALID);
         }
-
-        String oldAccessToken = (String) redisTemplate.opsForValue().get(StrUtil.format(RedisConstants.Auth.USER_ACCESS_TOKEN, onlineUser.getUserId()));
-
+        Object oldAccessTokenValue = redisTemplate.opsForValue().get(StrUtil.format(RedisConstants.Auth.USER_ACCESS_TOKEN, onlineUser.getUserId()));
         // 删除旧的访问令牌记录
-        if (oldAccessToken != null) {
-            redisTemplate.delete(formatTokenKey(oldAccessToken));
-        }
+        Optional.of(oldAccessTokenValue)
+                .map(String.class::cast)
+                .ifPresent(oldAccessToken -> redisTemplate.delete(formatTokenKey(oldAccessToken)));
 
         // 生成新访问令牌并存储
         String newAccessToken = IdUtil.fastSimpleUUID();
@@ -168,22 +168,40 @@ public class RedisTokenManager implements TokenManager {
         OnlineUser onlineUser = (OnlineUser) redisTemplate.opsForValue().get(formatTokenKey(token));
         if (onlineUser != null) {
             Long userId = onlineUser.getUserId();
-            // 1. 删除访问令牌相关
-            String userAccessKey = StrUtil.format(RedisConstants.Auth.USER_ACCESS_TOKEN, userId);
-            String accessToken = (String) redisTemplate.opsForValue().get(userAccessKey);
-            if (accessToken != null) {
-                redisTemplate.delete(formatTokenKey(accessToken));
-                redisTemplate.delete(userAccessKey);
-            }
-
-            // 2. 删除刷新令牌相关
-            String userRefreshKey = StrUtil.format(RedisConstants.Auth.USER_REFRESH_TOKEN, userId);
-            String refreshToken = (String) redisTemplate.opsForValue().get(userRefreshKey);
-            if (refreshToken != null) {
-                redisTemplate.delete(StrUtil.format(RedisConstants.Auth.REFRESH_TOKEN_USER, refreshToken));
-                redisTemplate.delete(userRefreshKey);
-            }
+            invalidateUserSessions(userId);
         }
+    }
+
+    /**
+     * 使指定用户的所有会话失效
+     *
+     * @param userId 用户ID
+     */
+    @Override
+    public void invalidateUserSessions(Long userId) {
+        if (userId == null) {
+            return;
+        }
+
+        // 1. 删除访问令牌相关
+        String userAccessKey = StrUtil.format(RedisConstants.Auth.USER_ACCESS_TOKEN, userId);
+        Object accessTokenValue = redisTemplate.opsForValue().get(userAccessKey);
+        Optional.of(accessTokenValue)
+                .map(String.class::cast)
+                .ifPresent(accessToken -> redisTemplate.delete(formatTokenKey(accessToken)));
+        // 无论是否存在访问令牌映射，都尝试删除 userAccessKey
+        redisTemplate.delete(userAccessKey);
+
+        // 2. 删除刷新令牌相关
+        String userRefreshKey = StrUtil.format(RedisConstants.Auth.USER_REFRESH_TOKEN, userId);
+        Object refreshTokenValue = redisTemplate.opsForValue().get(userRefreshKey);
+        Optional.of(refreshTokenValue)
+                .map(String.class::cast)
+                .ifPresent(refreshToken ->
+                        redisTemplate.delete(StrUtil.format(RedisConstants.Auth.REFRESH_TOKEN_USER, refreshToken))
+                );
+        // 同样清理 userRefreshKey 本身
+        redisTemplate.delete(userRefreshKey);
     }
 
     /**
@@ -218,10 +236,10 @@ public class RedisTokenManager implements TokenManager {
         String userAccessKey = StrUtil.format(RedisConstants.Auth.USER_ACCESS_TOKEN, userId);
         // 单设备登录控制，删除旧的访问令牌
         if (!allowMultiLogin) {
-            String oldAccessToken = (String) redisTemplate.opsForValue().get(userAccessKey);
-            if (oldAccessToken != null) {
-                redisTemplate.delete(formatTokenKey(oldAccessToken));
-            }
+            Object oldAccessTokenValue = redisTemplate.opsForValue().get(userAccessKey);
+            Optional.of(oldAccessTokenValue)
+                    .map(String.class::cast)
+                    .ifPresent(oldAccessToken -> redisTemplate.delete(formatTokenKey(oldAccessToken)));
         }
         // 存储访问令牌映射（用户ID -> 访问令牌），用于单设备登录控制删除旧的访问令牌和刷新令牌时删除旧令牌
         setRedisValue(userAccessKey, accessToken, securityProperties.getSession().getAccessTokenTimeToLive());

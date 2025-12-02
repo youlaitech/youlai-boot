@@ -485,14 +485,14 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
     }
 
     /**
-     * 修改用户密码
+     * 修改指定用户密码
      *
      * @param userId 用户ID
      * @param data   密码修改表单数据
      * @return true|false
      */
     @Override
-    public boolean changePassword(Long userId, PasswordUpdateForm data) {
+    public boolean changeUserPassword(Long userId, PasswordUpdateForm data) {
 
         User user = this.getById(userId);
         if (user == null) {
@@ -522,26 +522,30 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
         );
 
         if (result) {
-            // 加入黑名单，重新登录
-            String accessToken = SecurityUtils.getTokenFromRequest();
-            tokenManager.invalidateToken(accessToken);
+            // 密码变更后，使当前用户的所有会话失效，强制重新登录
+            tokenManager.invalidateUserSessions(userId);
         }
         return result;
     }
 
     /**
-     * 重置密码
+     * 重置指定用户密码
      *
      * @param userId   用户ID
      * @param password 密码重置表单数据
      * @return true|false
      */
     @Override
-    public boolean resetPassword(Long userId, String password) {
-        return this.update(new LambdaUpdateWrapper<User>()
+    public boolean resetUserPassword(Long userId, String password) {
+        boolean result = this.update(new LambdaUpdateWrapper<User>()
                 .eq(User::getId, userId)
                 .set(User::getPassword, passwordEncoder.encode(password))
         );
+        if (result) {
+            // 管理员重置用户密码后，使该用户的所有会话失效
+            tokenManager.invalidateUserSessions(userId);
+        }
+        return result;
     }
 
     /**

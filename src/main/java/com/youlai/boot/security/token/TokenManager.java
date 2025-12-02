@@ -64,5 +64,13 @@ public interface TokenManager {
         // throw new UnsupportedOperationException("Not implemented");
     }
 
+    /**
+     * 使指定用户的所有会话失效
+     *
+     * @param userId 用户ID
+     */
+    default void invalidateUserSessions(Long userId) {
+        // 默认空实现，由具体 TokenManager 决定是否支持按用户下线
+    }
 
 }

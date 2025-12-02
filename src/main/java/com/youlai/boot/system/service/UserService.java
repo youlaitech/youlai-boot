@@ -107,22 +107,22 @@ public interface UserService extends IService<User> {
     boolean updateUserProfile(UserProfileForm formData);
 
     /**
-     * 修改用户密码
+     * 修改指定用户密码
      *
      * @param userId 用户ID
      * @param data   修改密码表单数据
      * @return {@link Boolean} 是否修改成功
      */
-    boolean changePassword(Long userId, PasswordUpdateForm data);
+    boolean changeUserPassword(Long userId, PasswordUpdateForm data);
 
     /**
-     * 重置用户密码
+     * 重置指定用户密码
      *
      * @param userId   用户ID
      * @param password 重置后的密码
      * @return {@link Boolean} 是否重置成功
      */
-    boolean resetPassword(Long userId, String password);
+    boolean resetUserPassword(Long userId, String password);
 
     /**
      * 发送短信验证码(绑定或更换手机号)

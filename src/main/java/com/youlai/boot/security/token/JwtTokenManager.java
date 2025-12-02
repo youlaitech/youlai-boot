@@ -110,7 +110,7 @@ public class JwtTokenManager implements TokenManager {
      */
     @Override
     public boolean validateToken(String token) {
-        return validateToken(token,false);
+        return validateToken(token, false);
     }
 
     /**
@@ -121,7 +121,7 @@ public class JwtTokenManager implements TokenManager {
      */
     @Override
     public boolean validateRefreshToken(String refreshToken) {
-        return validateToken(refreshToken,true);
+        return validateToken(refreshToken, true);
     }
 
     /**
@@ -138,17 +138,34 @@ public class JwtTokenManager implements TokenManager {
             boolean isValid = jwt.setKey(secretKey).validate(0);
 
             if (isValid) {
-                // 检查 Token 是否已被加入黑名单(注销、修改密码等场景)
                 JSONObject payloads = jwt.getPayloads();
+                // 1. 校验刷新令牌类型（仅在校验刷新令牌场景启用）
                 String jti = payloads.getStr(JWTPayload.JWT_ID);
-                if(validateRefreshToken) {
+                if (validateRefreshToken) {
                     //刷新token需要校验token类别
                     boolean isRefreshToken = payloads.getBool(JwtClaimConstants.TOKEN_TYPE);
                     if (!isRefreshToken) {
                         return false;
                     }
                 }
-                // 判断是否在黑名单中，如果在，则返回 false 标识Token无效
+                // 2. 校验安全版本号（用于按用户维度失效历史 Token）
+                Long userId = payloads.getLong(JwtClaimConstants.USER_ID);
+                if (userId != null) {
+                    // 老版本 Token 可能没有 SECURITY_VERSION 声明，视为 0 版本
+                    Integer tokenVersionRaw = payloads.getInt(JwtClaimConstants.SECURITY_VERSION);
+                    int tokenVersion = tokenVersionRaw != null ? tokenVersionRaw : 0;
+
+                    String versionKey = StrUtil.format(RedisConstants.Auth.USER_SECURITY_VERSION, userId);
+                    Integer currentVersionRaw = (Integer) redisTemplate.opsForValue().get(versionKey);
+                    int currentVersion = currentVersionRaw != null ? currentVersionRaw : 0;
+
+                    // 如果当前版本号比 Token 携带的版本号新，则认为该 Token 已失效
+                    if (tokenVersion < currentVersion) {
+                        return false;
+                    }
+                }
+
+                // 3. 判断是否在黑名单中，如果在，则返回 false 标识Token无效
                 if (Boolean.TRUE.equals(redisTemplate.hasKey(StrUtil.format(RedisConstants.Auth.BLACKLIST_TOKEN, jti)))) {
                     return false;
                 }
@@ -167,7 +184,7 @@ public class JwtTokenManager implements TokenManager {
      */
     @Override
     public void invalidateToken(String token) {
-        if(StringUtils.isBlank(token)) {
+        if (StringUtils.isBlank(token)) {
             return;
         }
 
@@ -186,14 +203,31 @@ public class JwtTokenManager implements TokenManager {
                 // Token已过期，直接返回
                 return;
             }
-            // 计算Token剩余时间，将其加入黑名单
+            // 计算Token剩余时间，将其加入黑名单（值使用简单布尔标记即可）
             int expirationIn = expirationAt - currentTimeSeconds;
-            redisTemplate.opsForValue().set(blacklistTokenKey, null, expirationIn, TimeUnit.SECONDS);
+            redisTemplate.opsForValue().set(blacklistTokenKey, Boolean.TRUE, expirationIn, TimeUnit.SECONDS);
         } else {
             // 永不过期的Token永久加入黑名单
-            redisTemplate.opsForValue().set(blacklistTokenKey, null);
+            redisTemplate.opsForValue().set(blacklistTokenKey, Boolean.TRUE);
         }
         ;
+    }
+
+    /**
+     * 失效指定用户的所有会话
+     * <p>
+     * 通过提升用户的安全版本号，使携带旧版本号的 Token 在后续校验时全部失效
+     */
+    @Override
+    public void invalidateUserSessions(Long userId) {
+        if (userId == null) {
+            return;
+        }
+
+        String versionKey = StrUtil.format(RedisConstants.Auth.USER_SECURITY_VERSION, userId);
+        // 递增版本号
+        redisTemplate.opsForValue().increment(versionKey);
+
     }
 
     /**
@@ -258,6 +292,12 @@ public class JwtTokenManager implements TokenManager {
         if (isRefreshToken) {
             payload.put(JwtClaimConstants.TOKEN_TYPE, true);
         }
+
+        // 设置安全版本号：不存在时默认为 0
+        String versionKey = StrUtil.format(RedisConstants.Auth.USER_SECURITY_VERSION, userDetails.getUserId());
+        Integer currentVersion = (Integer) redisTemplate.opsForValue().get(versionKey);
+        int securityVersion = currentVersion != null ? currentVersion : 0;
+        payload.put(JwtClaimConstants.SECURITY_VERSION, securityVersion);
 
         // 设置过期时间 -1 表示永不过期
         if (ttl != -1) {
