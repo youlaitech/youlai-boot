@@ -7,6 +7,7 @@ import com.baomidou.mybatisplus.extension.plugins.inner.DataPermissionIntercepto
 import com.baomidou.mybatisplus.extension.plugins.inner.PaginationInnerInterceptor;
 import com.youlai.boot.plugin.mybatis.MyDataPermissionHandler;
 import com.youlai.boot.plugin.mybatis.MyMetaObjectHandler;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.transaction.annotation.EnableTransactionManagement;
@@ -21,16 +22,27 @@ import org.springframework.transaction.annotation.EnableTransactionManagement;
 @EnableTransactionManagement
 public class MybatisConfig {
 
+    @Value("${app.db-type:mysql}")
+    private String dbType;
+
     /**
      * 分页插件和数据权限插件
      */
     @Bean
     public MybatisPlusInterceptor mybatisPlusInterceptor() {
         MybatisPlusInterceptor interceptor = new MybatisPlusInterceptor();
-        //数据权限
+        // 数据权限
         interceptor.addInnerInterceptor(new DataPermissionInterceptor(new MyDataPermissionHandler()));
-        //分页插件
-        interceptor.addInnerInterceptor(new PaginationInnerInterceptor(DbType.MYSQL));
+        // 分页插件，根据配置动态选择数据库类型
+        DbType mpDbType = DbType.MYSQL;
+        String type = dbType == null ? "mysql" : dbType.toLowerCase();
+        if ("postgres".equals(type) || "postgresql".equals(type)) {
+            mpDbType = DbType.POSTGRE_SQL;
+        } else if ("dm".equals(type) || "dameng".equals(type)) {
+            // 达梦更接近 Oracle 语法，这里选择 ORACLE 方言以获得较好兼容性
+            mpDbType = DbType.ORACLE;
+        }
+        interceptor.addInnerInterceptor(new PaginationInnerInterceptor(mpDbType));
 
         return interceptor;
     }
