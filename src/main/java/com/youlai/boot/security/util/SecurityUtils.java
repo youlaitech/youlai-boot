@@ -113,7 +113,7 @@ public class SecurityUtils {
      *
      * @return Token 字符串
      */
-    public static String getTokenFromRequest() {
+    public static String getAccessToken() {
         ServletRequestAttributes servletRequestAttributes = ((ServletRequestAttributes) RequestContextHolder.getRequestAttributes());
         if(Objects.isNull(servletRequestAttributes)) {
             return null;

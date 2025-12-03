@@ -152,10 +152,8 @@ public class AuthServiceImpl implements AuthService {
      */
     @Override
     public void logout() {
-        String token = SecurityUtils.getTokenFromRequest();
-        if (StrUtil.isNotBlank(token) && token.startsWith(SecurityConstants.BEARER_TOKEN_PREFIX )) {
-            token = token.substring(SecurityConstants.BEARER_TOKEN_PREFIX .length());
-            // 将JWT令牌加入黑名单
+        String token = SecurityUtils.getAccessToken();
+        if (StrUtil.isNotBlank(token)) {
             tokenManager.invalidateToken(token);
             // 清除Security上下文
             SecurityContextHolder.clearContext();
