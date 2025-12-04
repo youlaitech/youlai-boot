@@ -45,7 +45,7 @@
       acr.username,
       acr.original_command,
       acr.provider,
-      acr.model,
+      acr.`model`,
       acr.parse_success,
       acr.function_calls,
       acr.explanation,

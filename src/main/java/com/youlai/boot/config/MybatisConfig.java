@@ -7,10 +7,14 @@ import com.baomidou.mybatisplus.extension.plugins.inner.DataPermissionIntercepto
 import com.baomidou.mybatisplus.extension.plugins.inner.PaginationInnerInterceptor;
 import com.youlai.boot.plugin.mybatis.MyDataPermissionHandler;
 import com.youlai.boot.plugin.mybatis.MyMetaObjectHandler;
+import org.apache.ibatis.mapping.DatabaseIdProvider;
+import org.apache.ibatis.mapping.VendorDatabaseIdProvider;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.transaction.annotation.EnableTransactionManagement;
+
+import java.util.Properties;
 
 /**
  * mybatis-plus 配置类
@@ -55,6 +59,19 @@ public class MybatisConfig {
         GlobalConfig globalConfig = new GlobalConfig();
         globalConfig.setMetaObjectHandler(new MyMetaObjectHandler());
         return globalConfig;
+    }
+
+    /**
+     * 数据库类型自动识别
+     */
+    @Bean
+    public DatabaseIdProvider databaseIdProvider() {
+        DatabaseIdProvider databaseIdProvider = new VendorDatabaseIdProvider();
+        Properties properties = new Properties();
+        properties.setProperty("DM", "dm");
+        properties.setProperty("MySQL", "mysql");
+        databaseIdProvider.setProperties(properties);
+        return databaseIdProvider;
     }
 
 }

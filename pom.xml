@@ -274,6 +274,12 @@
         <version>1.0.0-M6</version>
       </dependency>
 
+        <dependency>
+            <groupId>com.dameng</groupId>
+            <artifactId>DmJdbcDriver8</artifactId>
+            <version>8.1.4.181</version>
+        </dependency>
+
     </dependencies>
 
     <build>
