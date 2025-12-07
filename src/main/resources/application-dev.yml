@@ -1,5 +1,5 @@
 server:
-  port: 8989
+  port: 8000
 
 # 数据库类型：用于 MyBatis-Plus 分页方言等（仅方言，不负责连接信息）
 app:

@@ -29,7 +29,7 @@ import org.springframework.security.access.prepost.PreAuthorize;
 @RestController
 @RequiredArgsConstructor
 @Tag(name = "08.系统配置")
-@RequestMapping("/api/v1/config")
+@RequestMapping("/api/v1/configs")
 public class ConfigController {
 
     private final ConfigService configService;
