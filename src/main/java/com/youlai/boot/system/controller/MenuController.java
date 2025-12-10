@@ -62,7 +62,7 @@ public class MenuController {
 
     @Operation(summary = "菜单表单数据")
     @GetMapping("/{id}/form")
-    @PreAuthorize("@ss.hasPerm('sys:menu:edit')")
+    @PreAuthorize("@ss.hasPerm('sys:menu:update')")
     public Result<MenuForm> getMenuForm(
             @Parameter(description = "菜单ID") @PathVariable Long id
     ) {
@@ -72,7 +72,7 @@ public class MenuController {
 
     @Operation(summary = "新增菜单")
     @PostMapping
-    @PreAuthorize("@ss.hasPerm('sys:menu:add')")
+    @PreAuthorize("@ss.hasPerm('sys:menu:create')")
     @RepeatSubmit
     public Result<?> addMenu(@RequestBody MenuForm menuForm) {
         boolean result = menuService.saveMenu(menuForm);
@@ -81,7 +81,7 @@ public class MenuController {
 
     @Operation(summary = "修改菜单")
     @PutMapping(value = "/{id}")
-    @PreAuthorize("@ss.hasPerm('sys:menu:edit')")
+    @PreAuthorize("@ss.hasPerm('sys:menu:update')")
     public Result<?> updateMenu(
             @RequestBody MenuForm menuForm
     ) {
@@ -101,7 +101,7 @@ public class MenuController {
 
     @Operation(summary = "修改菜单显示状态")
     @PatchMapping("/{menuId}")
-    @PreAuthorize("@ss.hasPerm('sys:menu:edit')")
+    @PreAuthorize("@ss.hasPerm('sys:menu:update')")
     public Result<?> updateMenuVisible(
             @Parameter(description = "菜单ID") @PathVariable Long menuId,
             @Parameter(description = "显示状态(1:显示;0:隐藏)") Integer visible

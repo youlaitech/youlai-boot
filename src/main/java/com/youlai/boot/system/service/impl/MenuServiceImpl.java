@@ -205,19 +205,25 @@ public class MenuServiceImpl extends ServiceImpl<MenuMapper, Menu> implements Me
      */
     private RouteVO toRouteVo(Menu menu) {
         RouteVO routeVO = new RouteVO();
+        String routePath = menu.getRoutePath();
+        boolean externalLink = StrUtil.startWithAny(routePath, "http://", "https://");
+
         // 获取路由名称
         String routeName = menu.getRouteName();
         if (StrUtil.isBlank(routeName)) {
-            // 路由 name 需要驼峰，首字母大写
-            routeName = StringUtils.capitalize(StrUtil.toCamelCase(menu.getRoutePath(), '-'));
+            // 外链不做驼峰转换，使用唯一占位，避免 http:// 被解析异常
+            routeName = externalLink
+                    ? "ext-" + menu.getId()
+                    : StringUtils.capitalize(StrUtil.toCamelCase(routePath, '-'));
         }
         // 根据name路由跳转 this.$router.push({name:xxx})
         routeVO.setName(routeName);
 
         // 根据path路由跳转 this.$router.push({path:xxx})
-        routeVO.setPath(menu.getRoutePath());
+        routeVO.setPath(routePath);
         routeVO.setRedirect(menu.getRedirect());
-        routeVO.setComponent(menu.getComponent());
+        // 外链无组件
+        routeVO.setComponent(externalLink ? null : menu.getComponent());
 
         RouteVO.Meta meta = new RouteVO.Meta();
         meta.setTitle(menu.getName());
@@ -253,7 +259,9 @@ public class MenuServiceImpl extends ServiceImpl<MenuMapper, Menu> implements Me
     @CacheEvict(cacheNames = "menu", key = "'routes'")
     public boolean saveMenu(MenuForm menuForm) {
 
-        Integer menuType = menuForm.getType();
+        String menuType = menuForm.getType();
+        boolean isExternalLink = MenuTypeEnum.MENU.getValue().equals(menuType)
+                && StrUtil.startWithAny(menuForm.getRoutePath(), "http://", "https://");
 
         if (MenuTypeEnum.CATALOG.getValue().equals(menuType)) {  // 如果是目录
             String path = menuForm.getRoutePath();
@@ -261,8 +269,8 @@ public class MenuServiceImpl extends ServiceImpl<MenuMapper, Menu> implements Me
                 menuForm.setRoutePath("/" + path); // 一级目录需以 / 开头
             }
             menuForm.setComponent("Layout");
-        } else if (MenuTypeEnum.EXTLINK.getValue().equals(menuType)) {
-            // 外链菜单组件设置为 null
+        } else if (isExternalLink) {
+            // 外链菜单组件设置为 null，通过 routePath 判断外链
             menuForm.setComponent(null);
         }
         if (Objects.equals(menuForm.getParentId(), menuForm.getId())) {
@@ -281,7 +289,7 @@ public class MenuServiceImpl extends ServiceImpl<MenuMapper, Menu> implements Me
             entity.setParams(null);
         }
         // 新增类型为菜单时候 路由名称唯一
-        if (MenuTypeEnum.MENU.getValue().equals(menuType)) {
+        if (MenuTypeEnum.MENU.getValue().equals(menuType) && !isExternalLink) {
             Assert.isFalse(this.exists(new LambdaQueryWrapper<Menu>()
                     .eq(Menu::getRouteName, entity.getRouteName())
                     .ne(menuForm.getId() != null, Menu::getId, menuForm.getId())
@@ -463,8 +471,8 @@ public class MenuServiceImpl extends ServiceImpl<MenuMapper, Menu> implements Me
 
             // 生成CURD按钮权限
             String permPrefix = genConfig.getModuleName() + ":" + genConfig.getTableName().replace("_", "-") + ":";
-            String[] actions = {"查询", "新增", "编辑", "删除"};
-            String[] perms = {"query", "add", "edit", "delete"};
+            String[] actions = {"查询", "新增", "修改", "删除"};
+            String[] perms = {"list", "create", "update", "delete"};
 
             for (int i = 0; i < actions.length; i++) {
                 Menu button = new Menu();

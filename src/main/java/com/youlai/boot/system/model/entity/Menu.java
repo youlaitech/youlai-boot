@@ -34,9 +34,9 @@ public class Menu {
     private String name;
 
     /**
-     * 菜单类型(1-菜单；2-目录；3-外链；4-按钮权限)
+     * 菜单类型(C-目录 M-菜单 B-按钮)
      */
-    private Integer type;
+    private String type;
 
     /**
      * 路由名称（Vue Router 中定义的路由名称）

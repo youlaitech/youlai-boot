@@ -68,7 +68,7 @@ public class UserController {
 
     @Operation(summary = "新增用户")
     @PostMapping
-    @PreAuthorize("@ss.hasPerm('sys:user:add')")
+    @PreAuthorize("@ss.hasPerm('sys:user:create')")
     @RepeatSubmit
     @Log(value = "新增用户", module = LogModuleEnum.USER)
     public Result<?> saveUser(
@@ -80,7 +80,7 @@ public class UserController {
 
     @Operation(summary = "获取用户表单数据")
     @GetMapping("/{userId}/form")
-    @PreAuthorize("@ss.hasPerm('sys:user:edit')")
+    @PreAuthorize("@ss.hasPerm('sys:user:update')")
     @Log(value = "用户表单数据", module = LogModuleEnum.USER)
     public Result<UserForm> getUserForm(
             @Parameter(description = "用户ID") @PathVariable Long userId
@@ -91,7 +91,7 @@ public class UserController {
 
     @Operation(summary = "修改用户")
     @PutMapping(value = "/{userId}")
-    @PreAuthorize("@ss.hasPerm('sys:user:edit')")
+    @PreAuthorize("@ss.hasPerm('sys:user:update')")
     @Log(value = "修改用户", module = LogModuleEnum.USER)
     public Result<Void> updateUser(
             @Parameter(description = "用户ID") @PathVariable Long userId,
@@ -114,7 +114,7 @@ public class UserController {
 
     @Operation(summary = "修改用户状态")
     @PatchMapping(value = "/{userId}/status")
-    @PreAuthorize("@ss.hasPerm('sys:user:edit')")
+    @PreAuthorize("@ss.hasPerm('sys:user:update')")
     @Log(value = "修改用户状态", module = LogModuleEnum.USER)
     public Result<Void> updateUserStatus(
             @Parameter(description = "用户ID") @PathVariable Long userId,

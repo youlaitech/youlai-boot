@@ -52,7 +52,7 @@ public class DeptController {
 
     @Operation(summary = "新增部门")
     @PostMapping
-    @PreAuthorize("@ss.hasPerm('sys:dept:add')")
+    @PreAuthorize("@ss.hasPerm('sys:dept:create')")
     @RepeatSubmit
     public Result<?> saveDept(
             @Valid @RequestBody DeptForm formData
@@ -72,7 +72,7 @@ public class DeptController {
 
     @Operation(summary = "修改部门")
     @PutMapping(value = "/{deptId}")
-    @PreAuthorize("@ss.hasPerm('sys:dept:edit')")
+    @PreAuthorize("@ss.hasPerm('sys:dept:update')")
     public Result<?> updateDept(
             @PathVariable Long deptId,
             @Valid @RequestBody DeptForm formData

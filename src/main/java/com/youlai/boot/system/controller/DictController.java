@@ -77,7 +77,7 @@ public class DictController {
 
     @Operation(summary = "新增字典")
     @PostMapping
-    @PreAuthorize("@ss.hasPerm('sys:dict:add')")
+    @PreAuthorize("@ss.hasPerm('sys:dict:create')")
     @RepeatSubmit
     public Result<?> saveDict(@Valid @RequestBody DictForm formData) {
         boolean result = dictService.saveDict(formData);
@@ -90,7 +90,7 @@ public class DictController {
 
     @Operation(summary = "修改字典")
     @PutMapping("/{id}")
-    @PreAuthorize("@ss.hasPerm('sys:dict:edit')")
+    @PreAuthorize("@ss.hasPerm('sys:dict:update')")
     public Result<?> updateDict(
             @PathVariable Long id,
             @RequestBody DictForm dictForm
@@ -148,7 +148,7 @@ public class DictController {
 
     @Operation(summary = "新增字典项")
     @PostMapping("/{dictCode}/items")
-    @PreAuthorize("@ss.hasPerm('sys:dict-item:add')")
+    @PreAuthorize("@ss.hasPerm('sys:dict-item:create')")
     @RepeatSubmit
     public Result<Void> saveDictItem(
             @PathVariable String dictCode,
@@ -177,7 +177,7 @@ public class DictController {
 
     @Operation(summary = "修改字典项")
     @PutMapping("/{dictCode}/items/{itemId}")
-    @PreAuthorize("@ss.hasPerm('sys:dict-item:edit')")
+    @PreAuthorize("@ss.hasPerm('sys:dict-item:update')")
     @RepeatSubmit
     public Result<?> updateDictItem(
             @PathVariable String dictCode,

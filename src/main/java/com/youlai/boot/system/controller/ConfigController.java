@@ -36,7 +36,7 @@ public class ConfigController {
 
     @Operation(summary = "系统配置分页列表")
     @GetMapping("/page")
-    @PreAuthorize("@ss.hasPerm('sys:config:query')")
+    @PreAuthorize("@ss.hasPerm('sys:config:list')")
     @Log( value = "系统配置分页列表",module = LogModuleEnum.SETTING)
     public PageResult<ConfigVO> page(@ParameterObject ConfigPageQuery configPageQuery) {
         IPage<ConfigVO> result = configService.page(configPageQuery);
@@ -45,7 +45,7 @@ public class ConfigController {
 
     @Operation(summary = "新增系统配置")
     @PostMapping
-    @PreAuthorize("@ss.hasPerm('sys:config:add')")
+    @PreAuthorize("@ss.hasPerm('sys:config:create')")
     @Log( value = "新增系统配置",module = LogModuleEnum.SETTING)
     public Result<?> save(@RequestBody @Valid ConfigForm configForm) {
         return Result.judge(configService.save(configForm));

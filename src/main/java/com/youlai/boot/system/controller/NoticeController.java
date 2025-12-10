@@ -37,7 +37,7 @@ public class NoticeController {
 
     @Operation(summary = "通知公告分页列表")
     @GetMapping("/page")
-    @PreAuthorize("@ss.hasPerm('sys:notice:query')")
+    @PreAuthorize("@ss.hasPerm('sys:notice:list')")
     public PageResult<NoticePageVO> getNoticePage(NoticePageQuery queryParams) {
         IPage<NoticePageVO> result = noticeService.getNoticePage(queryParams);
         return PageResult.success(result);
@@ -45,7 +45,7 @@ public class NoticeController {
 
     @Operation(summary = "新增通知公告")
     @PostMapping
-    @PreAuthorize("@ss.hasPerm('sys:notice:add')")
+    @PreAuthorize("@ss.hasPerm('sys:notice:create')")
     public Result<?> saveNotice(@RequestBody @Valid NoticeForm formData) {
         boolean result = noticeService.saveNotice(formData);
         return Result.judge(result);
@@ -53,7 +53,7 @@ public class NoticeController {
 
     @Operation(summary = "获取通知公告表单数据")
     @GetMapping("/{id}/form")
-    @PreAuthorize("@ss.hasPerm('sys:notice:edit')")
+    @PreAuthorize("@ss.hasPerm('sys:notice:update')")
     public Result<NoticeForm> getNoticeForm(
             @Parameter(description = "通知公告ID") @PathVariable Long id
     ) {
@@ -72,7 +72,7 @@ public class NoticeController {
 
     @Operation(summary = "修改通知公告")
     @PutMapping(value = "/{id}")
-    @PreAuthorize("@ss.hasPerm('sys:notice:edit')")
+    @PreAuthorize("@ss.hasPerm('sys:notice:update')")
     public Result<Void> updateNotice(
             @Parameter(description = "通知公告ID") @PathVariable Long id,
             @RequestBody @Validated NoticeForm formData
