@@ -79,3 +79,4 @@ public class AiCommandLog extends BaseEntity {
     private String ipAddress;
 }
 
+

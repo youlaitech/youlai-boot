@@ -30,3 +30,4 @@ public interface AiCommandLogService extends IService<AiCommandLog> {
     void rollbackCommand(String logId);
 }
 
+

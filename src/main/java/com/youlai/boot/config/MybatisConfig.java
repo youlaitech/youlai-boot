@@ -5,11 +5,16 @@ import com.baomidou.mybatisplus.core.config.GlobalConfig;
 import com.baomidou.mybatisplus.extension.plugins.MybatisPlusInterceptor;
 import com.baomidou.mybatisplus.extension.plugins.inner.DataPermissionInterceptor;
 import com.baomidou.mybatisplus.extension.plugins.inner.PaginationInnerInterceptor;
+import com.baomidou.mybatisplus.extension.plugins.inner.TenantLineInnerInterceptor;
+import com.youlai.boot.config.property.TenantProperties;
 import com.youlai.boot.plugin.mybatis.MyDataPermissionHandler;
 import com.youlai.boot.plugin.mybatis.MyMetaObjectHandler;
+import com.youlai.boot.plugin.mybatis.TenantLineHandler;
 import org.apache.ibatis.mapping.DatabaseIdProvider;
 import org.apache.ibatis.mapping.VendorDatabaseIdProvider;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.transaction.annotation.EnableTransactionManagement;
@@ -29,14 +34,30 @@ public class MybatisConfig {
     @Value("${app.db-type:mysql}")
     private String dbType;
 
+    @Autowired(required = false)
+    private TenantLineHandler tenantLineHandler;
+
+    @Autowired(required = false)
+    private TenantProperties tenantProperties;
+
     /**
      * 分页插件和数据权限插件
+     * <p>
+     * 如果启用了多租户，则添加多租户插件（必须在最前面）
+     * </p>
      */
     @Bean
     public MybatisPlusInterceptor mybatisPlusInterceptor() {
         MybatisPlusInterceptor interceptor = new MybatisPlusInterceptor();
+
+        // 多租户插件（如果启用，必须在最前面）
+        if (tenantProperties != null && Boolean.TRUE.equals(tenantProperties.getEnabled()) && tenantLineHandler != null) {
+            interceptor.addInnerInterceptor(new TenantLineInnerInterceptor(tenantLineHandler));
+        }
+
         // 数据权限
         interceptor.addInnerInterceptor(new DataPermissionInterceptor(new MyDataPermissionHandler()));
+
         // 分页插件，根据配置动态选择数据库类型
         DbType mpDbType = DbType.MYSQL;
         String type = dbType == null ? "mysql" : dbType.toLowerCase();

@@ -6,19 +6,19 @@ spring:
     type: com.alibaba.druid.pool.DruidDataSource
     # === MySQL 数据源（默认启用） ===
     driver-class-name: com.mysql.cj.jdbc.Driver
-    url: jdbc:mysql://www.youlai.tech:3306/youlai_boot?zeroDateTimeBehavior=convertToNull&useUnicode=true&characterEncoding=UTF-8&serverTimezone=Asia/Shanghai&autoReconnect=true&allowMultiQueries=true
+    url: jdbc:mysql://www.youlai.tech:3306/youlai_admin?zeroDateTimeBehavior=convertToNull&useUnicode=true&characterEncoding=UTF-8&serverTimezone=Asia/Shanghai&autoReconnect=true&allowMultiQueries=true
     username: youlai
     password: 123456
 
     # === PostgreSQL 数据源示例（按需启用） ===
     # driver-class-name: org.postgresql.Driver
-    # url: jdbc:postgresql://127.0.0.1:5432/youlai_boot
+    # url: jdbc:postgresql://127.0.0.1:5432/youlai_admin
     # username: postgres
     # password: 123456
 
     # === 达梦 DM 数据源示例（按需启用，注意按实际驱动与 URL 调整） ===
     # driver-class-name: dm.jdbc.driver.DmDriver
-    # url: jdbc:dm://127.0.0.1:5236?schema=YOULAI_BOOT
+    # url: jdbc:dm://127.0.0.1:5236?schema=YOULAI_ADMIN
     # username: SYSDBA
     # password: 123456
   data:

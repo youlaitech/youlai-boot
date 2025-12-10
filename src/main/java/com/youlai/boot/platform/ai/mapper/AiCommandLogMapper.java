@@ -23,3 +23,4 @@ public interface AiCommandLogMapper extends BaseMapper<AiCommandLog> {
     IPage<AiCommandLogVO> getLogPage(Page<AiCommandLogVO> page, AiCommandPageQuery queryParams);
 }
 
+

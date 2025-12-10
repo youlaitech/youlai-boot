@@ -10,19 +10,19 @@ spring:
     type: com.alibaba.druid.pool.DruidDataSource
     # === MySQL 数据源（默认启用） ===
     driver-class-name: com.mysql.cj.jdbc.Driver
-    url: jdbc:mysql://www.youlai.tech:3306/youlai_boot?zeroDateTimeBehavior=convertToNull&useUnicode=true&characterEncoding=UTF-8&serverTimezone=Asia/Shanghai&autoReconnect=true&allowMultiQueries=true
+    url: jdbc:mysql://www.youlai.tech:3306/youlai_admin?zeroDateTimeBehavior=convertToNull&useUnicode=true&characterEncoding=UTF-8&serverTimezone=Asia/Shanghai&autoReconnect=true&allowMultiQueries=true
     username: youlai
     password: 123456
 
     # === PostgreSQL 数据源示例（按需启用） ===
     # driver-class-name: org.postgresql.Driver
-    # url: jdbc:postgresql://127.0.0.1:5432/youlai_boot
+    # url: jdbc:postgresql://127.0.0.1:5432/youlai_admin
     # username: postgres
     # password: 123456
 
     # === 达梦 DM 数据源示例（按需启用，注意按实际驱动与 URL 调整） ===
     # driver-class-name: dm.jdbc.driver.DmDriver
-    # url: jdbc:dm://127.0.0.1:5236?schema=YOULAI_BOOT
+    # url: jdbc:dm://127.0.0.1:5236?schema=YOULAI_ADMIN
     # username: SYSDBA
     # password: 123456
   data:
@@ -264,3 +264,32 @@ wx:
   miniapp:
     app-id: xxxxxx
     app-secret: xxxxxx
+
+# ============================================
+# 多租户配置
+# ============================================
+# 说明：通过 youlai.tenant.enabled 控制是否启用多租户功能
+# 启用后，所有 SQL 查询会自动添加 tenant_id 过滤条件
+# ============================================
+youlai:
+  tenant:
+    # 是否启用多租户功能（默认：false）
+    # 设置为 true 启用多租户，设置为 false 禁用多租户（零成本切换）
+    enabled: false
+    
+    # 租户字段名（默认：tenant_id）
+    column: tenant_id
+    
+    # 默认租户ID（用于兼容旧数据，tenant_id 为 NULL 时使用）
+    default-tenant-id: 1
+    
+    # 请求头中的租户ID字段名（默认：tenant-id）
+    header-name: tenant-id
+    
+    # 忽略多租户过滤的表名列表（系统表、租户表等不需要租户隔离的表）
+    ignore-tables:
+      - sys_tenant      # 租户表本身
+      - sys_dict        # 字典表（通常共享）
+      - sys_dict_item   # 字典项表（通常共享）
+      - sys_config      # 系统配置表（通常共享）
+# ============================================
