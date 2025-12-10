@@ -1,0 +1,96 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.youlai.boot.platform.ai.mapper.AiCommandLogMapper">
+
+  <resultMap id="AiCommandLogVOResult" type="com.youlai.boot.platform.ai.model.vo.AiCommandLogVO">
+    <id property="id" column="id"/>
+    <result property="userId" column="user_id"/>
+    <result property="username" column="username"/>
+    <result property="originalCommand" column="original_command"/>
+    <result property="aiProvider" column="ai_provider"/>
+    <result property="aiModel" column="ai_model"/>
+    <result property="parseStatus" column="parse_status"/>
+    <result property="functionCalls" column="function_calls"/>
+    <result property="explanation" column="explanation"/>
+    <result property="confidence" column="confidence"/>
+    <result property="parseErrorMessage" column="parse_error_message"/>
+    <result property="inputTokens" column="input_tokens"/>
+    <result property="outputTokens" column="output_tokens"/>
+    <result property="parseDurationMs" column="parse_duration_ms"/>
+    <result property="functionName" column="function_name"/>
+    <result property="functionArguments" column="function_arguments"/>
+    <result property="executeStatus" column="execute_status"/>
+    <result property="executeErrorMessage" column="execute_error_message"/>
+    <result property="ipAddress" column="ip_address"/>
+    <result property="createTime" column="create_time"/>
+    <result property="updateTime" column="update_time"/>
+  </resultMap>
+
+  <select id="getLogPage" resultMap="AiCommandLogVOResult">
+    SELECT
+      acl.id,
+      acl.user_id,
+      acl.username,
+      acl.original_command,
+      acl.ai_provider,
+      acl.ai_model,
+      acl.parse_status,
+      acl.function_calls,
+      acl.explanation,
+      acl.confidence,
+      acl.parse_error_message,
+      acl.input_tokens,
+      acl.output_tokens,
+      acl.parse_duration_ms,
+      acl.function_name,
+      acl.function_arguments,
+      acl.execute_status,
+      acl.execute_error_message,
+      acl.ip_address,
+      acl.create_time,
+      acl.update_time
+    FROM ai_command_log acl
+    <where>
+      <if test="queryParams.keywords != null and queryParams.keywords != ''">
+        (
+          acl.original_command LIKE CONCAT('%', #{queryParams.keywords}, '%')
+          OR acl.function_name LIKE CONCAT('%', #{queryParams.keywords}, '%')
+          OR acl.username LIKE CONCAT('%', #{queryParams.keywords}, '%')
+        )
+      </if>
+      <if test="queryParams.executeStatus != null">
+        AND acl.execute_status = #{queryParams.executeStatus}
+      </if>
+      <if test="queryParams.userId != null">
+        AND acl.user_id = #{queryParams.userId}
+      </if>
+      <if test="queryParams.parseStatus != null">
+        AND acl.parse_status = #{queryParams.parseStatus}
+      </if>
+      <if test="queryParams.functionName != null and queryParams.functionName != ''">
+        AND acl.function_name = #{queryParams.functionName}
+      </if>
+      <if test="queryParams.aiProvider != null and queryParams.aiProvider != ''">
+        AND acl.ai_provider = #{queryParams.aiProvider}
+      </if>
+      <if test="queryParams.aiModel != null and queryParams.aiModel != ''">
+        AND acl.ai_model = #{queryParams.aiModel}
+      </if>
+      <if test="
+        queryParams.createTime != null
+        and queryParams.createTime.size() == 2
+        and queryParams.createTime[0] != null
+        and queryParams.createTime[0] != ''
+        and queryParams.createTime[1] != null
+        and queryParams.createTime[1] != ''
+      ">
+        AND acl.create_time BETWEEN #{queryParams.createTime[0]} AND #{queryParams.createTime[1]}
+      </if>
+    </where>
+    ORDER BY acl.create_time DESC
+  </select>
+
+</mapper>
+

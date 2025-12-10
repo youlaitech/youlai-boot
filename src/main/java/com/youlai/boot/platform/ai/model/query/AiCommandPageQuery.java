@@ -21,19 +21,25 @@ public class AiCommandPageQuery extends BasePageQuery {
     @Schema(description = "关键字(原始命令/函数名称/用户名)")
     private String keywords;
 
-    @Schema(description = "执行状态(pending-待执行, success-成功, failed-失败)")
-    private String executeStatus;
+    @Schema(description = "执行状态(0-待执行, 1-成功, -1-失败)")
+    private Integer executeStatus;
 
     @Schema(description = "用户ID")
     private Long userId;
 
-    @Schema(description = "是否危险操作")
-    private Boolean isDangerous;
+    @Schema(description = "解析状态(0-失败, 1-成功)")
+    private Integer parseStatus;
 
     @Schema(description = "创建时间范围")
     private List<String> createTime;
 
     @Schema(description = "函数名称")
     private String functionName;
+
+    @Schema(description = "AI供应商")
+    private String aiProvider;
+
+    @Schema(description = "AI模型")
+    private String aiModel;
 }
 

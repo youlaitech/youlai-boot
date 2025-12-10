@@ -9,11 +9,14 @@ import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
 /**
- * AI命令记录VO（合并解析和执行记录）
+ * AI命令记录VO
+ *
+ * @author Ray.Hao
+ * @since 3.0.0
  */
 @Data
 @Schema(description = "AI命令记录VO")
-public class AiCommandRecordVO implements Serializable {
+public class AiCommandLogVO implements Serializable {
 
     @Schema(description = "主键ID")
     private String id;
@@ -30,13 +33,13 @@ public class AiCommandRecordVO implements Serializable {
     // ==================== 解析相关字段 ====================
 
     @Schema(description = "AI供应商")
-    private String provider;
+    private String aiProvider;
 
     @Schema(description = "AI模型")
-    private String model;
+    private String aiModel;
 
-    @Schema(description = "解析是否成功")
-    private Boolean parseSuccess;
+    @Schema(description = "解析状态(0-失败, 1-成功)")
+    private Integer parseStatus;
 
     @Schema(description = "解析出的函数调用列表(JSON)")
     private String functionCalls;
@@ -56,11 +59,8 @@ public class AiCommandRecordVO implements Serializable {
     @Schema(description = "输出Token数量")
     private Integer outputTokens;
 
-    @Schema(description = "总Token数量")
-    private Integer totalTokens;
-
     @Schema(description = "解析耗时(毫秒)")
-    private Long parseTime;
+    private Integer parseDurationMs;
 
     // ==================== 执行相关字段 ====================
 
@@ -70,40 +70,16 @@ public class AiCommandRecordVO implements Serializable {
     @Schema(description = "函数参数(JSON)")
     private String functionArguments;
 
-    @Schema(description = "执行状态")
-    private String executeStatus;
-
-    @Schema(description = "执行结果(JSON)")
-    private String executeResult;
+    @Schema(description = "执行状态(0-待执行, 1-成功, -1-失败)")
+    private Integer executeStatus;
 
     @Schema(description = "执行错误信息")
     private String executeErrorMessage;
-
-    @Schema(description = "影响的记录数")
-    private Integer affectedRows;
-
-    @Schema(description = "是否危险操作")
-    private Boolean isDangerous;
-
-    @Schema(description = "是否需要确认")
-    private Boolean requiresConfirmation;
-
-    @Schema(description = "用户是否确认")
-    private Boolean userConfirmed;
-
-    @Schema(description = "执行耗时(毫秒)")
-    private Long executionTime;
 
     // ==================== 通用字段 ====================
 
     @Schema(description = "IP地址")
     private String ipAddress;
-
-    @Schema(description = "用户代理")
-    private String userAgent;
-
-    @Schema(description = "当前页面路由")
-    private String currentRoute;
 
     @Schema(description = "创建时间")
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
@@ -112,9 +88,5 @@ public class AiCommandRecordVO implements Serializable {
     @Schema(description = "更新时间")
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     private LocalDateTime updateTime;
-
-    @Schema(description = "备注")
-    private String remark;
 }
-
 

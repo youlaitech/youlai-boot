@@ -6,13 +6,12 @@ import cn.hutool.extra.servlet.JakartaServletUtil;
 import cn.hutool.json.JSONUtil;
 import cn.hutool.json.JSONArray;
 import cn.hutool.json.JSONObject;
-import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.youlai.boot.platform.ai.model.dto.AiExecuteRequestDTO;
 import com.youlai.boot.platform.ai.model.dto.AiFunctionCallDTO;
 import com.youlai.boot.platform.ai.model.dto.AiParseRequestDTO;
 import com.youlai.boot.platform.ai.model.dto.AiParseResponseDTO;
-import com.youlai.boot.platform.ai.model.entity.AiCommandRecord;
-import com.youlai.boot.platform.ai.service.AiCommandRecordService;
+import com.youlai.boot.platform.ai.model.entity.AiCommandLog;
+import com.youlai.boot.platform.ai.service.AiCommandLogService;
 import com.youlai.boot.platform.ai.service.AiCommandService;
 import com.youlai.boot.platform.ai.tools.UserTools;
 import com.youlai.boot.security.util.SecurityUtils;
@@ -51,7 +50,7 @@ public class AiCommandServiceImpl implements AiCommandService {
     当无法识别命令时，success=false，并给出 error。
     """;
 
-  private final AiCommandRecordService recordService;
+  private final AiCommandLogService logService;
   private final UserTools userTools;
   private final ChatClient chatClient;
 
@@ -72,14 +71,13 @@ public class AiCommandServiceImpl implements AiCommandService {
     String username = SecurityUtils.getUsername();
     String ipAddress = JakartaServletUtil.getClientIP(httpRequest);
 
-    AiCommandRecord record = new AiCommandRecord();
-    record.setUserId(userId);
-    record.setUsername(username);
-    record.setOriginalCommand(command);
-    record.setIpAddress(ipAddress);
-    record.setCurrentRoute(request.getCurrentRoute());
-    record.setProvider("spring-ai");
-    record.setModel("auto");
+    AiCommandLog log = new AiCommandLog();
+    log.setUserId(userId);
+    log.setUsername(username);
+    log.setOriginalCommand(command);
+    log.setIpAddress(ipAddress);
+    log.setAiProvider("spring-ai");
+    log.setAiModel("auto");
 
     String systemPrompt = buildSystemPrompt();
     String userPrompt = buildUserPrompt(request);
@@ -97,19 +95,20 @@ public class AiCommandServiceImpl implements AiCommandService {
 
       ParseResult parseResult = parseAiResponse(rawContent);
 
-      record.setProvider(StrUtil.emptyToDefault(parseResult.provider(), "spring-ai"));
-      record.setModel(StrUtil.emptyToDefault(parseResult.model(), "auto"));
-      record.setParseSuccess(parseResult.success());
-      record.setExplanation(parseResult.explanation());
-      record.setFunctionCalls(JSONUtil.toJsonStr(parseResult.functionCalls()));
-      record.setConfidence(parseResult.confidence() != null ? BigDecimal.valueOf(parseResult.confidence()) : null);
-      record.setParseErrorMessage(parseResult.success() ? null : StrUtil.emptyToDefault(parseResult.error(), "解析失败"));
-      record.setParseTime(System.currentTimeMillis() - startTime);
+      log.setAiProvider(StrUtil.emptyToDefault(parseResult.provider(), "spring-ai"));
+      log.setAiModel(StrUtil.emptyToDefault(parseResult.model(), "auto"));
+      log.setParseStatus(parseResult.success() ? 1 : 0);
+      log.setExplanation(parseResult.explanation());
+      log.setFunctionCalls(JSONUtil.toJsonStr(parseResult.functionCalls()));
+      log.setConfidence(parseResult.confidence() != null ? BigDecimal.valueOf(parseResult.confidence()) : null);
+      log.setParseErrorMessage(parseResult.success() ? null : StrUtil.emptyToDefault(parseResult.error(), "解析失败"));
+      long duration = System.currentTimeMillis() - startTime;
+      log.setParseDurationMs((int) duration);
 
-      recordService.save(record);
+      logService.save(log);
 
       AiParseResponseDTO response = AiParseResponseDTO.builder()
-        .parseLogId(record.getId())
+        .parseLogId(log.getId())
         .success(parseResult.success())
         .functionCalls(parseResult.functionCalls())
         .explanation(parseResult.explanation())
@@ -121,17 +120,17 @@ public class AiCommandServiceImpl implements AiCommandService {
       if (!parseResult.success()) {
         log.warn("❗️ AI 未能解析命令: {}", parseResult.error());
       } else {
-        log.info("✅ 解析成功，审计记录ID: {}", record.getId());
+        log.info("✅ 解析成功，审计记录ID: {}", log.getId());
       }
 
       return response;
     } catch (Exception e) {
       long duration = System.currentTimeMillis() - startTime;
-      record.setParseSuccess(false);
-      record.setFunctionCalls(JSONUtil.toJsonStr(Collections.emptyList()));
-      record.setParseErrorMessage(e.getMessage());
-      record.setParseTime(duration);
-      recordService.save(record);
+      log.setParseStatus(0);
+      log.setFunctionCalls(JSONUtil.toJsonStr(Collections.emptyList()));
+      log.setParseErrorMessage(e.getMessage());
+      log.setParseDurationMs((int) duration);
+      logService.save(log);
 
       log.error("❌ 解析命令失败: {}", e.getMessage(), e);
       throw new RuntimeException("解析命令失败: " + e.getMessage(), e);
@@ -232,96 +231,57 @@ public class AiCommandServiceImpl implements AiCommandService {
 
     AiFunctionCallDTO functionCall = request.getFunctionCall();
 
-    // 判断是否为危险操作
-    boolean isDangerous = isDangerousOperation(functionCall.getName());
-
     // 根据解析日志ID获取审计记录，如果不存在则创建新记录
-    AiCommandRecord record;
+    AiCommandLog log;
     if (StrUtil.isNotBlank(request.getParseLogId())) {
       // 更新已存在的审计记录（解析阶段已创建）
-      record = recordService.getById(request.getParseLogId());
-      if (record == null) {
+      log = logService.getById(request.getParseLogId());
+      if (log == null) {
         throw new IllegalStateException("未找到对应的解析记录，ID: " + request.getParseLogId());
       }
     } else {
       // 如果没有解析日志ID，创建新记录（兼容直接执行的情况）
-      record = new AiCommandRecord();
-      record.setUserId(userId);
-      record.setUsername(username);
-      record.setOriginalCommand(request.getOriginalCommand());
-      record.setIpAddress(ipAddress);
-      record.setCurrentRoute(request.getCurrentRoute());
-      recordService.save(record);
+      log = new AiCommandLog();
+      log.setUserId(userId);
+      log.setUsername(username);
+      log.setOriginalCommand(request.getOriginalCommand());
+      log.setIpAddress(ipAddress);
+      logService.save(log);
     }
 
     // 更新执行相关字段
-    record.setFunctionName(functionCall.getName());
-    record.setFunctionArguments(JSONUtil.toJsonStr(functionCall.getArguments()));
-    record.setIsDangerous(isDangerous);
-    record.setRequiresConfirmation(request.getConfirmMode() != null &&
-      "manual".equals(request.getConfirmMode()));
-    record.setUserConfirmed(request.getUserConfirmed());
-    record.setIdempotencyKey(request.getIdempotencyKey());
-    record.setUserAgent(httpRequest.getHeader("User-Agent"));
-    record.setExecuteStatus("pending");
+    log.setFunctionName(functionCall.getName());
+    log.setFunctionArguments(JSONUtil.toJsonStr(functionCall.getArguments()));
+    log.setExecuteStatus(0); // 0-待执行
 
     try {
-      // 幂等性检查
-      if (StrUtil.isNotBlank(request.getIdempotencyKey())) {
-        AiCommandRecord existing = recordService.getOne(
-          new LambdaQueryWrapper<AiCommandRecord>()
-            .eq(AiCommandRecord::getIdempotencyKey, request.getIdempotencyKey())
-            .ne(AiCommandRecord::getId, record.getId()) // 排除当前记录
-        );
-        if (existing != null) {
-          log.warn("⚠️ 检测到重复执行，幂等性令牌: {}", request.getIdempotencyKey());
-          throw new IllegalStateException("该操作已执行，请勿重复提交");
-        }
-      }
-
       // 🎯 执行具体的函数调用
       Object result = executeFunctionCall(functionCall);
 
       // 更新执行成功
-      record.setExecuteStatus("success");
-      record.setExecuteResult(JSONUtil.toJsonStr(result));
-      record.setExecutionTime(System.currentTimeMillis() - startTime);
+      log.setExecuteStatus(1); // 1-成功
+      log.setExecuteErrorMessage(null);
 
       // 更新审计记录
-      recordService.updateById(record);
+      logService.updateById(log);
 
-      log.info("✅ 命令执行成功，审计记录ID: {}", record.getId());
+      log.info("✅ 命令执行成功，审计记录ID: {}", log.getId());
 
       return result;
 
     } catch (Exception e) {
       // 更新执行失败
-      record.setExecuteStatus("failed");
-      record.setExecuteErrorMessage(e.getMessage());
-      record.setExecutionTime(System.currentTimeMillis() - startTime);
+      log.setExecuteStatus(-1); // -1-失败
+      log.setExecuteErrorMessage(e.getMessage());
 
       // 更新审计记录
-      recordService.updateById(record);
+      logService.updateById(log);
 
-      log.error("❌ 命令执行失败，审计记录ID: {}", record.getId(), e);
+      log.error("❌ 命令执行失败，审计记录ID: {}", log.getId(), e);
 
       // 抛出异常，由 Controller 统一处理
       throw e;
     }
-  }
-
-  /**
-   * 判断是否为危险操作
-   */
-  private boolean isDangerousOperation(String functionName) {
-    String[] dangerousKeywords = {"delete", "remove", "drop", "truncate", "clear"};
-    String lowerName = functionName.toLowerCase();
-    for (String keyword : dangerousKeywords) {
-      if (lowerName.contains(keyword)) {
-        return true;
-      }
-    }
-    return false;
   }
 
   /**

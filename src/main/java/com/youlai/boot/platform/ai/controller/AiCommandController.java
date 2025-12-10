@@ -7,8 +7,8 @@ import com.youlai.boot.platform.ai.model.dto.AiExecuteRequestDTO;
 import com.youlai.boot.platform.ai.model.dto.AiParseRequestDTO;
 import com.youlai.boot.platform.ai.model.dto.AiParseResponseDTO;
 import com.youlai.boot.platform.ai.model.query.AiCommandPageQuery;
-import com.youlai.boot.platform.ai.model.vo.AiCommandRecordVO;
-import com.youlai.boot.platform.ai.service.AiCommandRecordService;
+import com.youlai.boot.platform.ai.model.vo.AiCommandLogVO;
+import com.youlai.boot.platform.ai.service.AiCommandLogService;
 import com.youlai.boot.platform.ai.service.AiCommandService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -32,7 +32,7 @@ import org.springframework.web.bind.annotation.*;
 public class AiCommandController {
 
   private final AiCommandService aiCommandService;
-  private final AiCommandRecordService recordService;
+  private final AiCommandLogService logService;
 
   @Operation(summary = "解析自然语言命令")
   @PostMapping("/parse")
@@ -72,17 +72,17 @@ public class AiCommandController {
 
   @Operation(summary = "获取AI命令记录分页列表")
   @GetMapping("/records")
-  public PageResult<AiCommandRecordVO> getRecordPage(AiCommandPageQuery queryParams) {
-    IPage<AiCommandRecordVO> page = recordService.getRecordPage(queryParams);
+  public PageResult<AiCommandLogVO> getLogPage(AiCommandPageQuery queryParams) {
+    IPage<AiCommandLogVO> page = logService.getLogPage(queryParams);
     return PageResult.success(page);
   }
 
   @Operation(summary = "撤销命令执行")
-  @PostMapping("/rollback/{recordId}")
+  @PostMapping("/rollback/{logId}")
   public Result<?> rollbackCommand(
-    @Parameter(description = "记录ID") @PathVariable String recordId
+    @Parameter(description = "记录ID") @PathVariable String logId
   ) {
-    recordService.rollbackCommand(recordId);
+    logService.rollbackCommand(logId);
     return Result.success("撤销成功");
   }
 
