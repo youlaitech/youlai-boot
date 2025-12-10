@@ -32,17 +32,17 @@ public class AiCommandLogServiceImpl extends ServiceImpl<AiCommandLogMapper, AiC
 
     @Override
     public void rollbackCommand(String logId) {
-        AiCommandLog log = this.getById(logId);
-        if (log == null) {
+        AiCommandLog commandLog = this.getById(logId);
+        if (commandLog == null) {
             throw new RuntimeException("命令记录不存在");
         }
 
-        if (log.getExecuteStatus() == null || log.getExecuteStatus() != 1) {
+        if (commandLog.getExecuteStatus() == null || commandLog.getExecuteStatus() != 1) {
             throw new RuntimeException("只能撤销成功执行的命令");
         }
 
         // TODO: 实现具体的回滚逻辑
-        log.info("撤销命令执行: logId={}, function={}", logId, log.getFunctionName());
+        log.info("撤销命令执行: logId={}, function={}", logId, commandLog.getFunctionName());
         throw new UnsupportedOperationException("回滚功能尚未实现");
     }
 }
