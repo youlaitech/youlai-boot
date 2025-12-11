@@ -59,6 +59,9 @@
         <!-- 微信 jdk -->
         <weixin-java.version>4.7.7.B</weixin-java.version>
         <caffeine.version>2.9.3</caffeine.version>
+        
+        <!-- 阿里 TransmittableThreadLocal (支持异步场景的ThreadLocal传递) -->
+        <transmittable-thread-local.version>2.14.5</transmittable-thread-local.version>
     </properties>
 
     <dependencies>
@@ -73,6 +76,13 @@
             <groupId>cn.hutool</groupId>
             <artifactId>hutool-all</artifactId>
             <version>${hutool.version}</version>
+        </dependency>
+
+        <!-- TransmittableThreadLocal: 支持异步场景的租户上下文传递 -->
+        <dependency>
+            <groupId>com.alibaba</groupId>
+            <artifactId>transmittable-thread-local</artifactId>
+            <version>${transmittable-thread-local.version}</version>
         </dependency>
 
         <!-- 允许使用Lombok的Java Bean类中使用MapStruct注解 (Lombok 1.18.20+) -->

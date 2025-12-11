@@ -28,6 +28,10 @@ public class MyMetaObjectHandler implements MetaObjectHandler {
 
     /**
      * 新增填充创建时间、更新时间和租户ID
+     * <p>
+     * 多租户模式下，tenant_id 字段的 exist 属性会被 TenantDynamicFieldConfig 动态设置为 true，
+     * 因此这里的 strictInsertFill 可以正常工作
+     * </p>
      *
      * @param metaObject 元数据
      */
@@ -37,23 +41,16 @@ public class MyMetaObjectHandler implements MetaObjectHandler {
         this.strictUpdateFill(metaObject, "updateTime", LocalDateTime::now, LocalDateTime.class);
 
         // 如果启用了多租户，自动填充租户ID
-        // 注意：由于 BaseEntity 中 tenantId 字段使用了 exist = false（避免单租户模式报错）
-        // 在启用多租户时，需要通过反射动态修改字段的 exist 属性，或者直接设置值
-        // 但 MyBatis-Plus 的字段映射是静态的，无法动态修改
-        // 因此，我们使用 strictInsertFill，它会自动处理字段映射
-        // 如果字段不存在（exist = false），strictInsertFill 会跳过，不会报错
         if (tenantProperties != null && Boolean.TRUE.equals(tenantProperties.getEnabled())) {
             Long tenantId = TenantContextHolder.getTenantId();
+            if (tenantId == null) {
+                // 如果上下文中没有租户ID，使用默认租户ID
+                tenantId = tenantProperties.getDefaultTenantId();
+            }
             if (tenantId != null) {
-                // 使用数据库字段名（tenant_id）进行填充
-                // 注意：由于 exist = false，这个填充不会写入数据库
-                // 但多租户的数据隔离是通过 TenantLineHandler 自动添加 WHERE 条件实现的
-                // 所以这里只需要设置实体对象的属性值即可（用于业务逻辑）
-                String propertyName = "tenantId";
-                if (metaObject.hasGetter(propertyName)) {
-                    // 直接设置值到实体对象，不依赖字段映射
-                    metaObject.setValue(propertyName, tenantId);
-                }
+                // 使用 strictInsertFill 自动填充租户ID
+                // 注意：由于 TenantDynamicFieldConfig 已将 exist 设置为 true，这里可以正常填充
+                this.strictInsertFill(metaObject, "tenantId", () -> tenantId, Long.class);
             }
         }
     }

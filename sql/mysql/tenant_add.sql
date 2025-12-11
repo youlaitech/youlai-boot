@@ -39,7 +39,30 @@ INSERT INTO `sys_tenant` (`id`, `name`, `code`, `status`, `create_time`) VALUES
 (1, '默认租户', 'DEFAULT', 1, NOW());
 
 -- ============================================
--- 2. 创建用户租户关联表（支持一个用户属于多个租户）
+-- 2. 创建租户切换审计日志表
+-- ============================================
+DROP TABLE IF EXISTS `sys_tenant_switch_log`;
+CREATE TABLE `sys_tenant_switch_log` (
+  `id` bigint NOT NULL AUTO_INCREMENT COMMENT '主键ID',
+  `user_id` bigint NOT NULL COMMENT '用户ID',
+  `username` varchar(64) COMMENT '用户名',
+  `from_tenant_id` bigint COMMENT '原租户ID',
+  `from_tenant_name` varchar(100) COMMENT '原租户名称',
+  `to_tenant_id` bigint NOT NULL COMMENT '目标租户ID',
+  `to_tenant_name` varchar(100) COMMENT '目标租户名称',
+  `switch_time` datetime NOT NULL COMMENT '切换时间',
+  `ip_address` varchar(50) COMMENT 'IP地址',
+  `user_agent` varchar(500) COMMENT '浏览器信息',
+  `status` tinyint DEFAULT '1' COMMENT '切换状态（1-成功 0-失败）',
+  `fail_reason` varchar(255) COMMENT '失败原因',
+  PRIMARY KEY (`id`),
+  KEY `idx_user_id` (`user_id`),
+  KEY `idx_switch_time` (`switch_time`),
+  KEY `idx_status` (`status`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='租户切换审计日志表';
+
+-- ============================================
+-- 3. 创建用户租户关联表（支持一个用户属于多个租户）
 -- ============================================
 DROP TABLE IF EXISTS `sys_user_tenant`;
 CREATE TABLE `sys_user_tenant` (

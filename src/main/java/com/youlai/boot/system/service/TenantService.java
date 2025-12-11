@@ -46,5 +46,17 @@ public interface TenantService extends IService<Tenant> {
      * @return true-有权限，false-无权限
      */
     boolean hasTenantPermission(Long userId, Long tenantId);
-}
 
+    /**
+     * 记录租户切换审计日志
+     *
+     * @param userId       用户ID
+     * @param fromTenantId 原租户ID
+     * @param toTenantId   目标租户ID
+     * @param success      是否成功
+     * @param failReason   失败原因
+     * @param request      HTTP请求对象
+     */
+    void recordTenantSwitch(Long userId, Long fromTenantId, Long toTenantId, 
+                            boolean success, String failReason, jakarta.servlet.http.HttpServletRequest request);
+}

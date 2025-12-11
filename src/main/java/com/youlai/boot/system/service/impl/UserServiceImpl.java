@@ -76,6 +76,10 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
 
     private final UserConverter userConverter;
 
+    private final com.youlai.boot.config.property.TenantProperties tenantProperties;
+
+    private final com.youlai.boot.system.mapper.UserTenantMapper userTenantMapper;
+
     /**
      * 获取用户分页列表
      *
@@ -118,6 +122,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
      * @return true|false
      */
     @Override
+    @Transactional(rollbackFor = Exception.class)
     public boolean saveUser(UserForm userForm) {
 
         String username = userForm.getUsername();
@@ -139,6 +144,11 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
         if (result) {
             // 保存用户角色
             userRoleService.saveUserRoles(entity.getId(), userForm.getRoleIds());
+
+            // 如果启用多租户，保存用户租户关联
+            if (Boolean.TRUE.equals(tenantProperties.getEnabled())) {
+                saveUserTenantRelation(entity.getId(), entity.getTenantId(), true);
+            }
         }
         return result;
     }
@@ -151,7 +161,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
      * @return true|false
      */
     @Override
-    @Transactional
+    @Transactional(rollbackFor = Exception.class)
     public boolean updateUser(Long userId, UserForm userForm) {
 
         String username = userForm.getUsername();
@@ -161,6 +171,10 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
                 .ne(User::getId, userId)
         );
         Assert.isTrue(count == 0, "用户名已存在");
+
+        // 获取原用户信息，用于比较租户是否变更
+        User oldUser = this.getById(userId);
+        Long oldTenantId = oldUser != null ? oldUser.getTenantId() : null;
 
         // form -> entity
         User entity = userConverter.toEntity(userForm);
@@ -172,6 +186,23 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
         if (result) {
             // 保存用户角色
             userRoleService.saveUserRoles(entity.getId(), userForm.getRoleIds());
+
+            // 如果启用多租户且租户发生变更，更新用户租户关联
+            if (Boolean.TRUE.equals(tenantProperties.getEnabled())) {
+                Long newTenantId = entity.getTenantId();
+                if (newTenantId != null && !newTenantId.equals(oldTenantId)) {
+                    // 删除旧的租户关联
+                    if (oldTenantId != null) {
+                        userTenantMapper.delete(
+                            new LambdaQueryWrapper<com.youlai.boot.system.model.entity.UserTenant>()
+                                .eq(com.youlai.boot.system.model.entity.UserTenant::getUserId, userId)
+                                .eq(com.youlai.boot.system.model.entity.UserTenant::getTenantId, oldTenantId)
+                        );
+                    }
+                    // 保存新的租户关联
+                    saveUserTenantRelation(userId, newTenantId, true);
+                }
+            }
         }
         return result;
     }
@@ -183,14 +214,28 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
      * @return true|false
      */
     @Override
+    @Transactional(rollbackFor = Exception.class)
     public boolean deleteUsers(String idsStr) {
         Assert.isTrue(StrUtil.isNotBlank(idsStr), "删除的用户数据为空");
         // 逻辑删除
         List<Long> ids = Arrays.stream(idsStr.split(","))
                 .map(Long::parseLong)
                 .collect(Collectors.toList());
-        return this.removeByIds(ids);
-
+        
+        boolean result = this.removeByIds(ids);
+        
+        // 如果启用多租户，删除用户租户关联
+        if (result && Boolean.TRUE.equals(tenantProperties.getEnabled())) {
+            for (Long userId : ids) {
+                userTenantMapper.delete(
+                    new LambdaQueryWrapper<com.youlai.boot.system.model.entity.UserTenant>()
+                        .eq(com.youlai.boot.system.model.entity.UserTenant::getUserId, userId)
+                );
+                log.info("删除用户租户关联：userId={}", userId);
+            }
+        }
+        
+        return result;
     }
 
     /**
@@ -684,6 +729,47 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
                 .eq(User::getStatus, 1)
         );
         return userConverter.toOptions(list);
+    }
+
+    /**
+     * 保存用户租户关联关系
+     * <p>
+     * 仅在启用多租户时调用此方法
+     * </p>
+     *
+     * @param userId    用户ID
+     * @param tenantId  租户ID
+     * @param isDefault 是否为默认租户
+     */
+    private void saveUserTenantRelation(Long userId, Long tenantId, boolean isDefault) {
+        if (userId == null || tenantId == null) {
+            log.warn("用户ID或租户ID为空，跳过保存用户租户关联");
+            return;
+        }
+
+        // 检查关联是否已存在
+        com.youlai.boot.system.model.entity.UserTenant existingRelation = userTenantMapper.selectOne(
+            new LambdaQueryWrapper<com.youlai.boot.system.model.entity.UserTenant>()
+                .eq(com.youlai.boot.system.model.entity.UserTenant::getUserId, userId)
+                .eq(com.youlai.boot.system.model.entity.UserTenant::getTenantId, tenantId)
+        );
+
+        if (existingRelation != null) {
+            // 如果已存在，更新 is_default 标识
+            if (isDefault && existingRelation.getIsDefault() != 1) {
+                existingRelation.setIsDefault(1);
+                userTenantMapper.updateById(existingRelation);
+                log.info("更新用户租户关联：userId={}, tenantId={}, isDefault=true", userId, tenantId);
+            }
+        } else {
+            // 不存在则新增
+            com.youlai.boot.system.model.entity.UserTenant userTenant = new com.youlai.boot.system.model.entity.UserTenant();
+            userTenant.setUserId(userId);
+            userTenant.setTenantId(tenantId);
+            userTenant.setIsDefault(isDefault ? 1 : 0);
+            userTenantMapper.insert(userTenant);
+            log.info("保存用户租户关联：userId={}, tenantId={}, isDefault={}", userId, tenantId, isDefault);
+        }
     }
 
 }
