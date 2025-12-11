@@ -39,6 +39,11 @@ public class OnlineUser {
     private Integer dataScope;
 
     /**
+     * 租户ID
+     */
+    private Long tenantId;
+
+    /**
      * 角色权限集合
      */
     private Set<String> roles;

@@ -1,7 +1,7 @@
 package com.youlai.boot.platform.codegen.service;
 
 import com.baomidou.mybatisplus.extension.service.IService;
-import com.youlai.boot.platform.codegen.model.entity.GenConfig;
+import com.youlai.boot.platform.codegen.model.entity.GenTable;
 import com.youlai.boot.platform.codegen.model.form.GenConfigForm;
 
 /**
@@ -10,7 +10,7 @@ import com.youlai.boot.platform.codegen.model.form.GenConfigForm;
  * @author Ray
  * @since 2.10.0
  */
-public interface GenConfigService extends IService<GenConfig> {
+public interface GenTableService extends IService<GenTable> {
 
     /**
      * 获取代码生成配置
@@ -18,7 +18,7 @@ public interface GenConfigService extends IService<GenConfig> {
      * @param tableName 表名
      * @return
      */
-    GenConfigForm getGenConfigFormData(String tableName);
+    GenConfigForm getGenTableFormData(String tableName);
 
     /**
      * 保存代码生成配置

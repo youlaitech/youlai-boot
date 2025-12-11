@@ -11,21 +11,21 @@ import lombok.Getter;
 import lombok.Setter;
 
 /**
- * 字段生成配置实体
+ * 代码生成表字段配置实体
  *
  * @author Ray
  * @since 2.10.0
  */
-@TableName(value = "gen_field_config")
+@TableName(value = "gen_table_column")
 @Getter
 @Setter
-public class GenFieldConfig extends BaseEntity {
+public class GenTableColumn extends BaseEntity {
 
 
     /**
-     * 关联的配置ID
+     * 关联的表配置ID
      */
-    private Long configId;
+    private Long tableId;
 
     /**
      * 列名
@@ -104,3 +104,4 @@ public class GenFieldConfig extends BaseEntity {
      */
     private String dictType;
 }
+

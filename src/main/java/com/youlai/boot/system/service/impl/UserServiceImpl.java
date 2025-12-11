@@ -18,6 +18,7 @@ import com.youlai.boot.security.model.UserAuthCredentials;
 import com.youlai.boot.security.service.PermissionService;
 import com.youlai.boot.security.token.TokenManager;
 import com.youlai.boot.security.util.SecurityUtils;
+import com.youlai.boot.common.tenant.TenantContextHolder;
 import com.youlai.boot.platform.mail.service.MailService;
 import com.youlai.boot.system.converter.UserConverter;
 import com.youlai.boot.system.enums.DictCodeEnum;
@@ -78,7 +79,6 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
 
     private final com.youlai.boot.config.property.TenantProperties tenantProperties;
 
-    private final com.youlai.boot.system.mapper.UserTenantMapper userTenantMapper;
 
     /**
      * 获取用户分页列表
@@ -126,17 +126,26 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
     public boolean saveUser(UserForm userForm) {
 
         String username = userForm.getUsername();
-
-        long count = this.count(new LambdaQueryWrapper<User>().eq(User::getUsername, username));
-        Assert.isTrue(count == 0, "用户名已存在");
-
+        
         // 实体转换 form->entity
         User entity = userConverter.toEntity(userForm);
+        
+        // 获取当前操作员的租户ID（新增用户时，租户ID由 MyMetaObjectHandler 自动填充）
+        Long tenantId = TenantContextHolder.getTenantId();
+        Assert.notNull(tenantId, "租户ID不能为空");
+
+        // 检查同一租户下用户名是否已存在（新设计：用户名在租户内唯一）
+        long count = this.count(new LambdaQueryWrapper<User>()
+                .eq(User::getUsername, username)
+                .eq(User::getTenantId, tenantId));
+        Assert.isTrue(count == 0, "该租户下用户名已存在");
 
         // 设置默认加密密码
         String defaultEncryptPwd = passwordEncoder.encode(SystemConstants.DEFAULT_PASSWORD);
         entity.setPassword(defaultEncryptPwd);
         entity.setCreateBy(SecurityUtils.getUserId());
+        
+        // 注意：租户ID由 MyMetaObjectHandler.insertFill() 自动填充，无需手动设置
 
         // 新增用户
         boolean result = this.save(entity);
@@ -144,11 +153,6 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
         if (result) {
             // 保存用户角色
             userRoleService.saveUserRoles(entity.getId(), userForm.getRoleIds());
-
-            // 如果启用多租户，保存用户租户关联
-            if (Boolean.TRUE.equals(tenantProperties.getEnabled())) {
-                saveUserTenantRelation(entity.getId(), entity.getTenantId(), true);
-            }
         }
         return result;
     }
@@ -165,20 +169,32 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
     public boolean updateUser(Long userId, UserForm userForm) {
 
         String username = userForm.getUsername();
+        
+        // 获取原用户信息
+        User oldUser = this.getById(userId);
+        Assert.notNull(oldUser, "用户不存在");
+        
+        Long oldTenantId = oldUser.getTenantId();
+        Long currentTenantId = TenantContextHolder.getTenantId();
+        
+        // 验证：只能修改当前租户下的用户（防止跨租户修改）
+        Assert.isTrue(oldTenantId != null && oldTenantId.equals(currentTenantId), 
+                "只能修改当前租户下的用户");
 
+        // 检查同一租户下用户名是否已存在（排除当前用户）
         long count = this.count(new LambdaQueryWrapper<User>()
                 .eq(User::getUsername, username)
+                .eq(User::getTenantId, currentTenantId)
                 .ne(User::getId, userId)
         );
-        Assert.isTrue(count == 0, "用户名已存在");
-
-        // 获取原用户信息，用于比较租户是否变更
-        User oldUser = this.getById(userId);
-        Long oldTenantId = oldUser != null ? oldUser.getTenantId() : null;
+        Assert.isTrue(count == 0, "该租户下用户名已存在");
 
         // form -> entity
         User entity = userConverter.toEntity(userForm);
         entity.setUpdateBy(SecurityUtils.getUserId());
+        
+        // 保持租户ID不变（不允许跨租户修改用户）
+        entity.setTenantId(oldTenantId);
 
         // 修改用户
         boolean result = this.updateById(entity);
@@ -186,23 +202,6 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
         if (result) {
             // 保存用户角色
             userRoleService.saveUserRoles(entity.getId(), userForm.getRoleIds());
-
-            // 如果启用多租户且租户发生变更，更新用户租户关联
-            if (Boolean.TRUE.equals(tenantProperties.getEnabled())) {
-                Long newTenantId = entity.getTenantId();
-                if (newTenantId != null && !newTenantId.equals(oldTenantId)) {
-                    // 删除旧的租户关联
-                    if (oldTenantId != null) {
-                        userTenantMapper.delete(
-                            new LambdaQueryWrapper<com.youlai.boot.system.model.entity.UserTenant>()
-                                .eq(com.youlai.boot.system.model.entity.UserTenant::getUserId, userId)
-                                .eq(com.youlai.boot.system.model.entity.UserTenant::getTenantId, oldTenantId)
-                        );
-                    }
-                    // 保存新的租户关联
-                    saveUserTenantRelation(userId, newTenantId, true);
-                }
-            }
         }
         return result;
     }
@@ -224,16 +223,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
         
         boolean result = this.removeByIds(ids);
         
-        // 如果启用多租户，删除用户租户关联
-        if (result && Boolean.TRUE.equals(tenantProperties.getEnabled())) {
-            for (Long userId : ids) {
-                userTenantMapper.delete(
-                    new LambdaQueryWrapper<com.youlai.boot.system.model.entity.UserTenant>()
-                        .eq(com.youlai.boot.system.model.entity.UserTenant::getUserId, userId)
-                );
-                log.info("删除用户租户关联：userId={}", userId);
-            }
-        }
+        // 新设计：用户删除时，tenant_id 字段会随用户记录一起逻辑删除，无需额外处理
         
         return result;
     }
@@ -254,6 +244,46 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
             userAuthCredentials.setDataScope(dataScope);
         }
         return userAuthCredentials;
+    }
+
+    @Override
+    public UserAuthCredentials getAuthCredentialsByUsernameAndTenant(String username, Long tenantId) {
+        // 临时忽略租户过滤，查询指定租户下的用户
+        TenantContextHolder.setIgnoreTenant(true);
+        try {
+            // 先查询用户
+            User user = this.getOne(
+                    new LambdaQueryWrapper<User>()
+                            .eq(User::getUsername, username)
+                            .eq(User::getTenantId, tenantId)
+                            .eq(User::getIsDeleted, 0)
+                            .last("LIMIT 1")
+            );
+            if (user == null) {
+                return null;
+            }
+            // 设置租户上下文，然后查询认证信息（这样会包含该租户下的角色）
+            TenantContextHolder.setTenantId(tenantId);
+            return getAuthCredentialsByUsername(username);
+        } finally {
+            TenantContextHolder.setIgnoreTenant(false);
+        }
+    }
+
+    @Override
+    public List<User> listUsersByUsername(String username) {
+        // 临时忽略租户过滤，查询该用户名在所有租户下的记录
+        TenantContextHolder.setIgnoreTenant(true);
+        try {
+            return this.list(
+                    new LambdaQueryWrapper<User>()
+                            .eq(User::getUsername, username)
+                            .eq(User::getIsDeleted, 0)
+                            .orderByAsc(User::getTenantId) // 按租户ID排序，优先返回较小的租户ID
+            );
+        } finally {
+            TenantContextHolder.setIgnoreTenant(false);
+        }
     }
 
     /**
@@ -731,45 +761,5 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
         return userConverter.toOptions(list);
     }
 
-    /**
-     * 保存用户租户关联关系
-     * <p>
-     * 仅在启用多租户时调用此方法
-     * </p>
-     *
-     * @param userId    用户ID
-     * @param tenantId  租户ID
-     * @param isDefault 是否为默认租户
-     */
-    private void saveUserTenantRelation(Long userId, Long tenantId, boolean isDefault) {
-        if (userId == null || tenantId == null) {
-            log.warn("用户ID或租户ID为空，跳过保存用户租户关联");
-            return;
-        }
-
-        // 检查关联是否已存在
-        com.youlai.boot.system.model.entity.UserTenant existingRelation = userTenantMapper.selectOne(
-            new LambdaQueryWrapper<com.youlai.boot.system.model.entity.UserTenant>()
-                .eq(com.youlai.boot.system.model.entity.UserTenant::getUserId, userId)
-                .eq(com.youlai.boot.system.model.entity.UserTenant::getTenantId, tenantId)
-        );
-
-        if (existingRelation != null) {
-            // 如果已存在，更新 is_default 标识
-            if (isDefault && existingRelation.getIsDefault() != 1) {
-                existingRelation.setIsDefault(1);
-                userTenantMapper.updateById(existingRelation);
-                log.info("更新用户租户关联：userId={}, tenantId={}, isDefault=true", userId, tenantId);
-            }
-        } else {
-            // 不存在则新增
-            com.youlai.boot.system.model.entity.UserTenant userTenant = new com.youlai.boot.system.model.entity.UserTenant();
-            userTenant.setUserId(userId);
-            userTenant.setTenantId(tenantId);
-            userTenant.setIsDefault(isDefault ? 1 : 0);
-            userTenantMapper.insert(userTenant);
-            log.info("保存用户租户关联：userId={}, tenantId={}, isDefault={}", userId, tenantId, isDefault);
-        }
-    }
 
 }

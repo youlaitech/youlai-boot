@@ -16,7 +16,7 @@ import java.time.LocalDateTime;
  */
 @Data
 @Schema(description = "AI命令记录VO")
-public class AiCommandLogVO implements Serializable {
+public class AiCommandRecordVO implements Serializable {
 
     @Schema(description = "主键ID")
     private String id;
@@ -89,5 +89,4 @@ public class AiCommandLogVO implements Serializable {
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     private LocalDateTime updateTime;
 }
-
 

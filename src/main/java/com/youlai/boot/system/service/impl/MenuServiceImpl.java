@@ -10,7 +10,7 @@ import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.youlai.boot.platform.codegen.model.entity.GenConfig;
+import com.youlai.boot.platform.codegen.model.entity.GenTable;
 import com.youlai.boot.security.util.SecurityUtils;
 import com.youlai.boot.system.converter.MenuConverter;
 import com.youlai.boot.system.mapper.MenuMapper;
@@ -427,14 +427,14 @@ public class MenuServiceImpl extends ServiceImpl<MenuMapper, Menu> implements Me
      * 代码生成时添加菜单
      *
      * @param parentMenuId 父菜单ID
-     * @param genConfig    实体名称
+     * @param genTable    实体名称
      */
     @Override
-    public void addMenuForCodegen(Long parentMenuId, GenConfig genConfig) {
+    public void addMenuForCodegen(Long parentMenuId, GenTable genTable) {
         Menu parentMenu = this.getById(parentMenuId);
         Assert.notNull(parentMenu, "上级菜单不存在");
 
-        String entityName = genConfig.getEntityName();
+        String entityName = genTable.getEntityName();
 
         long count = this.count(new LambdaQueryWrapper<Menu>().eq(Menu::getRouteName, entityName));
         if (count > 0) {
@@ -453,11 +453,11 @@ public class MenuServiceImpl extends ServiceImpl<MenuMapper, Menu> implements Me
 
         Menu menu = new Menu();
         menu.setParentId(parentMenuId);
-        menu.setName(genConfig.getBusinessName());
+        menu.setName(genTable.getBusinessName());
 
         menu.setRouteName(entityName);
         menu.setRoutePath(StrUtil.toSymbolCase(entityName, '-'));
-        menu.setComponent(genConfig.getModuleName() + "/" + StrUtil.toSymbolCase(entityName, '-') + "/index");
+        menu.setComponent(genTable.getModuleName() + "/" + StrUtil.toSymbolCase(entityName, '-') + "/index");
         menu.setType(MenuTypeEnum.MENU.getValue());
         menu.setSort(sort);
         menu.setVisible(1);
@@ -470,7 +470,7 @@ public class MenuServiceImpl extends ServiceImpl<MenuMapper, Menu> implements Me
             this.updateById(menu);
 
             // 生成CURD按钮权限
-            String permPrefix = genConfig.getModuleName() + ":" + genConfig.getTableName().replace("_", "-") + ":";
+            String permPrefix = genTable.getModuleName() + ":" + genTable.getTableName().replace("_", "-") + ":";
             String[] actions = {"查询", "新增", "修改", "删除"};
             String[] perms = {"list", "create", "update", "delete"};
 

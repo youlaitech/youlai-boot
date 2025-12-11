@@ -1,5 +1,6 @@
 package com.youlai.boot.security.service;
 
+import com.youlai.boot.common.tenant.TenantContextHolder;
 import com.youlai.boot.security.model.SysUserDetails;
 import com.youlai.boot.security.model.UserAuthCredentials;
 import com.youlai.boot.system.service.UserService;
@@ -37,6 +38,8 @@ public class SysUserDetailsService implements UserDetailsService {
             if (userAuthCredentials == null) {
                 throw new UsernameNotFoundException(username);
             }
+            // 将当前上下文中的租户ID写入认证凭证，便于后续 Token 携带租户信息
+            userAuthCredentials.setTenantId(TenantContextHolder.getTenantId());
             return new SysUserDetails(userAuthCredentials);
         } catch (Exception e) {
             // 记录异常日志

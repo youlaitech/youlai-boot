@@ -9,12 +9,11 @@ import com.baomidou.mybatisplus.extension.plugins.inner.TenantLineInnerIntercept
 import com.youlai.boot.config.property.TenantProperties;
 import com.youlai.boot.plugin.mybatis.MyDataPermissionHandler;
 import com.youlai.boot.plugin.mybatis.MyMetaObjectHandler;
-import com.youlai.boot.plugin.mybatis.TenantLineHandler;
+import com.youlai.boot.plugin.mybatis.MyTenantLineHandler;
 import org.apache.ibatis.mapping.DatabaseIdProvider;
 import org.apache.ibatis.mapping.VendorDatabaseIdProvider;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.transaction.annotation.EnableTransactionManagement;
@@ -35,7 +34,7 @@ public class MybatisConfig {
     private String dbType;
 
     @Autowired(required = false)
-    private TenantLineHandler tenantLineHandler;
+    private MyTenantLineHandler myTenantLineHandler;
 
     @Autowired(required = false)
     private TenantProperties tenantProperties;
@@ -51,8 +50,8 @@ public class MybatisConfig {
         MybatisPlusInterceptor interceptor = new MybatisPlusInterceptor();
 
         // 多租户插件（如果启用，必须在最前面）
-        if (tenantProperties != null && Boolean.TRUE.equals(tenantProperties.getEnabled()) && tenantLineHandler != null) {
-            interceptor.addInnerInterceptor(new TenantLineInnerInterceptor(tenantLineHandler));
+        if (tenantProperties != null && Boolean.TRUE.equals(tenantProperties.getEnabled()) && myTenantLineHandler != null) {
+            interceptor.addInnerInterceptor(new TenantLineInnerInterceptor(myTenantLineHandler));
         }
 
         // 数据权限

@@ -18,9 +18,10 @@ public interface AuthService {
      *
      * @param username 用户名
      * @param password 密码
+     * @param tenantId 租户ID（可选，多租户模式下用于指定租户）
      * @return 登录结果
      */
-    AuthenticationToken login(String username, String password);
+    AuthenticationToken login(String username, String password, Long tenantId);
 
     /**
      * 登出

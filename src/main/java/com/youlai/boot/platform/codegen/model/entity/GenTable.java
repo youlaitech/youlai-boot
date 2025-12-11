@@ -7,15 +7,15 @@ import lombok.Getter;
 import lombok.Setter;
 
 /**
- * 代码生成基础配置
+ * 代码生成表配置
  *
  * @author Ray
  * @since 2.10.0
  */
-@TableName(value = "gen_config")
+@TableName(value = "gen_table")
 @Getter
 @Setter
-public class GenConfig extends BaseEntity {
+public class GenTable extends BaseEntity {
 
     /**
      * 表名
@@ -62,3 +62,4 @@ public class GenConfig extends BaseEntity {
      */
     private String removeTablePrefix;
 }
+

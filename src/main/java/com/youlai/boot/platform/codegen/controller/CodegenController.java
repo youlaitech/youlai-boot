@@ -11,7 +11,7 @@ import com.youlai.boot.platform.codegen.model.query.TablePageQuery;
 import com.youlai.boot.platform.codegen.model.vo.CodegenPreviewVO;
 import com.youlai.boot.platform.codegen.model.vo.TablePageVO;
 import com.youlai.boot.common.annotation.Log;
-import com.youlai.boot.platform.codegen.service.GenConfigService;
+import com.youlai.boot.platform.codegen.service.GenTableService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -40,7 +40,7 @@ import java.util.List;
 public class CodegenController {
 
     private final CodegenService codegenService;
-    private final GenConfigService genConfigService;
+    private final GenTableService genTableService;
     private final CodegenProperties codegenProperties;
 
     @Operation(summary = "获取数据表分页列表")
@@ -55,10 +55,10 @@ public class CodegenController {
 
     @Operation(summary = "获取代码生成配置")
     @GetMapping("/{tableName}/config")
-    public Result<GenConfigForm> getGenConfigFormData(
+    public Result<GenConfigForm> getGenTableFormData(
             @Parameter(description = "表名", example = "sys_user") @PathVariable String tableName
     ) {
-        GenConfigForm formData = genConfigService.getGenConfigFormData(tableName);
+        GenConfigForm formData = genTableService.getGenTableFormData(tableName);
         return Result.success(formData);
     }
 
@@ -66,7 +66,7 @@ public class CodegenController {
     @PostMapping("/{tableName}/config")
     @Log(value = "生成代码", module = LogModuleEnum.OTHER)
     public Result<?> saveGenConfig(@RequestBody GenConfigForm formData) {
-        genConfigService.saveGenConfig(formData);
+        genTableService.saveGenConfig(formData);
         return Result.success();
     }
 
@@ -75,7 +75,7 @@ public class CodegenController {
     public Result<?> deleteGenConfig(
             @Parameter(description = "表名", example = "sys_user") @PathVariable String tableName
     ) {
-        genConfigService.deleteGenConfig(tableName);
+        genTableService.deleteGenConfig(tableName);
         return Result.success();
     }
 

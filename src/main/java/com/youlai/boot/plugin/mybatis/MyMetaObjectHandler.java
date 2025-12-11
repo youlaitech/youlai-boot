@@ -16,7 +16,7 @@ import java.time.LocalDateTime;
  * 支持自动填充创建时间、更新时间和租户ID
  * </p>
  *
- * @author haoxr
+ * @author Ray.Hao
  * @since 2022/10/14
  */
 @Component
@@ -50,7 +50,8 @@ public class MyMetaObjectHandler implements MetaObjectHandler {
             if (tenantId != null) {
                 // 使用 strictInsertFill 自动填充租户ID
                 // 注意：由于 TenantDynamicFieldConfig 已将 exist 设置为 true，这里可以正常填充
-                this.strictInsertFill(metaObject, "tenantId", () -> tenantId, Long.class);
+                Long finalTenantId = tenantId;
+                this.strictInsertFill(metaObject, "tenantId", () -> finalTenantId, Long.class);
             }
         }
     }

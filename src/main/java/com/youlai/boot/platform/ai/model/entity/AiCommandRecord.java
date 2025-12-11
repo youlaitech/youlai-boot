@@ -15,8 +15,8 @@ import java.math.BigDecimal;
  */
 @Data
 @EqualsAndHashCode(callSuper = true)
-@TableName("ai_command_log")
-public class AiCommandLog extends BaseEntity {
+@TableName("ai_command_record")
+public class AiCommandRecord extends BaseEntity {
 
     /** 用户ID */
     private Long userId;

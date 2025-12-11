@@ -25,7 +25,7 @@ import java.util.List;
 @Component
 @RequiredArgsConstructor
 @ConditionalOnProperty(prefix = "youlai.tenant", name = "enabled", havingValue = "true", matchIfMissing = false)
-public class TenantLineHandler implements com.baomidou.mybatisplus.extension.plugins.handler.TenantLineHandler {
+public class MyTenantLineHandler implements TenantLineHandler {
 
     private final TenantProperties tenantProperties;
 

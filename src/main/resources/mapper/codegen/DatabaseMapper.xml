@@ -16,7 +16,7 @@
             CASE WHEN t2.id IS NOT NULL THEN 1 ELSE 0 END AS isConfigured
         FROM
             information_schema.tables t1
-            LEFT JOIN gen_config t2 on t1.TABLE_NAME = t2.table_name
+            LEFT JOIN gen_table t2 on t1.TABLE_NAME = t2.table_name
         WHERE
             t1.TABLE_SCHEMA = (SELECT DATABASE())
             AND t1.table_type = 'BASE TABLE'
@@ -46,7 +46,7 @@
         ALL_TABLES t1
         LEFT JOIN ALL_TAB_COMMENTS c ON t1.TABLE_NAME = c.TABLE_NAME AND t1.OWNER = c.OWNER
         LEFT JOIN ALL_OBJECTS o ON t1.TABLE_NAME = o.OBJECT_NAME AND t1.OWNER = o.OWNER AND o.OBJECT_TYPE = 'TABLE'
-        LEFT JOIN gen_config t2 ON t1.TABLE_NAME = t2.table_name
+        LEFT JOIN gen_table t2 ON t1.TABLE_NAME = t2.table_name
         WHERE
         t1.OWNER = 'YOULAI_BOOT'
         <if test="queryParams.keywords != null and queryParams.keywords.trim() neq ''">

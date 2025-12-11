@@ -1,20 +1,32 @@
 package com.youlai.boot.auth.controller;
 
 import com.youlai.boot.auth.model.vo.CaptchaVO;
+import com.youlai.boot.auth.model.vo.ChooseTenantVO;
+import com.youlai.boot.auth.model.dto.LoginRequest;
 import com.youlai.boot.auth.model.dto.WxMiniAppPhoneLoginDTO;
 import com.youlai.boot.common.enums.LogModuleEnum;
+import com.youlai.boot.config.property.TenantProperties;
 import com.youlai.boot.core.web.Result;
 import com.youlai.boot.auth.service.AuthService;
 import com.youlai.boot.auth.model.dto.WxMiniAppCodeLoginDTO;
 import com.youlai.boot.common.annotation.Log;
+import com.youlai.boot.core.web.ResultCode;
 import com.youlai.boot.security.model.AuthenticationToken;
+import com.youlai.boot.system.model.entity.User;
+import com.youlai.boot.system.model.vo.TenantVO;
+import com.youlai.boot.system.service.TenantService;
+import com.youlai.boot.system.service.UserService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
+import java.util.stream.Collectors;
 
 
 /**
@@ -31,6 +43,10 @@ import org.springframework.web.bind.annotation.*;
 public class AuthController {
 
     private final AuthService authService;
+    private final UserService userService;
+    private final TenantService tenantService;
+    private final TenantProperties tenantProperties;
+    private final PasswordEncoder passwordEncoder;
 
     @Operation(summary = "获取验证码")
     @GetMapping("/captcha")
@@ -42,12 +58,62 @@ public class AuthController {
     @Operation(summary = "账号密码登录")
     @PostMapping("/login")
     @Log(value = "登录", module = LogModuleEnum.LOGIN)
-    public Result<AuthenticationToken> login(
-            @Parameter(description = "用户名", example = "admin") @RequestParam String username,
-            @Parameter(description = "密码", example = "123456") @RequestParam String password
-    ) {
-        AuthenticationToken authenticationToken = authService.login(username, password);
-        return Result.success(authenticationToken);
+    public Result<?> login(@RequestBody @Valid LoginRequest request) {
+        String username = request.getUsername();
+        String password = request.getPassword();
+        Long tenantId = request.getTenantId();
+
+        // 如果未启用多租户，直接登录
+        if (tenantProperties == null || !Boolean.TRUE.equals(tenantProperties.getEnabled())) {
+            AuthenticationToken authenticationToken = authService.login(username, password, null);
+            return Result.success(authenticationToken);
+        }
+
+        // 多租户模式：如果指定了租户ID，直接验证该租户下的密码
+        if (tenantId != null) {
+            AuthenticationToken authenticationToken = authService.login(username, password, tenantId);
+            return Result.success(authenticationToken);
+        }
+
+        // 多租户模式：未指定租户ID，查询该用户名在所有租户下的记录
+        List<User> users = userService.listUsersByUsername(username);
+
+        if (users.isEmpty()) {
+            return Result.failed("用户不存在");
+        }
+
+        // 过滤出正常状态的用户
+        List<User> activeUsers = users.stream()
+                .filter(user -> user.getStatus() != null && user.getStatus() == 1)
+                .toList();
+
+        if (activeUsers.isEmpty()) {
+            return Result.failed("用户已被禁用");
+        }
+
+        // 如果只有1个租户，尝试验证该租户下的密码（兼容性）
+        if (activeUsers.size() == 1) {
+            User user = activeUsers.get(0);
+            // 登录（Spring Security 会验证密码）
+            AuthenticationToken authenticationToken = authService.login(username, password, user.getTenantId());
+            return Result.success(authenticationToken);
+        }
+
+        // 如果多个租户，返回 choose_tenant 响应（含 tenants 列表）
+        // 注意：此时不验证密码，直接返回租户列表让用户选择
+        List<TenantVO> tenants = activeUsers.stream()
+                .map(user -> tenantService.getTenantById(user.getTenantId()))
+                .filter(tenant -> tenant != null && (tenant.getStatus() == null || tenant.getStatus() == 1))
+                .distinct() // 去重（理论上不会有重复，但保险起见）
+                .collect(Collectors.toList());
+
+        if (tenants.isEmpty()) {
+            return Result.failed("用户所属的租户均不可用");
+        }
+
+        // 返回 choose_tenant 响应
+        ChooseTenantVO chooseTenantVO = new ChooseTenantVO(tenants);
+        return Result.failed(ResultCode.CHOOSE_TENANT, chooseTenantVO);
     }
 
     @Operation(summary = "短信验证码登录")

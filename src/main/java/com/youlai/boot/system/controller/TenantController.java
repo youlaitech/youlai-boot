@@ -27,7 +27,7 @@ import java.util.List;
  */
 @Tag(name = "租户管理接口")
 @RestController
-@RequestMapping("/api/v1/tenant")
+@RequestMapping("/api/v1/tenants")
 @RequiredArgsConstructor
 @Slf4j
 @ConditionalOnProperty(prefix = "youlai.tenant", name = "enabled", havingValue = "true", matchIfMissing = false)
@@ -44,7 +44,7 @@ public class TenantController {
      * @return 租户列表
      */
     @Operation(summary = "获取当前用户的租户列表")
-    @GetMapping("/list")
+    @GetMapping
     public Result<List<TenantVO>> getTenantList() {
         Long userId = SecurityUtils.getUserId();
         List<TenantVO> tenantList = tenantService.getTenantListByUserId(userId);
@@ -72,14 +72,13 @@ public class TenantController {
      * 切换租户
      * <p>
      * 切换当前用户的租户上下文，需要验证用户是否有权限访问该租户
-     * 并记录审计日志
      * </p>
      *
      * @param tenantId 目标租户ID
      * @return 切换结果
      */
     @Operation(summary = "切换租户")
-    @PostMapping("/switch/{tenantId}")
+    @PostMapping("/{tenantId}/switch")
     public Result<TenantVO> switchTenant(
             @Parameter(description = "租户ID") @PathVariable Long tenantId,
             HttpServletRequest request
@@ -89,41 +88,30 @@ public class TenantController {
         
         log.info("用户 {} 请求切换租户：{} -> {}", userId, fromTenantId, tenantId);
 
-        try {
-            // 验证用户是否有权限访问该租户
-            boolean hasPermission = tenantService.hasTenantPermission(userId, tenantId);
-            if (!hasPermission) {
-                log.warn("用户 {} 无权限访问租户 {}", userId, tenantId);
-                // 记录失败日志
-                tenantService.recordTenantSwitch(userId, fromTenantId, tenantId, false, "无权限访问该租户", request);
-                return Result.failed("无权限访问该租户");
-            }
-
-            // 验证租户是否存在且正常
-            TenantVO tenant = tenantService.getTenantById(tenantId);
-            if (tenant == null) {
-                tenantService.recordTenantSwitch(userId, fromTenantId, tenantId, false, "租户不存在", request);
-                return Result.failed("租户不存在");
-            }
-            if (tenant.getStatus() == null || tenant.getStatus() != 1) {
-                tenantService.recordTenantSwitch(userId, fromTenantId, tenantId, false, "租户已禁用", request);
-                return Result.failed("租户已禁用");
-            }
-
-            // 设置新的租户上下文
-            TenantContextHolder.setTenantId(tenantId);
-            
-            // 记录成功日志
-            tenantService.recordTenantSwitch(userId, fromTenantId, tenantId, true, null, request);
-            
-            log.info("用户 {} 成功切换租户到 {}", userId, tenantId);
-
-            return Result.success(tenant);
-        } catch (Exception e) {
-            log.error("用户 {} 切换租户失败", userId, e);
-            tenantService.recordTenantSwitch(userId, fromTenantId, tenantId, false, e.getMessage(), request);
-            return Result.failed("切换租户失败：" + e.getMessage());
+        // 验证用户是否有权限访问该租户
+        boolean hasPermission = tenantService.hasTenantPermission(userId, tenantId);
+        if (!hasPermission) {
+            log.warn("用户 {} 无权限访问租户 {}", userId, tenantId);
+            return Result.failed("无权限访问该租户");
         }
+
+        // 验证租户是否存在且正常
+        TenantVO tenant = tenantService.getTenantById(tenantId);
+        if (tenant == null) {
+            log.warn("用户 {} 尝试切换到不存在的租户 {}", userId, tenantId);
+            return Result.failed("租户不存在");
+        }
+        if (tenant.getStatus() == null || tenant.getStatus() != 1) {
+            log.warn("用户 {} 尝试切换到已禁用的租户 {}", userId, tenantId);
+            return Result.failed("租户已禁用");
+        }
+
+        // 设置新的租户上下文
+        TenantContextHolder.setTenantId(tenantId);
+        
+        log.info("用户 {} 成功切换租户：{} -> {}", userId, fromTenantId, tenantId);
+
+        return Result.success(tenant);
     }
 }
 

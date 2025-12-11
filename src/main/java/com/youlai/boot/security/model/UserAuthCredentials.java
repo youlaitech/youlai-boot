@@ -54,4 +54,9 @@ public class UserAuthCredentials {
      */
     private Integer dataScope;
 
+    /**
+     * 租户ID（从登录上下文中获取）
+     */
+    private Long tenantId;
+
 }

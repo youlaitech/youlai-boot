@@ -21,6 +21,7 @@ import com.youlai.boot.security.model.WxMiniAppCodeAuthenticationToken;
 import com.youlai.boot.security.model.WxMiniAppPhoneAuthenticationToken;
 import com.youlai.boot.security.token.TokenManager;
 import com.youlai.boot.security.util.SecurityUtils;
+import com.youlai.boot.common.tenant.TenantContextHolder;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.redis.core.RedisTemplate;
@@ -61,10 +62,16 @@ public class AuthServiceImpl implements AuthService {
      *
      * @param username 用户名
      * @param password 密码
+     * @param tenantId 租户ID（可选，多租户模式下用于指定租户）
      * @return 访问令牌
      */
     @Override
-    public AuthenticationToken login(String username, String password) {
+    public AuthenticationToken login(String username, String password, Long tenantId) {
+        // 如果指定了租户ID，需要先设置租户上下文，以便查询该租户下的用户
+        if (tenantId != null) {
+            com.youlai.boot.common.tenant.TenantContextHolder.setTenantId(tenantId);
+        }
+        
         // 1. 创建用于密码认证的令牌（未认证）
         UsernamePasswordAuthenticationToken authenticationToken =
                 new UsernamePasswordAuthenticationToken(username.trim(), password);
@@ -194,16 +201,16 @@ public class AuthServiceImpl implements AuthService {
         String imageBase64Data = captcha.getImageBase64Data();
 
         // 验证码文本缓存至Redis，用于登录校验
-        String captchaKey = IdUtil.fastSimpleUUID();
+        String captchaId = IdUtil.fastSimpleUUID();
         redisTemplate.opsForValue().set(
-                StrUtil.format(RedisConstants.Captcha.IMAGE_CODE, captchaKey),
+                StrUtil.format(RedisConstants.Captcha.IMAGE_CODE, captchaId),
                 captchaCode,
                 captchaProperties.getExpireSeconds(),
                 TimeUnit.SECONDS
         );
 
         return CaptchaVO.builder()
-                .captchaKey(captchaKey)
+                .captchaId(captchaId)
                 .captchaBase64(imageBase64Data)
                 .build();
     }

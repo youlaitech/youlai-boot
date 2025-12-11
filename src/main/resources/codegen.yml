@@ -13,8 +13,8 @@ codegen:
     moduleName: system
   # 排除数据表
   excludeTables:
-    - gen_config
-    - gen_field_config
+    - gen_table
+    - gen_table_column
   ## 模板配置
   templateConfigs:
     API:

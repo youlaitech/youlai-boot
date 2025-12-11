@@ -255,19 +255,6 @@ INSERT INTO `sys_menu` VALUES (913, 911, '0,9,910,911', '菜单三级-2', 'M', N
 -- 路由参数
 INSERT INTO `sys_menu` VALUES (1001, 10, '0,10', '参数(type=1)', 'M', 'RouteParamType1', 'route-param-type1', 'demo/route-param', NULL, 0, 1, 1, 1, 'el-icon-Star', NULL, now(), now(), '{\"type\": \"1\"}');
 INSERT INTO `sys_menu` VALUES (1002, 10, '0,10', '参数(type=2)', 'M', 'RouteParamType2', 'route-param-type2', 'demo/route-param', NULL, 0, 1, 1, 2, 'el-icon-StarFilled', NULL, now(), now(), '{\"type\": \"2\"}');
--- ============================================
---- 系统配置权限按钮（ID: 901-905）
---- 字典项权限按钮（ID: 701-704）
--- ============================================
--- 通知公告权限按钮（ID: 1101-1106）
--- ============================================
--- ============================================
--- 字典项权限按钮（ID: 701-704）
--- ============================================
--- ============================================
--- 租户管理权限按钮（ID: 501-505）
--- ============================================
-
 
 -- ----------------------------
 -- Table structure for sys_role
@@ -353,6 +340,7 @@ INSERT INTO `sys_role_menu` VALUES (2, 1001), (2, 1002);
 DROP TABLE IF EXISTS `sys_user`;
 CREATE TABLE `sys_user`  (
                              `id` bigint NOT NULL AUTO_INCREMENT,
+                             `tenant_id` bigint DEFAULT 1 COMMENT '租户ID',
                              `username` varchar(64) COMMENT '用户名',
                              `nickname` varchar(64) COMMENT '昵称',
                              `gender` tinyint(1) DEFAULT 1 COMMENT '性别((1-男 2-女 0-保密)',
@@ -369,15 +357,16 @@ CREATE TABLE `sys_user`  (
                              `is_deleted` tinyint(1) DEFAULT 0 COMMENT '逻辑删除标识(0-未删除 1-已删除)',
                              `openid` char(28) COMMENT '微信 openid',
                              PRIMARY KEY (`id`) USING BTREE,
-                             KEY `login_name` (`username`)
+                             UNIQUE KEY `uk_username_tenant` (`username`, `tenant_id`),
+                             KEY `idx_tenant_id` (`tenant_id`)
 ) ENGINE = InnoDB CHARACTER SET = utf8mb4 COMMENT = '系统用户表';
 
 -- ----------------------------
 -- Records of sys_user
 -- ----------------------------
-INSERT INTO `sys_user` VALUES (1, 'root', '有来技术', 0, '$2a$10$xVWsNOhHrCxh5UbpCE7/HuJ.PAOKcYAqRxD2CO2nVnJS.IAXkr5aq', NULL, 'https://foruda.gitee.com/images/1723603502796844527/03cdca2a_716974.gif', '18812345677', 1, 'youlaitech@163.com', now(), NULL, now(), NULL, 0,NULL);
-INSERT INTO `sys_user` VALUES (2, 'admin', '系统管理员', 1, '$2a$10$xVWsNOhHrCxh5UbpCE7/HuJ.PAOKcYAqRxD2CO2nVnJS.IAXkr5aq', 1, 'https://foruda.gitee.com/images/1723603502796844527/03cdca2a_716974.gif', '18812345678', 1, 'youlaitech@163.com', now(), NULL, now(), NULL, 0,NULL);
-INSERT INTO `sys_user` VALUES (3, 'test', '测试小用户', 1, '$2a$10$xVWsNOhHrCxh5UbpCE7/HuJ.PAOKcYAqRxD2CO2nVnJS.IAXkr5aq', 3, 'https://foruda.gitee.com/images/1723603502796844527/03cdca2a_716974.gif', '18812345679', 1, 'youlaitech@163.com', now(), NULL, now(), NULL, 0,NULL);
+INSERT INTO `sys_user` VALUES (1, 1, 'root', '有来技术', 0, '$2a$10$xVWsNOhHrCxh5UbpCE7/HuJ.PAOKcYAqRxD2CO2nVnJS.IAXkr5aq', NULL, 'https://foruda.gitee.com/images/1723603502796844527/03cdca2a_716974.gif', '18812345677', 1, 'youlaitech@163.com', now(), NULL, now(), NULL, 0,NULL);
+INSERT INTO `sys_user` VALUES (2, 1, 'admin', '系统管理员', 1, '$2a$10$xVWsNOhHrCxh5UbpCE7/HuJ.PAOKcYAqRxD2CO2nVnJS.IAXkr5aq', 1, 'https://foruda.gitee.com/images/1723603502796844527/03cdca2a_716974.gif', '18812345678', 1, 'youlaitech@163.com', now(), NULL, now(), NULL, 0,NULL);
+INSERT INTO `sys_user` VALUES (3, 1, 'test', '测试小用户', 1, '$2a$10$xVWsNOhHrCxh5UbpCE7/HuJ.PAOKcYAqRxD2CO2nVnJS.IAXkr5aq', 3, 'https://foruda.gitee.com/images/1723603502796844527/03cdca2a_716974.gif', '18812345679', 1, 'youlaitech@163.com', now(), NULL, now(), NULL, 0,NULL);
 
 -- ----------------------------
 -- Table structure for sys_user_role
@@ -425,10 +414,10 @@ CREATE TABLE `sys_log` (
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4 COMMENT='系统操作日志表';
 
 -- ----------------------------
--- Table structure for gen_config
+-- Table structure for gen_table
 -- ----------------------------
-DROP TABLE IF EXISTS `gen_config`;
-CREATE TABLE `gen_config` (
+DROP TABLE IF EXISTS `gen_table`;
+CREATE TABLE `gen_table` (
                               `id` bigint NOT NULL AUTO_INCREMENT,
                               `table_name` varchar(100) NOT NULL COMMENT '表名',
                               `module_name` varchar(100) COMMENT '模块名',
@@ -447,12 +436,12 @@ CREATE TABLE `gen_config` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='代码生成配置表';
 
 -- ----------------------------
--- Table structure for gen_field_config
+-- Table structure for gen_table_column
 -- ----------------------------
-DROP TABLE IF EXISTS `gen_field_config`;
-CREATE TABLE `gen_field_config` (
+DROP TABLE IF EXISTS `gen_table_column`;
+CREATE TABLE `gen_table_column` (
                                     `id` bigint NOT NULL AUTO_INCREMENT,
-                                    `config_id` bigint NOT NULL COMMENT '关联的配置ID',
+                                    `table_id` bigint NOT NULL COMMENT '关联的表配置ID',
                                     `column_name` varchar(100)  ,
                                     `column_type` varchar(50)  ,
                                     `column_length` int ,
@@ -471,7 +460,7 @@ CREATE TABLE `gen_field_config` (
                                     `create_time` datetime COMMENT '创建时间',
                                     `update_time` datetime COMMENT '更新时间',
                                     PRIMARY KEY (`id`),
-                                    KEY `config_id` (`config_id`)
+                                    KEY `idx_table_id` (`table_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='代码生成字段配置表';
 
 -- ----------------------------
@@ -559,60 +548,60 @@ INSERT INTO `sys_user_notice` VALUES (10, 10, 2, 1, NULL, now(), now(), 0);
 -- ----------------------------
 -- AI 命令记录表
 -- ----------------------------
-DROP TABLE IF EXISTS `ai_command_log`;
-CREATE TABLE `ai_command_log` (
-  `id` bigint NOT NULL AUTO_INCREMENT COMMENT '主键ID',
-  `user_id` bigint DEFAULT NULL COMMENT '用户ID',
-  `username` varchar(64) DEFAULT NULL COMMENT '用户名',
-  `original_command` text COMMENT '原始命令',
-  `ai_provider` varchar(32) DEFAULT NULL COMMENT 'AI 供应商(qwen/openai/deepseek/gemini等)',
-  `ai_model` varchar(64) DEFAULT NULL COMMENT 'AI 模型名称(qwen-plus/qwen-max/gpt-4-turbo等)',
-  `parse_status` tinyint DEFAULT '0' COMMENT '解析是否成功(0-失败, 1-成功)',
-  `function_calls` text COMMENT '解析出的函数调用列表(JSON)',
-  `explanation` varchar(500) DEFAULT NULL COMMENT 'AI的理解说明',
-  `confidence` decimal(3,2) DEFAULT NULL COMMENT '置信度(0.00-1.00)',
-  `parse_error_message` text COMMENT '解析错误信息',
-  `input_tokens` int DEFAULT NULL COMMENT '输入Token数量',
-  `output_tokens` int DEFAULT NULL COMMENT '输出Token数量',
-  `parse_duration_ms` int DEFAULT NULL COMMENT '解析耗时(毫秒)',
-  `function_name` varchar(255) DEFAULT NULL COMMENT '执行的函数名称',
-  `function_arguments` text COMMENT '函数参数(JSON)',
-  `execute_status` tinyint(1) DEFAULT NULL COMMENT '执行状态(0-待执行, 1-成功, -1-失败)',
-  `execute_error_message` text COMMENT '执行错误信息',
-  `ip_address` varchar(128) DEFAULT NULL COMMENT 'IP地址',
-  `create_time` datetime DEFAULT NULL COMMENT '创建时间',
-  `update_time` datetime DEFAULT NULL COMMENT '更新时间',
-  PRIMARY KEY (`id`),
-  KEY `idx_user_id` (`user_id`),
-  KEY `idx_create_time` (`create_time`),
-  KEY `idx_provider` (`ai_provider`),
-  KEY `idx_model` (`ai_model`),
-  KEY `idx_parse_success` (`parse_status`),
-  KEY `idx_execute_status` (`execute_status`)
-) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8mb4 COMMENT='AI 命令日志表';
+DROP TABLE IF EXISTS `ai_command_record`;
+CREATE TABLE `ai_command_record` (
+                                  `id` bigint NOT NULL AUTO_INCREMENT COMMENT '主键ID',
+                                  `user_id` bigint DEFAULT NULL COMMENT '用户ID',
+                                  `username` varchar(64) DEFAULT NULL COMMENT '用户名',
+                                  `original_command` text COMMENT '原始命令',
+                                  `ai_provider` varchar(32) DEFAULT NULL COMMENT 'AI 供应商(qwen/openai/deepseek/gemini等)',
+                                  `ai_model` varchar(64) DEFAULT NULL COMMENT 'AI 模型名称(qwen-plus/qwen-max/gpt-4-turbo等)',
+                                  `parse_status` tinyint DEFAULT '0' COMMENT '解析是否成功(0-失败, 1-成功)',
+                                  `function_calls` text COMMENT '解析出的函数调用列表(JSON)',
+                                  `explanation` varchar(500) DEFAULT NULL COMMENT 'AI的理解说明',
+                                  `confidence` decimal(3,2) DEFAULT NULL COMMENT '置信度(0.00-1.00)',
+                                  `parse_error_message` text COMMENT '解析错误信息',
+                                  `input_tokens` int DEFAULT NULL COMMENT '输入Token数量',
+                                  `output_tokens` int DEFAULT NULL COMMENT '输出Token数量',
+                                  `parse_duration_ms` int DEFAULT NULL COMMENT '解析耗时(毫秒)',
+                                  `function_name` varchar(255) DEFAULT NULL COMMENT '执行的函数名称',
+                                  `function_arguments` text COMMENT '函数参数(JSON)',
+                                  `execute_status` tinyint(1) DEFAULT NULL COMMENT '执行状态(0-待执行, 1-成功, -1-失败)',
+                                  `execute_error_message` text COMMENT '执行错误信息',
+                                  `ip_address` varchar(128) DEFAULT NULL COMMENT 'IP地址',
+                                  `create_time` datetime DEFAULT NULL COMMENT '创建时间',
+                                  `update_time` datetime DEFAULT NULL COMMENT '更新时间',
+                                  PRIMARY KEY (`id`),
+                                  KEY `idx_user_id` (`user_id`),
+                                  KEY `idx_create_time` (`create_time`),
+                                  KEY `idx_provider` (`ai_provider`),
+                                  KEY `idx_model` (`ai_model`),
+                                  KEY `idx_parse_success` (`parse_status`),
+                                  KEY `idx_execute_status` (`execute_status`)
+) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8mb4 COMMENT='AI 命令记录表';
 
 -- ----------------------------
 -- 租户表（多租户模式）
 -- ----------------------------
 DROP TABLE IF EXISTS `sys_tenant`;
 CREATE TABLE `sys_tenant` (
-  `id` bigint NOT NULL AUTO_INCREMENT COMMENT '租户ID',
-  `name` varchar(100) NOT NULL COMMENT '租户名称',
-  `code` varchar(50) NOT NULL COMMENT '租户编码（唯一）',
-  `contact_name` varchar(50) DEFAULT NULL COMMENT '联系人姓名',
-  `contact_phone` varchar(20) DEFAULT NULL COMMENT '联系人电话',
-  `contact_email` varchar(100) DEFAULT NULL COMMENT '联系人邮箱',
-  `domain` varchar(100) DEFAULT NULL COMMENT '租户域名（用于域名识别）',
-  `logo` varchar(255) DEFAULT NULL COMMENT '租户Logo',
-  `status` tinyint DEFAULT '1' COMMENT '状态(1-正常 0-禁用)',
-  `remark` varchar(500) DEFAULT NULL COMMENT '备注',
-  `expire_time` datetime DEFAULT NULL COMMENT '过期时间（NULL表示永不过期）',
-  `create_time` datetime COMMENT '创建时间',
-  `update_time` datetime COMMENT '更新时间',
-  PRIMARY KEY (`id`),
-  UNIQUE KEY `uk_code` (`code`),
-  UNIQUE KEY `uk_domain` (`domain`),
-  KEY `idx_status` (`status`)
+                              `id` bigint NOT NULL AUTO_INCREMENT COMMENT '租户ID',
+                              `name` varchar(100) NOT NULL COMMENT '租户名称',
+                              `code` varchar(50) NOT NULL COMMENT '租户编码（唯一）',
+                              `contact_name` varchar(50) DEFAULT NULL COMMENT '联系人姓名',
+                              `contact_phone` varchar(20) DEFAULT NULL COMMENT '联系人电话',
+                              `contact_email` varchar(100) DEFAULT NULL COMMENT '联系人邮箱',
+                              `domain` varchar(100) DEFAULT NULL COMMENT '租户域名（用于域名识别）',
+                              `logo` varchar(255) DEFAULT NULL COMMENT '租户Logo',
+                              `status` tinyint DEFAULT '1' COMMENT '状态(1-正常 0-禁用)',
+                              `remark` varchar(500) DEFAULT NULL COMMENT '备注',
+                              `expire_time` datetime DEFAULT NULL COMMENT '过期时间（NULL表示永不过期）',
+                              `create_time` datetime COMMENT '创建时间',
+                              `update_time` datetime COMMENT '更新时间',
+                              PRIMARY KEY (`id`),
+                              UNIQUE KEY `uk_code` (`code`),
+                              UNIQUE KEY `uk_domain` (`domain`),
+                              KEY `idx_status` (`status`)
 ) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8mb4 COMMENT='系统租户表';
 
 -- ----------------------------
@@ -621,28 +610,6 @@ CREATE TABLE `sys_tenant` (
 INSERT INTO `sys_tenant` VALUES (1, '默认租户', 'DEFAULT', '系统管理员', '18812345678', 'admin@youlai.tech', NULL, NULL, 1, '系统默认租户', NULL, now(), now());
 INSERT INTO `sys_tenant` VALUES (2, '演示租户', 'DEMO', '演示用户', '18812345679', 'demo@youlai.tech', 'demo.youlai.tech', NULL, 1, '演示租户', NULL, now(), now());
 
--- ----------------------------
--- 用户租户关联表（多租户模式）
--- ----------------------------
-DROP TABLE IF EXISTS `sys_user_tenant`;
-CREATE TABLE `sys_user_tenant` (
-  `id` bigint NOT NULL AUTO_INCREMENT COMMENT '主键ID',
-  `user_id` bigint NOT NULL COMMENT '用户ID',
-  `tenant_id` bigint NOT NULL COMMENT '租户ID',
-  `is_default` tinyint DEFAULT '0' COMMENT '是否默认租户(1-是 0-否)',
-  `create_time` datetime COMMENT '创建时间',
-  PRIMARY KEY (`id`),
-  UNIQUE KEY `uk_user_tenant` (`user_id`, `tenant_id`),
-  KEY `idx_user_id` (`user_id`),
-  KEY `idx_tenant_id` (`tenant_id`)
-) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8mb4 COMMENT='用户租户关联表（多租户模式）';
-
--- ----------------------------
--- Records of sys_user_tenant
--- ----------------------------
-INSERT INTO `sys_user_tenant` VALUES (1, 1, 1, 1, now());
-INSERT INTO `sys_user_tenant` VALUES (2, 2, 1, 1, now());
-INSERT INTO `sys_user_tenant` VALUES (3, 2, 2, 0, now());
 
 
 SET FOREIGN_KEY_CHECKS = 1;
