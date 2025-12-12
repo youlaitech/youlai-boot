@@ -363,7 +363,7 @@
               })
               .finally(() => (loading.value = false));
         } else {
-                ${entityName}API.add(formData)
+                ${entityName}API.create(formData)
               .then(() => {
                 ElMessage.success("新增成功");
                 handleCloseDialog();
