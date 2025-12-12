@@ -288,9 +288,11 @@ youlai:
     
     # 忽略多租户过滤的表名列表（系统表、租户表等不需要租户隔离的表）
     ignore-tables:
-      - sys_tenant      # 租户表本身
-      - sys_menu        # 菜单表（功能入口定义，所有租户共享）
-      - sys_dict        # 字典表（通常共享）
-      - sys_dict_item   # 字典项表（通常共享）
-      - sys_config      # 系统配置表（通常共享）
+      - sys_tenant       # 租户表本身
+      - sys_menu         # 菜单表（功能入口定义，所有租户共享）
+      - sys_dict         # 字典表（通常共享）
+      - sys_dict_item    # 字典项表（通常共享）
+      - sys_config       # 系统配置表（通常共享）
+      - gen_table        # 代码生成表（平台共用）
+      - gen_table_column # 代码生成字段表（平台共用）
 # ============================================

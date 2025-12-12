@@ -83,12 +83,15 @@ public interface UserService extends IService<User> {
     UserAuthCredentials getAuthCredentialsByUsernameAndTenant(String username, Long tenantId);
 
     /**
-     * 根据用户名查询该用户在所有租户下的记录（用于多租户登录时判断是否需要选择租户）
+     * 跨租户查询用户账户列表
+     * <p>
+     * 查询该用户名在所有租户下的账户记录，用于多租户登录时判断是否需要选择租户
+     * </p>
      *
      * @param username 用户名
-     * @return 用户列表（每个租户一条记录）
+     * @return 用户账户列表（每个租户一条记录）
      */
-    List<User> listUsersByUsername(String username);
+    List<User> findUserAcrossAllTenants(String username);
 
 
     /**

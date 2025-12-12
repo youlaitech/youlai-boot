@@ -67,6 +67,13 @@ ADD INDEX `idx_tenant_id` (`tenant_id`);
 
 UPDATE `sys_role` SET `tenant_id` = 1 WHERE `tenant_id` IS NULL;
 
+-- 角色菜单关联表
+ALTER TABLE `sys_role_menu`
+ADD COLUMN `tenant_id` bigint DEFAULT 1 COMMENT '租户ID' AFTER `role_id`,
+ADD INDEX `idx_role_menu_tenant_id` (`tenant_id`);
+
+UPDATE `sys_role_menu` SET `tenant_id` = 1 WHERE `tenant_id` IS NULL;
+
 -- 部门表
 ALTER TABLE `sys_dept` 
 ADD COLUMN `tenant_id` bigint DEFAULT 1 COMMENT '租户ID' AFTER `id`,

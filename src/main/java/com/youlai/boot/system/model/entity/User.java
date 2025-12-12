@@ -18,10 +18,12 @@ public class User extends BaseEntity {
      */
     private String username;
 
+
     /**
      * 昵称
      */
     private String nickname;
+
 
     /**
      * 性别((1-男 2-女 0-保密)

@@ -32,7 +32,7 @@ public class TenantServiceImpl extends ServiceImpl<TenantMapper, Tenant> impleme
     private final UserMapper userMapper;
 
     @Override
-    public List<TenantVO> getTenantListByUserId(Long userId) {
+    public List<TenantVO> getAccessibleTenants(Long userId) {
         // 临时忽略租户过滤，查询所有租户
         TenantContextHolder.setIgnoreTenant(true);
         try {
@@ -123,7 +123,7 @@ public class TenantServiceImpl extends ServiceImpl<TenantMapper, Tenant> impleme
     }
 
     @Override
-    public boolean hasTenantPermission(Long userId, Long tenantId) {
+    public boolean canAccessTenant(Long userId, Long tenantId) {
         TenantContextHolder.setIgnoreTenant(true);
         try {
             // 先根据用户ID查询用户信息（获取 username）

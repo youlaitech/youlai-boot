@@ -15,12 +15,15 @@ import java.util.List;
 public interface TenantService extends IService<Tenant> {
 
     /**
-     * 根据用户ID查询用户所属的租户列表
+     * 获取用户可访问的租户列表
+     * <p>
+     * 通过用户名查询该用户在所有租户下的账户，返回可访问的租户列表
+     * </p>
      *
      * @param userId 用户ID
-     * @return 租户列表
+     * @return 可访问的租户列表
      */
-    List<TenantVO> getTenantListByUserId(Long userId);
+    List<TenantVO> getAccessibleTenants(Long userId);
 
     /**
      * 根据租户ID查询租户信息
@@ -39,11 +42,14 @@ public interface TenantService extends IService<Tenant> {
     Long getTenantIdByDomain(String domain);
 
     /**
-     * 验证用户是否有权限访问指定租户
+     * 检查用户是否可以访问指定租户
+     * <p>
+     * 验证该用户名在目标租户下是否存在账户
+     * </p>
      *
      * @param userId   用户ID
      * @param tenantId 租户ID
-     * @return true-有权限，false-无权限
+     * @return true-可访问，false-不可访问
      */
-    boolean hasTenantPermission(Long userId, Long tenantId);
+    boolean canAccessTenant(Long userId, Long tenantId);
 }

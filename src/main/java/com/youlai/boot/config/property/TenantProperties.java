@@ -48,18 +48,5 @@ public class TenantProperties {
      */
     private String headerName = "tenant-id";
 
-    /**
-     * 初始化默认忽略的表
-     */
-    public TenantProperties() {
-        // 系统表默认忽略多租户
-        ignoreTables.add("sys_tenant");
-        ignoreTables.add("sys_dict");
-        ignoreTables.add("sys_dict_item");
-        ignoreTables.add("sys_config");
-        // 代码生成表（平台共用，不做租户隔离）
-        ignoreTables.add("gen_table");
-        ignoreTables.add("gen_table_column");
-    }
 }
 

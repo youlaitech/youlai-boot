@@ -43,12 +43,12 @@ public class TenantController {
      *
      * @return 租户列表
      */
-    @Operation(summary = "获取当前用户的租户列表")
+    @Operation(summary = "获取当前用户可访问的租户列表")
     @GetMapping
-    public Result<List<TenantVO>> getTenantList() {
+    public Result<List<TenantVO>> getAccessibleTenants() {
         Long userId = SecurityUtils.getUserId();
-        List<TenantVO> tenantList = tenantService.getTenantListByUserId(userId);
-        log.info("获取用户 {} 的租户列表，共 {} 个租户", userId, tenantList.size());
+        List<TenantVO> tenantList = tenantService.getAccessibleTenants(userId);
+        log.debug("用户 {} 可访问 {} 个租户", userId, tenantList.size());
         return Result.success(tenantList);
     }
 
@@ -88,11 +88,10 @@ public class TenantController {
         
         log.info("用户 {} 请求切换租户：{} -> {}", userId, fromTenantId, tenantId);
 
-        // 验证用户是否有权限访问该租户
-        boolean hasPermission = tenantService.hasTenantPermission(userId, tenantId);
-        if (!hasPermission) {
-            log.warn("用户 {} 无权限访问租户 {}", userId, tenantId);
-            return Result.failed("无权限访问该租户");
+        // 验证用户是否可以访问该租户
+        if (!tenantService.canAccessTenant(userId, tenantId)) {
+            log.warn("用户 {} 无权访问租户 {}", userId, tenantId);
+            return Result.failed("无权访问该租户");
         }
 
         // 验证租户是否存在且正常

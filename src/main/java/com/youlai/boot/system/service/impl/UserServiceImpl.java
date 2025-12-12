@@ -271,15 +271,15 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
     }
 
     @Override
-    public List<User> listUsersByUsername(String username) {
-        // 临时忽略租户过滤，查询该用户名在所有租户下的记录
+    public List<User> findUserAcrossAllTenants(String username) {
+        // 临时忽略租户过滤，查询该用户名在所有租户下的账户记录
         TenantContextHolder.setIgnoreTenant(true);
         try {
             return this.list(
                     new LambdaQueryWrapper<User>()
                             .eq(User::getUsername, username)
                             .eq(User::getIsDeleted, 0)
-                            .orderByAsc(User::getTenantId) // 按租户ID排序，优先返回较小的租户ID
+                            .orderByAsc(User::getTenantId)
             );
         } finally {
             TenantContextHolder.setIgnoreTenant(false);

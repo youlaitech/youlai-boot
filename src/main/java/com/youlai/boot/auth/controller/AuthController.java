@@ -46,7 +46,6 @@ public class AuthController {
     private final UserService userService;
     private final TenantService tenantService;
     private final TenantProperties tenantProperties;
-    private final PasswordEncoder passwordEncoder;
 
     @Operation(summary = "获取验证码")
     @GetMapping("/captcha")
@@ -75,8 +74,8 @@ public class AuthController {
             return Result.success(authenticationToken);
         }
 
-        // 多租户模式：未指定租户ID，查询该用户名在所有租户下的记录
-        List<User> users = userService.listUsersByUsername(username);
+        // 多租户模式：未指定租户ID，查询该用户名在所有租户下的账户
+        List<User> users = userService.findUserAcrossAllTenants(username);
 
         if (users.isEmpty()) {
             return Result.failed("用户不存在");

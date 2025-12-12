@@ -36,6 +36,10 @@ ALTER TABLE `sys_user` ADD UNIQUE KEY `login_name` (`username`);
 ALTER TABLE `sys_role` DROP INDEX `idx_tenant_id`;
 ALTER TABLE `sys_role` DROP COLUMN `tenant_id`;
 
+-- 角色菜单关联表
+ALTER TABLE `sys_role_menu` DROP INDEX `idx_role_menu_tenant_id`;
+ALTER TABLE `sys_role_menu` DROP COLUMN `tenant_id`;
+
 -- 部门表
 ALTER TABLE `sys_dept` DROP INDEX `idx_tenant_id`;
 ALTER TABLE `sys_dept` DROP COLUMN `tenant_id`;
