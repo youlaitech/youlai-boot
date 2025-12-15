@@ -1,7 +1,7 @@
 package com.youlai.boot.security.handler;
 
 import com.youlai.boot.core.web.ResultCode;
-import com.youlai.boot.core.web.WebResponseHelper;
+import com.youlai.boot.core.web.WebResponseWriter;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.InsufficientAuthenticationException;
 import org.springframework.security.core.AuthenticationException;
@@ -32,13 +32,13 @@ public class MyAuthenticationEntryPoint implements AuthenticationEntryPoint {
     public void commence(HttpServletRequest request, HttpServletResponse response, AuthenticationException authException) throws IOException, ServletException {
         if (authException instanceof BadCredentialsException) {
             // 用户名或密码错误
-            WebResponseHelper.writeError(response, ResultCode.USER_PASSWORD_ERROR);
+            WebResponseWriter.writeError(response, ResultCode.USER_PASSWORD_ERROR);
         } else if(authException instanceof InsufficientAuthenticationException){
             // 请求头缺失Authorization、Token格式错误、Token过期、签名验证失败
-            WebResponseHelper.writeError(response, ResultCode.ACCESS_TOKEN_INVALID);
+            WebResponseWriter.writeError(response, ResultCode.ACCESS_TOKEN_INVALID);
         } else {
             // 其他未明确处理的认证异常（如账户被锁定、账户禁用等）
-            WebResponseHelper.writeError(response, ResultCode.USER_LOGIN_EXCEPTION, authException.getMessage());
+            WebResponseWriter.writeError(response, ResultCode.USER_LOGIN_EXCEPTION, authException.getMessage());
         }
     }
 }

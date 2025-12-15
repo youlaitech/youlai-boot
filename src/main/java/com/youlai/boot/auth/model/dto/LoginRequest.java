@@ -28,8 +28,5 @@ public class LoginRequest {
 
     @Schema(description = "验证码", example = "1234")
     private String captchaCode;
-
-    @Schema(description = "租户ID（可选，多租户模式下用于指定租户）", example = "1")
-    private Long tenantId;
 }
 

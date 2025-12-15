@@ -76,9 +76,6 @@ public enum ResultCode implements IResultCode, Serializable {
     USER_VERIFICATION_CODE_ATTEMPT_LIMIT_EXCEEDED("A0241", "用户验证码尝试次数超限"),
     USER_VERIFICATION_CODE_EXPIRED("A0242", "用户验证码过期"),
 
-    // 多租户登录
-    CHOOSE_TENANT("A0250", "请选择登录租户"),
-
     /** 二级宏观错误码  */
     ACCESS_PERMISSION_EXCEPTION("A0300", "访问权限异常"),
     ACCESS_UNAUTHORIZED("A0301", "访问未授权"),

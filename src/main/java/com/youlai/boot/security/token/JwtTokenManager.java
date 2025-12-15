@@ -91,7 +91,6 @@ public class JwtTokenManager implements TokenManager {
         userDetails.setUserId(payloads.getLong(JwtClaimConstants.USER_ID)); // 用户ID
         userDetails.setDeptId(payloads.getLong(JwtClaimConstants.DEPT_ID)); // 部门ID
         userDetails.setDataScope(payloads.getInt(JwtClaimConstants.DATA_SCOPE)); // 数据权限范围
-        userDetails.setTenantId(payloads.getLong(JwtClaimConstants.TENANT_ID)); // 租户ID
 
         userDetails.setUsername(payloads.getStr(JWTPayload.SUBJECT)); // 用户名
         // 角色集合
@@ -276,7 +275,6 @@ public class JwtTokenManager implements TokenManager {
         payload.put(JwtClaimConstants.USER_ID, userDetails.getUserId()); // 用户ID
         payload.put(JwtClaimConstants.DEPT_ID, userDetails.getDeptId()); // 部门ID
         payload.put(JwtClaimConstants.DATA_SCOPE, userDetails.getDataScope()); // 数据权限范围
-        payload.put(JwtClaimConstants.TENANT_ID, userDetails.getTenantId()); // 租户ID
 
         // claims 中添加角色信息
         Set<String> roles = authentication.getAuthorities().stream()

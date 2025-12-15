@@ -36,11 +36,6 @@ public interface JwtClaimConstants {
     String AUTHORITIES = "authorities";
 
     /**
-     * 租户ID
-     */
-    String TENANT_ID = "tenantId";
-
-    /**
      * 安全版本号，用于按用户失效历史令牌
      */
     String SECURITY_VERSION = "securityVersion";

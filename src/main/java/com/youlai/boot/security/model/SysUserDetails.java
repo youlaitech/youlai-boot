@@ -57,11 +57,6 @@ public class SysUserDetails implements UserDetails {
     private Integer dataScope;
 
     /**
-     * 租户ID
-     */
-    private Long tenantId;
-
-    /**
      * 用户角色权限集合
      */
     private Collection<SimpleGrantedAuthority> authorities;
@@ -78,7 +73,6 @@ public class SysUserDetails implements UserDetails {
         this.enabled = ObjectUtil.equal(user.getStatus(), 1);
         this.deptId = user.getDeptId();
         this.dataScope = user.getDataScope();
-        this.tenantId = user.getTenantId();
 
         // 初始化角色权限集合
         this.authorities = CollectionUtil.isNotEmpty(user.getRoles())

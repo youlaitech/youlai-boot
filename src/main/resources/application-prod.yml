@@ -319,32 +319,3 @@ ai:
     max-executions-per-minute: 10
     max-executions-per-day: 100
 
-# ============================================
-# 多租户配置
-# ============================================
-# 说明：通过 youlai.tenant.enabled 控制是否启用多租户功能
-# 启用后，所有 SQL 查询会自动添加 tenant_id 过滤条件
-# ============================================
-youlai:
-  tenant:
-    # 是否启用多租户功能（默认：false）
-    # 设置为 true 启用多租户，设置为 false 禁用多租户（零成本切换）
-    enabled: true
-    
-    # 租户字段名（默认：tenant_id）
-    column: tenant_id
-    
-    # 默认租户ID（用于兼容旧数据，tenant_id 为 NULL 时使用）
-    default-tenant-id: 1
-    
-    # 请求头中的租户ID字段名（默认：tenant-id）
-    header-name: tenant-id
-    
-    # 忽略多租户过滤的表名列表（系统表、租户表等不需要租户隔离的表）
-    ignore-tables:
-      - sys_tenant      # 租户表本身
-      - sys_menu        # 菜单表（功能入口定义，所有租户共享）
-      - sys_dict        # 字典表（通常共享）
-      - sys_dict_item   # 字典项表（通常共享）
-      - sys_config      # 系统配置表（通常共享）
-# ============================================

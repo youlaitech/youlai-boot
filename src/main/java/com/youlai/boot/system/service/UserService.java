@@ -73,26 +73,6 @@ public interface UserService extends IService<User> {
      */
     UserAuthCredentials getAuthCredentialsByUsername(String username);
 
-    /**
-     * 根据用户名和租户ID获取认证信息（用于多租户登录）
-     *
-     * @param username 用户名
-     * @param tenantId 租户ID
-     * @return {@link UserAuthCredentials}
-     */
-    UserAuthCredentials getAuthCredentialsByUsernameAndTenant(String username, Long tenantId);
-
-    /**
-     * 跨租户查询用户账户列表
-     * <p>
-     * 查询该用户名在所有租户下的账户记录，用于多租户登录时判断是否需要选择租户
-     * </p>
-     *
-     * @param username 用户名
-     * @return 用户账户列表（每个租户一条记录）
-     */
-    List<User> findUserAcrossAllTenants(String username);
-
 
     /**
      * 获取导出用户列表

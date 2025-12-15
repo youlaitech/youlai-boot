@@ -6,7 +6,7 @@ import com.youlai.boot.common.constant.RedisConstants;
 import com.youlai.boot.common.constant.SystemConstants;
 import com.youlai.boot.core.web.ResultCode;
 import com.youlai.boot.common.util.IPUtils;
-import com.youlai.boot.core.web.WebResponseHelper;
+import com.youlai.boot.core.web.WebResponseWriter;
 import com.youlai.boot.system.service.ConfigService;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
@@ -88,7 +88,7 @@ public class RateLimiterFilter extends OncePerRequestFilter {
         // 判断是否限流
         if (rateLimit(ip)) {
             // 返回限流错误信息
-            WebResponseHelper.writeError(response, ResultCode.REQUEST_CONCURRENCY_LIMIT_EXCEEDED);
+            WebResponseWriter.writeError(response, ResultCode.REQUEST_CONCURRENCY_LIMIT_EXCEEDED);
             return;
         }
 

@@ -7,7 +7,7 @@ import cn.hutool.json.JSONUtil;
 import com.youlai.boot.common.constant.RedisConstants;
 import com.youlai.boot.common.constant.SecurityConstants;
 import com.youlai.boot.core.web.ResultCode;
-import com.youlai.boot.core.web.WebResponseHelper;
+import com.youlai.boot.core.web.WebResponseWriter;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.ServletInputStream;
@@ -61,7 +61,7 @@ public class CaptchaValidationFilter extends OncePerRequestFilter {
         // 仅支持 JSON 登录
         String contentType = request.getContentType();
         if (contentType == null || !contentType.contains(MediaType.APPLICATION_JSON_VALUE)) {
-            WebResponseHelper.writeError(response, ResultCode.USER_VERIFICATION_CODE_ERROR);
+            WebResponseWriter.writeError(response, ResultCode.USER_VERIFICATION_CODE_ERROR);
             return;
         }
 
@@ -80,7 +80,7 @@ public class CaptchaValidationFilter extends OncePerRequestFilter {
         }
 
         if (StrUtil.isBlank(captchaCode) || StrUtil.isBlank(captchaId)) {
-            WebResponseHelper.writeError(response, ResultCode.USER_VERIFICATION_CODE_ERROR);
+            WebResponseWriter.writeError(response, ResultCode.USER_VERIFICATION_CODE_ERROR);
             return;
         }
 
@@ -88,7 +88,7 @@ public class CaptchaValidationFilter extends OncePerRequestFilter {
                 StrUtil.format(RedisConstants.Captcha.IMAGE_CODE, captchaId)
         );
         if (cacheVerifyCode == null) {
-            WebResponseHelper.writeError(response, ResultCode.USER_VERIFICATION_CODE_EXPIRED);
+            WebResponseWriter.writeError(response, ResultCode.USER_VERIFICATION_CODE_EXPIRED);
             return;
         }
 
@@ -96,7 +96,7 @@ public class CaptchaValidationFilter extends OncePerRequestFilter {
             HttpServletRequest repeatableRequest = new RepeatableReadRequestWrapper(requestWrapper, bodyBytes);
             chain.doFilter(repeatableRequest, response);
         } else {
-            WebResponseHelper.writeError(response, ResultCode.USER_VERIFICATION_CODE_ERROR);
+            WebResponseWriter.writeError(response, ResultCode.USER_VERIFICATION_CODE_ERROR);
         }
     }
 

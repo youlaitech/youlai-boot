@@ -1,7 +1,7 @@
 package com.youlai.boot.security.handler;
 
 import com.youlai.boot.core.web.ResultCode;
-import com.youlai.boot.core.web.WebResponseHelper;
+import com.youlai.boot.core.web.WebResponseWriter;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.web.access.AccessDeniedHandler;
 import org.springframework.stereotype.Component;
@@ -20,7 +20,7 @@ public class MyAccessDeniedHandler implements AccessDeniedHandler {
 
     @Override
     public void handle(HttpServletRequest request, HttpServletResponse response, AccessDeniedException accessDeniedException) {
-        WebResponseHelper.writeError(response, ResultCode.ACCESS_UNAUTHORIZED);
+        WebResponseWriter.writeError(response, ResultCode.ACCESS_UNAUTHORIZED);
     }
 
 }

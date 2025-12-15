@@ -3,7 +3,7 @@ package com.youlai.boot.security.filter;
 import cn.hutool.core.util.StrUtil;
 import com.youlai.boot.common.constant.SecurityConstants;
 import com.youlai.boot.core.web.ResultCode;
-import com.youlai.boot.core.web.WebResponseHelper;
+import com.youlai.boot.core.web.WebResponseWriter;
 import com.youlai.boot.security.token.TokenManager;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
@@ -52,7 +52,7 @@ public class TokenAuthenticationFilter extends OncePerRequestFilter {
                 // 执行令牌有效性检查（包含密码学验签和过期时间验证）
                 boolean isValidToken = tokenManager.validateToken(rawToken);
                 if (!isValidToken) {
-                    WebResponseHelper.writeError(response, ResultCode.ACCESS_TOKEN_INVALID);
+                    WebResponseWriter.writeError(response, ResultCode.ACCESS_TOKEN_INVALID);
                     return;
                 }
 
@@ -63,7 +63,7 @@ public class TokenAuthenticationFilter extends OncePerRequestFilter {
         } catch (Exception ex) {
             // 安全上下文清除保障（防止上下文残留）
             SecurityContextHolder.clearContext();
-            WebResponseHelper.writeError(response, ResultCode.ACCESS_TOKEN_INVALID);
+            WebResponseWriter.writeError(response, ResultCode.ACCESS_TOKEN_INVALID);
             return;
         }
 

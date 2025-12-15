@@ -1,6 +1,7 @@
 package com.youlai.boot.system.model.entity;
 
 import com.baomidou.mybatisplus.annotation.*;
+import com.fasterxml.jackson.annotation.JsonInclude;
 import com.youlai.boot.common.enums.LogModuleEnum;
 import lombok.Data;
 
@@ -106,6 +107,5 @@ public class Log implements Serializable {
      */
     @TableField(fill = FieldFill.INSERT)
     private LocalDateTime createTime;
-
 
 }

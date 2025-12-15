@@ -14,11 +14,6 @@ import java.util.Set;
 public class RolePermsBO {
 
     /**
-     * 租户ID
-     */
-    private Long tenantId;
-
-    /**
      * 角色编码
      */
     private String roleCode;

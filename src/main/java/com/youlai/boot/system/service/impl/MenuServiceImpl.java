@@ -157,7 +157,31 @@ public class MenuServiceImpl extends ServiceImpl<MenuMapper, Menu> implements Me
                     .orderByAsc(Menu::getSort)
             );
         } else {
+            // 普通用户：通过角色获取菜单（权限控制已过滤）
             menuList = this.baseMapper.getMenusByRoleCodes(roleCodes);
+            
+            // 双重保障：动态查询"平台管理"目录，过滤其子菜单
+            // 通过路由路径识别平台管理目录，避免硬编码
+            Menu platformMenu = this.getOne(new LambdaQueryWrapper<Menu>()
+                    .eq(Menu::getRoutePath, "/platform")
+                    .eq(Menu::getParentId, SystemConstants.ROOT_NODE_ID)
+                    .eq(Menu::getType, MenuTypeEnum.CATALOG.getValue())
+                    .last("LIMIT 1")
+            );
+            
+            if (platformMenu != null) {
+                final Long platformMenuId = platformMenu.getId();
+                menuList = menuList.stream()
+                        .filter(menu -> {
+                            String treePath = menu.getTreePath();
+                            // 排除平台管理目录及其子菜单
+                            // treePath 格式：0,1 或 0,1,110 等
+                            return treePath == null ||
+                                    (!treePath.startsWith("0," + platformMenuId + ",") &&
+                                     !treePath.equals("0," + platformMenuId));
+                        })
+                        .collect(Collectors.toList());
+            }
         }
         return buildRoutes(SystemConstants.ROOT_NODE_ID, menuList);
     }

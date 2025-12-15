@@ -3,8 +3,6 @@ package com.youlai.boot.security.service;
 import cn.hutool.core.collection.CollectionUtil;
 import cn.hutool.core.util.StrUtil;
 import com.youlai.boot.common.constant.RedisConstants;
-import com.youlai.boot.common.tenant.TenantContextHolder;
-import com.youlai.boot.config.property.TenantProperties;
 import com.youlai.boot.security.util.SecurityUtils;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -26,7 +24,6 @@ import java.util.*;
 public class PermissionService {
 
     private final RedisTemplate<String, Object> redisTemplate;
-    private final TenantProperties tenantProperties;
 
     /**
      * 判断当前登录用户是否拥有操作权限
@@ -70,20 +67,7 @@ public class PermissionService {
 
 
     /**
-     * 构建租户权限缓存key
-     *
-     * @param tenantId 租户ID
-     * @return 缓存key
-     */
-    private String buildRolePermsCacheKey(Long tenantId) {
-        if (!tenantProperties.getEnabled() || tenantId == null) {
-            return RedisConstants.System.ROLE_PERMS;
-        }
-        return RedisConstants.System.ROLE_PERMS + ":" + tenantId;
-    }
-
-    /**
-     * 从缓存中获取角色权限列表（兼容单租户和多租户）
+     * 从缓存中获取角色权限列表
      *
      * @param roleCodes 角色编码集合
      * @return 角色权限列表
@@ -93,9 +77,8 @@ public class PermissionService {
             return Collections.emptySet();
         }
 
-        // 获取当前租户ID并构建缓存Key
-        Long tenantId = TenantContextHolder.getTenantId();
-        String cacheKey = buildRolePermsCacheKey(tenantId);
+        // 构建缓存Key
+        String cacheKey = RedisConstants.System.ROLE_PERMS;
 
         Set<String> perms = new HashSet<>();
         Collection<Object> roleCodesAsObjects = new ArrayList<>(roleCodes);
