@@ -155,7 +155,7 @@ INSERT INTO `sys_menu` VALUES (33, 2, '0,1,2', '用户删除', 4, NULL, '', NULL
 INSERT INTO `sys_menu` VALUES (36, 0, '0', '组件封装', 2, NULL, '/component', 'Layout', NULL, NULL, NULL, 1, 10, 'menu', '', now(), now(), NULL);
 INSERT INTO `sys_menu` VALUES (37, 36, '0,36', '富文本编辑器', 1, 'WangEditor', 'wang-editor', 'demo/wang-editor', NULL, NULL, 1, 1, 2, '', '', NULL, NULL, NULL);
 INSERT INTO `sys_menu` VALUES (38, 36, '0,36', '图片上传', 1, 'Upload', 'upload', 'demo/upload', NULL, NULL, 1, 1, 3, '', '', now(), now(), NULL);
-INSERT INTO `sys_menu` VALUES (39, 36, '0,36', '图标选择器', 1, 'IconSelect', 'icon-select', 'demo/icon-select', NULL, NULL, 1, 1, 4, '', '', now(), now(), NULL);
+INSERT INTO `sys_menu` VALUES (39, 36, '0,36', '图标选择器', 1, 'IconSelect', 'icon-select', 'demo/icon-selector', NULL, NULL, 1, 1, 4, '', '', now(), now(), NULL);
 INSERT INTO `sys_menu` VALUES (40, 0, '0', '接口文档', 2, NULL, '/api', 'Layout', NULL, 1, NULL, 1, 7, 'api', '', now(), now(), NULL);
 INSERT INTO `sys_menu` VALUES (41, 40, '0,40', 'Apifox', 1, 'Apifox', 'apifox', 'demo/api/apifox', NULL, NULL, 1, 1, 1, 'api', '', now(), now(), NULL);
 INSERT INTO `sys_menu` VALUES (70, 3, '0,1,3', '角色新增', 4, NULL, '', NULL, 'sys:role:add', NULL, NULL, 1, 2, '', NULL, now(), now(), NULL);
