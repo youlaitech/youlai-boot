@@ -2,7 +2,9 @@ package com.youlai.boot.core.aspect;
 
 import cn.hutool.core.date.DateUtil;
 import cn.hutool.core.date.TimeInterval;
+import cn.hutool.core.util.ClassUtil;
 import cn.hutool.core.util.StrUtil;
+import cn.hutool.core.util.TypeUtil;
 import cn.hutool.crypto.digest.DigestUtil;
 import cn.hutool.http.useragent.UserAgent;
 import cn.hutool.http.useragent.UserAgentUtil;
@@ -179,7 +181,12 @@ public class LogAspect {
         if (paramsArray != null) {
             for (Object param : paramsArray) {
                 if (!shouldFilterObject(param)) {
-                    params.append(JSONUtil.toJsonStr(param)).append(" ");
+                    // 如果是基本类型或者枚举类型，直接添加到参数字符串中
+                    if(param.getClass().isPrimitive() || param.getClass().isEnum()) {
+                        params.append(param).append(" ");
+                    } else {
+                        params.append(JSONUtil.toJsonStr(param)).append(" ");
+                    }
                 }
             }
         }
