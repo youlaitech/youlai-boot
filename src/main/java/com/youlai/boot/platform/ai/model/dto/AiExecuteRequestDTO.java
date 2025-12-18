@@ -3,13 +3,13 @@ package com.youlai.boot.platform.ai.model.dto;
 import lombok.Data;
 
 /**
- * AI 命令执行请求 DTO
+ * AI 命令执行请求 Dto
  *
  * @author Ray.Hao
  * @since 3.0.0
  */
 @Data
-public class AiExecuteRequestDTO {
+public class AiExecuteRequestDto {
 
     /**
      * 关联的解析日志ID
@@ -24,7 +24,7 @@ public class AiExecuteRequestDTO {
     /**
      * 要执行的函数调用
      */
-    private AiFunctionCallDTO functionCall;
+    private AiFunctionCallDto functionCall;
 
     /**
      * 确认模式：auto=自动执行, manual=需要用户确认
@@ -46,6 +46,3 @@ public class AiExecuteRequestDTO {
      */
     private String currentRoute;
 }
-
-
-

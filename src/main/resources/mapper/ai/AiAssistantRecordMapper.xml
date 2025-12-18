@@ -2,9 +2,9 @@
 <!DOCTYPE mapper
   PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
   "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
-<mapper namespace="com.youlai.boot.platform.ai.mapper.AiCommandRecordMapper">
+<mapper namespace="com.youlai.boot.platform.ai.mapper.AiAssistantRecordMapper">
 
-  <resultMap id="AiCommandRecordResultMap" type="com.youlai.boot.platform.ai.model.vo.AiCommandRecordVO">
+  <resultMap id="AiAssistantRecordResultMap" type="com.youlai.boot.platform.ai.model.vo.AiAssistantRecordVo">
     <id property="id" column="id"/>
     <result property="userId" column="user_id"/>
     <result property="username" column="username"/>
@@ -28,55 +28,55 @@
     <result property="updateTime" column="update_time"/>
   </resultMap>
 
-  <select id="getRecordPage" resultMap="AiCommandRecordResultMap">
+  <select id="getRecordPage" resultMap="AiAssistantRecordResultMap">
     SELECT
-      acr.id,
-      acr.user_id,
-      acr.username,
-      acr.original_command,
-      acr.ai_provider,
-      acr.ai_model,
-      acr.parse_status,
-      acr.function_calls,
-      acr.explanation,
-      acr.confidence,
-      acr.parse_error_message,
-      acr.input_tokens,
-      acr.output_tokens,
-      acr.parse_duration_ms,
-      acr.function_name,
-      acr.function_arguments,
-      acr.execute_status,
-      acr.execute_error_message,
-      acr.ip_address,
-      acr.create_time,
-      acr.update_time
-    FROM ai_command_record acr
+      aar.id,
+      aar.user_id,
+      aar.username,
+      aar.original_command,
+      aar.ai_provider,
+      aar.ai_model,
+      aar.parse_status,
+      aar.function_calls,
+      aar.explanation,
+      aar.confidence,
+      aar.parse_error_message,
+      aar.input_tokens,
+      aar.output_tokens,
+      aar.parse_duration_ms,
+      aar.function_name,
+      aar.function_arguments,
+      aar.execute_status,
+      aar.execute_error_message,
+      aar.ip_address,
+      aar.create_time,
+      aar.update_time
+    FROM ai_assistant_record aar
     <where>
       <if test="queryParams.keywords != null and queryParams.keywords != ''">
         (
-          acr.original_command LIKE CONCAT('%', #{queryParams.keywords}, '%')
-          OR acr.function_name LIKE CONCAT('%', #{queryParams.keywords}, '%')
-          OR acr.username LIKE CONCAT('%', #{queryParams.keywords}, '%')
+          aar.original_command LIKE CONCAT('%', #{queryParams.keywords}, '%')
+          OR aar.function_name LIKE CONCAT('%', #{queryParams.keywords}, '%')
+          OR aar.username LIKE CONCAT('%', #{queryParams.keywords}, '%')
         )
       </if>
       <if test="queryParams.executeStatus != null">
-        AND acr.execute_status = #{queryParams.executeStatus}
+        AND aar.execute_status = #{queryParams.executeStatus}
       </if>
       <if test="queryParams.userId != null">
-        AND acr.user_id = #{queryParams.userId}
+        AND aar.user_id = #{queryParams.userId}
       </if>
       <if test="queryParams.parseStatus != null">
-        AND acr.parse_status = #{queryParams.parseStatus}
+        AND aar.parse_status = #{queryParams.parseStatus}
       </if>
       <if test="queryParams.functionName != null and queryParams.functionName != ''">
-        AND acr.function_name = #{queryParams.functionName}
+        AND aar.function_name = #{queryParams.functionName}
       </if>
       <if test="queryParams.aiProvider != null and queryParams.aiProvider != ''">
-        AND acr.ai_provider = #{queryParams.aiProvider}
+        AND aar.ai_provider = #{queryParams.aiProvider}
       </if>
       <if test="queryParams.aiModel != null and queryParams.aiModel != ''">
-        AND acr.ai_model = #{queryParams.aiModel}
+        AND aar.ai_model = #{queryParams.aiModel}
       </if>
       <if test="
         queryParams.createTime != null
@@ -86,12 +86,10 @@
         and queryParams.createTime[1] != null
         and queryParams.createTime[1] != ''
       ">
-        AND acr.create_time BETWEEN #{queryParams.createTime[0]} AND #{queryParams.createTime[1]}
+        AND aar.create_time BETWEEN #{queryParams.createTime[0]} AND #{queryParams.createTime[1]}
       </if>
     </where>
-    ORDER BY acr.create_time DESC
+    ORDER BY aar.create_time DESC
   </select>
 
 </mapper>
-
-

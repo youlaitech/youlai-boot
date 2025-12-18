@@ -7,7 +7,7 @@ import com.youlai.boot.core.web.Result;
 import com.youlai.boot.common.annotation.Log;
 import com.youlai.boot.system.model.form.ConfigForm;
 import com.youlai.boot.system.model.query.ConfigPageQuery;
-import com.youlai.boot.system.model.vo.ConfigVO;
+import com.youlai.boot.system.model.vo.ConfigVo;
 import com.youlai.boot.system.service.ConfigService;
 import io.swagger.v3.oas.annotations.Parameter;
 import jakarta.validation.Valid;
@@ -38,8 +38,8 @@ public class ConfigController {
     @GetMapping("/page")
     @PreAuthorize("@ss.hasPerm('sys:config:list')")
     @Log( value = "系统配置分页列表",module = LogModuleEnum.SETTING)
-    public PageResult<ConfigVO> page(@ParameterObject ConfigPageQuery configPageQuery) {
-        IPage<ConfigVO> result = configService.page(configPageQuery);
+    public PageResult<ConfigVo> page(@ParameterObject ConfigPageQuery configPageQuery) {
+        IPage<ConfigVo> result = configService.page(configPageQuery);
         return PageResult.success(result);
     }
 

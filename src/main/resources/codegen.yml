@@ -1,4 +1,3 @@
-
 # 代码生成器配置
 codegen:
   # 下载代码文件名称
@@ -20,6 +19,10 @@ codegen:
     API:
       templatePath: codegen/api.ts.vm
       subpackageName: api
+      extension: .ts
+    API_TYPES:
+      templatePath: codegen/api-types.ts.vm
+      subpackageName: types
       extension: .ts
     VIEW:
       templatePath: codegen/index.vue.vm
@@ -50,7 +53,7 @@ codegen:
     Form:
       templatePath: codegen/form.java.vm
       subpackageName: model.form
-    VO:
+    Vo:
       templatePath: codegen/vo.java.vm
       subpackageName: model.vo
     Entity:

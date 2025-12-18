@@ -5,8 +5,8 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.IService;
 import com.youlai.boot.system.model.entity.UserNotice;
 import com.youlai.boot.system.model.query.NoticePageQuery;
-import com.youlai.boot.system.model.vo.UserNoticePageVO;
-import com.youlai.boot.system.model.vo.NoticePageVO;
+import com.youlai.boot.system.model.vo.UserNoticePageVo;
+import com.youlai.boot.system.model.vo.NoticePageVo;
 
 import java.util.List;
 
@@ -31,5 +31,5 @@ public interface UserNoticeService extends IService<UserNotice> {
      * @param queryParams 查询参数
      * @return 我的通知公告分页列表
      */
-    IPage<UserNoticePageVO> getMyNoticePage(Page<NoticePageVO> page, NoticePageQuery queryParams);
+    IPage<UserNoticePageVo> getMyNoticePage(Page<NoticePageVo> page, NoticePageQuery queryParams);
 }

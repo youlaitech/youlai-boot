@@ -1,22 +1,15 @@
 package com.youlai.boot.platform.websocket.service.impl;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.youlai.boot.system.model.dto.DictEventDTO;
+import com.youlai.boot.platform.websocket.dto.DictChangeEvent;
+import com.youlai.boot.platform.websocket.dto.TextMessage;
+import com.youlai.boot.platform.websocket.publisher.WebSocketPublisher;
+import com.youlai.boot.platform.websocket.session.UserSessionRegistry;
 import com.youlai.boot.platform.websocket.service.WebSocketService;
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import com.youlai.boot.platform.websocket.topic.WebSocketTopics;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.stream.Collectors;
 
 /**
  * WebSocket 服务实现类
@@ -33,39 +26,12 @@ import java.util.stream.Collectors;
 @Slf4j
 public class WebSocketServiceImpl implements WebSocketService {
 
-    // ==================== 在线用户管理 ====================
-    
-    /**
-     * 用户在线会话映射表
-     * Key: 用户名
-     * Value: 该用户的所有会话 ID 集合（支持多设备登录）
-     */
-    private final Map<String, Set<String>> userSessionsMap = new ConcurrentHashMap<>();
+    private final UserSessionRegistry userSessionRegistry;
+    private final WebSocketPublisher webSocketPublisher;
 
-    /**
-     * 会话详情映射表
-     * Key: 会话 ID
-     * Value: 会话详细信息
-     */
-    private final Map<String, SessionInfo> sessionDetailsMap = new ConcurrentHashMap<>();
-
-    // ==================== 依赖注入 ====================
-    
-    private SimpMessagingTemplate messagingTemplate;
-    private final ObjectMapper objectMapper;
-
-    @Autowired
-    public WebSocketServiceImpl(ObjectMapper objectMapper) {
-        this.objectMapper = objectMapper;
-    }
-
-    /**
-     * 延迟注入 SimpMessagingTemplate，避免循环依赖
-     */
-    @Autowired(required = false)
-    public void setMessagingTemplate(SimpMessagingTemplate messagingTemplate) {
-        this.messagingTemplate = messagingTemplate;
-        log.info("✓ WebSocket 消息模板已初始化");
+    public WebSocketServiceImpl(UserSessionRegistry userSessionRegistry, WebSocketPublisher webSocketPublisher) {
+        this.userSessionRegistry = userSessionRegistry;
+        this.webSocketPublisher = webSocketPublisher;
     }
 
     // ==================== 用户在线状态管理 ====================
@@ -88,16 +54,10 @@ public class WebSocketServiceImpl implements WebSocketService {
             return;
         }
 
-        // 添加会话到用户的会话集合中（支持多设备登录）
-        userSessionsMap.computeIfAbsent(username, k -> ConcurrentHashMap.newKeySet())
-                       .add(sessionId);
+        userSessionRegistry.userConnected(username, sessionId);
 
-        // 保存会话详情
-        SessionInfo sessionInfo = new SessionInfo(username, sessionId, System.currentTimeMillis());
-        sessionDetailsMap.put(sessionId, sessionInfo);
-
-        int sessionCount = userSessionsMap.get(username).size();
-        int totalOnlineUsers = userSessionsMap.size();
+        int sessionCount = userSessionRegistry.getUserSessionCount(username);
+        int totalOnlineUsers = userSessionRegistry.getOnlineUserCount();
 
         log.info("✓ 用户[{}]会话[{}]上线（该用户共 {} 个会话，系统总在线用户数：{}）",
                 username, sessionId, sessionCount, totalOnlineUsers);
@@ -117,20 +77,9 @@ public class WebSocketServiceImpl implements WebSocketService {
             return;
         }
 
-        // 获取该用户的所有会话
-        Set<String> sessions = userSessionsMap.get(username);
-        if (sessions == null || sessions.isEmpty()) {
-            log.warn("用户[{}]下线：未找到会话记录", username);
-            return;
-        }
+        userSessionRegistry.userDisconnected(username);
 
-        // 移除所有会话详情（通常一次只断开一个会话，但这里做全量清理）
-        sessions.forEach(sessionDetailsMap::remove);
-
-        // 移除用户的会话记录
-        userSessionsMap.remove(username);
-
-        int totalOnlineUsers = userSessionsMap.size();
+        int totalOnlineUsers = userSessionRegistry.getOnlineUserCount();
         log.info("✓ 用户[{}]下线（系统总在线用户数：{}）", username, totalOnlineUsers);
 
         // 广播在线用户数变更
@@ -143,29 +92,8 @@ public class WebSocketServiceImpl implements WebSocketService {
      * @param sessionId 会话 ID
      */
     public void removeSession(String sessionId) {
-        SessionInfo sessionInfo = sessionDetailsMap.remove(sessionId);
-        if (sessionInfo == null) {
-            return;
-        }
-
-        String username = sessionInfo.getUsername();
-        Set<String> sessions = userSessionsMap.get(username);
-
-        if (sessions != null) {
-            sessions.remove(sessionId);
-
-            // 如果该用户没有其他会话了，移除用户记录
-            if (sessions.isEmpty()) {
-                userSessionsMap.remove(username);
-                log.info("✓ 用户[{}]最后一个会话[{}]下线", username, sessionId);
-            } else {
-                log.info("✓ 用户[{}]会话[{}]下线（还剩 {} 个会话）", 
-                        username, sessionId, sessions.size());
-            }
-
-            // 广播在线用户数变更
-            broadcastOnlineUserCount();
-        }
+        userSessionRegistry.removeSession(sessionId);
+        broadcastOnlineUserCount();
     }
 
     /**
@@ -173,23 +101,8 @@ public class WebSocketServiceImpl implements WebSocketService {
      *
      * @return 在线用户信息列表
      */
-    public List<OnlineUserDTO> getOnlineUsers() {
-        return userSessionsMap.entrySet().stream()
-                .map(entry -> {
-                    String username = entry.getKey();
-                    Set<String> sessions = entry.getValue();
-
-                    // 获取该用户最早的登录时间
-                    long earliestLoginTime = sessions.stream()
-                            .map(sessionDetailsMap::get)
-                            .filter(info -> info != null)
-                            .mapToLong(SessionInfo::getConnectTime)
-                            .min()
-                            .orElse(System.currentTimeMillis());
-
-                    return new OnlineUserDTO(username, sessions.size(), earliestLoginTime);
-                })
-                .collect(Collectors.toList());
+    public List<UserSessionRegistry.OnlineUserDto> getOnlineUsers() {
+        return userSessionRegistry.getOnlineUsers();
     }
 
     /**
@@ -198,7 +111,7 @@ public class WebSocketServiceImpl implements WebSocketService {
      * @return 在线用户数（不是会话数）
      */
     public int getOnlineUserCount() {
-        return userSessionsMap.size();
+        return userSessionRegistry.getOnlineUserCount();
     }
 
     /**
@@ -207,7 +120,7 @@ public class WebSocketServiceImpl implements WebSocketService {
      * @return 所有在线会话的总数
      */
     public int getTotalSessionCount() {
-        return sessionDetailsMap.size();
+        return userSessionRegistry.getTotalSessionCount();
     }
 
     /**
@@ -217,8 +130,7 @@ public class WebSocketServiceImpl implements WebSocketService {
      * @return 是否在线
      */
     public boolean isUserOnline(String username) {
-        Set<String> sessions = userSessionsMap.get(username);
-        return sessions != null && !sessions.isEmpty();
+        return userSessionRegistry.isUserOnline(username);
     }
 
     /**
@@ -228,8 +140,7 @@ public class WebSocketServiceImpl implements WebSocketService {
      * @return 会话数量
      */
     public int getUserSessionCount(String username) {
-        Set<String> sessions = userSessionsMap.get(username);
-        return sessions != null ? sessions.size() : 0;
+        return userSessionRegistry.getUserSessionCount(username);
     }
 
     /**
@@ -246,18 +157,9 @@ public class WebSocketServiceImpl implements WebSocketService {
      * 广播在线用户数量变更（内部方法）
      */
     private void broadcastOnlineUserCount() {
-        if (messagingTemplate == null) {
-            log.warn("消息模板尚未初始化，无法发送在线用户数量");
-            return;
-        }
-
-        try {
-            int count = getOnlineUserCount();
-            messagingTemplate.convertAndSend("/topic/online-count", count);
-            log.debug("✓ 已广播在线用户数量: {}", count);
-        } catch (Exception e) {
-            log.error("广播在线用户数量失败", e);
-        }
+        int count = getOnlineUserCount();
+        webSocketPublisher.publish(WebSocketTopics.TOPIC_ONLINE_COUNT, count);
+        log.debug("✓ 已广播在线用户数量: {}", count);
     }
 
     // ==================== 消息推送功能 ====================
@@ -274,30 +176,9 @@ public class WebSocketServiceImpl implements WebSocketService {
             return;
         }
 
-        DictEventDTO event = new DictEventDTO(dictCode);
-        sendDictChangeEvent(event);
-    }
-
-    /**
-     * 发送字典变更事件
-     *
-     * @param event 字典事件
-     */
-    private void sendDictChangeEvent(DictEventDTO event) {
-        if (messagingTemplate == null) {
-            log.warn("消息模板尚未初始化，无法发送字典更新通知");
-            return;
-        }
-
-        try {
-            String message = objectMapper.writeValueAsString(event);
-            messagingTemplate.convertAndSend("/topic/dict", message);
-            log.info("✓ 已广播字典变更通知: dictCode={}", event.getDictCode());
-        } catch (JsonProcessingException e) {
-            log.error("字典事件序列化失败: dictCode={}", event.getDictCode(), e);
-        } catch (Exception e) {
-            log.error("发送字典变更通知失败: dictCode={}", event.getDictCode(), e);
-        }
+        DictChangeEvent event = new DictChangeEvent(dictCode);
+        webSocketPublisher.publish(WebSocketTopics.TOPIC_DICT, event);
+        log.info("✓ 已广播字典变更通知: dictCode={}", dictCode);
     }
 
     /**
@@ -318,20 +199,8 @@ public class WebSocketServiceImpl implements WebSocketService {
             return;
         }
 
-        if (messagingTemplate == null) {
-            log.warn("消息模板尚未初始化，无法发送用户消息");
-            return;
-        }
-
-        try {
-            String messageJson = objectMapper.writeValueAsString(message);
-            messagingTemplate.convertAndSendToUser(username, "/queue/messages", messageJson);
-            log.info("✓ 已向用户[{}]发送通知", username);
-        } catch (JsonProcessingException e) {
-            log.error("消息序列化失败: username={}", username, e);
-        } catch (Exception e) {
-            log.error("向用户[{}]发送通知失败", username, e);
-        }
+        webSocketPublisher.publishToUser(username, WebSocketTopics.USER_QUEUE_MESSAGES, message);
+        log.info("✓ 已向用户[{}]发送通知", username);
     }
 
     /**
@@ -345,71 +214,8 @@ public class WebSocketServiceImpl implements WebSocketService {
             return;
         }
 
-        if (messagingTemplate == null) {
-            log.warn("消息模板尚未初始化，无法发送广播消息");
-            return;
-        }
-
-        try {
-            SystemMessage systemMessage = new SystemMessage(
-                    "系统通知",
-                    message,
-                    System.currentTimeMillis()
-            );
-            String messageJson = objectMapper.writeValueAsString(systemMessage);
-            messagingTemplate.convertAndSend("/topic/public", messageJson);
-            log.info("✓ 已广播系统消息: {}", message);
-        } catch (JsonProcessingException e) {
-            log.error("系统消息序列化失败", e);
-        } catch (Exception e) {
-            log.error("广播系统消息失败", e);
-        }
-    }
-
-    // ==================== 内部数据类 ====================
-
-    /**
-     * 会话信息
-     */
-    @Data
-    @AllArgsConstructor
-    @NoArgsConstructor
-    private static class SessionInfo {
-        /** 用户名 */
-        private String username;
-        /** 会话 ID */
-        private String sessionId;
-        /** 连接时间戳 */
-        private long connectTime;
-    }
-
-    /**
-     * 在线用户 DTO
-     */
-    @Data
-    @AllArgsConstructor
-    @NoArgsConstructor
-    public static class OnlineUserDTO {
-        /** 用户名 */
-        private String username;
-        /** 会话数量 */
-        private int sessionCount;
-        /** 首次登录时间 */
-        private long loginTime;
-    }
-
-    /**
-     * 系统消息
-     */
-    @Data
-    @AllArgsConstructor
-    @NoArgsConstructor
-    public static class SystemMessage {
-        /** 发送者 */
-        private String sender;
-        /** 消息内容 */
-        private String content;
-        /** 时间戳 */
-        private long timestamp;
+        TextMessage systemMessage = new TextMessage("系统通知", message, System.currentTimeMillis());
+        webSocketPublisher.publish(WebSocketTopics.TOPIC_PUBLIC, systemMessage);
+        log.info("✓ 已广播系统消息: {}", message);
     }
 }

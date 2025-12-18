@@ -6,13 +6,13 @@ import java.util.HashSet;
 import java.util.Set;
 
 /**
- * 用户会话DTO
+ * 用户会话Dto
  *
  * @author Ray.Hao
  * @since 3.0.0
  */
 @Data
-public class UserSessionDTO {
+public class UserSessionDto {
 
     /**
      * 用户名
@@ -29,7 +29,7 @@ public class UserSessionDTO {
      */
     private long lastActiveTime;
 
-    public UserSessionDTO(String username) {
+    public UserSessionDto(String username) {
         this.username = username;
         this.sessionIds = new HashSet<>();
         this.lastActiveTime = System.currentTimeMillis();

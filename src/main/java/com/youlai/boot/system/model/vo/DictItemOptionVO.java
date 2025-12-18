@@ -13,7 +13,7 @@ import lombok.Setter;
 @Schema(description = "字典项键值对象")
 @Getter
 @Setter
-public class DictItemOptionVO {
+public class DictItemOptionVo {
 
     @Schema(description = "字典项值")
     private String value;

@@ -6,7 +6,7 @@ import com.youlai.boot.common.constant.RedisConstants;
 import com.youlai.boot.security.exception.CaptchaValidationException;
 import com.youlai.boot.security.model.SmsAuthenticationToken;
 import com.youlai.boot.security.model.SysUserDetails;
-import com.youlai.boot.security.model.UserAuthCredentials;
+import com.youlai.boot.security.model.UserAuthInfo;
 import com.youlai.boot.system.service.UserService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.redis.core.RedisTemplate;
@@ -15,7 +15,6 @@ import org.springframework.security.authentication.DisabledException;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
-
 
 /**
  * 短信验证码认证 Provider
@@ -50,14 +49,14 @@ public class SmsAuthenticationProvider implements AuthenticationProvider {
         String inputVerifyCode = (String) authentication.getCredentials();
 
         // 根据手机号获取用户信息
-        UserAuthCredentials userAuthCredentials = userService.getAuthCredentialsByMobile(mobile);
+        UserAuthInfo userAuthInfo = userService.getAuthInfoByMobile(mobile);
 
-        if (userAuthCredentials == null) {
+        if (userAuthInfo == null) {
             throw new UsernameNotFoundException("用户不存在");
         }
 
         // 检查用户状态是否有效
-        if (ObjectUtil.notEqual(userAuthCredentials.getStatus(), 1)) {
+        if (ObjectUtil.notEqual(userAuthInfo.getStatus(), 1)) {
             throw new DisabledException("用户已被禁用");
         }
 
@@ -73,7 +72,7 @@ public class SmsAuthenticationProvider implements AuthenticationProvider {
         }
 
         // 构建认证后的用户详情信息
-        SysUserDetails userDetails = new SysUserDetails(userAuthCredentials);
+        SysUserDetails userDetails = new SysUserDetails(userAuthInfo);
 
         // 创建已认证的 SmsAuthenticationToken
         return SmsAuthenticationToken.authenticated(

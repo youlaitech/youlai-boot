@@ -2,7 +2,7 @@ package com.youlai.boot.system.converter;
 
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.youlai.boot.system.model.entity.Role;
-import com.youlai.boot.system.model.vo.RolePageVO;
+import com.youlai.boot.system.model.vo.RolePageVo;
 import com.youlai.boot.common.model.Option;
 import com.youlai.boot.system.model.form.RoleForm;
 import org.mapstruct.Mapper;
@@ -20,7 +20,7 @@ import java.util.List;
 @Mapper(componentModel = "spring")
 public interface RoleConverter {
 
-    Page<RolePageVO> toPageVo(Page<Role> page);
+    Page<RolePageVo> toPageVo(Page<Role> page);
 
     @Mappings({
             @Mapping(target = "value", source = "id"),

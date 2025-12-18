@@ -14,7 +14,7 @@ import java.time.LocalDateTime;
  */
 @Schema(description ="用户分页对象")
 @Data
-public class UserPageVO {
+public class UserPageVo {
 
     @Schema(description="用户ID")
     private Long id;

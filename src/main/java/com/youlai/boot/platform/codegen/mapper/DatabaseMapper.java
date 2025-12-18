@@ -5,7 +5,7 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.youlai.boot.platform.codegen.model.bo.ColumnMetaData;
 import com.youlai.boot.platform.codegen.model.bo.TableMetaData;
 import com.youlai.boot.platform.codegen.model.query.TablePageQuery;
-import com.youlai.boot.platform.codegen.model.vo.TablePageVO;
+import com.youlai.boot.platform.codegen.model.vo.TablePageVo;
 import org.apache.ibatis.annotations.Mapper;
 
 import java.util.List;
@@ -27,7 +27,7 @@ public interface DatabaseMapper extends BaseMapper {
      * @param queryParams
      * @return
      */
-    Page<TablePageVO> getTablePage(Page<TablePageVO> page, TablePageQuery queryParams);
+    Page<TablePageVo> getTablePage(Page<TablePageVo> page, TablePageQuery queryParams);
 
     /**
      * 获取表字段列表

@@ -6,7 +6,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import ${packageName}.${moduleName}.model.form.${entityName}Form;
 import ${packageName}.${moduleName}.model.query.${entityName}Query;
-import ${packageName}.${moduleName}.model.vo.${entityName}VO;
+import ${packageName}.${moduleName}.model.vo.${entityName}Vo;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.youlai.boot.core.web.PageResult;
 import com.youlai.boot.core.web.Result;
@@ -26,56 +26,56 @@ import jakarta.validation.Valid;
  */
 @Tag(name = "${businessName}接口")
 @RestController
-@RequestMapping("/api/v1/${kebabCaseEntityName}")
+@RequestMapping("/api/v1/${entityKebab}")
 @RequiredArgsConstructor
 public class ${entityName}Controller  {
 
-    private final ${entityName}Service ${lowerFirstEntityName}Service;
+    private final ${entityName}Service ${entityLowerCamel}Service;
 
     @Operation(summary = "$!{businessName}分页列表")
     @GetMapping("/page")
-    @PreAuthorize("@ss.hasPerm('${moduleName}:${kebabCaseEntityName}:query')")
-    public PageResult<${entityName}VO> get${entityName}Page(${entityName}Query queryParams ) {
-        IPage<${entityName}VO> result = ${lowerFirstEntityName}Service.get${entityName}Page(queryParams);
+    @PreAuthorize("@ss.hasPerm('${moduleName}:${entityKebab}:query')")
+    public PageResult<${entityName}Vo> get${entityName}Page(${entityName}Query queryParams ) {
+        IPage<${entityName}Vo> result = ${entityLowerCamel}Service.get${entityName}Page(queryParams);
         return PageResult.success(result);
     }
 
     @Operation(summary = "新增${businessName}")
     @PostMapping
-    @PreAuthorize("@ss.hasPerm('${moduleName}:${kebabCaseEntityName}:add')")
+    @PreAuthorize("@ss.hasPerm('${moduleName}:${entityKebab}:add')")
     public Result<Void> save${entityName}(@RequestBody @Valid ${entityName}Form formData ) {
-        boolean result = ${lowerFirstEntityName}Service.save${entityName}(formData);
+        boolean result = ${entityLowerCamel}Service.save${entityName}(formData);
         return Result.judge(result);
     }
 
     @Operation(summary = "获取${businessName}表单数据")
     @GetMapping("/{id}/form")
-    @PreAuthorize("@ss.hasPerm('${moduleName}:${kebabCaseEntityName}:edit')")
+    @PreAuthorize("@ss.hasPerm('${moduleName}:${entityKebab}:edit')")
     public Result<${entityName}Form> get${entityName}Form(
         @Parameter(description = "$!{businessName}ID") @PathVariable Long id
     ) {
-        ${entityName}Form formData = ${lowerFirstEntityName}Service.get${entityName}FormData(id);
+        ${entityName}Form formData = ${entityLowerCamel}Service.get${entityName}FormData(id);
         return Result.success(formData);
     }
 
     @Operation(summary = "修改${businessName}")
     @PutMapping(value = "/{id}")
-    @PreAuthorize("@ss.hasPerm('${moduleName}:${kebabCaseEntityName}:edit')")
+    @PreAuthorize("@ss.hasPerm('${moduleName}:${entityKebab}:edit')")
     public Result<Void> update${entityName}(
             @Parameter(description = "$!{businessName}ID") @PathVariable Long id,
             @RequestBody @Validated ${entityName}Form formData
     ) {
-        boolean result = ${lowerFirstEntityName}Service.update${entityName}(id, formData);
+        boolean result = ${entityLowerCamel}Service.update${entityName}(id, formData);
         return Result.judge(result);
     }
 
     @Operation(summary = "删除${businessName}")
     @DeleteMapping("/{ids}")
-    @PreAuthorize("@ss.hasPerm('${moduleName}:${kebabCaseEntityName}:delete')")
+    @PreAuthorize("@ss.hasPerm('${moduleName}:${entityKebab}:delete')")
     public Result<Void> delete${entityName}s(
         @Parameter(description = "$!{businessName}ID，多个以英文逗号(,)分割") @PathVariable String ids
     ) {
-        boolean result = ${lowerFirstEntityName}Service.delete${entityName}s(ids);
+        boolean result = ${entityLowerCamel}Service.delete${entityName}s(ids);
         return Result.judge(result);
     }
 }

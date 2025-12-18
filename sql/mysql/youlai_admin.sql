@@ -138,8 +138,8 @@ CREATE TABLE `sys_menu`  (
 -- ----------------------------
 -- 顶级目录（1-9）：系统/代码生成/AI助手/文档/接口文档/组件/演示/多级/路由
 INSERT INTO `sys_menu` VALUES (1, 0, '0', '系统管理', 'C', '', '/system', 'Layout', NULL, NULL, NULL, 1, 1, 'system', '/system/user', now(), now(), NULL);
-INSERT INTO `sys_menu` VALUES (2, 0, '0', '代码生成', 'C', '', '/gen', 'Layout', NULL, NULL, NULL, 1, 2, 'code', '/gen/index', now(), now(), NULL);
-INSERT INTO `sys_menu` VALUES (3, 0, '0', 'AI助手', 'C', '', '/ai', 'Layout', NULL, NULL, NULL, 1, 3, 'platform', '/ai/command-record', now(), now(), NULL);
+INSERT INTO `sys_menu` VALUES (2, 0, '0', '代码生成', 'C', '', '/codegen', 'Layout', NULL, NULL, NULL, 1, 2, 'code', '/codegen/index', now(), now(), NULL);
+INSERT INTO `sys_menu` VALUES (3, 0, '0', 'AI助手', 'C', '', '/ai', 'Layout', NULL, NULL, NULL, 1, 3, 'ai', '/ai/command-record', now(), now(), NULL);
 INSERT INTO `sys_menu` VALUES (4, 0, '0', '平台文档', 'C', '', '/doc', 'Layout', NULL, NULL, NULL, 1, 4, 'document', '', now(), now(), NULL);
 INSERT INTO `sys_menu` VALUES (5, 0, '0', '接口文档', 'C', '', '/api', 'Layout', NULL, NULL, NULL, 1, 5, 'api', '', now(), now(), NULL);
 INSERT INTO `sys_menu` VALUES (6, 0, '0', '组件封装', 'C', '', '/component', 'Layout', NULL, NULL, NULL, 1, 6, 'menu', '', now(), now(), NULL);
@@ -205,7 +205,7 @@ INSERT INTO `sys_menu` VALUES (2805, 280, '0,1,280', '通知发布', 'B', NULL, 
 INSERT INTO `sys_menu` VALUES (2806, 280, '0,1,280', '通知撤回', 'B', NULL, '', NULL, 'sys:notice:revoke', 0, 1, 1, 6, '', NULL, now(), now(), NULL);
 
 -- 代码生成
-INSERT INTO `sys_menu` VALUES (310, 2, '0,2', '代码生成', 'M', 'Gen', 'gen', 'gen/index', NULL, NULL, 1, 1, 1, 'code', NULL, now(), now(), NULL);
+INSERT INTO `sys_menu` VALUES (310, 2, '0,2', '代码生成', 'M', 'Codegen', 'codegen', 'codegen/index', NULL, NULL, 1, 1, 1, 'code', NULL, now(), now(), NULL);
 
 -- AI 助手
 INSERT INTO `sys_menu` VALUES (401, 3, '0,3', 'AI命令记录', 'M', 'AiCommandRecord', 'command-record', 'ai/command-record/index', NULL, NULL, 1, 1, 1, 'document', NULL, now(), now(), NULL);
@@ -537,8 +537,8 @@ INSERT INTO `sys_user_notice` VALUES (10, 10, 2, 1, NULL, now(), now(), 0);
 -- ----------------------------
 -- AI 命令记录表
 -- ----------------------------
-DROP TABLE IF EXISTS `ai_command_record`;
-CREATE TABLE `ai_command_record` (
+DROP TABLE IF EXISTS `ai_assistant_record`;
+CREATE TABLE `ai_assistant_record` (
                                   `id` bigint NOT NULL AUTO_INCREMENT COMMENT '主键ID',
                                   `user_id` bigint DEFAULT NULL COMMENT '用户ID',
                                   `username` varchar(64) DEFAULT NULL COMMENT '用户名',
@@ -565,40 +565,6 @@ CREATE TABLE `ai_command_record` (
                                   KEY `idx_create_time` (`create_time`),
                                   KEY `idx_provider` (`ai_provider`),
                                   KEY `idx_model` (`ai_model`),
-                                  KEY `idx_parse_success` (`parse_status`),
+                                  KEY `idx_parse_status` (`parse_status`),
                                   KEY `idx_execute_status` (`execute_status`)
-) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8mb4 COMMENT='AI 命令记录表';
-
--- ----------------------------
--- 租户表（多租户模式）
--- ----------------------------
-DROP TABLE IF EXISTS `sys_tenant`;
-CREATE TABLE `sys_tenant` (
-                              `id` bigint NOT NULL AUTO_INCREMENT COMMENT '租户ID',
-                              `name` varchar(100) NOT NULL COMMENT '租户名称',
-                              `code` varchar(50) NOT NULL COMMENT '租户编码（唯一）',
-                              `contact_name` varchar(50) DEFAULT NULL COMMENT '联系人姓名',
-                              `contact_phone` varchar(20) DEFAULT NULL COMMENT '联系人电话',
-                              `contact_email` varchar(100) DEFAULT NULL COMMENT '联系人邮箱',
-                              `domain` varchar(100) DEFAULT NULL COMMENT '租户域名（用于域名识别）',
-                              `logo` varchar(255) DEFAULT NULL COMMENT '租户Logo',
-                              `status` tinyint DEFAULT '1' COMMENT '状态(1-正常 0-禁用)',
-                              `remark` varchar(500) DEFAULT NULL COMMENT '备注',
-                              `expire_time` datetime DEFAULT NULL COMMENT '过期时间（NULL表示永不过期）',
-                              `create_time` datetime COMMENT '创建时间',
-                              `update_time` datetime COMMENT '更新时间',
-                              PRIMARY KEY (`id`),
-                              UNIQUE KEY `uk_code` (`code`),
-                              UNIQUE KEY `uk_domain` (`domain`),
-                              KEY `idx_status` (`status`)
-) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8mb4 COMMENT='系统租户表';
-
--- ----------------------------
--- Records of sys_tenant
--- ----------------------------
-INSERT INTO `sys_tenant` VALUES (1, '默认租户', 'DEFAULT', '系统管理员', '18812345678', 'admin@youlai.tech', NULL, NULL, 1, '系统默认租户', NULL, now(), now());
-INSERT INTO `sys_tenant` VALUES (2, '演示租户', 'DEMO', '演示用户', '18812345679', 'demo@youlai.tech', 'demo.youlai.tech', NULL, 1, '演示租户', NULL, now(), now());
-
-
-
-SET FOREIGN_KEY_CHECKS = 1;
+) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8mb4 COMMENT='AI 助手行为记录表（解析、执行、审计）';

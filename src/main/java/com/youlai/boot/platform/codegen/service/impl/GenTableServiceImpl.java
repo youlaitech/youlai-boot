@@ -161,9 +161,10 @@ public class GenTableServiceImpl extends ServiceImpl<GenTableMapper, GenTable> i
         fieldConfig.setFieldName(StrUtil.toCamelCase(columnMetaData.getColumnName()));
         fieldConfig.setIsRequired("YES".equals(columnMetaData.getIsNullable()) ? 0 : 1);
 
-        if (fieldConfig.getColumnType().equals("date")) {
+        String columnType = StrUtil.blankToDefault(fieldConfig.getColumnType(), "").toLowerCase();
+        if ("date".equals(columnType)) {
             fieldConfig.setFormType(FormTypeEnum.DATE);
-        } else if (fieldConfig.getColumnType().equals("datetime")) {
+        } else if ("datetime".equals(columnType) || "timestamp".equals(columnType)) {
             fieldConfig.setFormType(FormTypeEnum.DATE_TIME);
         } else {
             fieldConfig.setFormType(FormTypeEnum.INPUT);

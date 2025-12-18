@@ -4,9 +4,9 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.youlai.boot.system.model.entity.Log;
 import com.baomidou.mybatisplus.extension.service.IService;
 import com.youlai.boot.system.model.query.LogPageQuery;
-import com.youlai.boot.system.model.vo.LogPageVO;
-import com.youlai.boot.system.model.vo.VisitStatsVO;
-import com.youlai.boot.system.model.vo.VisitTrendVO;
+import com.youlai.boot.system.model.vo.LogPageVo;
+import com.youlai.boot.system.model.vo.VisitStatsVo;
+import com.youlai.boot.system.model.vo.VisitTrendVo;
 
 import java.time.LocalDate;
 import java.util.List;
@@ -22,7 +22,7 @@ public interface LogService extends IService<Log> {
     /**
      * 获取日志分页列表
      */
-    Page<LogPageVO> getLogPage(LogPageQuery queryParams);
+    Page<LogPageVo> getLogPage(LogPageQuery queryParams);
 
 
     /**
@@ -31,11 +31,11 @@ public interface LogService extends IService<Log> {
      * @param startDate 开始时间
      * @param endDate   结束时间
      */
-    VisitTrendVO getVisitTrend(LocalDate startDate, LocalDate endDate);
+    VisitTrendVo getVisitTrend(LocalDate startDate, LocalDate endDate);
 
     /**
      * 获取访问统计
      */
-    VisitStatsVO getVisitStats();
+    VisitStatsVo getVisitStats();
 
 }

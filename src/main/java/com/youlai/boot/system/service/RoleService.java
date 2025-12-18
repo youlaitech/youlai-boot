@@ -7,7 +7,7 @@ import com.youlai.boot.system.model.entity.Role;
 import com.youlai.boot.common.model.Option;
 import com.youlai.boot.system.model.form.RoleForm;
 import com.youlai.boot.system.model.query.RolePageQuery;
-import com.youlai.boot.system.model.vo.RolePageVO;
+import com.youlai.boot.system.model.vo.RolePageVo;
 
 import java.util.List;
 import java.util.Set;
@@ -26,7 +26,7 @@ public interface RoleService extends IService<Role> {
      * @param queryParams
      * @return
      */
-    Page<RolePageVO> getRolePage(RolePageQuery queryParams);
+    Page<RolePageVo> getRolePage(RolePageQuery queryParams);
 
 
     /**

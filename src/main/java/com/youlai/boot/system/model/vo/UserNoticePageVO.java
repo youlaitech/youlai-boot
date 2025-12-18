@@ -7,14 +7,14 @@ import lombok.Data;
 import java.time.LocalDateTime;
 
 /**
- * 用户公告VO
+ * 用户公告Vo
  *
  * @author Theo
  * @since 2024-08-28 16:56
  */
 @Data
-@Schema(description = "用户公告VO")
-public class UserNoticePageVO {
+@Schema(description = "用户公告Vo")
+public class UserNoticePageVo {
 
     @Schema(description = "通知ID")
     private Long id;

@@ -16,7 +16,7 @@
     </select>
 
     <!-- 权限和拥有权限的角色的映射 -->
-    <resultMap id="PremRolesMap" type="com.youlai.boot.system.model.bo.RolePermsBO">
+    <resultMap id="PremRolesMap" type="com.youlai.boot.system.model.bo.RolePermsBo">
         <result property="roleCode" column="role_code"/>
         <collection property="perms" ofType="string" javaType="java.util.Set">
             <result column="perm"/>

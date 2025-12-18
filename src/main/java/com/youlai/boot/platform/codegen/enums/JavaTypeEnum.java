@@ -27,9 +27,11 @@ public enum JavaTypeEnum {
     FLOAT("float", "Float", "number"),
     DOUBLE("double", "Double", "number"),
     DECIMAL("decimal", "BigDecimal", "number"),
-    DATE("date", "LocalDate", "Date"),
-    DATETIME("datetime", "LocalDateTime", "Date"),
-    TIMESTAMP("timestamp", "LocalDateTime", "Date");
+    DATE("date", "LocalDate", "string"),
+    DATETIME("datetime", "LocalDateTime", "string"),
+    TIMESTAMP("timestamp", "LocalDateTime", "string"),
+    BOOLEAN("boolean", "Boolean", "boolean"),
+    BIT("bit", "Boolean", "boolean");
 
     // 数据库类型
     private final String dbType;
@@ -61,11 +63,12 @@ public enum JavaTypeEnum {
      * @return 对应的Java类型
      */
     public static String getJavaTypeByColumnType(String columnType) {
-        JavaTypeEnum javaTypeEnum = typeMap.get(columnType);
+        String normalized = normalizeColumnType(columnType);
+        JavaTypeEnum javaTypeEnum = typeMap.get(normalized);
         if (javaTypeEnum != null) {
             return javaTypeEnum.getJavaType();
         }
-        return null;
+        return "String";
     }
 
     /**
@@ -75,11 +78,31 @@ public enum JavaTypeEnum {
      * @return 对应的TypeScript类型
      */
     public static String getTsTypeByJavaType(String javaType) {
+        if (javaType == null) {
+            return "any";
+        }
         for (JavaTypeEnum javaTypeEnum : JavaTypeEnum.values()) {
             if (javaTypeEnum.getJavaType().equals(javaType)) {
                 return javaTypeEnum.getTsType();
             }
         }
-        return null;
+        return "any";
+    }
+
+    private static String normalizeColumnType(String columnType) {
+        if (columnType == null) {
+            return "";
+        }
+        // Handle values like: varchar(255), bigint unsigned, INT
+        String normalized = columnType.trim().toLowerCase();
+        int parenIndex = normalized.indexOf('(');
+        if (parenIndex > -1) {
+            normalized = normalized.substring(0, parenIndex);
+        }
+        // Remove modifiers
+        normalized = normalized.replace("unsigned", "").replace("zerofill", "").trim();
+        // Collapse repeated spaces
+        normalized = normalized.replaceAll("\\s+", " ");
+        return normalized;
     }
 }

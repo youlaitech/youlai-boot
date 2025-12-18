@@ -11,7 +11,7 @@ import java.util.Set;
  * @since 2023/11/29
  */
 @Data
-public class RolePermsBO {
+public class RolePermsBo {
 
     /**
      * 角色编码

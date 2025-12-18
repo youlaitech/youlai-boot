@@ -6,7 +6,7 @@
 <mapper namespace="com.youlai.boot.platform.codegen.mapper.DatabaseMapper">
 
     <!-- 查询数据库表分页 mysql版本-->
-    <select id="getTablePage" resultType="com.youlai.boot.platform.codegen.model.vo.TablePageVO" databaseId="mysql">
+    <select id="getTablePage" resultType="com.youlai.boot.platform.codegen.model.vo.TablePageVo" databaseId="mysql">
         SELECT
             t1.TABLE_NAME ,
             t1.TABLE_COMMENT ,
@@ -34,7 +34,7 @@
             CREATE_TIME DESC
     </select>
     <!-- 查询数据库表分页 dm版本-->
-    <select id="getTablePage" resultType="com.youlai.boot.platform.codegen.model.vo.TablePageVO" databaseId="dm">
+    <select id="getTablePage" resultType="com.youlai.boot.platform.codegen.model.vo.TablePageVo" databaseId="dm">
         SELECT
         t1.TABLE_NAME ,
         c.COMMENTS AS TABLE_COMMENT ,

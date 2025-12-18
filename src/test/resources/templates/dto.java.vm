@@ -12,7 +12,7 @@ import lombok.Setter;
 import java.io.Serializable;
 import java.time.LocalDateTime;
 /**
- * $!{table.comment} DTO
+ * $!{table.comment} Dto
  *
  * @author ${author}
  * @since ${date}
@@ -26,13 +26,13 @@ import java.time.LocalDateTime;
 #end
 @Schema( description = "$!{table.comment}传输层对象")
 #if(${superEntityClass})
-public class ${entity}DTO extends ${superEntityClass}#if(${activeRecord})<${entity}>#end {
+public class ${entity}Dto extends ${superEntityClass}#if(${activeRecord})<${entity}>#end {
 #elseif(${activeRecord})
-public class ${entity}DTO extends Model<${entity}> {
+public class ${entity}Dto extends Model<${entity}> {
 #elseif(${entitySerialVersionUID})
-public class ${entity}DTO implements Serializable {
+public class ${entity}Dto implements Serializable {
 #else
-public class ${entity}DTO {
+public class ${entity}Dto {
 #end
 #if(${entitySerialVersionUID})
 

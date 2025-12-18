@@ -8,7 +8,7 @@ import com.youlai.boot.core.web.PageResult;
 import com.youlai.boot.core.web.Result;
 import com.youlai.boot.system.model.form.RoleForm;
 import com.youlai.boot.system.model.query.RolePageQuery;
-import com.youlai.boot.system.model.vo.RolePageVO;
+import com.youlai.boot.system.model.vo.RolePageVo;
 import com.youlai.boot.common.annotation.Log;
 import com.youlai.boot.system.service.RoleService;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -39,10 +39,10 @@ public class RoleController {
     @Operation(summary = "角色分页列表")
     @GetMapping("/page")
     @Log(value = "角色分页列表", module = LogModuleEnum.ROLE)
-    public PageResult<RolePageVO> getRolePage(
+    public PageResult<RolePageVo> getRolePage(
             RolePageQuery queryParams
     ) {
-        Page<RolePageVO> result = roleService.getRolePage(queryParams);
+        Page<RolePageVo> result = roleService.getRolePage(queryParams);
         return PageResult.success(result);
     }
 

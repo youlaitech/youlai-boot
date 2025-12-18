@@ -1,12 +1,13 @@
 import request from "@/utils/request";
+import type { ${entityName}Form, ${entityName}PageQuery, ${entityName}PageVo } from "@/api/types";
 
-const ${entityName.toUpperCase()}_BASE_URL = "/api/v1/${kebabCaseEntityName}";
+const ${entityUpperSnake}_BASE_URL = "/api/v1/${entityKebab}";
 
 const ${entityName}API = {
     /** 获取${businessName}分页数据 */
     getPage(queryParams?: ${entityName}PageQuery) {
-        return request<any, PageResult<${entityName}PageVO[]>>({
-            url: `${${entityName.toUpperCase()}_BASE_URL}/page`,
+        return request<any, PageResult<${entityName}PageVo[]>>({
+            url: `${${entityUpperSnake}_BASE_URL}/page`,
             method: "get",
             params: queryParams,
         });
@@ -19,7 +20,7 @@ const ${entityName}API = {
      */
     getFormData(id: number) {
         return request<any, ${entityName}Form>({
-            url: `${${entityName.toUpperCase()}_BASE_URL}/${id}/form`,
+            url: `${${entityUpperSnake}_BASE_URL}/${id}/form`,
             method: "get",
         });
     },
@@ -31,7 +32,7 @@ const ${entityName}API = {
      */
     create(data: ${entityName}Form) {
         return request({
-            url: `${${entityName.toUpperCase()}_BASE_URL}`,
+            url: `${${entityUpperSnake}_BASE_URL}`,
             method: "post",
             data,
         });
@@ -45,7 +46,7 @@ const ${entityName}API = {
      */
      update(id: string, data: ${entityName}Form) {
         return request({
-            url: `${${entityName.toUpperCase()}_BASE_URL}/${id}`,
+            url: `${${entityUpperSnake}_BASE_URL}/${id}`,
             method: "put",
             data,
         });
@@ -58,54 +59,10 @@ const ${entityName}API = {
      */
      deleteByIds(ids: string) {
         return request({
-            url: `${${entityName.toUpperCase()}_BASE_URL}/${ids}`,
+            url: `${${entityUpperSnake}_BASE_URL}/${ids}`,
             method: "delete",
         });
     }
 }
 
 export default ${entityName}API;
-
-/** ${businessName}分页查询参数 */
-export interface ${entityName}PageQuery extends PageQuery {
-    #foreach($fieldConfig in $fieldConfigs)
-        #if($fieldConfig.isShowInQuery)
-            #if("$!fieldConfig.fieldComment" != "")
-    /** ${fieldConfig.fieldComment} */
-            #end
-            #if($fieldConfig.formType == "DATE" || $fieldConfig.formType == "DATE_TIME")
-                #if($fieldConfig.queryType == "BETWEEN")
-    ${fieldConfig.fieldName}?: [string, string];
-                #else
-    ${fieldConfig.fieldName}?: ${fieldConfig.tsType};
-                #end
-            #else
-    ${fieldConfig.fieldName}?: ${fieldConfig.tsType};
-            #end
-        #end
-    #end
-}
-
-/** ${businessName}表单对象 */
-export interface ${entityName}Form {
-    #foreach($fieldConfig in $fieldConfigs)
-        #if($fieldConfig.isShowInForm)
-    #if("$!fieldConfig.fieldComment" != "")
-    /** ${fieldConfig.fieldComment} */
-    #end
-    ${fieldConfig.fieldName}?:  ${fieldConfig.tsType};
-        #end
-    #end
-}
-
-/** ${businessName}分页对象 */
-export interface ${entityName}PageVO {
-    #foreach($fieldConfig in $fieldConfigs)
-        #if($fieldConfig.isShowInList)
-            #if("$!fieldConfig.fieldComment" != "")
-    /** ${fieldConfig.fieldComment} */
-            #end
-    ${fieldConfig.fieldName}?: ${fieldConfig.tsType};
-        #end
-    #end
-}

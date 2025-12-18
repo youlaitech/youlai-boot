@@ -3,7 +3,7 @@ package com.youlai.boot.platform.codegen.model.bo;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 
-@Schema(description = "数据表字段VO")
+@Schema(description = "数据表字段Vo")
 @Data
 public class ColumnMetaData {
 

@@ -10,7 +10,7 @@ import ${packageName}.${moduleName}.service.${entityName}Service;
 import ${packageName}.${moduleName}.model.entity.${entityName};
 import ${packageName}.${moduleName}.model.form.${entityName}Form;
 import ${packageName}.${moduleName}.model.query.${entityName}Query;
-import ${packageName}.${moduleName}.model.vo.${entityName}VO;
+import ${packageName}.${moduleName}.model.vo.${entityName}Vo;
 import ${packageName}.${moduleName}.converter.${entityName}Converter;
 
 import java.util.Arrays;
@@ -30,21 +30,21 @@ import cn.hutool.core.util.StrUtil;
 @RequiredArgsConstructor
 public class ${entityName}ServiceImpl extends ServiceImpl<${entityName}Mapper, ${entityName}> implements ${entityName}Service {
 
-    private final ${entityName}Converter ${lowerFirstEntityName}Converter;
+    private final ${entityName}Converter ${entityLowerCamel}Converter;
 
     /**
     * 获取${businessName}分页列表
     *
     * @param queryParams 查询参数
-    * @return {@link IPage<${entityName}VO>} $!{businessName}分页列表
+    * @return {@link IPage<${entityName}Vo>} $!{businessName}分页列表
     */
     @Override
-    public IPage<${entityName}VO> get${entityName}Page(${entityName}Query queryParams) {
-        Page<${entityName}VO> pageVO = this.baseMapper.get${entityName}Page(
+    public IPage<${entityName}Vo> get${entityName}Page(${entityName}Query queryParams) {
+        Page<${entityName}Vo> pageVo = this.baseMapper.get${entityName}Page(
                 new Page<>(queryParams.getPageNum(), queryParams.getPageSize()),
                 queryParams
         );
-        return pageVO;
+        return pageVo;
     }
     
     /**
@@ -56,7 +56,7 @@ public class ${entityName}ServiceImpl extends ServiceImpl<${entityName}Mapper, $
     @Override
     public ${entityName}Form get${entityName}FormData(Long id) {
         ${entityName} entity = this.getById(id);
-        return ${lowerFirstEntityName}Converter.toForm(entity);
+        return ${entityLowerCamel}Converter.toForm(entity);
     }
     
     /**
@@ -67,7 +67,7 @@ public class ${entityName}ServiceImpl extends ServiceImpl<${entityName}Mapper, $
      */
     @Override
     public boolean save${entityName}(${entityName}Form formData) {
-        ${entityName} entity = ${lowerFirstEntityName}Converter.toEntity(formData);
+        ${entityName} entity = ${entityLowerCamel}Converter.toEntity(formData);
         return this.save(entity);
     }
     
@@ -80,7 +80,7 @@ public class ${entityName}ServiceImpl extends ServiceImpl<${entityName}Mapper, $
      */
     @Override
     public boolean update${entityName}(Long id,${entityName}Form formData) {
-        ${entityName} entity = ${lowerFirstEntityName}Converter.toEntity(formData);
+        ${entityName} entity = ${entityLowerCamel}Converter.toEntity(formData);
         return this.updateById(entity);
     }
     

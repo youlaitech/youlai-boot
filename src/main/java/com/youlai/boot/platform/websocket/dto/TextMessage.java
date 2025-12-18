@@ -1,25 +1,15 @@
-package com.youlai.boot.platform.websocket.model;
+package com.youlai.boot.platform.websocket.dto;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-/**
- * 系统消息体
- */
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class ChatMessage {
+public class TextMessage {
 
-    /**
-     * 发送者
-     */
     private String sender;
-
-    /**
-     * 消息内容
-     */
     private String content;
-
+    private Long timestamp;
 }

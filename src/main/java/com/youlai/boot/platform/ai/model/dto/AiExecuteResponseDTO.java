@@ -6,7 +6,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 /**
- * AI 命令执行响应 DTO
+ * AI 命令执行响应 Dto
  *
  * @author Ray.Hao
  * @since 3.0.0
@@ -15,7 +15,7 @@ import lombok.NoArgsConstructor;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class AiExecuteResponseDTO {
+public class AiExecuteResponseDto {
 
     /**
      * 是否执行成功
@@ -57,6 +57,3 @@ public class AiExecuteResponseDTO {
      */
     private String confirmationPrompt;
 }
-
-
-

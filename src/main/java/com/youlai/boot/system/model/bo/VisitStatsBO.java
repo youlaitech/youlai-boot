@@ -14,7 +14,7 @@ import java.math.BigDecimal;
  */
 @Getter
 @Setter
-public class VisitStatsBO {
+public class VisitStatsBo {
 
     @Schema(description = "今日访问量 (PV)")
     private Integer todayCount;

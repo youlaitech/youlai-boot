@@ -3,7 +3,7 @@
 <mapper namespace="${packageName}.${moduleName}.mapper.${entityName}Mapper">
 
     <!-- 获取${businessName}分页列表 -->
-    <select id="get${entityName}Page" resultType="${packageName}.${moduleName}.model.vo.${entityName}VO">
+    <select id="get${entityName}Page" resultType="${packageName}.${moduleName}.model.vo.${entityName}Vo">
         SELECT
         #if($fieldConfigs)
             #set ($fields = [])

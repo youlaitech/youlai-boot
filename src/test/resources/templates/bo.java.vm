@@ -26,13 +26,13 @@ import java.time.LocalDateTime;
   #end
 #end
 #if(${superEntityClass})
-public class ${entity}BO extends ${superEntityClass}#if(${activeRecord})<${entity}>#end {
+public class ${entity}Bo extends ${superEntityClass}#if(${activeRecord})<${entity}>#end {
 #elseif(${activeRecord})
-public class ${entity}BO extends Model<${entity}> {
+public class ${entity}Bo extends Model<${entity}> {
 #elseif(${entitySerialVersionUID})
-public class ${entity}BO implements Serializable {
+public class ${entity}Bo implements Serializable {
 #else
-public class ${entity}BO {
+public class ${entity}Bo {
 #end
 #if(${entitySerialVersionUID})
 

@@ -15,7 +15,7 @@
     </select>
 
     <!-- 获取角色绑定的用户数 -->
-    <select id="countUsersForRole" resultType="java.lang.Integer">
+    <select id="countUsersByRoleId" resultType="java.lang.Integer">
         SELECT
             count(*)
         FROM

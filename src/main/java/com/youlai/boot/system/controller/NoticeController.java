@@ -5,9 +5,9 @@ import com.youlai.boot.core.web.PageResult;
 import com.youlai.boot.core.web.Result;
 import com.youlai.boot.system.model.form.NoticeForm;
 import com.youlai.boot.system.model.query.NoticePageQuery;
-import com.youlai.boot.system.model.vo.NoticeDetailVO;
-import com.youlai.boot.system.model.vo.NoticePageVO;
-import com.youlai.boot.system.model.vo.UserNoticePageVO;
+import com.youlai.boot.system.model.vo.NoticeDetailVo;
+import com.youlai.boot.system.model.vo.NoticePageVo;
+import com.youlai.boot.system.model.vo.UserNoticePageVo;
 import com.youlai.boot.system.service.NoticeService;
 import com.youlai.boot.system.service.UserNoticeService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -38,8 +38,8 @@ public class NoticeController {
     @Operation(summary = "通知公告分页列表")
     @GetMapping("/page")
     @PreAuthorize("@ss.hasPerm('sys:notice:list')")
-    public PageResult<NoticePageVO> getNoticePage(NoticePageQuery queryParams) {
-        IPage<NoticePageVO> result = noticeService.getNoticePage(queryParams);
+    public PageResult<NoticePageVo> getNoticePage(NoticePageQuery queryParams) {
+        IPage<NoticePageVo> result = noticeService.getNoticePage(queryParams);
         return PageResult.success(result);
     }
 
@@ -63,11 +63,11 @@ public class NoticeController {
 
     @Operation(summary = "阅读获取通知公告详情")
     @GetMapping("/{id}/detail")
-    public Result<NoticeDetailVO> getNoticeDetail(
+    public Result<NoticeDetailVo> getNoticeDetail(
             @Parameter(description = "通知公告ID") @PathVariable Long id
     ) {
-        NoticeDetailVO detailVO = noticeService.getNoticeDetail(id);
-        return Result.success(detailVO);
+        NoticeDetailVo detailVo = noticeService.getNoticeDetail(id);
+        return Result.success(detailVo);
     }
 
     @Operation(summary = "修改通知公告")
@@ -120,10 +120,10 @@ public class NoticeController {
 
     @Operation(summary = "获取我的通知公告分页列表")
     @GetMapping("/my")
-    public PageResult<UserNoticePageVO> getMyNoticePage(
+    public PageResult<UserNoticePageVo> getMyNoticePage(
             NoticePageQuery queryParams
     ) {
-        IPage<UserNoticePageVO> result = noticeService.getMyNoticePage(queryParams);
+        IPage<UserNoticePageVo> result = noticeService.getMyNoticePage(queryParams);
         return PageResult.success(result);
     }
 }

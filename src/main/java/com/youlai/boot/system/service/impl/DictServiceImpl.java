@@ -12,7 +12,7 @@ import com.youlai.boot.system.model.entity.Dict;
 import com.youlai.boot.system.model.entity.DictItem;
 import com.youlai.boot.system.model.form.DictForm;
 import com.youlai.boot.system.model.query.DictPageQuery;
-import com.youlai.boot.system.model.vo.DictPageVO;
+import com.youlai.boot.system.model.vo.DictPageVo;
 import com.youlai.boot.system.service.DictItemService;
 import com.youlai.boot.system.service.DictService;
 import lombok.RequiredArgsConstructor;
@@ -40,7 +40,7 @@ public class DictServiceImpl extends ServiceImpl<DictMapper, Dict> implements Di
      * @param queryParams 分页查询对象
      */
     @Override
-    public Page<DictPageVO> getDictPage(DictPageQuery queryParams) {
+    public Page<DictPageVo> getDictPage(DictPageQuery queryParams) {
         // 查询参数
         int pageNum = queryParams.getPageNum();
         int pageSize = queryParams.getPageSize();

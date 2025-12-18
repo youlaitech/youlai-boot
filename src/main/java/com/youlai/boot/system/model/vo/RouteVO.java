@@ -16,7 +16,7 @@ import java.util.Map;
 @Schema(description = "路由对象")
 @Data
 @JsonInclude(JsonInclude.Include.NON_EMPTY)
-public class RouteVO {
+public class RouteVo {
 
     @Schema(description = "路由路径", example = "user")
     private String path;
@@ -59,5 +59,5 @@ public class RouteVO {
     }
 
     @Schema(description = "子路由列表")
-    private List<RouteVO> children;
+    private List<RouteVo> children;
 }

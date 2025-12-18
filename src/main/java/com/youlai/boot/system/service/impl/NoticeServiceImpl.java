@@ -13,22 +13,23 @@ import com.youlai.boot.system.converter.NoticeConverter;
 import com.youlai.boot.system.enums.NoticePublishStatusEnum;
 import com.youlai.boot.system.enums.NoticeTargetEnum;
 import com.youlai.boot.system.mapper.NoticeMapper;
-import com.youlai.boot.system.model.bo.NoticeBO;
-import com.youlai.boot.system.model.dto.NoticeDTO;
+import com.youlai.boot.system.model.bo.NoticeBo;
+import com.youlai.boot.system.model.dto.NoticeDto;
 import com.youlai.boot.system.model.entity.Notice;
 import com.youlai.boot.system.model.entity.UserNotice;
 import com.youlai.boot.system.model.entity.User;
 import com.youlai.boot.system.model.form.NoticeForm;
 import com.youlai.boot.system.model.query.NoticePageQuery;
-import com.youlai.boot.system.model.vo.NoticePageVO;
-import com.youlai.boot.system.model.vo.UserNoticePageVO;
-import com.youlai.boot.system.model.vo.NoticeDetailVO;
+import com.youlai.boot.system.model.vo.NoticePageVo;
+import com.youlai.boot.system.model.vo.UserNoticePageVo;
+import com.youlai.boot.system.model.vo.NoticeDetailVo;
 import com.youlai.boot.system.service.NoticeService;
 import com.youlai.boot.system.service.UserNoticeService;
 import com.youlai.boot.system.service.UserOnlineService;
 import com.youlai.boot.system.service.UserService;
+import com.youlai.boot.platform.websocket.publisher.WebSocketPublisher;
+import com.youlai.boot.platform.websocket.topic.WebSocketTopics;
 import lombok.RequiredArgsConstructor;
-import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -52,18 +53,18 @@ public class NoticeServiceImpl extends ServiceImpl<NoticeMapper, Notice> impleme
     private final NoticeConverter noticeConverter;
     private final UserNoticeService userNoticeService;
     private final UserService userService;
-    private final SimpMessagingTemplate messagingTemplate;
+    private final WebSocketPublisher webSocketPublisher;
     private final UserOnlineService userOnlineService;
 
     /**
      * 获取通知公告分页列表
      *
      * @param queryParams 查询参数
-     * @return {@link IPage< NoticePageVO >} 通知公告分页列表
+     * @return {@link IPage< NoticePageVo >} 通知公告分页列表
      */
     @Override
-    public IPage<NoticePageVO> getNoticePage(NoticePageQuery queryParams) {
-        Page<NoticeBO> noticePage = this.baseMapper.getNoticePage(
+    public IPage<NoticePageVo> getNoticePage(NoticePageQuery queryParams) {
+        Page<NoticeBo> noticePage = this.baseMapper.getNoticePage(
                 new Page<>(queryParams.getPageNum(), queryParams.getPageSize()),
                 queryParams
         );
@@ -214,19 +215,19 @@ public class NoticeServiceImpl extends ServiceImpl<NoticeMapper, Notice> impleme
             Set<String> receivers = targetUserList.stream().map(User::getUsername).collect(Collectors.toSet());
 
             Set<String> allOnlineUsers = userOnlineService.getOnlineUsers().stream()
-              .map(UserOnlineService.UserOnlineDTO::getUsername)
+              .map(UserOnlineService.UserOnlineDto::getUsername)
               .collect(Collectors.toSet());
 
             // 找出在线用户的通知接收者
             Set<String> onlineReceivers = new HashSet<>(CollectionUtil.intersection(receivers, allOnlineUsers));
 
-            NoticeDTO noticeDTO = new NoticeDTO();
-            noticeDTO.setId(id);
-            noticeDTO.setTitle(notice.getTitle());
-            noticeDTO.setType(notice.getType());
-            noticeDTO.setPublishTime(notice.getPublishTime());
+            NoticeDto noticeDto = new NoticeDto();
+            noticeDto.setId(id);
+            noticeDto.setTitle(notice.getTitle());
+            noticeDto.setType(notice.getType());
+            noticeDto.setPublishTime(notice.getPublishTime());
 
-            onlineReceivers.forEach(receiver -> messagingTemplate.convertAndSendToUser(receiver, "/queue/message", noticeDTO));
+            onlineReceivers.forEach(receiver -> webSocketPublisher.publishToUser(receiver, WebSocketTopics.USER_QUEUE_MESSAGE, noticeDto));
         }
         return publishResult;
     }
@@ -249,7 +250,7 @@ public class NoticeServiceImpl extends ServiceImpl<NoticeMapper, Notice> impleme
             throw new BusinessException("通知公告未发布或已撤回");
         }
 
-        notice.setPublishStatus(NoticePublishStatusEnum.REVOKED.getValue());
+        notice.setPublishStatus(NoticePublishStatusEnum.REVoKED.getValue());
         notice.setRevokeTime(LocalDateTime.now());
         notice.setUpdateBy(SecurityUtils.getUserId());
 
@@ -267,11 +268,11 @@ public class NoticeServiceImpl extends ServiceImpl<NoticeMapper, Notice> impleme
     /**
      *
      * @param id 通知公告ID
-     * @return NoticeDetailVO 通知公告详情
+     * @return NoticeDetailVo 通知公告详情
      */
     @Override
-    public NoticeDetailVO getNoticeDetail(Long id) {
-        NoticeBO noticeBO = this.baseMapper.getNoticeDetail(id);
+    public NoticeDetailVo getNoticeDetail(Long id) {
+        NoticeBo noticeBo = this.baseMapper.getNoticeDetail(id);
         // 更新用户通知公告的阅读状态
         Long userId = SecurityUtils.getUserId();
         userNoticeService.update(new LambdaUpdateWrapper<UserNotice>()
@@ -280,7 +281,7 @@ public class NoticeServiceImpl extends ServiceImpl<NoticeMapper, Notice> impleme
                 .eq(UserNotice::getIsRead, 0)
                 .set(UserNotice::getIsRead, 1)
         );
-        return noticeConverter.toDetailVO(noticeBO);
+        return noticeConverter.toDetailVo(noticeBo);
     }
 
     /**
@@ -290,7 +291,7 @@ public class NoticeServiceImpl extends ServiceImpl<NoticeMapper, Notice> impleme
      * @return 通知公告分页列表
      */
     @Override
-    public IPage<UserNoticePageVO> getMyNoticePage(NoticePageQuery queryParams) {
+    public IPage<UserNoticePageVo> getMyNoticePage(NoticePageQuery queryParams) {
         queryParams.setUserId(SecurityUtils.getUserId());
         return userNoticeService.getMyNoticePage(
                 new Page<>(queryParams.getPageNum(), queryParams.getPageSize()),

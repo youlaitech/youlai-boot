@@ -9,7 +9,7 @@ import java.util.List;
 
 @Schema(description = "部门视图对象")
 @Data
-public class DeptVO {
+public class DeptVo {
 
     @Schema(description = "部门ID")
     private Long id;
@@ -30,7 +30,7 @@ public class DeptVO {
     private Integer status;
 
     @Schema(description = "子部门")
-    private List<DeptVO> children;
+    private List<DeptVo> children;
 
     @Schema(description = "创建时间")
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm")

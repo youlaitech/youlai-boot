@@ -3,7 +3,7 @@ package ${packageName}.${moduleName}.${subpackageName};
 import ${packageName}.${moduleName}.model.entity.${entityName};
 import ${packageName}.${moduleName}.model.form.${entityName}Form;
 import ${packageName}.${moduleName}.model.query.${entityName}Query;
-import ${packageName}.${moduleName}.model.vo.${entityName}VO;
+import ${packageName}.${moduleName}.model.vo.${entityName}Vo;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.service.IService;
 
@@ -18,9 +18,9 @@ public interface ${entityName}Service extends IService<${entityName}> {
     /**
      *$!{businessName}分页列表
      *
-     * @return {@link IPage<${entityName}VO>} $!{businessName}分页列表
+     * @return {@link IPage<${entityName}Vo>} $!{businessName}分页列表
      */
-    IPage<${entityName}VO> get${entityName}Page(${entityName}Query queryParams);
+    IPage<${entityName}Vo> get${entityName}Page(${entityName}Query queryParams);
 
     /**
      * 获取${businessName}表单数据

@@ -43,7 +43,7 @@ public enum ResultCode implements IResultCode, Serializable {
     VERIFICATION_CODE_INPUT_ERROR("A0130", "校验码输入错误"),
     SMS_VERIFICATION_CODE_INPUT_ERROR("A0131", "短信校验码输入错误"),
     EMAIL_VERIFICATION_CODE_INPUT_ERROR("A0132", "邮件校验码输入错误"),
-    VOICE_VERIFICATION_CODE_INPUT_ERROR("A0133", "语音校验码输入错误"),
+    VoICE_VERIFICATION_CODE_INPUT_ERROR("A0133", "语音校验码输入错误"),
 
     USER_CERTIFICATE_EXCEPTION("A0140", "用户证件异常"),
     USER_CERTIFICATE_TYPE_NOT_SELECTED("A0141", "用户证件类型未选择"),
@@ -262,7 +262,7 @@ public enum ResultCode implements IResultCode, Serializable {
     /** 二级宏观错误码  */
     NOTIFICATION_SERVICE_ERROR("C0500", "通知服务出错"),
     SMS_REMINDER_SERVICE_FAILED("C0501", "短信提醒服务失败"),
-    VOICE_REMINDER_SERVICE_FAILED("C0502", "语音提醒服务失败"),
+    VoICE_REMINDER_SERVICE_FAILED("C0502", "语音提醒服务失败"),
     EMAIL_REMINDER_SERVICE_FAILED("C0503", "邮件提醒服务失败");
 
 

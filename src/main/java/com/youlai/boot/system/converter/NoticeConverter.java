@@ -1,11 +1,11 @@
 package com.youlai.boot.system.converter;
 
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
-import com.youlai.boot.system.model.bo.NoticeBO;
+import com.youlai.boot.system.model.bo.NoticeBo;
 import com.youlai.boot.system.model.entity.Notice;
 import com.youlai.boot.system.model.form.NoticeForm;
-import com.youlai.boot.system.model.vo.NoticeDetailVO;
-import com.youlai.boot.system.model.vo.NoticePageVO;
+import com.youlai.boot.system.model.vo.NoticeDetailVo;
+import com.youlai.boot.system.model.vo.NoticePageVo;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.Mappings;
@@ -30,9 +30,9 @@ public interface NoticeConverter{
     })
     Notice toEntity(NoticeForm formData);
 
-    NoticePageVO toPageVo(NoticeBO bo);
+    NoticePageVo toPageVo(NoticeBo bo);
 
-    Page<NoticePageVO> toPageVo(Page<NoticeBO> noticePage);
+    Page<NoticePageVo> toPageVo(Page<NoticeBo> noticePage);
 
-    NoticeDetailVO toDetailVO(NoticeBO noticeBO);
+    NoticeDetailVo toDetailVo(NoticeBo noticeBo);
 }

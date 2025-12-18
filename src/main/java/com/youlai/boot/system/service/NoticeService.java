@@ -5,9 +5,9 @@ import com.baomidou.mybatisplus.extension.service.IService;
 import com.youlai.boot.system.model.entity.Notice;
 import com.youlai.boot.system.model.form.NoticeForm;
 import com.youlai.boot.system.model.query.NoticePageQuery;
-import com.youlai.boot.system.model.vo.NoticePageVO;
-import com.youlai.boot.system.model.vo.UserNoticePageVO;
-import com.youlai.boot.system.model.vo.NoticeDetailVO;
+import com.youlai.boot.system.model.vo.NoticePageVo;
+import com.youlai.boot.system.model.vo.UserNoticePageVo;
+import com.youlai.boot.system.model.vo.NoticeDetailVo;
 
 /**
  * 通知公告服务类
@@ -22,7 +22,7 @@ public interface NoticeService extends IService<Notice> {
      *
      * @return 通知公告分页列表
      */
-    IPage<NoticePageVO> getNoticePage(NoticePageQuery queryParams);
+    IPage<NoticePageVo> getNoticePage(NoticePageQuery queryParams);
 
     /**
      * 获取通知公告表单数据
@@ -79,7 +79,7 @@ public interface NoticeService extends IService<Notice> {
      * @param id 通知公告ID
      * @return 通知公告详情
      */
-    NoticeDetailVO getNoticeDetail(Long id);
+    NoticeDetailVo getNoticeDetail(Long id);
 
     /**
      * 获取我的通知公告分页列表
@@ -87,5 +87,5 @@ public interface NoticeService extends IService<Notice> {
      * @param queryParams 查询参数
      * @return 通知公告分页列表
      */
-    IPage<UserNoticePageVO> getMyNoticePage(NoticePageQuery queryParams);
+    IPage<UserNoticePageVo> getMyNoticePage(NoticePageQuery queryParams);
 }

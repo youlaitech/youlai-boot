@@ -6,7 +6,7 @@ import cn.binarywang.wx.miniapp.bean.WxMaPhoneNumberInfo;
 import cn.hutool.core.util.ObjectUtil;
 import cn.hutool.core.util.StrUtil;
 import com.youlai.boot.security.model.SysUserDetails;
-import com.youlai.boot.security.model.UserAuthCredentials;
+import com.youlai.boot.security.model.UserAuthInfo;
 import com.youlai.boot.security.model.WxMiniAppPhoneAuthenticationToken;
 import com.youlai.boot.system.service.UserService;
 import lombok.extern.slf4j.Slf4j;
@@ -78,28 +78,28 @@ public class WxMiniAppPhoneAuthenticationProvider implements AuthenticationProvi
         String phoneNumber = phoneNumberInfo.getPhoneNumber();
 
         // 3. 根据手机号查询用户，不存在则创建新用户
-        UserAuthCredentials userAuthCredentials = userService.getAuthCredentialsByMobile(phoneNumber);
+        UserAuthInfo userAuthInfo = userService.getAuthInfoByMobile(phoneNumber);
 
-        if (userAuthCredentials == null) {
+        if (userAuthInfo == null) {
             // 用户不存在，注册新用户
             boolean registered = userService.registerUserByMobileAndOpenId(phoneNumber, openId);
             if (!registered) {
                 throw new UsernameNotFoundException("用户注册失败");
             }
             // 重新获取用户信息
-            userAuthCredentials = userService.getAuthCredentialsByMobile(phoneNumber);
+            userAuthInfo = userService.getAuthInfoByMobile(phoneNumber);
         } else {
             // 用户存在，绑定openId（如果未绑定）
-            userService.bindUserOpenId(userAuthCredentials.getUserId(), openId);
+            userService.bindUserOpenId(userAuthInfo.getUserId(), openId);
         }
 
         // 4. 检查用户状态
-        if (ObjectUtil.notEqual(userAuthCredentials.getStatus(), 1)) {
+        if (ObjectUtil.notEqual(userAuthInfo.getStatus(), 1)) {
             throw new DisabledException("用户已被禁用");
         }
 
         // 5. 构建认证后的用户详情
-        SysUserDetails userDetails = new SysUserDetails(userAuthCredentials);
+        SysUserDetails userDetails = new SysUserDetails(userAuthInfo);
 
         // 6. 创建已认证的Token
         return WxMiniAppPhoneAuthenticationToken.authenticated(

@@ -7,7 +7,7 @@ import lombok.NoArgsConstructor;
 import java.util.List;
 
 /**
- * AI 解析响应 DTO
+ * AI 解析响应 Dto
  *
  * @author Ray.Hao
  * @since 3.0.0
@@ -16,7 +16,7 @@ import java.util.List;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class AiParseResponseDTO {
+public class AiParseResponseDto {
 
     /**
      * 解析日志ID（用于关联执行记录）
@@ -31,7 +31,7 @@ public class AiParseResponseDTO {
     /**
      * 解析后的函数调用列表
      */
-    private List<AiFunctionCallDTO> functionCalls;
+    private List<AiFunctionCallDto> functionCalls;
 
     /**
      * AI 的理解和说明
@@ -53,4 +53,3 @@ public class AiParseResponseDTO {
      */
     private String rawResponse;
 }
-

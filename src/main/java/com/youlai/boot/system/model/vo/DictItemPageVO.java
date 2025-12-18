@@ -14,7 +14,7 @@ import lombok.Setter;
 @Schema(description = "字典项分页对象")
 @Getter
 @Setter
-public class DictItemPageVO {
+public class DictItemPageVo {
 
     @Schema(description = "字典项ID")
     private Long id;

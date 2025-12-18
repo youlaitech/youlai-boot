@@ -13,7 +13,7 @@ import lombok.Setter;
 #end
 
 /**
- * $!{table.comment} 分页VO
+ * $!{table.comment} 分页Vo
  *
  * @author ${author}
  * @since ${date}
@@ -27,13 +27,13 @@ import lombok.Setter;
 #end
 @Schema( description = "$!{table.comment}分页视图对象")
 #if(${superEntityClass})
-public class ${entity}PageVO extends ${superEntityClass}#if(${activeRecord})<${entity}>#end {
+public class ${entity}PageVo extends ${superEntityClass}#if(${activeRecord})<${entity}>#end {
 #elseif(${activeRecord})
-public class ${entity}PageVO extends Model<${entity}> {
+public class ${entity}PageVo extends Model<${entity}> {
 #elseif(${entitySerialVersionUID})
-public class ${entity}PageVO implements Serializable {
+public class ${entity}PageVo implements Serializable {
 #else
-public class ${entity}PageVO {
+public class ${entity}PageVo {
 #end
 #if(${entitySerialVersionUID})
 

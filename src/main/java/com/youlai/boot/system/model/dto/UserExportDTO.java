@@ -16,7 +16,7 @@ import java.time.LocalDateTime;
 
 @Data
 @ColumnWidth(20)
-public class UserExportDTO {
+public class UserExportDto {
 
     @ExcelProperty(value = "用户名")
     private String username;

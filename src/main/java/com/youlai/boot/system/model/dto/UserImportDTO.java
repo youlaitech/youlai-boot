@@ -10,7 +10,7 @@ import lombok.Data;
  * @since 2022/4/10
  */
 @Data
-public class UserImportDTO {
+public class UserImportDto {
 
     @ExcelProperty(value = "用户名")
     private String username;

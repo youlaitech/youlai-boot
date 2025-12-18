@@ -8,8 +8,8 @@ import com.youlai.boot.common.enums.LogModuleEnum;
 import com.youlai.boot.platform.codegen.service.CodegenService;
 import com.youlai.boot.platform.codegen.model.form.GenConfigForm;
 import com.youlai.boot.platform.codegen.model.query.TablePageQuery;
-import com.youlai.boot.platform.codegen.model.vo.CodegenPreviewVO;
-import com.youlai.boot.platform.codegen.model.vo.TablePageVO;
+import com.youlai.boot.platform.codegen.model.vo.CodegenPreviewVo;
+import com.youlai.boot.platform.codegen.model.vo.TablePageVo;
 import com.youlai.boot.common.annotation.Log;
 import com.youlai.boot.platform.codegen.service.GenTableService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -46,10 +46,10 @@ public class CodegenController {
     @Operation(summary = "获取数据表分页列表")
     @GetMapping("/table/page")
     @Log(value = "代码生成分页列表", module = LogModuleEnum.OTHER)
-    public PageResult<TablePageVO> getTablePage(
+    public PageResult<TablePageVo> getTablePage(
             TablePageQuery queryParams
     ) {
-        Page<TablePageVO> result = codegenService.getTablePage(queryParams);
+        Page<TablePageVo> result = codegenService.getTablePage(queryParams);
         return PageResult.success(result);
     }
 
@@ -82,9 +82,9 @@ public class CodegenController {
     @Operation(summary = "获取预览生成代码")
     @GetMapping("/{tableName}/preview")
     @Log(value = "预览生成代码", module = LogModuleEnum.OTHER)
-    public Result<List<CodegenPreviewVO>> getTablePreviewData(@PathVariable String tableName,
+    public Result<List<CodegenPreviewVo>> getTablePreviewData(@PathVariable String tableName,
                                                               @RequestParam(value = "pageType", required = false, defaultValue = "classic") String pageType) {
-        List<CodegenPreviewVO> list = codegenService.getCodegenPreviewData(tableName, pageType);
+        List<CodegenPreviewVo> list = codegenService.getCodegenPreviewData(tableName, pageType);
         return Result.success(list);
     }
 

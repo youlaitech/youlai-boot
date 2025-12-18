@@ -1,10 +1,9 @@
 package com.youlai.boot.system.service;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
+import com.youlai.boot.platform.websocket.publisher.WebSocketPublisher;
+import com.youlai.boot.platform.websocket.topic.WebSocketTopics;
 import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -26,11 +25,10 @@ public class UserOnlineService {
     // 在线用户映射表，key为用户名，value为用户在线信息
     private final Map<String, UserOnlineInfo> onlineUsers = new ConcurrentHashMap<>();
     
-    private SimpMessagingTemplate messagingTemplate;
+    private final WebSocketPublisher webSocketPublisher;
 
-    @Autowired(required = false)
-    public void setMessagingTemplate(SimpMessagingTemplate messagingTemplate) {
-        this.messagingTemplate = messagingTemplate;
+    public UserOnlineService(WebSocketPublisher webSocketPublisher) {
+        this.webSocketPublisher = webSocketPublisher;
     }
 
     /**
@@ -68,9 +66,9 @@ public class UserOnlineService {
      *
      * @return 在线用户名列表
      */
-    public List<UserOnlineDTO> getOnlineUsers() {
+    public List<UserOnlineDto> getOnlineUsers() {
         return onlineUsers.values().stream()
-                .map(info -> new UserOnlineDTO(info.getUsername(), info.getLoginTime()))
+                .map(info -> new UserOnlineDto(info.getUsername(), info.getLoginTime()))
                 .collect(Collectors.toList());
     }
 
@@ -97,11 +95,6 @@ public class UserOnlineService {
      * 通知所有客户端在线用户变更
      */
     private void notifyOnlineUsersChange() {
-        if (messagingTemplate == null) {
-            log.warn("消息模板尚未初始化，无法发送在线用户数量");
-            return;
-        }
-        
         // 发送简化版数据（仅数量）
         sendOnlineUserCount();
     }
@@ -110,15 +103,10 @@ public class UserOnlineService {
      * 发送在线用户数量（简化版，不包含用户详情）
      */
     private void sendOnlineUserCount() {
-        if (messagingTemplate == null) {
-            log.warn("消息模板尚未初始化，无法发送在线用户数量");
-            return;
-        }
-        
         try {
             // 直接发送数量，更轻量
             int count = onlineUsers.size();
-            messagingTemplate.convertAndSend("/topic/online-count", count);
+            webSocketPublisher.publish(WebSocketTopics.TOPIC_ONLINE_COUNT, count);
             log.debug("已发送在线用户数量: {}", count);
         } catch (Exception e) {
             log.error("发送在线用户数量失败", e);
@@ -136,10 +124,10 @@ public class UserOnlineService {
     }
 
     /**
-     * 用户在线DTO（用于返回给前端）
+     * 用户在线Dto（用于返回给前端）
      */
     @Data
-    public static class UserOnlineDTO {
+    public static class UserOnlineDto {
         private final String username;
         private final long loginTime;
     }
@@ -151,7 +139,7 @@ public class UserOnlineService {
     private static class OnlineUsersChangeEvent {
         private String type;
         private int count;
-        private List<UserOnlineDTO> users;
+        private List<UserOnlineDto> users;
         private long timestamp;
     }
 } 
