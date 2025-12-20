@@ -329,7 +329,6 @@ INSERT INTO `sys_role_menu` VALUES (2, 1001), (2, 1002);
 DROP TABLE IF EXISTS `sys_user`;
 CREATE TABLE `sys_user`  (
                              `id` bigint NOT NULL AUTO_INCREMENT,
-                             `tenant_id` bigint DEFAULT 1 COMMENT '租户ID',
                              `username` varchar(64) COMMENT '用户名',
                              `nickname` varchar(64) COMMENT '昵称',
                              `gender` tinyint(1) DEFAULT 1 COMMENT '性别((1-男 2-女 0-保密)',
@@ -346,16 +345,15 @@ CREATE TABLE `sys_user`  (
                              `is_deleted` tinyint(1) DEFAULT 0 COMMENT '逻辑删除标识(0-未删除 1-已删除)',
                              `openid` char(28) COMMENT '微信 openid',
                              PRIMARY KEY (`id`) USING BTREE,
-                             UNIQUE KEY `uk_username_tenant` (`username`, `tenant_id`),
-                             KEY `idx_tenant_id` (`tenant_id`)
+                             UNIQUE KEY `uk_username` (`username`)
 ) ENGINE = InnoDB CHARACTER SET = utf8mb4 COMMENT = '系统用户表';
 
 -- ----------------------------
 -- Records of sys_user
 -- ----------------------------
-INSERT INTO `sys_user` VALUES (1, 1, 'root', '有来技术', 0, '$2a$10$xVWsNOhHrCxh5UbpCE7/HuJ.PAOKcYAqRxD2CO2nVnJS.IAXkr5aq', NULL, 'https://foruda.gitee.com/images/1723603502796844527/03cdca2a_716974.gif', '18812345677', 1, 'youlaitech@163.com', now(), NULL, now(), NULL, 0,NULL);
-INSERT INTO `sys_user` VALUES (2, 1, 'admin', '系统管理员', 1, '$2a$10$xVWsNOhHrCxh5UbpCE7/HuJ.PAOKcYAqRxD2CO2nVnJS.IAXkr5aq', 1, 'https://foruda.gitee.com/images/1723603502796844527/03cdca2a_716974.gif', '18812345678', 1, 'youlaitech@163.com', now(), NULL, now(), NULL, 0,NULL);
-INSERT INTO `sys_user` VALUES (3, 1, 'test', '测试小用户', 1, '$2a$10$xVWsNOhHrCxh5UbpCE7/HuJ.PAOKcYAqRxD2CO2nVnJS.IAXkr5aq', 3, 'https://foruda.gitee.com/images/1723603502796844527/03cdca2a_716974.gif', '18812345679', 1, 'youlaitech@163.com', now(), NULL, now(), NULL, 0,NULL);
+INSERT INTO `sys_user` VALUES (1, 'root', '有来技术', 0, '$2a$10$xVWsNOhHrCxh5UbpCE7/HuJ.PAOKcYAqRxD2CO2nVnJS.IAXkr5aq', NULL, 'https://foruda.gitee.com/images/1723603502796844527/03cdca2a_716974.gif', '18812345677', 1, 'youlaitech@163.com', now(), NULL, now(), NULL, 0,NULL);
+INSERT INTO `sys_user` VALUES (2, 'admin', '系统管理员', 1, '$2a$10$xVWsNOhHrCxh5UbpCE7/HuJ.PAOKcYAqRxD2CO2nVnJS.IAXkr5aq', 1, 'https://foruda.gitee.com/images/1723603502796844527/03cdca2a_716974.gif', '18812345678', 1, 'youlaitech@163.com', now(), NULL, now(), NULL, 0,NULL);
+INSERT INTO `sys_user` VALUES (3, 'test', '测试小用户', 1, '$2a$10$xVWsNOhHrCxh5UbpCE7/HuJ.PAOKcYAqRxD2CO2nVnJS.IAXkr5aq', 3, 'https://foruda.gitee.com/images/1723603502796844527/03cdca2a_716974.gif', '18812345679', 1, 'youlaitech@163.com', now(), NULL, now(), NULL, 0,NULL);
 
 -- ----------------------------
 -- Table structure for sys_user_role
