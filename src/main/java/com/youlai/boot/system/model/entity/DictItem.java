@@ -50,4 +50,14 @@ public class DictItem extends BaseEntity {
      * 标签类型
      */
     private String tagType;
+
+    /**
+     * 创建人 ID
+     */
+    private Long createBy;
+
+    /**
+     * 更新人 ID
+     */
+    private Long updateBy;
 }

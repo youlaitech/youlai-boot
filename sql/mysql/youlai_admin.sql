@@ -395,7 +395,6 @@ CREATE TABLE `sys_log` (
                            `os` varchar(100) COMMENT '终端系统',
                            `create_by` bigint COMMENT '创建人ID',
                            `create_time` datetime COMMENT '创建时间',
-                           `is_deleted` tinyint DEFAULT '0' COMMENT '逻辑删除标识(1-已删除 0-未删除)',
                            PRIMARY KEY (`id`) USING BTREE,
                            KEY `idx_create_time` (`create_time`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4 COMMENT='系统操作日志表';
