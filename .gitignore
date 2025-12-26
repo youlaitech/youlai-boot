@@ -17,3 +17,4 @@ docker/*/data/
 docker/minio/config
 docker/xxljob/logs
 application-youlai.yml
+youlai_admin_template.sql

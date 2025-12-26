@@ -59,7 +59,7 @@
         <!-- 微信 jdk -->
         <weixin-java.version>4.7.7.B</weixin-java.version>
         <caffeine.version>2.9.3</caffeine.version>
-        
+
         <!-- 阿里 TransmittableThreadLocal (支持异步场景的ThreadLocal传递) -->
         <transmittable-thread-local.version>2.14.5</transmittable-thread-local.version>
     </properties>
@@ -278,11 +278,11 @@
         </dependency>-->
 
         <!-- Spring AI OpenAI（兼容通义千问、DeepSeek等） -->
-      <dependency>
-        <groupId>org.springframework.ai</groupId>
-        <artifactId>spring-ai-openai-spring-boot-starter</artifactId>
-        <version>1.0.0-M6</version>
-      </dependency>
+        <dependency>
+            <groupId>org.springframework.ai</groupId>
+            <artifactId>spring-ai-starter-model-openai</artifactId>
+            <version>1.1.2</version>
+        </dependency>
 
         <dependency>
             <groupId>com.dameng</groupId>

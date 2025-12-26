@@ -208,7 +208,7 @@ INSERT INTO `sys_menu` VALUES (2806, 280, '0,1,280', '通知撤回', 'B', NULL, 
 INSERT INTO `sys_menu` VALUES (310, 2, '0,2', '代码生成', 'M', 'Codegen', 'codegen', 'codegen/index', NULL, NULL, 1, 1, 1, 'code', NULL, now(), now(), NULL);
 
 -- AI 助手
-INSERT INTO `sys_menu` VALUES (401, 3, '0,3', 'AI命令记录', 'M', 'AiCommandRecord', 'command-record', 'ai/command-record/index', NULL, NULL, 1, 1, 1, 'document', NULL, now(), now(), NULL);
+INSERT INTO `sys_menu` VALUES (401, 3, '0,3', 'AI命令记录', 'M', 'ai', 'ai', 'ai/index', NULL, NULL, 1, 1, 1, 'document', NULL, now(), now(), NULL);
 
 -- 平台文档（外链通过 route_path 识别）
 INSERT INTO `sys_menu` VALUES (501, 4, '0,4', '平台文档(外链)', 'M', NULL, 'https://juejin.cn/post/7228990409909108793', '', NULL, NULL, NULL, 1, 1, 'document', '', now(), now(), NULL);

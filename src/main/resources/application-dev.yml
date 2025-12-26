@@ -72,7 +72,7 @@ spring:
   ai:
     openai:
       # API Key
-      api-key: ${DASHSCOPE_API_KEY:sk-c2941d05bf2f411ca80424fxxxxxxxx}
+      api-key: ${DASHSCOPE_API_KEY:sk-c2941d05bf2f411ca80424fcd1eb4e07}
 
       # Base URL
       base-url: https://dashscope.aliyuncs.com/compatible-mode
