@@ -29,3 +29,5 @@ public class NoticeDto {
     private LocalDateTime publishTime;
 
 }
+
+ 

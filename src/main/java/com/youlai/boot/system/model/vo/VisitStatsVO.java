@@ -34,5 +34,6 @@ public class VisitStatsVo {
 
     @Schema(description = "页面浏览量增长率")
     private BigDecimal pvGrowthRate;
-
 }
+
+ 

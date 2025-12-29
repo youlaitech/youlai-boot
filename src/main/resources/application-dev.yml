@@ -1,5 +1,5 @@
 server:
-  port: 8000
+  port: 8001
 
 # 数据库类型：用于 MyBatis-Plus 分页方言等（仅方言，不负责连接信息）
 app:
@@ -11,8 +11,8 @@ spring:
     # === MySQL 数据源（默认启用） ===
     driver-class-name: com.mysql.cj.jdbc.Driver
     url: jdbc:mysql://www.youlai.tech:3306/youlai_admin?zeroDateTimeBehavior=convertToNull&useUnicode=true&characterEncoding=UTF-8&serverTimezone=Asia/Shanghai&autoReconnect=true&allowMultiQueries=true
-    username: root
-    password: Youlai@2025
+    username: youlai
+    password: 123456
 
     # === PostgreSQL 数据源示例（按需启用） ===
     # driver-class-name: org.postgresql.Driver

@@ -37,5 +37,6 @@ public class UserNoticePageVo {
 
     @Schema(description = "是否已读")
     private Integer isRead;
-
 }
+
+ 

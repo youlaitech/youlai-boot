@@ -36,3 +36,5 @@ public class ConfigVo {
     @Schema(description = "描述、备注")
     private String remark;
 }
+
+ 

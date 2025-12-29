@@ -49,5 +49,6 @@ public class MenuVo {
     @Schema(description = "子菜单")
     @JsonInclude(value = JsonInclude.Include.NON_NULL)
     private List<MenuVo> children;
-
 }
+
+ 

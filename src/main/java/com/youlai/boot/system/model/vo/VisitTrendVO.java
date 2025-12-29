@@ -1,6 +1,5 @@
 package com.youlai.boot.system.model.vo;
 
-
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Getter;
 import lombok.Setter;
@@ -26,5 +25,6 @@ public class VisitTrendVo {
 
     @Schema(description = "IP数")
     private List<Integer> ipList;
-
 }
+
+ 

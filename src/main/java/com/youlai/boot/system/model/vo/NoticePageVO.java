@@ -59,3 +59,5 @@ public class NoticePageVo implements Serializable {
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm")
     private LocalDateTime revokeTime;
 }
+
+ 

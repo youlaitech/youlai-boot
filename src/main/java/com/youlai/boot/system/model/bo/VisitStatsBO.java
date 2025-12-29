@@ -26,3 +26,5 @@ public class VisitStatsBo {
     private BigDecimal growthRate;
 
 }
+
+ 

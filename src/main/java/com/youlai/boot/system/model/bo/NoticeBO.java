@@ -73,3 +73,5 @@ public class NoticeBo {
      */
     private LocalDateTime revokeTime;
 }
+
+ 

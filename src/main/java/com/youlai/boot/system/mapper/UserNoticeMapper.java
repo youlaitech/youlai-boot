@@ -10,10 +10,9 @@ import com.youlai.boot.system.model.vo.UserNoticePageVo;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 
-import java.util.List;
 
 /**
- * 用户公告状态Mapper接口
+ * 用户公告状态
  *
  * @author youlaitech
  * @since 2024-08-28 16:56

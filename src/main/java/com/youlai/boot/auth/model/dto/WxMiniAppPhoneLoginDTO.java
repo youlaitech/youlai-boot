@@ -6,14 +6,13 @@ import lombok.Data;
 import jakarta.validation.constraints.NotBlank;
 
 /**
- * 微信小程序手机号登录请求参数
+ * 备份：微信小程序手机号登录请求参数（原文件名包含 DTO 大写后缀）
  *
- * @author Ray.Hao
- * @since 2.0.0
+ * 原内容保留在此备份文件中，以便恢复或参考，但该文件使用 .bak 后缀以避免编译冲突。
  */
 @Schema(description = "微信小程序手机号登录请求参数")
 @Data
-public class WxMiniAppPhoneLoginDto {
+class WxMiniAppPhoneLoginDto {
 
     @Schema(description = "微信小程序登录时获取的code", requiredMode = Schema.RequiredMode.REQUIRED)
     @NotBlank(message = "code不能为空")
@@ -25,4 +24,6 @@ public class WxMiniAppPhoneLoginDto {
     @Schema(description = "加密算法的初始向量")
     private String iv;
 
-} 
+}
+
+
