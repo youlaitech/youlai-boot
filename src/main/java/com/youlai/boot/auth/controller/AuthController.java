@@ -1,12 +1,12 @@
 package com.youlai.boot.auth.controller;
 
+import com.youlai.boot.auth.model.dto.WxMiniAppCodeLoginDto;
+import com.youlai.boot.auth.model.dto.WxMiniAppPhoneLoginDto;
 import com.youlai.boot.auth.model.vo.CaptchaVo;
 import com.youlai.boot.auth.model.dto.LoginRequest;
-import com.youlai.boot.auth.model.dto.WxMiniAppPhoneLoginDto;
 import com.youlai.boot.common.enums.LogModuleEnum;
 import com.youlai.boot.core.web.Result;
 import com.youlai.boot.auth.service.AuthService;
-import com.youlai.boot.auth.model.dto.WxMiniAppCodeLoginDto;
 import com.youlai.boot.common.annotation.Log;
 import com.youlai.boot.security.model.AuthenticationToken;
 import io.swagger.v3.oas.annotations.Operation;
@@ -15,16 +15,13 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
-
-
 
 /**
  * 认证控制层
  *
  * @author Ray.Hao
- * @since 2022/10/16
+ * @since 0.0.1
  */
 @Tag(name = "01.认证中心")
 @RestController
@@ -95,7 +92,6 @@ public class AuthController {
         AuthenticationToken token = authService.loginByWxMiniAppPhone(loginDto);
         return Result.success(token);
     }
-
 
     @Operation(summary = "退出登录")
     @DeleteMapping("/logout")
