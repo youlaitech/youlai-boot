@@ -36,7 +36,6 @@ import java.util.List;
  */
 @Tag(name = "06.字典接口")
 @RestController
-@SuppressWarnings("SpellCheckingInspection")
 @RequestMapping("/api/v1/dicts")
 @RequiredArgsConstructor
 public class DictController {
