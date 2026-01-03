@@ -15,8 +15,8 @@ import java.util.*;
 /**
  * SpringSecurity 权限校验
  *
- * @author haoxr
- * @since 2022/2/22
+ * @author Ray.Hao
+ * @since 0.0.1
  */
 @Component("ss")
 @RequiredArgsConstructor
@@ -73,15 +73,16 @@ public class PermissionService {
      * @return 角色权限列表
      */
     public Set<String> getRolePermsFormCache(Set<String> roleCodes) {
-        // 检查输入是否为空
         if (CollectionUtil.isEmpty(roleCodes)) {
             return Collections.emptySet();
         }
 
+        // 构建缓存Key
+        String cacheKey = RedisConstants.System.ROLE_PERMS;
+
         Set<String> perms = new HashSet<>();
-        // 从缓存中一次性获取所有角色的权限
         Collection<Object> roleCodesAsObjects = new ArrayList<>(roleCodes);
-        List<Object> rolePermsList = redisTemplate.opsForHash().multiGet(RedisConstants.System.ROLE_PERMS, roleCodesAsObjects);
+        List<Object> rolePermsList = redisTemplate.opsForHash().multiGet(cacheKey, roleCodesAsObjects);
 
         for (Object rolePermsObj : rolePermsList) {
             if (rolePermsObj instanceof Set) {

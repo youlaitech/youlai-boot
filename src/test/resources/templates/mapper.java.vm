@@ -6,7 +6,7 @@ import ${superMapperClassPackage};
 import ${mapperAnnotationClass.name};
 #end
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
-import ${package.Parent}.model.bo.${entity}BO;
+import ${package.Parent}.model.bo.${entity}Bo;
 import ${package.Parent}.model.query.${entity}PageQuery;
 import org.apache.ibatis.annotations.Mapper;
 
@@ -30,6 +30,6 @@ public interface ${table.mapperName} extends ${superMapperClass}<${entity}> {
      * @param queryParams 查询参数
      * @return
      */
-    Page<${entity}BO> listPaged${entity}s(Page<${entity}BO> page, ${entity}PageQuery queryParams);
+    Page<${entity}Bo> listPaged${entity}s(Page<${entity}Bo> page, ${entity}PageQuery queryParams);
 
 }

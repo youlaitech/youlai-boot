@@ -19,7 +19,7 @@ public interface RoleMapper extends BaseMapper<Role> {
      * 获取最大范围的数据权限
      *
      * @param roles 角色编码集合
-     * @return
+     * @return {@link Integer} – 数据权限范围
      */
     Integer getMaximumDataScope(Set<String> roles);
 }

@@ -5,7 +5,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import ${package.Parent}.model.form.${entity}Form;
 import ${package.Parent}.model.query.${entity}PageQuery;
-import ${package.Parent}.model.vo.${entity}PageVO;
+import ${package.Parent}.model.vo.${entity}PageVo;
 import ${package.Parent}.service.${table.serviceName};
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.youlai.common.result.PageResult;
@@ -41,8 +41,8 @@ public class ${table.controllerName} {
 
         @Operation(summary = "$!{table.comment}分页列表")
         @GetMapping("/page")
-        public PageResult<${entity}PageVO> listPaged${entity}s(${entity}PageQuery queryParams ) {
-            IPage<${entity}PageVO> result = ${firstCharLowerCaseEntity}Service.listPaged${entity}s(queryParams);
+        public PageResult<${entity}PageVo> listPaged${entity}s(${entity}PageQuery queryParams ) {
+            IPage<${entity}PageVo> result = ${firstCharLowerCaseEntity}Service.listPaged${entity}s(queryParams);
             return PageResult.success(result);
         }
 

@@ -5,9 +5,9 @@ import cn.hutool.captcha.CaptchaUtil;
 import cn.hutool.captcha.generator.CodeGenerator;
 import cn.hutool.core.util.IdUtil;
 import cn.hutool.core.util.StrUtil;
-import com.youlai.boot.auth.model.dto.WxMiniAppCodeLoginDTO;
-import com.youlai.boot.auth.model.dto.WxMiniAppPhoneLoginDTO;
-import com.youlai.boot.auth.model.vo.CaptchaVO;
+import com.youlai.boot.auth.model.dto.WxMiniAppCodeLoginDto;
+import com.youlai.boot.auth.model.dto.WxMiniAppPhoneLoginDto;
+import com.youlai.boot.auth.model.vo.CaptchaVo;
 import com.youlai.boot.auth.service.AuthService;
 import com.youlai.boot.common.constant.RedisConstants;
 import com.youlai.boot.common.constant.SecurityConstants;
@@ -70,6 +70,11 @@ public class AuthServiceImpl implements AuthService {
                 new UsernamePasswordAuthenticationToken(username.trim(), password);
 
         // 2. 执行认证（认证中）
+        // 说明：这里的认证流程由 Spring Security 提供的 AuthenticationManager 执行。
+        // 默认情况下会委托给 DaoAuthenticationProvider：
+        // 1) retrieveUser(...)：内部通过 UserDetailsService.loadUserByUsername(...) 获取用户信息（本项目为 SysUserDetailsService 实现）
+        // 2) additionalAuthenticationChecks(...)：对比请求密码与用户存储密码（由 PasswordEncoder 完成匹配）
+        // 认证通过后返回已认证的 Authentication（principal 为 SysUserDetails，authorities 为角色/权限集合）。
         Authentication authentication = authenticationManager.authenticate(authenticationToken);
 
         // 3. 认证成功后生成 JWT 令牌，并存入 Security 上下文，供登录日志 AOP 使用（已认证）
@@ -152,10 +157,8 @@ public class AuthServiceImpl implements AuthService {
      */
     @Override
     public void logout() {
-        String token = SecurityUtils.getTokenFromRequest();
-        if (StrUtil.isNotBlank(token) && token.startsWith(SecurityConstants.BEARER_TOKEN_PREFIX )) {
-            token = token.substring(SecurityConstants.BEARER_TOKEN_PREFIX .length());
-            // 将JWT令牌加入黑名单
+        String token = SecurityUtils.getAccessToken();
+        if (StrUtil.isNotBlank(token)) {
             tokenManager.invalidateToken(token);
             // 清除Security上下文
             SecurityContextHolder.clearContext();
@@ -168,7 +171,7 @@ public class AuthServiceImpl implements AuthService {
      * @return 验证码
      */
     @Override
-    public CaptchaVO getCaptcha() {
+    public CaptchaVo getCaptcha() {
 
         String captchaType = captchaProperties.getType();
         int width = captchaProperties.getWidth();
@@ -196,16 +199,16 @@ public class AuthServiceImpl implements AuthService {
         String imageBase64Data = captcha.getImageBase64Data();
 
         // 验证码文本缓存至Redis，用于登录校验
-        String captchaKey = IdUtil.fastSimpleUUID();
+        String captchaId = IdUtil.fastSimpleUUID();
         redisTemplate.opsForValue().set(
-                StrUtil.format(RedisConstants.Captcha.IMAGE_CODE, captchaKey),
+                StrUtil.format(RedisConstants.Captcha.IMAGE_CODE, captchaId),
                 captchaCode,
                 captchaProperties.getExpireSeconds(),
                 TimeUnit.SECONDS
         );
 
-        return CaptchaVO.builder()
-                .captchaKey(captchaKey)
+        return CaptchaVo.builder()
+                .captchaId(captchaId)
                 .captchaBase64(imageBase64Data)
                 .build();
     }
@@ -224,13 +227,13 @@ public class AuthServiceImpl implements AuthService {
     /**
      * 微信小程序Code登录
      *
-     * @param loginDTO 登录参数
+     * @param loginDto 登录参数
      * @return 访问令牌
      */
     @Override
-    public AuthenticationToken loginByWxMiniAppCode(WxMiniAppCodeLoginDTO loginDTO) {
+    public AuthenticationToken loginByWxMiniAppCode(WxMiniAppCodeLoginDto loginDto) {
         // 1. 创建微信小程序认证令牌（未认证）
-        WxMiniAppCodeAuthenticationToken authenticationToken = new WxMiniAppCodeAuthenticationToken(loginDTO.getCode());
+        WxMiniAppCodeAuthenticationToken authenticationToken = new WxMiniAppCodeAuthenticationToken(loginDto.getCode());
 
         // 2. 执行认证（认证中）
         Authentication authentication = authenticationManager.authenticate(authenticationToken);
@@ -245,16 +248,16 @@ public class AuthServiceImpl implements AuthService {
     /**
      * 微信小程序手机号登录
      *
-     * @param loginDTO 登录参数
+     * @param loginDto 登录参数
      * @return 访问令牌
      */
     @Override
-    public AuthenticationToken loginByWxMiniAppPhone(WxMiniAppPhoneLoginDTO loginDTO) {
+    public AuthenticationToken loginByWxMiniAppPhone(WxMiniAppPhoneLoginDto loginDto) {
         // 创建微信小程序手机号认证Token
         WxMiniAppPhoneAuthenticationToken authenticationToken = new WxMiniAppPhoneAuthenticationToken(
-                loginDTO.getCode(),
-                loginDTO.getEncryptedData(),
-                loginDTO.getIv()
+                loginDto.getCode(),
+                loginDto.getEncryptedData(),
+                loginDto.getIv()
         );
 
         // 执行认证

@@ -14,7 +14,7 @@ import java.util.Date;
  */
 @Schema(description = "个人中心用户信息")
 @Data
-public class UserProfileVO {
+public class UserProfileVo {
 
     @Schema(description = "用户ID")
     private Long id;
@@ -46,5 +46,6 @@ public class UserProfileVO {
     @Schema(description = "创建时间")
     @JsonFormat(pattern = "yyyy-MM-dd")
     private Date createTime;
-
 }
+
+ 

@@ -8,7 +8,7 @@ import java.time.LocalDateTime;
 
 @Schema(description ="角色分页对象")
 @Data
-public class RolePageVO {
+public class RolePageVo {
 
     @Schema(description="角色ID")
     private Long id;
@@ -31,3 +31,5 @@ public class RolePageVO {
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     private LocalDateTime updateTime;
 }
+
+ 

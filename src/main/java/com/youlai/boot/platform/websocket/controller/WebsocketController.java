@@ -1,12 +1,13 @@
 package com.youlai.boot.platform.websocket.controller;
 
-import com.youlai.boot.platform.websocket.model.ChatMessage;
+import com.youlai.boot.platform.websocket.dto.TextMessage;
+import com.youlai.boot.platform.websocket.publisher.WebSocketPublisher;
+import com.youlai.boot.platform.websocket.topic.WebSocketTopics;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.messaging.handler.annotation.DestinationVariable;
 import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.messaging.handler.annotation.SendTo;
-import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -26,7 +27,7 @@ import java.security.Principal;
 @Slf4j
 public class WebsocketController {
 
-    private final SimpMessagingTemplate messagingTemplate;
+    private final WebSocketPublisher webSocketPublisher;
 
 
     /**
@@ -58,7 +59,7 @@ public class WebsocketController {
 
         log.info("发送人:{}; 接收人:{}", sender, receiver);
         // 发送消息给指定用户，拼接后路径 /user/{receiver}/queue/greeting
-        messagingTemplate.convertAndSendToUser(receiver, "/queue/greeting", new ChatMessage(sender, message));
+        webSocketPublisher.publishToUser(receiver, WebSocketTopics.USER_QUEUE_GREETING, new TextMessage(sender, message, System.currentTimeMillis()));
     }
 
 }

@@ -14,14 +14,14 @@ import com.youlai.boot.core.web.Result;
 import com.youlai.boot.common.util.ExcelUtils;
 import com.youlai.boot.security.util.SecurityUtils;
 import com.youlai.boot.system.listener.UserImportListener;
-import com.youlai.boot.system.model.dto.UserExportDTO;
-import com.youlai.boot.system.model.dto.UserImportDTO;
+import com.youlai.boot.system.model.dto.UserExportDto;
+import com.youlai.boot.system.model.dto.UserImportDto;
 import com.youlai.boot.system.model.entity.User;
 import com.youlai.boot.system.model.form.*;
 import com.youlai.boot.system.model.query.UserPageQuery;
-import com.youlai.boot.system.model.dto.CurrentUserDTO;
-import com.youlai.boot.system.model.vo.UserPageVO;
-import com.youlai.boot.system.model.vo.UserProfileVO;
+import com.youlai.boot.system.model.dto.CurrentUserDto;
+import com.youlai.boot.system.model.vo.UserPageVo;
+import com.youlai.boot.system.model.vo.UserProfileVo;
 import com.youlai.boot.system.service.UserService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -59,16 +59,16 @@ public class UserController {
     @Operation(summary = "用户分页列表")
     @GetMapping("/page")
     @Log(value = "用户分页列表", module = LogModuleEnum.USER)
-    public PageResult<UserPageVO> getUserPage(
+    public PageResult<UserPageVo> getUserPage(
             @Valid UserPageQuery queryParams
     ) {
-        IPage<UserPageVO> result = userService.getUserPage(queryParams);
+        IPage<UserPageVo> result = userService.getUserPage(queryParams);
         return PageResult.success(result);
     }
 
     @Operation(summary = "新增用户")
     @PostMapping
-    @PreAuthorize("@ss.hasPerm('sys:user:add')")
+    @PreAuthorize("@ss.hasPerm('sys:user:create')")
     @RepeatSubmit
     @Log(value = "新增用户", module = LogModuleEnum.USER)
     public Result<?> saveUser(
@@ -80,7 +80,7 @@ public class UserController {
 
     @Operation(summary = "获取用户表单数据")
     @GetMapping("/{userId}/form")
-    @PreAuthorize("@ss.hasPerm('sys:user:edit')")
+    @PreAuthorize("@ss.hasPerm('sys:user:update')")
     @Log(value = "用户表单数据", module = LogModuleEnum.USER)
     public Result<UserForm> getUserForm(
             @Parameter(description = "用户ID") @PathVariable Long userId
@@ -91,7 +91,7 @@ public class UserController {
 
     @Operation(summary = "修改用户")
     @PutMapping(value = "/{userId}")
-    @PreAuthorize("@ss.hasPerm('sys:user:edit')")
+    @PreAuthorize("@ss.hasPerm('sys:user:update')")
     @Log(value = "修改用户", module = LogModuleEnum.USER)
     public Result<Void> updateUser(
             @Parameter(description = "用户ID") @PathVariable Long userId,
@@ -114,7 +114,7 @@ public class UserController {
 
     @Operation(summary = "修改用户状态")
     @PatchMapping(value = "/{userId}/status")
-    @PreAuthorize("@ss.hasPerm('sys:user:edit')")
+    @PreAuthorize("@ss.hasPerm('sys:user:update')")
     @Log(value = "修改用户状态", module = LogModuleEnum.USER)
     public Result<Void> updateUserStatus(
             @Parameter(description = "用户ID") @PathVariable Long userId,
@@ -130,9 +130,9 @@ public class UserController {
     @Operation(summary = "获取当前登录用户信息")
     @GetMapping("/me")
     @Log(value = "获取当前登录用户信息", module = LogModuleEnum.USER)
-    public Result<CurrentUserDTO> getCurrentUser() {
-        CurrentUserDTO currentUserDTO = userService.getCurrentUserInfo();
-        return Result.success(currentUserDTO);
+    public Result<CurrentUserDto> getCurrentUser() {
+        CurrentUserDto currentUserDto = userService.getCurrentUserInfo();
+        return Result.success(currentUserDto);
     }
 
     @Operation(summary = "用户导入模板下载")
@@ -160,7 +160,7 @@ public class UserController {
     @Log(value = "导入用户", module = LogModuleEnum.USER)
     public Result<ExcelResult> importUsers(MultipartFile file) throws IOException {
         UserImportListener listener = new UserImportListener();
-        ExcelUtils.importExcel(file.getInputStream(), UserImportDTO.class, listener);
+        ExcelUtils.importExcel(file.getInputStream(), UserImportDto.class, listener);
         return Result.success(listener.getExcelResult());
     }
 
@@ -173,17 +173,17 @@ public class UserController {
         response.setContentType("application/vnd.openxmlformats-officedocument.spreadsheetml.sheet");
         response.setHeader("Content-Disposition", "attachment; filename=" + URLEncoder.encode(fileName, StandardCharsets.UTF_8));
 
-        List<UserExportDTO> exportUserList = userService.listExportUsers(queryParams);
-        EasyExcel.write(response.getOutputStream(), UserExportDTO.class).sheet("用户列表")
+        List<UserExportDto> exportUserList = userService.listExportUsers(queryParams);
+        EasyExcel.write(response.getOutputStream(), UserExportDto.class).sheet("用户列表")
                 .doWrite(exportUserList);
     }
 
     @Operation(summary = "获取个人中心用户信息")
     @GetMapping("/profile")
     @Log(value = "获取个人中心用户信息", module = LogModuleEnum.USER)
-    public Result<UserProfileVO> getUserProfile() {
+    public Result<UserProfileVo> getUserProfile() {
         Long userId = SecurityUtils.getUserId();
-        UserProfileVO userProfile = userService.getUserProfile(userId);
+        UserProfileVo userProfile = userService.getUserProfile(userId);
         return Result.success(userProfile);
     }
 

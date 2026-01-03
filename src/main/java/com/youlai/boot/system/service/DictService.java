@@ -6,8 +6,8 @@ import com.youlai.boot.common.model.Option;
 import com.youlai.boot.system.model.entity.Dict;
 import com.youlai.boot.system.model.form.DictForm;
 import com.youlai.boot.system.model.query.DictPageQuery;
-import com.youlai.boot.system.model.vo.DictItemOptionVO;
-import com.youlai.boot.system.model.vo.DictPageVO;
+import com.youlai.boot.system.model.vo.DictItemOptionVo;
+import com.youlai.boot.system.model.vo.DictPageVo;
 
 import java.util.List;
 
@@ -25,7 +25,7 @@ public interface DictService extends IService<Dict> {
      * @param queryParams 分页查询对象
      * @return 字典分页列表
      */
-    Page<DictPageVO> getDictPage(DictPageQuery queryParams);
+    Page<DictPageVo> getDictPage(DictPageQuery queryParams);
 
     /**
      * 获取字典列表

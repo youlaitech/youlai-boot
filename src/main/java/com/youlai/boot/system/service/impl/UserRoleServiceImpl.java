@@ -17,10 +17,15 @@ import java.util.Set;
 import java.util.concurrent.CompletableFuture;
 import java.util.stream.Collectors;
 
+/**
+ * 用户角色业务实现类
+ *
+ * @author Ray.Hao
+ * @since 0.0.1
+ */
 @Service
 @RequiredArgsConstructor
 public class UserRoleServiceImpl extends ServiceImpl<UserRoleMapper, UserRole> implements UserRoleService {
-
 
   private final TokenManager tokenManager;
 
@@ -86,7 +91,7 @@ public class UserRoleServiceImpl extends ServiceImpl<UserRoleMapper, UserRole> i
    */
   @Override
   public boolean hasAssignedUsers(Long roleId) {
-    int count = this.baseMapper.countUsersForRole(roleId);
+    int count = this.baseMapper.countUsersByRoleId(roleId);
     return count > 0;
   }
 }

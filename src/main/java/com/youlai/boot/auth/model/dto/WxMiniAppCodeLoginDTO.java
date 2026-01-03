@@ -6,17 +6,16 @@ import lombok.Data;
 import jakarta.validation.constraints.NotBlank;
 
 /**
- * 微信小程序Code登录请求参数
- *
- * @author 有来技术团队
- * @since 2.0.0
+ *微信小程序Code登录请求参数
  */
 @Schema(description = "微信小程序Code登录请求参数")
 @Data
-public class WxMiniAppCodeLoginDTO {
+public class WxMiniAppCodeLoginDto {
 
     @Schema(description = "微信小程序登录时获取的code", requiredMode = Schema.RequiredMode.REQUIRED)
     @NotBlank(message = "code不能为空")
     private String code;
 
-} 
+}
+
+

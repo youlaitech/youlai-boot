@@ -26,8 +26,8 @@ public class MenuForm {
     @Schema(description = "菜单名称")
     private String name;
 
-    @Schema(description = "菜单类型（1-菜单 2-目录 3-外链 4-按钮）")
-    private Integer type;
+    @Schema(description = "菜单类型（C-目录 M-菜单 B-按钮）")
+    private String type;
 
     @Schema(description = "路由名称")
     private String routeName;

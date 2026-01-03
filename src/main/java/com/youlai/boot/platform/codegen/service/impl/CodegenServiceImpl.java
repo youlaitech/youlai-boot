@@ -13,16 +13,16 @@ import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.youlai.boot.platform.codegen.enums.JavaTypeEnum;
 import com.youlai.boot.config.property.CodegenProperties;
-import com.youlai.boot.platform.codegen.service.GenConfigService;
-import com.youlai.boot.platform.codegen.service.GenFieldConfigService;
+import com.youlai.boot.platform.codegen.service.GenTableService;
+import com.youlai.boot.platform.codegen.service.GenTableColumnService;
 import com.youlai.boot.platform.codegen.service.CodegenService;
 import com.youlai.boot.core.exception.BusinessException;
 import com.youlai.boot.platform.codegen.mapper.DatabaseMapper;
-import com.youlai.boot.platform.codegen.model.entity.GenConfig;
-import com.youlai.boot.platform.codegen.model.entity.GenFieldConfig;
+import com.youlai.boot.platform.codegen.model.entity.GenTable;
+import com.youlai.boot.platform.codegen.model.entity.GenTableColumn;
 import com.youlai.boot.platform.codegen.model.query.TablePageQuery;
-import com.youlai.boot.platform.codegen.model.vo.CodegenPreviewVO;
-import com.youlai.boot.platform.codegen.model.vo.TablePageVO;
+import com.youlai.boot.platform.codegen.model.vo.CodegenPreviewVo;
+import com.youlai.boot.platform.codegen.model.vo.TablePageVo;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -36,7 +36,11 @@ import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
 
 /**
- * 数据库服务实现类
+ * 代码生成服务实现类。
+ *
+ * <p>
+ * 根据代码生成配置（{@link CodegenProperties}）与表/字段元数据，渲染模板并提供预览与下载能力。
+ * </p>
  *
  * @author Ray
  * @since 2.10.0
@@ -48,8 +52,8 @@ public class CodegenServiceImpl implements CodegenService {
 
     private final DatabaseMapper databaseMapper;
     private final CodegenProperties codegenProperties;
-    private final GenConfigService genConfigService;
-    private final GenFieldConfigService genFieldConfigService;
+    private final GenTableService genTableService;
+    private final GenTableColumnService genTableColumnService;
 
     /**
      * 数据表分页列表
@@ -57,8 +61,8 @@ public class CodegenServiceImpl implements CodegenService {
      * @param queryParams 查询参数
      * @return 分页结果
      */
-    public Page<TablePageVO> getTablePage(TablePageQuery queryParams) {
-        Page<TablePageVO> page = new Page<>(queryParams.getPageNum(), queryParams.getPageSize());
+    public Page<TablePageVo> getTablePage(TablePageQuery queryParams) {
+        Page<TablePageVo> page = new Page<>(queryParams.getPageNum(), queryParams.getPageSize());
         // 设置排除的表
         List<String> excludeTables = codegenProperties.getExcludeTables();
         queryParams.setExcludeTables(excludeTables);
@@ -73,20 +77,20 @@ public class CodegenServiceImpl implements CodegenService {
      * @return 预览数据
      */
     @Override
-    public List<CodegenPreviewVO> getCodegenPreviewData(String tableName, String pageType) {
+    public List<CodegenPreviewVo> getCodegenPreviewData(String tableName, String pageType) {
 
-        List<CodegenPreviewVO> list = new ArrayList<>();
+        List<CodegenPreviewVo> list = new ArrayList<>();
 
-        GenConfig genConfig = genConfigService.getOne(new LambdaQueryWrapper<GenConfig>()
-                .eq(GenConfig::getTableName, tableName)
+        GenTable genTable = genTableService.getOne(new LambdaQueryWrapper<GenTable>()
+                .eq(GenTable::getTableName, tableName)
         );
-        if (genConfig == null) {
+        if (genTable == null) {
             throw new BusinessException("未找到表生成配置");
         }
 
-        List<GenFieldConfig> fieldConfigs = genFieldConfigService.list(new LambdaQueryWrapper<GenFieldConfig>()
-                .eq(GenFieldConfig::getConfigId, genConfig.getId())
-                .orderByAsc(GenFieldConfig::getFieldSort)
+        List<GenTableColumn> fieldConfigs = genTableColumnService.list(new LambdaQueryWrapper<GenTableColumn>()
+                .eq(GenTableColumn::getTableId, genTable.getId())
+                .orderByAsc(GenTableColumn::getFieldSort)
 
         );
         if (CollectionUtil.isEmpty(fieldConfigs)) {
@@ -96,13 +100,13 @@ public class CodegenServiceImpl implements CodegenService {
         // 遍历模板配置
         Map<String, CodegenProperties.TemplateConfig> templateConfigs = codegenProperties.getTemplateConfigs();
         for (Map.Entry<String, CodegenProperties.TemplateConfig> templateConfigEntry : templateConfigs.entrySet()) {
-            CodegenPreviewVO previewVO = new CodegenPreviewVO();
+            CodegenPreviewVo previewVo = new CodegenPreviewVo();
 
             CodegenProperties.TemplateConfig templateConfig = templateConfigEntry.getValue();
 
             /* 1. 生成文件名 UserController */
             // User Role Menu Dept
-            String entityName = genConfig.getEntityName();
+            String entityName = genTable.getEntityName();
             // Controller Service Mapper Entity
             String templateName = templateConfigEntry.getKey();
             // .java .ts .vue
@@ -110,37 +114,39 @@ public class CodegenServiceImpl implements CodegenService {
 
             // 文件名 UserController.java
             String fileName = getFileName(entityName, templateName, extension);
-            previewVO.setFileName(fileName);
+            previewVo.setFileName(fileName);
 
             /* 2. 生成文件路径 */
             // 包名：com.youlai.boot
-            String packageName = genConfig.getPackageName();
+            String packageName = genTable.getPackageName();
             // 模块名：system
-            String moduleName = genConfig.getModuleName();
+            String moduleName = genTable.getModuleName();
             // 子包名：controller
             String subpackageName = templateConfig.getSubpackageName();
             // 组合成文件路径：src/main/java/com/youlai/boot/system/controller
             String filePath = getFilePath(templateName, moduleName, packageName, subpackageName, entityName);
-            previewVO.setPath(filePath);
+            previewVo.setPath(filePath);
 
             /* 3. 生成文件内容 */
             // 将模板文件中的变量替换为具体的值 生成代码内容
             // 优先使用保存的 ui，没有则使用请求参数
-            String finalType = StrUtil.blankToDefault(genConfig.getPageType(), pageType);
-            String content = getCodeContent(templateConfig, genConfig, fieldConfigs, finalType);
-            previewVO.setContent(content);
+            String finalType = StrUtil.blankToDefault(genTable.getPageType(), pageType);
+            String content = getCodeContent(templateConfig, genTable, fieldConfigs, finalType);
+            previewVo.setContent(content);
 
-            list.add(previewVO);
+            list.add(previewVo);
         }
         return list;
     }
 
     /**
-     * 生成文件名
+     * 生成文件名。
      *
-     * @param entityName   实体类名 UserController
-     * @param templateName 模板名 Entity
-     * @param extension    文件后缀 .java
+     * <p>部分模板需要使用约定的命名规则（例如前端 API 文件）。</p>
+     *
+     * @param entityName   实体名（例如 User）
+     * @param templateName 模板名（例如 Entity、Controller、API）
+     * @param extension    文件后缀（例如 .java、.ts）
      * @return 文件名
      */
     private String getFileName(String entityName, String templateName, String extension) {
@@ -149,8 +155,11 @@ public class CodegenServiceImpl implements CodegenService {
         } else if ("MapperXml".equals(templateName)) {
             return entityName + "Mapper" + extension;
         } else if ("API".equals(templateName)) {
-            // 生成 user-api.ts 命名
-            return StrUtil.toSymbolCase(entityName, '-') + "-api" + extension;
+            // 生成 user.ts 命名
+            return StrUtil.toSymbolCase(entityName, '-') + extension;
+        } else if ("API_TYPES".equals(templateName)) {
+            // 生成 types/api/user.ts
+            return StrUtil.toSymbolCase(entityName, '-') + extension;
         } else if ("VIEW".equals(templateName)) {
             return "index.vue";
         }
@@ -158,14 +167,14 @@ public class CodegenServiceImpl implements CodegenService {
     }
 
     /**
-     * 生成文件路径
+     * 生成文件路径。
      *
-     * @param templateName   模板名 Entity
-     * @param moduleName     模块名 system
-     * @param packageName    包名 com.youlai
-     * @param subPackageName 子包名 controller
-     * @param entityName     实体类名 UserController
-     * @return 文件路径 src/main/java/com/youlai/system/controller
+     * @param templateName   模板名
+     * @param moduleName     模块名（例如 system）
+     * @param packageName    包名（例如 com.youlai.boot）
+     * @param subPackageName 子包名（例如 controller、service.impl、api、views）
+     * @param entityName     实体名（例如 User）
+     * @return 生成文件路径
      */
     private String getFilePath(String templateName, String moduleName, String packageName, String subPackageName, String entityName) {
         String path;
@@ -182,6 +191,13 @@ public class CodegenServiceImpl implements CodegenService {
                     + File.separator + "src"
                     + File.separator + subPackageName
                     + File.separator + moduleName
+            );
+        } else if ("API_TYPES".equals(templateName)) {
+            // path = "src/types/api";
+            path = (codegenProperties.getFrontendAppName()
+                    + File.separator + "src"
+                    + File.separator + "types"
+                    + File.separator + "api"
             );
         } else if ("VIEW".equals(templateName)) {
             // path = "src/views/system/user";
@@ -208,38 +224,47 @@ public class CodegenServiceImpl implements CodegenService {
     }
 
     /**
-     * 生成代码内容
+     * 渲染模板，生成代码内容。
      *
      * @param templateConfig 模板配置
-     * @param genConfig      生成配置
+     * @param genTable       表生成配置
      * @param fieldConfigs   字段配置
-     * @return 代码内容
+     * @param pageType       前端页面类型
+     * @return 渲染后的代码内容
      */
-    private String getCodeContent(CodegenProperties.TemplateConfig templateConfig, GenConfig genConfig, List<GenFieldConfig> fieldConfigs, String pageType) {
+    private String getCodeContent(CodegenProperties.TemplateConfig templateConfig, GenTable genTable, List<GenTableColumn> fieldConfigs, String pageType) {
 
         Map<String, Object> bindMap = new HashMap<>();
 
-        String entityName = genConfig.getEntityName();
+        String entityName = genTable.getEntityName();
 
-        bindMap.put("packageName", genConfig.getPackageName());
-        bindMap.put("moduleName", genConfig.getModuleName());
+        bindMap.put("packageName", genTable.getPackageName());
+        bindMap.put("moduleName", genTable.getModuleName());
         bindMap.put("subpackageName", templateConfig.getSubpackageName());
         bindMap.put("date", DateUtil.format(new Date(), "yyyy-MM-dd HH:mm"));
         bindMap.put("entityName", entityName);
-        bindMap.put("tableName", genConfig.getTableName());
-        bindMap.put("author", genConfig.getAuthor());
-        bindMap.put("lowerFirstEntityName", StrUtil.lowerFirst(entityName)); // UserTest → userTest
-        bindMap.put("kebabCaseEntityName", StrUtil.toSymbolCase(entityName, '-')); // UserTest → user-test
-        bindMap.put("businessName", genConfig.getBusinessName());
+        bindMap.put("tableName", genTable.getTableName());
+        bindMap.put("author", genTable.getAuthor());
+        String entityLowerCamel = StrUtil.lowerFirst(entityName);
+        String entityKebab = StrUtil.toSymbolCase(entityName, '-');
+        String entityUpperSnake = StrUtil.toSymbolCase(entityName, '_').toUpperCase();
+        bindMap.put("entityLowerCamel", entityLowerCamel);
+        bindMap.put("entityKebab", entityKebab);
+        bindMap.put("entityUpperSnake", entityUpperSnake);
+        bindMap.put("businessName", genTable.getBusinessName());
         bindMap.put("fieldConfigs", fieldConfigs);
 
         boolean hasLocalDateTime = false;
         boolean hasBigDecimal = false;
         boolean hasRequiredField = false;
 
-        for (GenFieldConfig fieldConfig : fieldConfigs) {
+        for (GenTableColumn fieldConfig : fieldConfigs) {
 
-            if ("LocalDateTime".equals(fieldConfig.getFieldType())) {
+            if (StrUtil.isBlank(fieldConfig.getFieldType())) {
+                fieldConfig.setFieldType(JavaTypeEnum.getJavaTypeByColumnType(fieldConfig.getColumnType()));
+            }
+
+            if ("LocalDateTime".equals(fieldConfig.getFieldType()) || "LocalDate".equals(fieldConfig.getFieldType())) {
                 hasLocalDateTime = true;
             }
             if ("BigDecimal".equals(fieldConfig.getFieldType())) {
@@ -267,10 +292,11 @@ public class CodegenServiceImpl implements CodegenService {
     }
 
     /**
-     * 下载代码
+     * 下载代码。
      *
-     * @param tableNames 表名数组，支持多张表。
-     * @return 压缩文件字节数组
+     * @param tableNames 表名数组，支持多张表
+     * @param ui         页面类型
+     * @return zip 压缩文件字节数组
      */
     @Override
     public byte[] downloadCode(String[] tableNames, String ui) {
@@ -292,15 +318,16 @@ public class CodegenServiceImpl implements CodegenService {
     }
 
     /**
-     * 根据表名生成代码并压缩到zip文件中
+     * 根据表名生成代码并压缩到 zip 文件中。
      *
      * @param tableName 表名
      * @param zip       压缩文件输出流
+     * @param ui        页面类型
      */
     private void generateAndZipCode(String tableName, ZipOutputStream zip, String ui) {
-        List<CodegenPreviewVO> codePreviewList = getCodegenPreviewData(tableName, ui);
+        List<CodegenPreviewVo> codePreviewList = getCodegenPreviewData(tableName, ui);
 
-        for (CodegenPreviewVO codePreview : codePreviewList) {
+        for (CodegenPreviewVo codePreview : codePreviewList) {
             String fileName = codePreview.getFileName();
             String content = codePreview.getContent();
             String path = codePreview.getPath();

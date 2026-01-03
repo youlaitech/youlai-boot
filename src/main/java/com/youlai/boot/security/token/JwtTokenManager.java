@@ -132,49 +132,46 @@ public class JwtTokenManager implements TokenManager {
      * @return 是否有效
      */
     private boolean validateToken(String token, boolean validateRefreshToken) {
-        try {
-            JWT jwt = JWTUtil.parseToken(token);
-            // 检查 Token 是否有效(验签 + 是否过期)
-            boolean isValid = jwt.setKey(secretKey).validate(0);
+        JWT jwt = JWTUtil.parseToken(token);
+        // 检查 Token 是否有效(验签 + 是否过期)
+        boolean isValid = jwt.setKey(secretKey).validate(0);
 
-            if (isValid) {
-                JSONObject payloads = jwt.getPayloads();
-                // 1. 校验刷新令牌类型（仅在校验刷新令牌场景启用）
-                String jti = payloads.getStr(JWTPayload.JWT_ID);
-                if (validateRefreshToken) {
-                    //刷新token需要校验token类别
-                    boolean isRefreshToken = payloads.getBool(JwtClaimConstants.TOKEN_TYPE);
-                    if (!isRefreshToken) {
-                        return false;
-                    }
-                }
-                // 2. 校验安全版本号（用于按用户维度失效历史 Token）
-                Long userId = payloads.getLong(JwtClaimConstants.USER_ID);
-                if (userId != null) {
-                    // 老版本 Token 可能没有 SECURITY_VERSION 声明，视为 0 版本
-                    Integer tokenVersionRaw = payloads.getInt(JwtClaimConstants.SECURITY_VERSION);
-                    int tokenVersion = tokenVersionRaw != null ? tokenVersionRaw : 0;
-
-                    String versionKey = StrUtil.format(RedisConstants.Auth.USER_SECURITY_VERSION, userId);
-                    Integer currentVersionRaw = (Integer) redisTemplate.opsForValue().get(versionKey);
-                    int currentVersion = currentVersionRaw != null ? currentVersionRaw : 0;
-
-                    // 如果当前版本号比 Token 携带的版本号新，则认为该 Token 已失效
-                    if (tokenVersion < currentVersion) {
-                        return false;
-                    }
-                }
-
-                // 3. 判断是否在黑名单中，如果在，则返回 false 标识Token无效
-                if (Boolean.TRUE.equals(redisTemplate.hasKey(StrUtil.format(RedisConstants.Auth.BLACKLIST_TOKEN, jti)))) {
+        if (isValid) {
+            JSONObject payloads = jwt.getPayloads();
+            // 1. 校验刷新令牌类型（仅在校验刷新令牌场景启用）
+            String jti = payloads.getStr(JWTPayload.JWT_ID);
+            if (validateRefreshToken) {
+                //刷新token需要校验token类别
+                boolean isRefreshToken = payloads.getBool(JwtClaimConstants.TOKEN_TYPE);
+                if (!isRefreshToken) {
                     return false;
                 }
             }
-            return isValid;
-        } catch (Exception gitignore) {
-            // token 验证
+            // 2. 校验安全版本号（用于按用户维度失效历史 Token）
+            //    场景示例：用户修改密码、被管理员强制下线、手动“踢所有端”后，将用户安全版本号 +1，旧版本 Token 全部失效
+            Long userId = payloads.getLong(JwtClaimConstants.USER_ID);
+            if (userId != null) {
+                // 老版本 Token 可能没有 SECURITY_VERSION 声明，视为 0 版本
+                Integer tokenVersionRaw = payloads.getInt(JwtClaimConstants.SECURITY_VERSION);
+                int tokenVersion = tokenVersionRaw != null ? tokenVersionRaw : 0;
+
+                String versionKey = StrUtil.format(RedisConstants.Auth.USER_SECURITY_VERSION, userId);
+                Integer currentVersionRaw = (Integer) redisTemplate.opsForValue().get(versionKey);
+                int currentVersion = currentVersionRaw != null ? currentVersionRaw : 0;
+
+                // 如果当前版本号比 Token 携带的版本号新，则认为该 Token 已失效
+                if (tokenVersion < currentVersion) {
+                    return false;
+                }
+            }
+
+            // 3. 判断是否在黑名单中，如果在，则返回 false 标识Token无效
+            //    场景示例：单点退出登录、后台手动注销某个会话、封禁账号后立即阻断当前 Token 等
+            if (Boolean.TRUE.equals(redisTemplate.hasKey(StrUtil.format(RedisConstants.Auth.BLACKLIST_TOKEN, jti)))) {
+                return false;
+            }
         }
-        return false;
+        return isValid;
     }
 
     /**
@@ -210,7 +207,6 @@ public class JwtTokenManager implements TokenManager {
             // 永不过期的Token永久加入黑名单
             redisTemplate.opsForValue().set(blacklistTokenKey, Boolean.TRUE);
         }
-        ;
     }
 
     /**

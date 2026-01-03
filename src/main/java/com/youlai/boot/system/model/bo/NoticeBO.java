@@ -11,7 +11,7 @@ import java.time.LocalDateTime;
  * @since 2024-09-01 10:31
  */
 @Data
-public class NoticeBO {
+public class NoticeBo {
 
     /**
      * 通知ID
@@ -73,3 +73,5 @@ public class NoticeBO {
      */
     private LocalDateTime revokeTime;
 }
+
+ 

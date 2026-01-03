@@ -8,9 +8,9 @@ import com.youlai.boot.common.enums.LogModuleEnum;
 import com.youlai.boot.system.model.form.DictItemForm;
 import com.youlai.boot.system.model.query.DictItemPageQuery;
 import com.youlai.boot.system.model.query.DictPageQuery;
-import com.youlai.boot.system.model.vo.DictItemOptionVO;
-import com.youlai.boot.system.model.vo.DictItemPageVO;
-import com.youlai.boot.system.model.vo.DictPageVO;
+import com.youlai.boot.system.model.vo.DictItemOptionVo;
+import com.youlai.boot.system.model.vo.DictItemPageVo;
+import com.youlai.boot.system.model.vo.DictPageVo;
 import com.youlai.boot.common.annotation.RepeatSubmit;
 import com.youlai.boot.system.model.form.DictForm;
 import com.youlai.boot.common.annotation.Log;
@@ -36,7 +36,6 @@ import java.util.List;
  */
 @Tag(name = "06.字典接口")
 @RestController
-@SuppressWarnings("SpellCheckingInspection")
 @RequestMapping("/api/v1/dicts")
 @RequiredArgsConstructor
 public class DictController {
@@ -51,10 +50,10 @@ public class DictController {
     @Operation(summary = "字典分页列表")
     @GetMapping("/page")
     @Log( value = "字典分页列表",module = LogModuleEnum.DICT)
-    public PageResult<DictPageVO> getDictPage(
+    public PageResult<DictPageVo> getDictPage(
             DictPageQuery queryParams
     ) {
-        Page<DictPageVO> result = dictService.getDictPage(queryParams);
+        Page<DictPageVo> result = dictService.getDictPage(queryParams);
         return PageResult.success(result);
     }
 
@@ -77,7 +76,7 @@ public class DictController {
 
     @Operation(summary = "新增字典")
     @PostMapping
-    @PreAuthorize("@ss.hasPerm('sys:dict:add')")
+    @PreAuthorize("@ss.hasPerm('sys:dict:create')")
     @RepeatSubmit
     public Result<?> saveDict(@Valid @RequestBody DictForm formData) {
         boolean result = dictService.saveDict(formData);
@@ -90,7 +89,7 @@ public class DictController {
 
     @Operation(summary = "修改字典")
     @PutMapping("/{id}")
-    @PreAuthorize("@ss.hasPerm('sys:dict:edit')")
+    @PreAuthorize("@ss.hasPerm('sys:dict:update')")
     public Result<?> updateDict(
             @PathVariable Long id,
             @RequestBody DictForm dictForm
@@ -128,27 +127,27 @@ public class DictController {
     //---------------------------------------------------
     @Operation(summary = "字典项分页列表")
     @GetMapping("/{dictCode}/items/page")
-    public PageResult<DictItemPageVO> getDictItemPage(
+    public PageResult<DictItemPageVo> getDictItemPage(
             @PathVariable String dictCode,
             DictItemPageQuery queryParams
     ) {
         queryParams.setDictCode(dictCode);
-        Page<DictItemPageVO> result = dictItemService.getDictItemPage(queryParams);
+        Page<DictItemPageVo> result = dictItemService.getDictItemPage(queryParams);
         return PageResult.success(result);
     }
 
     @Operation(summary = "字典项列表")
     @GetMapping("/{dictCode}/items")
-    public Result<List<DictItemOptionVO>> getDictItems(
+    public Result<List<DictItemOptionVo>> getDictItems(
             @Parameter(description = "字典编码") @PathVariable String dictCode
     ) {
-        List<DictItemOptionVO> list = dictItemService.getDictItems(dictCode);
+        List<DictItemOptionVo> list = dictItemService.getDictItems(dictCode);
         return Result.success(list);
     }
 
     @Operation(summary = "新增字典项")
     @PostMapping("/{dictCode}/items")
-    @PreAuthorize("@ss.hasPerm('sys:dict-item:add')")
+    @PreAuthorize("@ss.hasPerm('sys:dict-item:create')")
     @RepeatSubmit
     public Result<Void> saveDictItem(
             @PathVariable String dictCode,
@@ -177,7 +176,7 @@ public class DictController {
 
     @Operation(summary = "修改字典项")
     @PutMapping("/{dictCode}/items/{itemId}")
-    @PreAuthorize("@ss.hasPerm('sys:dict-item:edit')")
+    @PreAuthorize("@ss.hasPerm('sys:dict-item:update')")
     @RepeatSubmit
     public Result<?> updateDictItem(
             @PathVariable String dictCode,

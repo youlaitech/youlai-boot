@@ -22,7 +22,7 @@ import java.math.BigDecimal;
 @Getter
 @Setter
 @Schema( description = "$!{businessName}视图对象")
-public class ${entityName}VO implements Serializable {
+public class ${entityName}Vo implements Serializable {
 
     @Serial
     private static final long serialVersionUID = 1L;

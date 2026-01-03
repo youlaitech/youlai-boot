@@ -7,8 +7,8 @@ import com.youlai.boot.common.model.Option;
 import com.youlai.boot.core.web.Result;
 import com.youlai.boot.system.model.form.MenuForm;
 import com.youlai.boot.system.model.query.MenuQuery;
-import com.youlai.boot.system.model.vo.MenuVO;
-import com.youlai.boot.system.model.vo.RouteVO;
+import com.youlai.boot.system.model.vo.MenuVo;
+import com.youlai.boot.system.model.vo.RouteVo;
 import com.youlai.boot.system.service.MenuService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -38,8 +38,8 @@ public class MenuController {
     @Operation(summary = "菜单列表")
     @GetMapping
     @Log(value = "菜单列表", module = LogModuleEnum.MENU)
-    public Result<List<MenuVO>> getMenus(MenuQuery queryParams) {
-        List<MenuVO> menuList = menuService.listMenus(queryParams);
+    public Result<List<MenuVo>> getMenus(MenuQuery queryParams) {
+        List<MenuVo> menuList = menuService.listMenus(queryParams);
         return Result.success(menuList);
     }
 
@@ -55,14 +55,14 @@ public class MenuController {
 
     @Operation(summary = "当前用户菜单路由列表")
     @GetMapping("/routes")
-    public Result<List<RouteVO>> getCurrentUserRoutes() {
-        List<RouteVO> routeList = menuService.listCurrentUserRoutes();
+    public Result<List<RouteVo>> getCurrentUserRoutes() {
+        List<RouteVo> routeList = menuService.listCurrentUserRoutes();
         return Result.success(routeList);
     }
 
     @Operation(summary = "菜单表单数据")
     @GetMapping("/{id}/form")
-    @PreAuthorize("@ss.hasPerm('sys:menu:edit')")
+    @PreAuthorize("@ss.hasPerm('sys:menu:update')")
     public Result<MenuForm> getMenuForm(
             @Parameter(description = "菜单ID") @PathVariable Long id
     ) {
@@ -72,7 +72,7 @@ public class MenuController {
 
     @Operation(summary = "新增菜单")
     @PostMapping
-    @PreAuthorize("@ss.hasPerm('sys:menu:add')")
+    @PreAuthorize("@ss.hasPerm('sys:menu:create')")
     @RepeatSubmit
     public Result<?> addMenu(@RequestBody MenuForm menuForm) {
         boolean result = menuService.saveMenu(menuForm);
@@ -81,7 +81,7 @@ public class MenuController {
 
     @Operation(summary = "修改菜单")
     @PutMapping(value = "/{id}")
-    @PreAuthorize("@ss.hasPerm('sys:menu:edit')")
+    @PreAuthorize("@ss.hasPerm('sys:menu:update')")
     public Result<?> updateMenu(
             @RequestBody MenuForm menuForm
     ) {
@@ -101,7 +101,7 @@ public class MenuController {
 
     @Operation(summary = "修改菜单显示状态")
     @PatchMapping("/{menuId}")
-    @PreAuthorize("@ss.hasPerm('sys:menu:edit')")
+    @PreAuthorize("@ss.hasPerm('sys:menu:update')")
     public Result<?> updateMenuVisible(
             @Parameter(description = "菜单ID") @PathVariable Long menuId,
             @Parameter(description = "显示状态(1:显示;0:隐藏)") Integer visible

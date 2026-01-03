@@ -2,8 +2,8 @@ package com.youlai.boot.platform.codegen.service;
 
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.youlai.boot.platform.codegen.model.query.TablePageQuery;
-import com.youlai.boot.platform.codegen.model.vo.CodegenPreviewVO;
-import com.youlai.boot.platform.codegen.model.vo.TablePageVO;
+import com.youlai.boot.platform.codegen.model.vo.CodegenPreviewVo;
+import com.youlai.boot.platform.codegen.model.vo.TablePageVo;
 
 import java.util.List;
 
@@ -21,7 +21,7 @@ public interface CodegenService {
      * @param queryParams 查询参数
      * @return
      */
-    Page<TablePageVO> getTablePage(TablePageQuery queryParams);
+    Page<TablePageVo> getTablePage(TablePageQuery queryParams);
 
     /**
      * 获取预览生成代码
@@ -29,7 +29,7 @@ public interface CodegenService {
      * @param tableName 表名
      * @return
      */
-    List<CodegenPreviewVO> getCodegenPreviewData(String tableName, String pageType);
+    List<CodegenPreviewVo> getCodegenPreviewData(String tableName, String pageType);
 
     /**
      * 下载代码

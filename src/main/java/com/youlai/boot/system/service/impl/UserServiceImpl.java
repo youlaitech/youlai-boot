@@ -14,7 +14,7 @@ import com.youlai.boot.core.exception.BusinessException;
 import com.youlai.boot.common.model.Option;
 import com.youlai.boot.platform.sms.enums.SmsTypeEnum;
 import com.youlai.boot.platform.sms.service.SmsService;
-import com.youlai.boot.security.model.UserAuthCredentials;
+import com.youlai.boot.security.model.UserAuthInfo;
 import com.youlai.boot.security.service.PermissionService;
 import com.youlai.boot.security.token.TokenManager;
 import com.youlai.boot.security.util.SecurityUtils;
@@ -22,16 +22,16 @@ import com.youlai.boot.platform.mail.service.MailService;
 import com.youlai.boot.system.converter.UserConverter;
 import com.youlai.boot.system.enums.DictCodeEnum;
 import com.youlai.boot.system.mapper.UserMapper;
-import com.youlai.boot.system.model.bo.UserBO;
-import com.youlai.boot.system.model.dto.CurrentUserDTO;
-import com.youlai.boot.system.model.dto.UserExportDTO;
+import com.youlai.boot.system.model.bo.UserBo;
+import com.youlai.boot.system.model.dto.CurrentUserDto;
+import com.youlai.boot.system.model.dto.UserExportDto;
 import com.youlai.boot.system.model.entity.DictItem;
 import com.youlai.boot.system.model.entity.User;
 import com.youlai.boot.system.model.entity.UserRole;
 import com.youlai.boot.system.model.form.*;
 import com.youlai.boot.system.model.query.UserPageQuery;
-import com.youlai.boot.system.model.vo.UserPageVO;
-import com.youlai.boot.system.model.vo.UserProfileVO;
+import com.youlai.boot.system.model.vo.UserPageVo;
+import com.youlai.boot.system.model.vo.UserProfileVo;
 import com.youlai.boot.system.service.*;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -76,25 +76,26 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
 
     private final UserConverter userConverter;
 
+
     /**
      * 获取用户分页列表
      *
      * @param queryParams 查询参数
-     * @return {@link IPage<UserPageVO>} 用户分页列表
+     * @return {@link IPage<UserPageVo>} 用户分页列表
      */
     @Override
-    public IPage<UserPageVO> getUserPage(UserPageQuery queryParams) {
+    public IPage<UserPageVo> getUserPage(UserPageQuery queryParams) {
 
         // 参数构建
         int pageNum = queryParams.getPageNum();
         int pageSize = queryParams.getPageSize();
-        Page<UserBO> page = new Page<>(pageNum, pageSize);
+        Page<UserBo> page = new Page<>(pageNum, pageSize);
 
         boolean isRoot = SecurityUtils.isRoot();
         queryParams.setIsRoot(isRoot);
 
         // 查询数据
-        Page<UserBO> userPage = this.baseMapper.getUserPage(page, queryParams);
+        Page<UserBo> userPage = this.baseMapper.getUserPage(page, queryParams);
 
         // 实体转换
         return userConverter.toPageVo(userPage);
@@ -118,15 +119,18 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
      * @return true|false
      */
     @Override
+    @Transactional(rollbackFor = Exception.class)
     public boolean saveUser(UserForm userForm) {
 
         String username = userForm.getUsername();
-
-        long count = this.count(new LambdaQueryWrapper<User>().eq(User::getUsername, username));
-        Assert.isTrue(count == 0, "用户名已存在");
-
+        
         // 实体转换 form->entity
         User entity = userConverter.toEntity(userForm);
+        
+        // 检查用户名是否已存在
+        long count = this.count(new LambdaQueryWrapper<User>()
+                .eq(User::getUsername, username));
+        Assert.isTrue(count == 0, "用户名已存在");
 
         // 设置默认加密密码
         String defaultEncryptPwd = passwordEncoder.encode(SystemConstants.DEFAULT_PASSWORD);
@@ -151,11 +155,16 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
      * @return true|false
      */
     @Override
-    @Transactional
+    @Transactional(rollbackFor = Exception.class)
     public boolean updateUser(Long userId, UserForm userForm) {
 
         String username = userForm.getUsername();
+        
+        // 获取原用户信息
+        User oldUser = this.getById(userId);
+        Assert.notNull(oldUser, "用户不存在");
 
+        // 检查用户名是否已存在（排除当前用户）
         long count = this.count(new LambdaQueryWrapper<User>()
                 .eq(User::getUsername, username)
                 .ne(User::getId, userId)
@@ -183,33 +192,36 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
      * @return true|false
      */
     @Override
+    @Transactional(rollbackFor = Exception.class)
     public boolean deleteUsers(String idsStr) {
         Assert.isTrue(StrUtil.isNotBlank(idsStr), "删除的用户数据为空");
         // 逻辑删除
         List<Long> ids = Arrays.stream(idsStr.split(","))
                 .map(Long::parseLong)
                 .collect(Collectors.toList());
-        return this.removeByIds(ids);
-
+        
+        boolean result = this.removeByIds(ids);
+        return result;
     }
 
     /**
      * 根据用户名获取认证凭证信息
      *
      * @param username 用户名
-     * @return 用户认证凭证信息 {@link UserAuthCredentials}
+     * @return 用户认证凭证信息 {@link UserAuthInfo}
      */
     @Override
-    public UserAuthCredentials getAuthCredentialsByUsername(String username) {
-        UserAuthCredentials userAuthCredentials = this.baseMapper.getAuthCredentialsByUsername(username);
-        if (userAuthCredentials != null) {
-            Set<String> roles = userAuthCredentials.getRoles();
+    public UserAuthInfo getAuthInfoByUsername(String username) {
+        UserAuthInfo userAuthInfo = this.baseMapper.getAuthInfoByUsername(username);
+        if (userAuthInfo != null) {
+            Set<String> roles = userAuthInfo.getRoles();
             // 获取最大范围的数据权限
             Integer dataScope = roleService.getMaximumDataScope(roles);
-            userAuthCredentials.setDataScope(dataScope);
+            userAuthInfo.setDataScope(dataScope);
         }
-        return userAuthCredentials;
+        return userAuthInfo;
     }
+
 
     /**
      * 根据OpenID获取用户认证信息
@@ -218,18 +230,18 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
      * @return 用户认证信息
      */
     @Override
-    public UserAuthCredentials getAuthCredentialsByOpenId(String openId) {
+    public UserAuthInfo getAuthInfoByOpenId(String openId) {
         if (StrUtil.isBlank(openId)) {
             return null;
         }
-        UserAuthCredentials userAuthCredentials = this.baseMapper.getAuthCredentialsByOpenId(openId);
-        if (userAuthCredentials != null) {
-            Set<String> roles = userAuthCredentials.getRoles();
+        UserAuthInfo userAuthInfo = this.baseMapper.getAuthInfoByOpenId(openId);
+        if (userAuthInfo != null) {
+            Set<String> roles = userAuthInfo.getRoles();
             // 获取最大范围的数据权限
             Integer dataScope = roleService.getMaximumDataScope(roles);
-            userAuthCredentials.setDataScope(dataScope);
+            userAuthInfo.setDataScope(dataScope);
         }
-        return userAuthCredentials;
+        return userAuthInfo;
     }
 
     /**
@@ -239,18 +251,18 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
      * @return 用户认证信息
      */
     @Override
-    public UserAuthCredentials getAuthCredentialsByMobile(String mobile) {
+    public UserAuthInfo getAuthInfoByMobile(String mobile) {
         if (StrUtil.isBlank(mobile)) {
             return null;
         }
-        UserAuthCredentials userAuthCredentials = this.baseMapper.getAuthCredentialsByMobile(mobile);
-        if (userAuthCredentials != null) {
-            Set<String> roles = userAuthCredentials.getRoles();
+        UserAuthInfo userAuthInfo = this.baseMapper.getAuthInfoByMobile(mobile);
+        if (userAuthInfo != null) {
+            Set<String> roles = userAuthInfo.getRoles();
             // 获取最大范围的数据权限
             Integer dataScope = roleService.getMaximumDataScope(roles);
-            userAuthCredentials.setDataScope(dataScope);
+            userAuthInfo.setDataScope(dataScope);
         }
-        return userAuthCredentials;
+        return userAuthInfo;
     }
 
     /**
@@ -388,15 +400,15 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
      * 获取导出用户列表
      *
      * @param queryParams 查询参数
-     * @return {@link List<UserExportDTO>} 导出用户列表
+     * @return {@link List<UserExportDto>} 导出用户列表
      */
     @Override
-    public List<UserExportDTO> listExportUsers(UserPageQuery queryParams) {
+    public List<UserExportDto> listExportUsers(UserPageQuery queryParams) {
 
         boolean isRoot = SecurityUtils.isRoot();
         queryParams.setIsRoot(isRoot);
 
-        List<UserExportDTO> exportUsers = this.baseMapper.listExportUsers(queryParams);
+        List<UserExportDto> exportUsers = this.baseMapper.listExportUsers(queryParams);
         if (CollectionUtil.isNotEmpty(exportUsers)) {
             //获取性别的字典项
             Map<String, String> genderMap = dictItemService.list(
@@ -426,10 +438,10 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
     /**
      * 获取登录用户信息
      *
-     * @return {@link CurrentUserDTO}   用户信息
+     * @return {@link CurrentUserDto}   用户信息
      */
     @Override
-    public CurrentUserDTO getCurrentUserInfo() {
+    public CurrentUserDto getCurrentUserInfo() {
 
         String username = SecurityUtils.getUsername();
 
@@ -443,30 +455,30 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
                         User::getAvatar
                 )
         );
-        // entity->VO
-        CurrentUserDTO userInfoVO = userConverter.toCurrentUserDto(user);
+        // entity->Vo
+        CurrentUserDto userInfoVo = userConverter.toCurrentUserDto(user);
 
         // 用户角色集合
         Set<String> roles = SecurityUtils.getRoles();
-        userInfoVO.setRoles(roles);
+        userInfoVo.setRoles(roles);
 
         // 用户权限集合
         if (CollectionUtil.isNotEmpty(roles)) {
             Set<String> perms = permissionService.getRolePermsFormCache(roles);
-            userInfoVO.setPerms(perms);
+            userInfoVo.setPerms(perms);
         }
-        return userInfoVO;
+        return userInfoVo;
     }
 
     /**
      * 获取个人中心用户信息
      *
      * @param userId 用户ID
-     * @return {@link UserProfileVO} 个人中心用户信息
+     * @return {@link UserProfileVo} 个人中心用户信息
      */
     @Override
-    public UserProfileVO getUserProfile(Long userId) {
-        UserBO entity = this.baseMapper.getUserProfile(userId);
+    public UserProfileVo getUserProfile(Long userId) {
+        UserBo entity = this.baseMapper.getUserProfile(userId);
         return userConverter.toProfileVo(entity);
     }
 
@@ -685,5 +697,6 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
         );
         return userConverter.toOptions(list);
     }
+
 
 }

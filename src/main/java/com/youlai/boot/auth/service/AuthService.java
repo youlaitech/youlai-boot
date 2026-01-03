@@ -1,9 +1,9 @@
 package com.youlai.boot.auth.service;
 
-import com.youlai.boot.auth.model.vo.CaptchaVO;
-import com.youlai.boot.auth.model.dto.WxMiniAppPhoneLoginDTO;
+import com.youlai.boot.auth.model.vo.CaptchaVo;
+import com.youlai.boot.auth.model.dto.WxMiniAppPhoneLoginDto;
 import com.youlai.boot.security.model.AuthenticationToken;
-import com.youlai.boot.auth.model.dto.WxMiniAppCodeLoginDTO;
+import com.youlai.boot.auth.model.dto.WxMiniAppCodeLoginDto;
 
 /**
  * 认证服务接口
@@ -32,7 +32,7 @@ public interface AuthService {
      *
      * @return 验证码
      */
-    CaptchaVO getCaptcha();
+    CaptchaVo getCaptcha();
 
     /**
      * 刷新令牌
@@ -53,18 +53,18 @@ public interface AuthService {
     /**
      * 微信小程序Code登录
      *
-     * @param loginDTO 登录参数
+     * @param loginDto 登录参数
      * @return 访问令牌
      */
-    AuthenticationToken loginByWxMiniAppCode(WxMiniAppCodeLoginDTO loginDTO);
+    AuthenticationToken loginByWxMiniAppCode(WxMiniAppCodeLoginDto loginDto);
 
     /**
      * 微信小程序手机号登录
      *
-     * @param loginDTO 登录参数
+     * @param loginDto 登录参数
      * @return 访问令牌
      */
-    AuthenticationToken loginByWxMiniAppPhone(WxMiniAppPhoneLoginDTO loginDTO);
+    AuthenticationToken loginByWxMiniAppPhone(WxMiniAppPhoneLoginDto loginDto);
 
     /**
      * 发送短信验证码

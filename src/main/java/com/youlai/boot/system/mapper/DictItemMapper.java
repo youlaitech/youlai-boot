@@ -4,7 +4,7 @@ import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.youlai.boot.system.model.entity.DictItem;
 import com.youlai.boot.system.model.query.DictItemPageQuery;
-import com.youlai.boot.system.model.vo.DictItemPageVO;
+import com.youlai.boot.system.model.vo.DictItemPageVo;
 import org.apache.ibatis.annotations.Mapper;
 
 /**
@@ -19,7 +19,7 @@ public interface DictItemMapper extends BaseMapper<DictItem> {
     /**
      * 字典项分页列表
      */
-    Page<DictItemPageVO> getDictItemPage(Page<DictItemPageVO> page, DictItemPageQuery queryParams);
+    Page<DictItemPageVo> getDictItemPage(Page<DictItemPageVo> page, DictItemPageQuery queryParams);
 }
 
 

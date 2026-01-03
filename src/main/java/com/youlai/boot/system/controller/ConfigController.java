@@ -7,7 +7,7 @@ import com.youlai.boot.core.web.Result;
 import com.youlai.boot.common.annotation.Log;
 import com.youlai.boot.system.model.form.ConfigForm;
 import com.youlai.boot.system.model.query.ConfigPageQuery;
-import com.youlai.boot.system.model.vo.ConfigVO;
+import com.youlai.boot.system.model.vo.ConfigVo;
 import com.youlai.boot.system.service.ConfigService;
 import io.swagger.v3.oas.annotations.Parameter;
 import jakarta.validation.Valid;
@@ -29,23 +29,23 @@ import org.springframework.security.access.prepost.PreAuthorize;
 @RestController
 @RequiredArgsConstructor
 @Tag(name = "08.系统配置")
-@RequestMapping("/api/v1/config")
+@RequestMapping("/api/v1/configs")
 public class ConfigController {
 
     private final ConfigService configService;
 
     @Operation(summary = "系统配置分页列表")
     @GetMapping("/page")
-    @PreAuthorize("@ss.hasPerm('sys:config:query')")
+    @PreAuthorize("@ss.hasPerm('sys:config:list')")
     @Log( value = "系统配置分页列表",module = LogModuleEnum.SETTING)
-    public PageResult<ConfigVO> page(@ParameterObject ConfigPageQuery configPageQuery) {
-        IPage<ConfigVO> result = configService.page(configPageQuery);
+    public PageResult<ConfigVo> page(@ParameterObject ConfigPageQuery configPageQuery) {
+        IPage<ConfigVo> result = configService.page(configPageQuery);
         return PageResult.success(result);
     }
 
     @Operation(summary = "新增系统配置")
     @PostMapping
-    @PreAuthorize("@ss.hasPerm('sys:config:add')")
+    @PreAuthorize("@ss.hasPerm('sys:config:create')")
     @Log( value = "新增系统配置",module = LogModuleEnum.SETTING)
     public Result<?> save(@RequestBody @Valid ConfigForm configForm) {
         return Result.judge(configService.save(configForm));

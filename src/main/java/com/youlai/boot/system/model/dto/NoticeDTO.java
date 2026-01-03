@@ -13,7 +13,7 @@ import java.time.LocalDateTime;
  * @since 2024-9-2 14:32:58
  */
 @Data
-public class NoticeDTO {
+public class NoticeDto {
 
     @Schema(description = "通知ID")
     private Long id;
@@ -28,5 +28,6 @@ public class NoticeDTO {
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm")
     private LocalDateTime publishTime;
 
-
 }
+
+ 

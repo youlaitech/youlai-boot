@@ -4,7 +4,7 @@ import ${package.Entity}.${entity};
 import ${superServiceClassPackage};
 import ${package.Parent}.model.form.${entity}Form;
 import ${package.Parent}.model.query.${entity}PageQuery;
-import ${package.Parent}.model.vo.${entity}PageVO;
+import ${package.Parent}.model.vo.${entity}PageVo;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 /**
  * $!{table.comment} 服务类
@@ -20,7 +20,7 @@ public interface ${table.serviceName} extends ${superServiceClass}<${entity}> {
      *
      * @return
      */
-    IPage<${entity}PageVO> listPaged${entity}s(${entity}PageQuery queryParams);
+    IPage<${entity}PageVo> listPaged${entity}s(${entity}PageQuery queryParams);
 
 
     /**

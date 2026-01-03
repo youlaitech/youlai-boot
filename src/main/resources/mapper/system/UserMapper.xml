@@ -2,10 +2,11 @@
 <!DOCTYPE mapper
         PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<!--suppress ALL -->
 <mapper namespace="com.youlai.boot.system.mapper.UserMapper">
 
-    <!-- 用户分页列表 -->
-    <select id="getUserPage" resultType="com.youlai.boot.system.model.bo.UserBO">
+    <!-- 用户分页列表 mysql版本-->
+    <select id="getUserPage" resultType="com.youlai.boot.system.model.bo.UserBo" databaseId="mysql">
         SELECT
             u.id,
             u.username,
@@ -80,6 +81,82 @@
             </otherwise>
         </choose>
     </select>
+    <!-- 用户分页列表 dm版本-->
+    <select id="getUserPage" resultType="com.youlai.boot.system.model.bo.UserBo" databaseId="dm">
+        SELECT
+        u.id,
+        u.username,
+        u.nickname,
+        u.mobile,
+        u.gender,
+        u.avatar,
+        u.STATUS,
+        u.email,
+        d.NAME AS dept_name,
+        LISTAGG(r.name, ',') WITHIN GROUP (ORDER BY r.name) AS roleNames,
+        u.create_time
+        FROM
+        sys_user u
+        LEFT JOIN sys_dept d ON u.dept_id = d.id
+        LEFT JOIN sys_user_role sur ON u.id = sur.user_id
+        LEFT JOIN sys_role r ON sur.role_id = r.id
+        <where>
+            u.is_deleted = 0
+            <!-- 非超级管理员用户限制查看超级管理员  -->
+            <if test="!queryParams.isRoot">
+                AND NOT EXISTS (
+                SELECT
+                1
+                FROM sys_user_role sur
+                INNER JOIN sys_role r ON sur.role_id = r.id
+                WHERE
+                sur.user_id = u.id
+                AND r.code = '${@com.youlai.boot.common.constant.SystemConstants@ROOT_ROLE_CODE}'
+                )
+            </if>
+            <if test='queryParams.keywords!=null and queryParams.keywords.trim() neq ""'>
+                AND (
+                u.username LIKE CONCAT('%',#{queryParams.keywords},'%')
+                OR u.nickname LIKE CONCAT('%',#{queryParams.keywords},'%')
+                OR u.mobile LIKE CONCAT('%',#{queryParams.keywords},'%')
+                )
+            </if>
+            <if test='queryParams.status!=null'>
+                AND u.status = #{queryParams.status}
+            </if>
+            <if test='queryParams.deptId!=null'>
+                AND concat(',',concat(d.tree_path,',',d.id),',') like concat('%,',#{queryParams.deptId},',%')
+            </if>
+            <if test="queryParams.createTime != null and queryParams.createTime.size > 0">
+                <if test="queryParams.createTime[0] != null and queryParams.createTime[0] != ''">
+                    <bind name="startDate" value="queryParams.createTime[0].length() == 10 ? queryParams.createTime[0] + ' 00:00:00' : queryParams.createTime[0]"/>
+                    AND u.create_time &gt;= #{startDate}
+                </if>
+                <if test="queryParams.createTime[1] != null and queryParams.createTime[1] != ''">
+                    <bind name="endDate" value="queryParams.createTime[1].length() == 10 ? queryParams.createTime[1] + ' 23:59:59' : queryParams.createTime[1]"/>
+                    AND u.create_time &lt;= #{endDate}
+                </if>
+            </if>
+            <if test="queryParams.roleIds != null and queryParams.roleIds.size() > 0">
+                AND sur.role_id IN
+                <foreach item="roleId" collection="queryParams.roleIds" open="(" separator="," close=")">
+                    #{roleId}
+                </foreach>
+            </if>
+        </where>
+        GROUP BY
+        u.id
+        <choose>
+            <!-- 如果排序参数都传入 -->
+            <when test="queryParams.field != null and queryParams.field != '' and queryParams.direction != null">
+                ORDER BY u.${queryParams.field} ${queryParams.direction}
+            </when>
+            <!-- 默认排序 -->
+            <otherwise>
+                ORDER BY u.update_time DESC, u.create_time DESC
+            </otherwise>
+        </choose>
+    </select>
 
     <!-- 用户表单信息映射 -->
     <resultMap id="UserFormMap" type="com.youlai.boot.system.model.form.UserForm">
@@ -119,7 +196,7 @@
     </select>
 
     <!-- 用户认证信息映射 -->
-    <resultMap id="AuthCredentialsMap" type="com.youlai.boot.security.model.UserAuthCredentials">
+    <resultMap id="AuthCredentialsMap" type="com.youlai.boot.security.model.UserAuthInfo">
         <id property="userId" column="userId" jdbcType="BIGINT"/>
         <result property="username" column="username" jdbcType="VARCHAR"/>
         <result property="password" column="password" jdbcType="VARCHAR"/>
@@ -131,7 +208,7 @@
     </resultMap>
 
     <!-- 根据用户名获取用户的认证信息 -->
-    <select id="getAuthCredentialsByUsername" resultMap="AuthCredentialsMap">
+    <select id="getAuthInfoByUsername" resultMap="AuthCredentialsMap">
         SELECT
             t1.id userId,
             t1.username,
@@ -149,7 +226,7 @@
     </select>
 
     <!-- 根据微信openid获取用户的认证信息  -->
-    <select id="getAuthCredentialsByOpenId" resultMap="AuthCredentialsMap">
+    <select id="getAuthInfoByOpenId" resultMap="AuthCredentialsMap">
         SELECT
             t1.id userId,
             t1.username,
@@ -167,7 +244,7 @@
     </select>
 
     <!-- 根据手机号获取用户的认证信息 -->
-    <select id="getAuthCredentialsByMobile" resultMap="AuthCredentialsMap">
+    <select id="getAuthInfoByMobile" resultMap="AuthCredentialsMap">
         SELECT
             t1.id userId,
             t1.username,
@@ -184,7 +261,7 @@
     </select>
 
     <!-- 获取用户导出列表 -->
-    <select id="listExportUsers" resultType="com.youlai.boot.system.model.dto.UserExportDTO">
+    <select id="listExportUsers" resultType="com.youlai.boot.system.model.dto.UserExportDto">
         SELECT
             u.username,
             u.nickname,
@@ -224,8 +301,8 @@
         GROUP BY u.id
     </select>
 
-    <!-- 根据用户ID获取用户详情 -->
-    <select id="getUserProfile" resultType="com.youlai.boot.system.model.bo.UserBO">
+    <!-- 根据用户ID获取用户详情 mysql版本-->
+    <select id="getUserProfile" resultType="com.youlai.boot.system.model.bo.UserBo" databaseId="mysql">
         SELECT
             u.id,
             u.username,
@@ -237,6 +314,28 @@
             u.email,
             d.NAME AS deptName,
             GROUP_CONCAT(r.NAME) AS roleNames,
+            u.create_time
+        FROM
+            sys_user u
+                LEFT JOIN sys_dept d ON u.dept_id = d.id
+                LEFT JOIN sys_user_role sur ON u.id = sur.user_id
+                LEFT JOIN sys_role r ON sur.role_id = r.id
+        WHERE
+            u.id = #{userId} AND u.is_deleted = 0
+    </select>
+    <!-- 根据用户ID获取用户详情 dm版本-->
+    <select id="getUserProfile" resultType="com.youlai.boot.system.model.bo.UserBo" databaseId="dm">
+        SELECT
+            u.id,
+            u.username,
+            u.nickname,
+            u.mobile,
+            u.gender,
+            u.avatar,
+            u.STATUS,
+            u.email,
+            d.NAME AS deptName,
+            LISTAGG(r.name, ',') WITHIN GROUP (ORDER BY r.name) AS roleNames,
             u.create_time
         FROM
             sys_user u

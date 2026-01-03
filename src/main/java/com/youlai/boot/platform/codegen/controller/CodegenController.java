@@ -8,10 +8,10 @@ import com.youlai.boot.common.enums.LogModuleEnum;
 import com.youlai.boot.platform.codegen.service.CodegenService;
 import com.youlai.boot.platform.codegen.model.form.GenConfigForm;
 import com.youlai.boot.platform.codegen.model.query.TablePageQuery;
-import com.youlai.boot.platform.codegen.model.vo.CodegenPreviewVO;
-import com.youlai.boot.platform.codegen.model.vo.TablePageVO;
+import com.youlai.boot.platform.codegen.model.vo.CodegenPreviewVo;
+import com.youlai.boot.platform.codegen.model.vo.TablePageVo;
 import com.youlai.boot.common.annotation.Log;
-import com.youlai.boot.platform.codegen.service.GenConfigService;
+import com.youlai.boot.platform.codegen.service.GenTableService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -40,25 +40,25 @@ import java.util.List;
 public class CodegenController {
 
     private final CodegenService codegenService;
-    private final GenConfigService genConfigService;
+    private final GenTableService genTableService;
     private final CodegenProperties codegenProperties;
 
     @Operation(summary = "获取数据表分页列表")
     @GetMapping("/table/page")
     @Log(value = "代码生成分页列表", module = LogModuleEnum.OTHER)
-    public PageResult<TablePageVO> getTablePage(
+    public PageResult<TablePageVo> getTablePage(
             TablePageQuery queryParams
     ) {
-        Page<TablePageVO> result = codegenService.getTablePage(queryParams);
+        Page<TablePageVo> result = codegenService.getTablePage(queryParams);
         return PageResult.success(result);
     }
 
     @Operation(summary = "获取代码生成配置")
     @GetMapping("/{tableName}/config")
-    public Result<GenConfigForm> getGenConfigFormData(
+    public Result<GenConfigForm> getGenTableFormData(
             @Parameter(description = "表名", example = "sys_user") @PathVariable String tableName
     ) {
-        GenConfigForm formData = genConfigService.getGenConfigFormData(tableName);
+        GenConfigForm formData = genTableService.getGenTableFormData(tableName);
         return Result.success(formData);
     }
 
@@ -66,7 +66,7 @@ public class CodegenController {
     @PostMapping("/{tableName}/config")
     @Log(value = "生成代码", module = LogModuleEnum.OTHER)
     public Result<?> saveGenConfig(@RequestBody GenConfigForm formData) {
-        genConfigService.saveGenConfig(formData);
+        genTableService.saveGenConfig(formData);
         return Result.success();
     }
 
@@ -75,16 +75,16 @@ public class CodegenController {
     public Result<?> deleteGenConfig(
             @Parameter(description = "表名", example = "sys_user") @PathVariable String tableName
     ) {
-        genConfigService.deleteGenConfig(tableName);
+        genTableService.deleteGenConfig(tableName);
         return Result.success();
     }
 
     @Operation(summary = "获取预览生成代码")
     @GetMapping("/{tableName}/preview")
     @Log(value = "预览生成代码", module = LogModuleEnum.OTHER)
-    public Result<List<CodegenPreviewVO>> getTablePreviewData(@PathVariable String tableName,
+    public Result<List<CodegenPreviewVo>> getTablePreviewData(@PathVariable String tableName,
                                                               @RequestParam(value = "pageType", required = false, defaultValue = "classic") String pageType) {
-        List<CodegenPreviewVO> list = codegenService.getCodegenPreviewData(tableName, pageType);
+        List<CodegenPreviewVo> list = codegenService.getCodegenPreviewData(tableName, pageType);
         return Result.success(list);
     }
 

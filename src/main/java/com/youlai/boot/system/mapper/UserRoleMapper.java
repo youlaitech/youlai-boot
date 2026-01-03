@@ -18,5 +18,5 @@ public interface UserRoleMapper extends BaseMapper<UserRole> {
      *
      * @param roleId 角色ID
      */
-    int countUsersForRole(Long roleId);
+    int countUsersByRoleId(Long roleId);
 }

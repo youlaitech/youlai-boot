@@ -18,8 +18,8 @@ import java.io.Serializable;
 @Data
 @Builder
 @EqualsAndHashCode(callSuper = false)
-@Schema(description = "系统配置VO")
-public class ConfigVO {
+@Schema(description = "系统配置Vo")
+public class ConfigVo {
 
     @Schema(description = "主键")
     private Long id;
@@ -36,3 +36,5 @@ public class ConfigVO {
     @Schema(description = "描述、备注")
     private String remark;
 }
+
+ 

@@ -3,6 +3,7 @@ package com.youlai.boot.security.model;
 import cn.hutool.core.collection.CollectionUtil;
 import cn.hutool.core.util.ObjectUtil;
 import com.youlai.boot.common.constant.SecurityConstants;
+import com.youlai.boot.security.model.UserAuthInfo;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.springframework.security.core.GrantedAuthority;
@@ -64,9 +65,9 @@ public class SysUserDetails implements UserDetails {
     /**
      * 构造函数：根据用户认证信息初始化用户详情对象
      *
-     * @param user 用户认证信息对象 {@link UserAuthCredentials}
+     * @param user 用户认证信息对象 {@link UserAuthInfo}
      */
-    public SysUserDetails(UserAuthCredentials user) {
+    public SysUserDetails(UserAuthInfo user) {
         this.userId = user.getUserId();
         this.username = user.getUsername();
         this.password = user.getPassword();

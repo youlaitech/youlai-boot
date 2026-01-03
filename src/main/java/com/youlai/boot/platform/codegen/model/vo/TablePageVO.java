@@ -6,7 +6,7 @@ import lombok.Data;
 
 @Schema(description = "表视图对象")
 @Data
-public class TablePageVO {
+public class TablePageVo {
 
     @Schema(description = "表名称", example = "sys_user")
     private String tableName;

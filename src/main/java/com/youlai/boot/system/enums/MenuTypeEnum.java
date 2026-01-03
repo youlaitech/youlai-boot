@@ -5,28 +5,31 @@ import com.youlai.boot.common.base.IBaseEnum;
 import lombok.Getter;
 
 /**
- * 菜单类型枚举
+ * 菜单类型枚举（char）
  *
- * @author Ray.Hao
- * @since 2022/4/23 9:36
+ * C：目录
+ * M：菜单
+ * B：按钮
  */
 @Getter
-public enum MenuTypeEnum implements IBaseEnum<Integer> {
+public enum MenuTypeEnum implements IBaseEnum<String> {
 
-    NULL(0, null),
-    MENU(1, "菜单"),
-    CATALOG(2, "目录"),
-    EXTLINK(3, "外链"),
-    BUTTON(4, "按钮");
+    CATALOG("C", "目录"),
+    MENU("M", "菜单"),
+    BUTTON("B", "按钮");
 
-    //  Mybatis-Plus 提供注解表示插入数据库时插入该值
+    /**
+     * 数据库存储值
+     */
     @EnumValue
-    private final Integer value;
+    private final String value;
 
-    // @JsonValue //  表示对枚举序列化时返回此字段
+    /**
+     * 友好名称
+     */
     private final String label;
 
-    MenuTypeEnum(Integer value, String label) {
+    MenuTypeEnum(String value, String label) {
         this.value = value;
         this.label = label;
     }

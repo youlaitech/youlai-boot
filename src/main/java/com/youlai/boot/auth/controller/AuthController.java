@@ -1,11 +1,12 @@
 package com.youlai.boot.auth.controller;
 
-import com.youlai.boot.auth.model.vo.CaptchaVO;
-import com.youlai.boot.auth.model.dto.WxMiniAppPhoneLoginDTO;
+import com.youlai.boot.auth.model.dto.WxMiniAppCodeLoginDto;
+import com.youlai.boot.auth.model.dto.WxMiniAppPhoneLoginDto;
+import com.youlai.boot.auth.model.vo.CaptchaVo;
+import com.youlai.boot.auth.model.dto.LoginRequest;
 import com.youlai.boot.common.enums.LogModuleEnum;
 import com.youlai.boot.core.web.Result;
 import com.youlai.boot.auth.service.AuthService;
-import com.youlai.boot.auth.model.dto.WxMiniAppCodeLoginDTO;
 import com.youlai.boot.common.annotation.Log;
 import com.youlai.boot.security.model.AuthenticationToken;
 import io.swagger.v3.oas.annotations.Operation;
@@ -16,12 +17,11 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.*;
 
-
 /**
  * 认证控制层
  *
  * @author Ray.Hao
- * @since 2022/10/16
+ * @since 0.0.1
  */
 @Tag(name = "01.认证中心")
 @RestController
@@ -34,18 +34,17 @@ public class AuthController {
 
     @Operation(summary = "获取验证码")
     @GetMapping("/captcha")
-    public Result<CaptchaVO> getCaptcha() {
-        CaptchaVO captcha = authService.getCaptcha();
+    public Result<CaptchaVo> getCaptcha() {
+        CaptchaVo captcha = authService.getCaptcha();
         return Result.success(captcha);
     }
 
     @Operation(summary = "账号密码登录")
     @PostMapping("/login")
     @Log(value = "登录", module = LogModuleEnum.LOGIN)
-    public Result<AuthenticationToken> login(
-            @Parameter(description = "用户名", example = "admin") @RequestParam String username,
-            @Parameter(description = "密码", example = "123456") @RequestParam String password
-    ) {
+    public Result<?> login(@RequestBody @Valid LoginRequest request) {
+        String username = request.getUsername();
+        String password = request.getPassword();
         AuthenticationToken authenticationToken = authService.login(username, password);
         return Result.success(authenticationToken);
     }
@@ -82,18 +81,17 @@ public class AuthController {
 
     @Operation(summary = "微信小程序登录(Code)")
     @PostMapping("/wx/miniapp/code-login")
-    public Result<AuthenticationToken> loginByWxMiniAppCode(@RequestBody @Valid WxMiniAppCodeLoginDTO loginDTO) {
-        AuthenticationToken token = authService.loginByWxMiniAppCode(loginDTO);
+    public Result<AuthenticationToken> loginByWxMiniAppCode(@RequestBody @Valid WxMiniAppCodeLoginDto loginDto) {
+        AuthenticationToken token = authService.loginByWxMiniAppCode(loginDto);
         return Result.success(token);
     }
 
     @Operation(summary = "微信小程序登录(手机号)")
     @PostMapping("/wx/miniapp/phone-login")
-    public Result<AuthenticationToken> loginByWxMiniAppPhone(@RequestBody @Valid WxMiniAppPhoneLoginDTO loginDTO) {
-        AuthenticationToken token = authService.loginByWxMiniAppPhone(loginDTO);
+    public Result<AuthenticationToken> loginByWxMiniAppPhone(@RequestBody @Valid WxMiniAppPhoneLoginDto loginDto) {
+        AuthenticationToken token = authService.loginByWxMiniAppPhone(loginDto);
         return Result.success(token);
     }
-
 
     @Operation(summary = "退出登录")
     @DeleteMapping("/logout")

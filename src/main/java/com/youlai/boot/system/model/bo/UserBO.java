@@ -7,11 +7,11 @@ import java.time.LocalDateTime;
 /**
  * 用户持久化对象
  *
- * @author haoxr
+ * @author Ray.Hao
  * @since 2022/6/10
  */
 @Data
-public class UserBO {
+public class UserBo {
 
     /**
      * 用户ID
@@ -68,3 +68,5 @@ public class UserBO {
      */
     private LocalDateTime createTime;
 }
+
+ 

@@ -12,7 +12,7 @@ import lombok.Setter;
 #end
 
 /**
- * $!{table.comment} VO
+ * $!{table.comment} Vo
  *
  * @author ${author}
  * @since ${date}
@@ -26,13 +26,13 @@ import lombok.Setter;
 #end
 @Schema( description = "$!{table.comment}视图对象")
 #if(${superEntityClass})
-public class ${entity}VO extends ${superEntityClass}#if(${activeRecord})<${entity}>#end {
+public class ${entity}Vo extends ${superEntityClass}#if(${activeRecord})<${entity}>#end {
 #elseif(${activeRecord})
 public class ${entity} extends Model<${entity}> {
 #elseif(${entitySerialVersionUID})
-public class ${entity}VO implements Serializable {
+public class ${entity}Vo implements Serializable {
 #else
-public class ${entity}VO {
+public class ${entity}Vo {
 #end
 #if(${entitySerialVersionUID})
 

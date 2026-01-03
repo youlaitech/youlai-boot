@@ -2,10 +2,11 @@
 <!DOCTYPE mapper
         PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<!--suppress ALL -->
 <mapper namespace="com.youlai.boot.platform.codegen.mapper.DatabaseMapper">
 
-    <!-- 查询数据库表分页 -->
-    <select id="getTablePage" resultType="com.youlai.boot.platform.codegen.model.vo.TablePageVO">
+    <!-- 查询数据库表分页 mysql版本-->
+    <select id="getTablePage" resultType="com.youlai.boot.platform.codegen.model.vo.TablePageVo" databaseId="mysql">
         SELECT
             t1.TABLE_NAME ,
             t1.TABLE_COMMENT ,
@@ -15,7 +16,7 @@
             CASE WHEN t2.id IS NOT NULL THEN 1 ELSE 0 END AS isConfigured
         FROM
             information_schema.tables t1
-            LEFT JOIN gen_config t2 on t1.TABLE_NAME = t2.table_name
+            LEFT JOIN gen_table t2 on t1.TABLE_NAME = t2.table_name
         WHERE
             t1.TABLE_SCHEMA = (SELECT DATABASE())
             AND t1.table_type = 'BASE TABLE'
@@ -32,8 +33,38 @@
         ORDER BY
             CREATE_TIME DESC
     </select>
+    <!-- 查询数据库表分页 dm版本-->
+    <select id="getTablePage" resultType="com.youlai.boot.platform.codegen.model.vo.TablePageVo" databaseId="dm">
+        SELECT
+        t1.TABLE_NAME ,
+        c.COMMENTS AS TABLE_COMMENT ,
+        NULL AS TABLE_COLLATION,
+        'DM' AS ENGINE,
+        o.CREATED AS CREATE_TIME,
+        CASE WHEN t2.id IS NOT NULL THEN 1 ELSE 0 END AS isConfigured
+        FROM
+        ALL_TABLES t1
+        LEFT JOIN ALL_TAB_COMMENTS c ON t1.TABLE_NAME = c.TABLE_NAME AND t1.OWNER = c.OWNER
+        LEFT JOIN ALL_OBJECTS o ON t1.TABLE_NAME = o.OBJECT_NAME AND t1.OWNER = o.OWNER AND o.OBJECT_TYPE = 'TABLE'
+        LEFT JOIN gen_table t2 ON t1.TABLE_NAME = t2.table_name
+        WHERE
+        t1.OWNER = 'YOULAI_BOOT'
+        <if test="queryParams.keywords != null and queryParams.keywords.trim() neq ''">
+            AND t1.TABLE_NAME LIKE '%' || #{queryParams.keywords} || '%'
+        </if>
+        <!-- 排除的表 -->
+        <if test="queryParams.excludeTables != null and queryParams.excludeTables.size() > 0">
+            AND t1.TABLE_NAME NOT IN
+            <foreach collection="queryParams.excludeTables" item="excludeTable" open="(" close=")" separator=",">
+                #{excludeTable}
+            </foreach>
+        </if>
+        ORDER BY
+        o.CREATED DESC
+    </select>
 
-    <select id="getTableMetadata" resultType="com.youlai.boot.platform.codegen.model.bo.TableMetaData">
+    <!-- 查询数据库表元数据 mysql版本-->
+    <select id="getTableMetadata" resultType="com.youlai.boot.platform.codegen.model.bo.TableMetaData" databaseId="mysql">
         SELECT
             TABLE_NAME ,
             TABLE_COMMENT ,
@@ -46,8 +77,25 @@
             TABLE_SCHEMA = (SELECT DATABASE())
           AND TABLE_NAME = #{tableName}
     </select>
+    <!-- 获取数据库表元数据 dm版本-->
+    <select id="getTableMetadata" resultType="com.youlai.boot.platform.codegen.model.bo.TableMetaData" databaseId="dm">
+        SELECT
+            t1.TABLE_NAME ,
+            c.COMMENTS AS TABLE_COMMENT ,
+            NULL AS TABLE_COLLATION,
+            'DM' AS ENGINE,
+            o.CREATED AS CREATE_TIME
+        FROM
+            ALL_TABLES t1
+                LEFT JOIN ALL_TAB_COMMENTS c ON t1.TABLE_NAME = c.TABLE_NAME AND t1.OWNER = c.OWNER
+                LEFT JOIN ALL_OBJECTS o ON t1.TABLE_NAME = o.OBJECT_NAME AND t1.OWNER = o.OWNER AND o.OBJECT_TYPE = 'TABLE'
+        WHERE
+            t1.OWNER = 'YOULAI_BOOT'
+          AND t1.TABLE_NAME = #{tableName}
+    </select>
 
-    <select id="getTableColumns" resultType="com.youlai.boot.platform.codegen.model.bo.ColumnMetaData">
+    <!-- 获取数据库表字段元数据 mysql版本-->
+    <select id="getTableColumns" resultType="com.youlai.boot.platform.codegen.model.bo.ColumnMetaData" databaseId="mysql">
         SELECT
             COLUMN_NAME,
             DATA_TYPE,
@@ -64,6 +112,32 @@
             AND TABLE_NAME = #{tableName}
         ORDER BY ORDINAL_POSITION ASC
     </select>
-
+    <!-- 获取数据库表字段元数据 dm版本-->
+    <select id="getTableColumns" resultType="com.youlai.boot.platform.codegen.model.bo.ColumnMetaData" databaseId="dm">
+        SELECT
+            t1.COLUMN_NAME,
+            t1.DATA_TYPE,
+            c.COMMENTS AS COLUMN_COMMENT,
+            CASE WHEN con.CONSTRAINT_TYPE = 'P' THEN 1 ELSE 0 END AS isPrimaryKey,
+            CASE WHEN t1.NULLABLE = 'Y' THEN 'YES' ELSE 'NO' END AS IS_NULLABLE,
+            t1.DATA_LENGTH AS CHARACTER_MAXIMUM_LENGTH,
+            NULL AS CHARACTER_SET_NAME,
+            NULL AS COLLATION_NAME
+        FROM
+            ALL_TAB_COLUMNS t1
+                LEFT JOIN ALL_COL_COMMENTS c ON t1.TABLE_NAME = c.TABLE_NAME
+                AND t1.COLUMN_NAME = c.COLUMN_NAME
+                AND t1.OWNER = c.OWNER
+                LEFT JOIN ALL_CONS_COLUMNS cc ON t1.TABLE_NAME = cc.TABLE_NAME
+                AND t1.COLUMN_NAME = cc.COLUMN_NAME
+                AND t1.OWNER = cc.OWNER
+                LEFT JOIN ALL_CONSTRAINTS con ON cc.CONSTRAINT_NAME = con.CONSTRAINT_NAME
+                AND cc.OWNER = con.OWNER
+                AND con.CONSTRAINT_TYPE = 'P'
+        WHERE
+            t1.OWNER = 'YOULAI_BOOT'
+          AND t1.TABLE_NAME = #{tableName}
+        ORDER BY t1.COLUMN_ID ASC
+    </select>
 
 </mapper>

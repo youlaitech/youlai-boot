@@ -1,7 +1,7 @@
 package com.youlai.boot.platform.codegen.converter;
 
-import com.youlai.boot.platform.codegen.model.entity.GenConfig;
-import com.youlai.boot.platform.codegen.model.entity.GenFieldConfig;
+import com.youlai.boot.platform.codegen.model.entity.GenTable;
+import com.youlai.boot.platform.codegen.model.entity.GenTableColumn;
 import com.youlai.boot.platform.codegen.model.form.GenConfigForm;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
@@ -17,25 +17,25 @@ import java.util.List;
 @Mapper(componentModel = "spring")
 public interface CodegenConverter {
 
-    @Mapping(source = "genConfig.tableName", target = "tableName")
-    @Mapping(source = "genConfig.businessName", target = "businessName")
-    @Mapping(source = "genConfig.moduleName", target = "moduleName")
-    @Mapping(source = "genConfig.packageName", target = "packageName")
-    @Mapping(source = "genConfig.entityName", target = "entityName")
-    @Mapping(source = "genConfig.author", target = "author")
-    @Mapping(source = "genConfig.pageType", target = "pageType")
-    @Mapping(source = "genConfig.removeTablePrefix", target = "removeTablePrefix")
+    @Mapping(source = "genTable.tableName", target = "tableName")
+    @Mapping(source = "genTable.businessName", target = "businessName")
+    @Mapping(source = "genTable.moduleName", target = "moduleName")
+    @Mapping(source = "genTable.packageName", target = "packageName")
+    @Mapping(source = "genTable.entityName", target = "entityName")
+    @Mapping(source = "genTable.author", target = "author")
+    @Mapping(source = "genTable.pageType", target = "pageType")
+    @Mapping(source = "genTable.removeTablePrefix", target = "removeTablePrefix")
     @Mapping(source = "fieldConfigs", target = "fieldConfigs")
-    GenConfigForm toGenConfigForm(GenConfig genConfig, List<GenFieldConfig> fieldConfigs);
+    GenConfigForm toGenConfigForm(GenTable genTable, List<GenTableColumn> fieldConfigs);
 
-    List<GenConfigForm.FieldConfig> toGenFieldConfigForm(List<GenFieldConfig> fieldConfigs);
+    List<GenConfigForm.FieldConfig> toGenTableColumnForm(List<GenTableColumn> fieldConfigs);
 
-    GenConfigForm.FieldConfig toGenFieldConfigForm(GenFieldConfig genFieldConfig);
+    GenConfigForm.FieldConfig toGenTableColumnForm(GenTableColumn genTableColumn);
 
-    GenConfig toGenConfig(GenConfigForm formData);
+    GenTable toGenTable(GenConfigForm formData);
 
-    List<GenFieldConfig> toGenFieldConfig(List<GenConfigForm.FieldConfig> fieldConfigs);
+    List<GenTableColumn> toGenTableColumn(List<GenConfigForm.FieldConfig> fieldConfigs);
 
-    GenFieldConfig toGenFieldConfig(GenConfigForm.FieldConfig fieldConfig);
+    GenTableColumn toGenTableColumn(GenConfigForm.FieldConfig fieldConfig);
 
 }

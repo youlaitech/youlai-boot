@@ -14,7 +14,7 @@ import java.time.LocalDateTime;
  */
 @Schema(description ="用户分页对象")
 @Data
-public class UserPageVO {
+public class UserPageVo {
 
     @Schema(description="用户ID")
     private Long id;
@@ -49,5 +49,6 @@ public class UserPageVO {
     @Schema(description="创建时间")
     @JsonFormat(pattern = "yyyy/MM/dd HH:mm")
     private LocalDateTime createTime;
-
 }
+
+ 

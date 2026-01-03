@@ -7,13 +7,10 @@ import jakarta.validation.constraints.NotBlank;
 
 /**
  * 微信小程序手机号登录请求参数
- *
- * @author Ray.Hao
- * @since 2.0.0
  */
 @Schema(description = "微信小程序手机号登录请求参数")
 @Data
-public class WxMiniAppPhoneLoginDTO {
+public class WxMiniAppPhoneLoginDto {
 
     @Schema(description = "微信小程序登录时获取的code", requiredMode = Schema.RequiredMode.REQUIRED)
     @NotBlank(message = "code不能为空")
@@ -25,4 +22,6 @@ public class WxMiniAppPhoneLoginDTO {
     @Schema(description = "加密算法的初始向量")
     private String iv;
 
-} 
+}
+
+

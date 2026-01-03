@@ -3,9 +3,9 @@ package com.youlai.boot.platform.codegen.model.vo;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 
-@Schema(description = "代码生成代码预览VO")
+@Schema(description = "代码生成代码预览Vo")
 @Data
-public class CodegenPreviewVO {
+public class CodegenPreviewVo {
 
     @Schema(description = "生成文件路径")
     private String path;

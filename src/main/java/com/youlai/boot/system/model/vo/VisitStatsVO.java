@@ -15,7 +15,7 @@ import java.math.BigDecimal;
 @Schema(description = "访问量统计视图对象")
 @Getter
 @Setter
-public class VisitStatsVO {
+public class VisitStatsVo {
 
     @Schema(description = "今日独立访客数 (UV)")
     private Integer todayUvCount;
@@ -34,5 +34,6 @@ public class VisitStatsVO {
 
     @Schema(description = "页面浏览量增长率")
     private BigDecimal pvGrowthRate;
-
 }
+
+ 

@@ -1,13 +1,30 @@
 server:
-  port: 8989
+  port: 8000
+
+# 数据库类型：用于 MyBatis-Plus 分页方言等（仅方言，不负责连接信息）
+app:
+  db-type: mysql # 可选：mysql | postgres | dm
 
 spring:
   datasource:
     type: com.alibaba.druid.pool.DruidDataSource
+    # === MySQL 数据源（默认启用） ===
     driver-class-name: com.mysql.cj.jdbc.Driver
-    url: jdbc:mysql://www.youlai.tech:3306/youlai_boot?zeroDateTimeBehavior=convertToNull&useUnicode=true&characterEncoding=UTF-8&serverTimezone=Asia/Shanghai&autoReconnect=true&allowMultiQueries=true
+    url: jdbc:mysql://www.youlai.tech:3306/youlai_admin?zeroDateTimeBehavior=convertToNull&useUnicode=true&characterEncoding=UTF-8&serverTimezone=Asia/Shanghai&autoReconnect=true&allowMultiQueries=true
     username: youlai
     password: 123456
+
+    # === PostgreSQL 数据源示例（按需启用） ===
+    # driver-class-name: org.postgresql.Driver
+    # url: jdbc:postgresql://127.0.0.1:5432/youlai_admin
+    # username: postgres
+    # password: 123456
+
+    # === 达梦 DM 数据源示例（按需启用，注意按实际驱动与 URL 调整） ===
+    # driver-class-name: dm.jdbc.driver.DmDriver
+    # url: jdbc:dm://127.0.0.1:5236?schema=YOULAI_ADMIN
+    # username: SYSDBA
+    # password: 123456
   data:
     redis:
       database: 0
@@ -55,7 +72,7 @@ spring:
   ai:
     openai:
       # API Key
-      api-key: ${DASHSCOPE_API_KEY:sk-c2941d05bf2f411ca80424fxxxxxxxx}
+      api-key: ${DASHSCOPE_API_KEY:sk-c2941d05bf2f411ca80424fcd1eb4e07}
 
       # Base URL
       base-url: https://dashscope.aliyuncs.com/compatible-mode
@@ -73,6 +90,8 @@ spring:
           # JSON 输出格式（确保模型返回合法 JSON）
           response-format:
             type: json_object
+
+
 
 mybatis-plus:
   mapper-locations: classpath*:/mapper/**/*.xml

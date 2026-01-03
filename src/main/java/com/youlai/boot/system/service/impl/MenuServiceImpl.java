@@ -10,15 +10,15 @@ import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.youlai.boot.platform.codegen.model.entity.GenConfig;
+import com.youlai.boot.platform.codegen.model.entity.GenTable;
 import com.youlai.boot.security.util.SecurityUtils;
 import com.youlai.boot.system.converter.MenuConverter;
 import com.youlai.boot.system.mapper.MenuMapper;
 import com.youlai.boot.system.model.entity.Menu;
 import com.youlai.boot.system.model.form.MenuForm;
 import com.youlai.boot.system.model.query.MenuQuery;
-import com.youlai.boot.system.model.vo.MenuVO;
-import com.youlai.boot.system.model.vo.RouteVO;
+import com.youlai.boot.system.model.vo.MenuVo;
+import com.youlai.boot.system.model.vo.RouteVo;
 import com.youlai.boot.common.constant.SystemConstants;
 import com.youlai.boot.system.enums.MenuTypeEnum;
 import com.youlai.boot.common.enums.StatusEnum;
@@ -55,7 +55,7 @@ public class MenuServiceImpl extends ServiceImpl<MenuMapper, Menu> implements Me
      * @param queryParams {@link MenuQuery}
      */
     @Override
-    public List<MenuVO> listMenus(MenuQuery queryParams) {
+    public List<MenuVo> listMenus(MenuQuery queryParams) {
         List<Menu> menus = this.list(new LambdaQueryWrapper<Menu>()
                 .like(StrUtil.isNotBlank(queryParams.getKeywords()), Menu::getName, queryParams.getKeywords())
                 .orderByAsc(Menu::getSort)
@@ -88,15 +88,15 @@ public class MenuServiceImpl extends ServiceImpl<MenuMapper, Menu> implements Me
      * @param menuList 菜单列表
      * @return 菜单列表
      */
-    private List<MenuVO> buildMenuTree(Long parentId, List<Menu> menuList) {
+    private List<MenuVo> buildMenuTree(Long parentId, List<Menu> menuList) {
         return CollectionUtil.emptyIfNull(menuList)
                 .stream()
                 .filter(menu -> menu.getParentId().equals(parentId))
                 .map(entity -> {
-                    MenuVO menuVO = menuConverter.toVo(entity);
-                    List<MenuVO> children = buildMenuTree(entity.getId(), menuList);
-                    menuVO.setChildren(children);
-                    return menuVO;
+                    MenuVo menuVo = menuConverter.toVo(entity);
+                    List<MenuVo> children = buildMenuTree(entity.getId(), menuList);
+                    menuVo.setChildren(children);
+                    return menuVo;
                 }).toList();
     }
 
@@ -142,7 +142,7 @@ public class MenuServiceImpl extends ServiceImpl<MenuMapper, Menu> implements Me
      * 获取当前用户的菜单路由列表
      */
     @Override
-    public List<RouteVO> listCurrentUserRoutes() {
+    public List<RouteVo> listCurrentUserRoutes() {
         Set<String> roleCodes = SecurityUtils.getRoles();
 
         if (CollectionUtil.isEmpty(roleCodes)) {
@@ -157,7 +157,31 @@ public class MenuServiceImpl extends ServiceImpl<MenuMapper, Menu> implements Me
                     .orderByAsc(Menu::getSort)
             );
         } else {
+            // 普通用户：通过角色获取菜单（权限控制已过滤）
             menuList = this.baseMapper.getMenusByRoleCodes(roleCodes);
+            
+            // 双重保障：动态查询"平台管理"目录，过滤其子菜单
+            // 通过路由路径识别平台管理目录，避免硬编码
+            Menu platformMenu = this.getOne(new LambdaQueryWrapper<Menu>()
+                    .eq(Menu::getRoutePath, "/platform")
+                    .eq(Menu::getParentId, SystemConstants.ROOT_NODE_ID)
+                    .eq(Menu::getType, MenuTypeEnum.CATALOG.getValue())
+                    .last("LIMIT 1")
+            );
+            
+            if (platformMenu != null) {
+                final Long platformMenuId = platformMenu.getId();
+                menuList = menuList.stream()
+                        .filter(menu -> {
+                            String treePath = menu.getTreePath();
+                            // 排除平台管理目录及其子菜单
+                            // treePath 格式：0,1 或 0,1,110 等
+                            return treePath == null ||
+                                    (!treePath.startsWith("0," + platformMenuId + ",") &&
+                                     !treePath.equals("0," + platformMenuId));
+                        })
+                        .collect(Collectors.toList());
+            }
         }
         return buildRoutes(SystemConstants.ROOT_NODE_ID, menuList);
     }
@@ -171,7 +195,7 @@ public class MenuServiceImpl extends ServiceImpl<MenuMapper, Menu> implements Me
      *                   - template: 模板项目菜单数据
      */
     @Override
-    public List<RouteVO> listCurrentUserRoutes(String datasource) {
+    public List<RouteVo> listCurrentUserRoutes(String datasource) {
         return listCurrentUserRoutes();
     }
 
@@ -183,17 +207,17 @@ public class MenuServiceImpl extends ServiceImpl<MenuMapper, Menu> implements Me
      * @param menuList 菜单列表
      * @return 路由层级列表
      */
-    private List<RouteVO> buildRoutes(Long parentId, List<Menu> menuList) {
-        List<RouteVO> routeList = new ArrayList<>();
+    private List<RouteVo> buildRoutes(Long parentId, List<Menu> menuList) {
+        List<RouteVo> routeList = new ArrayList<>();
 
         for (Menu menu : menuList) {
             if (menu.getParentId().equals(parentId)) {
-                RouteVO routeVO = toRouteVo(menu);
-                List<RouteVO> children = buildRoutes(menu.getId(), menuList);
+                RouteVo routeVo = toRouteVo(menu);
+                List<RouteVo> children = buildRoutes(menu.getId(), menuList);
                 if (!children.isEmpty()) {
-                    routeVO.setChildren(children);
+                    routeVo.setChildren(children);
                 }
-                routeList.add(routeVO);
+                routeList.add(routeVo);
             }
         }
 
@@ -201,25 +225,31 @@ public class MenuServiceImpl extends ServiceImpl<MenuMapper, Menu> implements Me
     }
 
     /**
-     * 根据RouteBO创建RouteVO
+     * 根据RouteBO创建RouteVo
      */
-    private RouteVO toRouteVo(Menu menu) {
-        RouteVO routeVO = new RouteVO();
+    private RouteVo toRouteVo(Menu menu) {
+        RouteVo routeVo = new RouteVo();
+        String routePath = menu.getRoutePath();
+        boolean externalLink = StrUtil.startWithAny(routePath, "http://", "https://");
+
         // 获取路由名称
         String routeName = menu.getRouteName();
         if (StrUtil.isBlank(routeName)) {
-            // 路由 name 需要驼峰，首字母大写
-            routeName = StringUtils.capitalize(StrUtil.toCamelCase(menu.getRoutePath(), '-'));
+            // 外链不做驼峰转换，使用唯一占位，避免 http:// 被解析异常
+            routeName = externalLink
+                    ? "ext-" + menu.getId()
+                    : StringUtils.capitalize(StrUtil.toCamelCase(routePath, '-'));
         }
         // 根据name路由跳转 this.$router.push({name:xxx})
-        routeVO.setName(routeName);
+        routeVo.setName(routeName);
 
         // 根据path路由跳转 this.$router.push({path:xxx})
-        routeVO.setPath(menu.getRoutePath());
-        routeVO.setRedirect(menu.getRedirect());
-        routeVO.setComponent(menu.getComponent());
+        routeVo.setPath(routePath);
+        routeVo.setRedirect(menu.getRedirect());
+        // 外链无组件
+        routeVo.setComponent(externalLink ? null : menu.getComponent());
 
-        RouteVO.Meta meta = new RouteVO.Meta();
+        RouteVo.Meta meta = new RouteVo.Meta();
         meta.setTitle(menu.getName());
         meta.setIcon(menu.getIcon());
         meta.setHidden(StatusEnum.DISABLE.getValue().equals(menu.getVisible()));
@@ -242,8 +272,8 @@ public class MenuServiceImpl extends ServiceImpl<MenuMapper, Menu> implements Me
                 throw new RuntimeException("解析参数失败", e);
             }
         }
-        routeVO.setMeta(meta);
-        return routeVO;
+        routeVo.setMeta(meta);
+        return routeVo;
     }
 
     /**
@@ -253,7 +283,9 @@ public class MenuServiceImpl extends ServiceImpl<MenuMapper, Menu> implements Me
     @CacheEvict(cacheNames = "menu", key = "'routes'")
     public boolean saveMenu(MenuForm menuForm) {
 
-        Integer menuType = menuForm.getType();
+        String menuType = menuForm.getType();
+        boolean isExternalLink = MenuTypeEnum.MENU.getValue().equals(menuType)
+                && StrUtil.startWithAny(menuForm.getRoutePath(), "http://", "https://");
 
         if (MenuTypeEnum.CATALOG.getValue().equals(menuType)) {  // 如果是目录
             String path = menuForm.getRoutePath();
@@ -261,8 +293,8 @@ public class MenuServiceImpl extends ServiceImpl<MenuMapper, Menu> implements Me
                 menuForm.setRoutePath("/" + path); // 一级目录需以 / 开头
             }
             menuForm.setComponent("Layout");
-        } else if (MenuTypeEnum.EXTLINK.getValue().equals(menuType)) {
-            // 外链菜单组件设置为 null
+        } else if (isExternalLink) {
+            // 外链菜单组件设置为 null，通过 routePath 判断外链
             menuForm.setComponent(null);
         }
         if (Objects.equals(menuForm.getParentId(), menuForm.getId())) {
@@ -281,7 +313,7 @@ public class MenuServiceImpl extends ServiceImpl<MenuMapper, Menu> implements Me
             entity.setParams(null);
         }
         // 新增类型为菜单时候 路由名称唯一
-        if (MenuTypeEnum.MENU.getValue().equals(menuType)) {
+        if (MenuTypeEnum.MENU.getValue().equals(menuType) && !isExternalLink) {
             Assert.isFalse(this.exists(new LambdaQueryWrapper<Menu>()
                     .eq(Menu::getRouteName, entity.getRouteName())
                     .ne(menuForm.getId() != null, Menu::getId, menuForm.getId())
@@ -419,14 +451,14 @@ public class MenuServiceImpl extends ServiceImpl<MenuMapper, Menu> implements Me
      * 代码生成时添加菜单
      *
      * @param parentMenuId 父菜单ID
-     * @param genConfig    实体名称
+     * @param genTable    实体名称
      */
     @Override
-    public void addMenuForCodegen(Long parentMenuId, GenConfig genConfig) {
+    public void addMenuForCodegen(Long parentMenuId, GenTable genTable) {
         Menu parentMenu = this.getById(parentMenuId);
         Assert.notNull(parentMenu, "上级菜单不存在");
 
-        String entityName = genConfig.getEntityName();
+        String entityName = genTable.getEntityName();
 
         long count = this.count(new LambdaQueryWrapper<Menu>().eq(Menu::getRouteName, entityName));
         if (count > 0) {
@@ -445,11 +477,11 @@ public class MenuServiceImpl extends ServiceImpl<MenuMapper, Menu> implements Me
 
         Menu menu = new Menu();
         menu.setParentId(parentMenuId);
-        menu.setName(genConfig.getBusinessName());
+        menu.setName(genTable.getBusinessName());
 
         menu.setRouteName(entityName);
         menu.setRoutePath(StrUtil.toSymbolCase(entityName, '-'));
-        menu.setComponent(genConfig.getModuleName() + "/" + StrUtil.toSymbolCase(entityName, '-') + "/index");
+        menu.setComponent(genTable.getModuleName() + "/" + StrUtil.toSymbolCase(entityName, '-') + "/index");
         menu.setType(MenuTypeEnum.MENU.getValue());
         menu.setSort(sort);
         menu.setVisible(1);
@@ -462,9 +494,9 @@ public class MenuServiceImpl extends ServiceImpl<MenuMapper, Menu> implements Me
             this.updateById(menu);
 
             // 生成CURD按钮权限
-            String permPrefix = genConfig.getModuleName() + ":" + genConfig.getTableName().replace("_", "-") + ":";
-            String[] actions = {"查询", "新增", "编辑", "删除"};
-            String[] perms = {"query", "add", "edit", "delete"};
+            String permPrefix = genTable.getModuleName() + ":" + genTable.getTableName().replace("_", "-") + ":";
+            String[] actions = {"查询", "新增", "修改", "删除"};
+            String[] perms = {"list", "create", "update", "delete"};
 
             for (int i = 0; i < actions.length; i++) {
                 Menu button = new Menu();

@@ -7,13 +7,13 @@ import lombok.Data;
 import java.time.LocalDateTime;
 
 /**
- * 阅读通知公告VO
+ * 阅读通知公告Vo
  *
  * @author Theo
  * @since 2024-9-8 01:25:06
  */
 @Data
-public class NoticeDetailVO {
+public class NoticeDetailVo {
 
     @Schema(description = "通知ID")
     private Long id;
@@ -40,3 +40,6 @@ public class NoticeDetailVO {
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     private LocalDateTime publishTime;
 }
+
+
+ 

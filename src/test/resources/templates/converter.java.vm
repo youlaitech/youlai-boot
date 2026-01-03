@@ -4,11 +4,11 @@ import org.mapstruct.InheritInverseConfiguration;
 import org.mapstruct.Mapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 
-import ${package.Parent}.model.dto.${entity}DTO;
+import ${package.Parent}.model.dto.${entity}Dto;
 import ${package.Parent}.model.entity.${entity};
-import ${package.Parent}.model.vo.${entity}PageVO;
+import ${package.Parent}.model.vo.${entity}PageVo;
 import ${package.Parent}.model.form.${entity}Form;
-import ${package.Parent}.model.bo.${entity}BO;
+import ${package.Parent}.model.bo.${entity}Bo;
 
 /**
  * $!{table.comment}转换器
@@ -19,9 +19,9 @@ import ${package.Parent}.model.bo.${entity}BO;
 @Mapper(componentModel = "spring")
 public interface ${entity}Converter{
 
-    ${entity}PageVO toPageVo(${entity}BO bo);
+    ${entity}PageVo toPageVo(${entity}Bo bo);
 
-    Page<${entity}PageVO> toPageVo(Page<${entity}BO> bo);
+    Page<${entity}PageVo> toPageVo(Page<${entity}Bo> bo);
 
     ${entity}Form toForm(${entity} entity);
 

@@ -8,7 +8,7 @@ import com.youlai.boot.core.web.PageResult;
 import com.youlai.boot.core.web.Result;
 import com.youlai.boot.system.model.form.RoleForm;
 import com.youlai.boot.system.model.query.RolePageQuery;
-import com.youlai.boot.system.model.vo.RolePageVO;
+import com.youlai.boot.system.model.vo.RolePageVo;
 import com.youlai.boot.common.annotation.Log;
 import com.youlai.boot.system.service.RoleService;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -39,10 +39,10 @@ public class RoleController {
     @Operation(summary = "角色分页列表")
     @GetMapping("/page")
     @Log(value = "角色分页列表", module = LogModuleEnum.ROLE)
-    public PageResult<RolePageVO> getRolePage(
+    public PageResult<RolePageVo> getRolePage(
             RolePageQuery queryParams
     ) {
-        Page<RolePageVO> result = roleService.getRolePage(queryParams);
+        Page<RolePageVo> result = roleService.getRolePage(queryParams);
         return PageResult.success(result);
     }
 
@@ -55,7 +55,7 @@ public class RoleController {
 
     @Operation(summary = "新增角色")
     @PostMapping
-    @PreAuthorize("@ss.hasPerm('sys:role:add')")
+    @PreAuthorize("@ss.hasPerm('sys:role:create')")
     @RepeatSubmit
     public Result<?> addRole(@Valid @RequestBody RoleForm roleForm) {
         boolean result = roleService.saveRole(roleForm);
@@ -64,7 +64,7 @@ public class RoleController {
 
     @Operation(summary = "获取角色表单数据")
     @GetMapping("/{roleId}/form")
-    @PreAuthorize("@ss.hasPerm('sys:role:edit')")
+    @PreAuthorize("@ss.hasPerm('sys:role:update')")
     public Result<RoleForm> getRoleForm(
             @Parameter(description = "角色ID") @PathVariable Long roleId
     ) {
@@ -74,7 +74,7 @@ public class RoleController {
 
     @Operation(summary = "修改角色")
     @PutMapping(value = "/{id}")
-    @PreAuthorize("@ss.hasPerm('sys:role:edit')")
+    @PreAuthorize("@ss.hasPerm('sys:role:update')")
     public Result<?> updateRole(@Valid @RequestBody RoleForm roleForm) {
         boolean result = roleService.saveRole(roleForm);
         return Result.judge(result);
@@ -92,7 +92,7 @@ public class RoleController {
 
     @Operation(summary = "修改角色状态")
     @PutMapping(value = "/{roleId}/status")
-    @PreAuthorize("@ss.hasPerm('sys:role:edit')")
+    @PreAuthorize("@ss.hasPerm('sys:role:update')")
     public Result<?> updateRoleStatus(
             @Parameter(description = "角色ID") @PathVariable Long roleId,
             @Parameter(description = "状态(1:启用;0:禁用)") @RequestParam Integer status
@@ -112,6 +112,7 @@ public class RoleController {
 
     @Operation(summary = "角色分配菜单权限")
     @PutMapping("/{roleId}/menus")
+    @PreAuthorize("@ss.hasPerm('sys:role:assign')")
     public Result<Void> assignMenusToRole(
             @PathVariable Long roleId,
             @RequestBody List<Long> menuIds

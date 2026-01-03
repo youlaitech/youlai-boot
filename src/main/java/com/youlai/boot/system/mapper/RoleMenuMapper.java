@@ -1,7 +1,7 @@
 package com.youlai.boot.system.mapper;
 
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
-import com.youlai.boot.system.model.bo.RolePermsBO;
+import com.youlai.boot.system.model.bo.RolePermsBo;
 import com.youlai.boot.system.model.entity.RoleMenu;
 import org.apache.ibatis.annotations.Mapper;
 
@@ -28,7 +28,7 @@ public interface RoleMenuMapper extends BaseMapper<RoleMenu> {
     /**
      * 获取权限和拥有权限的角色列表
      */
-    List<RolePermsBO> getRolePermsList(String roleCode);
+    List<RolePermsBo> getRolePermsList(String roleCode);
 
 
     /**

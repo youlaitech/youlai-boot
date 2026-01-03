@@ -63,7 +63,8 @@
 <script setup lang="ts">
 defineOptions({ name: "$entityName" });
 
-import ${entityName}API, { ${entityName}Form, ${entityName}PageQuery } from "@/api/${moduleName}/${kebabCaseEntityName}-api";
+import ${entityName}API from "@/api/${moduleName}/${entityKebab}";
+import type { ${entityName}Form, ${entityName}PageQuery } from "@/api/types";
 import type { IObject, IModalConfig, IContentConfig, ISearchConfig } from "@/components/CURD/types";
 import usePage from "@/components/CURD/usePage";
 
@@ -85,7 +86,7 @@ const {
 
 // 搜索配置
 const searchConfig: ISearchConfig = reactive({
-  permPrefix: "${moduleName}:${kebabCaseEntityName}",
+  permPrefix: "${moduleName}:${entityKebab}",
   formItems: [
 #foreach($fieldConfig in $fieldConfigs)
 #if($fieldConfig.isShowInQuery == 1)
@@ -136,7 +137,7 @@ const searchConfig: ISearchConfig = reactive({
 // 列表配置
 const contentConfig: IContentConfig<${entityName}PageQuery> = reactive({
   // 权限前缀
-  permPrefix: "${moduleName}:${kebabCaseEntityName}",
+  permPrefix: "${moduleName}:${entityKebab}",
   table: {
     border: true,
     highlightCurrentRow: true,
@@ -194,7 +195,7 @@ const contentConfig: IContentConfig<${entityName}PageQuery> = reactive({
 // 新增配置
 const addModalConfig: IModalConfig<${entityName}Form> = reactive({
   // 权限前缀
-  permPrefix: "${moduleName}:${kebabCaseEntityName}",
+  permPrefix: "${moduleName}:${entityKebab}",
   // 主键
   pk: "id",
   // 弹窗配置
@@ -340,7 +341,7 @@ const addModalConfig: IModalConfig<${entityName}Form> = reactive({
 
 // 编辑配置
 const editModalConfig: IModalConfig<${entityName}Form> = reactive({
-  permPrefix: "${moduleName}:${kebabCaseEntityName}",
+  permPrefix: "${moduleName}:${entityKebab}",
   component: "drawer",
   drawer: {
     title: "编辑$!{entityComment}",

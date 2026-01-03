@@ -5,7 +5,7 @@ import cn.binarywang.wx.miniapp.bean.WxMaJscode2SessionResult;
 import cn.hutool.core.util.ObjectUtil;
 import cn.hutool.core.util.StrUtil;
 import com.youlai.boot.security.model.SysUserDetails;
-import com.youlai.boot.security.model.UserAuthCredentials;
+import com.youlai.boot.security.model.UserAuthInfo;
 import com.youlai.boot.security.model.WxMiniAppCodeAuthenticationToken;
 import com.youlai.boot.system.service.UserService;
 import lombok.extern.slf4j.Slf4j;
@@ -16,7 +16,6 @@ import org.springframework.security.authentication.DisabledException;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
-
 
 /**
  * 微信小程序Code认证Provider
@@ -30,12 +29,10 @@ public class WxMiniAppCodeAuthenticationProvider implements AuthenticationProvid
     private final UserService userService;
     private final WxMaService wxMaService;
 
-
     public WxMiniAppCodeAuthenticationProvider(UserService userService, WxMaService wxMaService) {
         this.userService = userService;
         this.wxMaService = wxMaService;
     }
-
 
     /**
      * 微信认证逻辑，参考 Spring Security 认证密码校验流程
@@ -63,26 +60,26 @@ public class WxMiniAppCodeAuthenticationProvider implements AuthenticationProvid
         }
 
         // 根据微信 OpenID 查询用户信息
-        UserAuthCredentials userAuthCredentials = userService.getAuthCredentialsByOpenId(openId);
+        UserAuthInfo userAuthInfo = userService.getAuthInfoByOpenId(openId);
 
-        if (userAuthCredentials == null) {
+        if (userAuthInfo == null) {
             // 用户不存在则注册
             userService.registerOrBindWechatUser(openId);
 
             // 再次查询用户信息，确保用户注册成功
-            userAuthCredentials = userService.getAuthCredentialsByOpenId(openId);
-            if (userAuthCredentials == null) {
+            userAuthInfo = userService.getAuthInfoByOpenId(openId);
+            if (userAuthInfo == null) {
                 throw new UsernameNotFoundException("用户注册失败，请稍后重试");
             }
         }
 
         // 检查用户状态是否有效
-        if (ObjectUtil.notEqual(userAuthCredentials.getStatus(), 1)) {
+        if (ObjectUtil.notEqual(userAuthInfo.getStatus(), 1)) {
             throw new DisabledException("用户已被禁用");
         }
 
         // 构建认证后的用户详情信息
-        SysUserDetails userDetails = new SysUserDetails(userAuthCredentials);
+        SysUserDetails userDetails = new SysUserDetails(userAuthInfo);
 
         // 创建已认证的Token
         return WxMiniAppCodeAuthenticationToken.authenticated(

@@ -18,7 +18,7 @@ import java.time.LocalDateTime;
 @Getter
 @Setter
 @Schema(description = "通知公告视图对象")
-public class NoticePageVO implements Serializable {
+public class NoticePageVo implements Serializable {
 
     @Serial
     private static final long serialVersionUID = 1L;
@@ -59,3 +59,5 @@ public class NoticePageVO implements Serializable {
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm")
     private LocalDateTime revokeTime;
 }
+
+ 

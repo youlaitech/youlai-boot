@@ -38,7 +38,7 @@
 #end
 
     <!-- ${table.comment}分页列表 -->
-    <select id="listPaged${entity}s" resultType="${package.Parent}.model.bo.${entity}BO">
+    <select id="listPaged${entity}s" resultType="${package.Parent}.model.bo.${entity}Bo">
         SELECT
             <include refid="Base_Column_List"/>
         FROM

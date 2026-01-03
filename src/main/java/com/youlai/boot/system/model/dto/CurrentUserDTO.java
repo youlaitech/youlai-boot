@@ -13,7 +13,7 @@ import java.util.Set;
  */
 @Schema(description ="当前登录用户对象")
 @Data
-public class CurrentUserDTO {
+public class CurrentUserDto {
 
     @Schema(description="用户ID")
     private Long userId;
@@ -34,3 +34,5 @@ public class CurrentUserDTO {
     private Set<String> perms;
 
 }
+
+ 

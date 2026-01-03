@@ -57,7 +57,7 @@ public class RepeatSubmitAspect {
 
         boolean locked = lock.tryLock(0, expire, TimeUnit.SECONDS);
         if (!locked) {
-            throw new BusinessException(ResultCode.USER_DUPLICATE_REQUEST);
+            throw new BusinessException(ResultCode.DUPLICATE_SUBMISSION);
         }
         return pjp.proceed();
     }

@@ -5,9 +5,9 @@ import com.youlai.boot.core.web.PageResult;
 import com.youlai.boot.core.web.Result;
 import com.youlai.boot.system.model.form.NoticeForm;
 import com.youlai.boot.system.model.query.NoticePageQuery;
-import com.youlai.boot.system.model.vo.NoticeDetailVO;
-import com.youlai.boot.system.model.vo.NoticePageVO;
-import com.youlai.boot.system.model.vo.UserNoticePageVO;
+import com.youlai.boot.system.model.vo.NoticeDetailVo;
+import com.youlai.boot.system.model.vo.NoticePageVo;
+import com.youlai.boot.system.model.vo.UserNoticePageVo;
 import com.youlai.boot.system.service.NoticeService;
 import com.youlai.boot.system.service.UserNoticeService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -37,15 +37,15 @@ public class NoticeController {
 
     @Operation(summary = "通知公告分页列表")
     @GetMapping("/page")
-    @PreAuthorize("@ss.hasPerm('sys:notice:query')")
-    public PageResult<NoticePageVO> getNoticePage(NoticePageQuery queryParams) {
-        IPage<NoticePageVO> result = noticeService.getNoticePage(queryParams);
+    @PreAuthorize("@ss.hasPerm('sys:notice:list')")
+    public PageResult<NoticePageVo> getNoticePage(NoticePageQuery queryParams) {
+        IPage<NoticePageVo> result = noticeService.getNoticePage(queryParams);
         return PageResult.success(result);
     }
 
     @Operation(summary = "新增通知公告")
     @PostMapping
-    @PreAuthorize("@ss.hasPerm('sys:notice:add')")
+    @PreAuthorize("@ss.hasPerm('sys:notice:create')")
     public Result<?> saveNotice(@RequestBody @Valid NoticeForm formData) {
         boolean result = noticeService.saveNotice(formData);
         return Result.judge(result);
@@ -53,7 +53,7 @@ public class NoticeController {
 
     @Operation(summary = "获取通知公告表单数据")
     @GetMapping("/{id}/form")
-    @PreAuthorize("@ss.hasPerm('sys:notice:edit')")
+    @PreAuthorize("@ss.hasPerm('sys:notice:update')")
     public Result<NoticeForm> getNoticeForm(
             @Parameter(description = "通知公告ID") @PathVariable Long id
     ) {
@@ -63,16 +63,16 @@ public class NoticeController {
 
     @Operation(summary = "阅读获取通知公告详情")
     @GetMapping("/{id}/detail")
-    public Result<NoticeDetailVO> getNoticeDetail(
+    public Result<NoticeDetailVo> getNoticeDetail(
             @Parameter(description = "通知公告ID") @PathVariable Long id
     ) {
-        NoticeDetailVO detailVO = noticeService.getNoticeDetail(id);
-        return Result.success(detailVO);
+        NoticeDetailVo detailVo = noticeService.getNoticeDetail(id);
+        return Result.success(detailVo);
     }
 
     @Operation(summary = "修改通知公告")
     @PutMapping(value = "/{id}")
-    @PreAuthorize("@ss.hasPerm('sys:notice:edit')")
+    @PreAuthorize("@ss.hasPerm('sys:notice:update')")
     public Result<Void> updateNotice(
             @Parameter(description = "通知公告ID") @PathVariable Long id,
             @RequestBody @Validated NoticeForm formData
@@ -120,10 +120,10 @@ public class NoticeController {
 
     @Operation(summary = "获取我的通知公告分页列表")
     @GetMapping("/my")
-    public PageResult<UserNoticePageVO> getMyNoticePage(
+    public PageResult<UserNoticePageVo> getMyNoticePage(
             NoticePageQuery queryParams
     ) {
-        IPage<UserNoticePageVO> result = noticeService.getMyNoticePage(queryParams);
+        IPage<UserNoticePageVo> result = noticeService.getMyNoticePage(queryParams);
         return PageResult.success(result);
     }
 }

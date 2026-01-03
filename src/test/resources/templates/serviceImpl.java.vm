@@ -9,8 +9,8 @@ import org.springframework.stereotype.Service;
 import com.youlai.common.util.DateUtils;
 import ${package.Parent}.model.form.${entity}Form;
 import ${package.Parent}.model.query.${entity}PageQuery;
-import ${package.Parent}.model.bo.${entity}BO;
-import ${package.Parent}.model.vo.${entity}PageVO;
+import ${package.Parent}.model.bo.${entity}Bo;
+import ${package.Parent}.model.vo.${entity}PageVo;
 import ${package.Parent}.converter.${entity}Converter;
 
 import com.baomidou.mybatisplus.core.metadata.IPage;
@@ -39,21 +39,21 @@ public class ${table.serviceImplName} extends ${superServiceImplClass}<${table.m
     * 获取$!{table.comment}分页列表
     *
     * @param queryParams 查询参数
-    * @return {@link IPage<${entity}PageVO>} $!{table.comment}分页列表
+    * @return {@link IPage<${entity}PageVo>} $!{table.comment}分页列表
     */
     @Override
-    public IPage<${entity}PageVO> listPaged${entity}s(${entity}PageQuery queryParams) {
+    public IPage<${entity}PageVo> listPaged${entity}s(${entity}PageQuery queryParams) {
     
         // 参数构建
         int pageNum = queryParams.getPageNum();
         int pageSize = queryParams.getPageSize();
-        Page<${entity}BO> page = new Page<>(pageNum, pageSize);
+        Page<${entity}Bo> page = new Page<>(pageNum, pageSize);
 
         // 格式化为数据库日期格式，避免日期比较使用格式化函数导致索引失效
         DateUtils.toDatabaseFormat(queryParams, "startTime", "endTime");
     
         // 查询数据
-        Page<${entity}BO> boPage = this.baseMapper.listPaged${entity}s(page, queryParams);
+        Page<${entity}Bo> boPage = this.baseMapper.listPaged${entity}s(page, queryParams);
     
         // 实体转换
         return ${firstCharLowerCaseEntity}Converter.toPageVo(boPage);

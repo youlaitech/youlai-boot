@@ -14,7 +14,7 @@ import com.youlai.boot.common.enums.StatusEnum;
 import com.youlai.boot.core.web.ExcelResult;
 import com.youlai.boot.system.converter.UserConverter;
 import com.youlai.boot.system.enums.DictCodeEnum;
-import com.youlai.boot.system.model.dto.UserImportDTO;
+import com.youlai.boot.system.model.dto.UserImportDto;
 import com.youlai.boot.system.model.entity.*;
 import com.youlai.boot.system.service.*;
 import lombok.Getter;
@@ -35,7 +35,7 @@ import java.util.stream.Collectors;
  * @since 2022/4/10
  */
 @Slf4j
-public class UserImportListener extends AnalysisEventListener<UserImportDTO> {
+public class UserImportListener extends AnalysisEventListener<UserImportDto> {
 
     /**
      * Excel 导入结果
@@ -82,15 +82,15 @@ public class UserImportListener extends AnalysisEventListener<UserImportDTO> {
      * 1. 数据校验；全字段校验
      * 2. 数据持久化；
      *
-     * @param userImportDTO 一行数据，类似于 {@link AnalysisContext#readRowHolder()}
+     * @param userImportDto 一行数据，类似于 {@link AnalysisContext#readRowHolder()}
      */
     @Override
-    public void invoke(UserImportDTO userImportDTO, AnalysisContext analysisContext) {
-        log.info("解析到一条用户数据:{}", JSONUtil.toJsonStr(userImportDTO));
+    public void invoke(UserImportDto userImportDto, AnalysisContext analysisContext) {
+        log.info("解析到一条用户数据:{}", JSONUtil.toJsonStr(userImportDto));
 
         boolean validation = true;
         String errorMsg = "第" + currentRow + "行数据校验失败：";
-        String username = userImportDTO.getUsername();
+        String username = userImportDto.getUsername();
         if (StrUtil.isBlank(username)) {
             errorMsg += "用户名为空；";
             validation = false;
@@ -102,13 +102,13 @@ public class UserImportListener extends AnalysisEventListener<UserImportDTO> {
             }
         }
 
-        String nickname = userImportDTO.getNickname();
+        String nickname = userImportDto.getNickname();
         if (StrUtil.isBlank(nickname)) {
             errorMsg += "用户昵称为空；";
             validation = false;
         }
 
-        String mobile = userImportDTO.getMobile();
+        String mobile = userImportDto.getMobile();
         if (StrUtil.isBlank(mobile)) {
             errorMsg += "手机号码为空；";
             validation = false;
@@ -121,16 +121,16 @@ public class UserImportListener extends AnalysisEventListener<UserImportDTO> {
 
         if (validation) {
             // 校验通过，持久化至数据库
-            User entity = userConverter.toEntity(userImportDTO);
+            User entity = userConverter.toEntity(userImportDto);
             entity.setPassword(passwordEncoder.encode(SystemConstants.DEFAULT_PASSWORD));   // 默认密码
             // 性别逆向翻译 根据字典标签得到字典值
-            String genderLabel = userImportDTO.getGenderLabel();
+            String genderLabel = userImportDto.getGenderLabel();
             entity.setGender(getGenderValue(genderLabel));
             // 角色解析
-            String roleCodes = userImportDTO.getRoleCodes();
+            String roleCodes = userImportDto.getRoleCodes();
             List<Long> roleIds = getRoleIds(roleCodes);
             // 部门解析
-            String deptCode = userImportDTO.getDeptCode();
+            String deptCode = userImportDto.getDeptCode();
             entity.setDeptId(getDeptId(deptCode));
 
             boolean saveResult = userService.save(entity);

@@ -3,13 +3,13 @@ package com.youlai.boot.system.service;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.service.IService;
 import com.youlai.boot.common.model.Option;
-import com.youlai.boot.security.model.UserAuthCredentials;
-import com.youlai.boot.system.model.dto.CurrentUserDTO;
-import com.youlai.boot.system.model.dto.UserExportDTO;
+import com.youlai.boot.security.model.UserAuthInfo;
+import com.youlai.boot.system.model.dto.CurrentUserDto;
+import com.youlai.boot.system.model.dto.UserExportDto;
 import com.youlai.boot.system.model.entity.User;
 import com.youlai.boot.system.model.query.UserPageQuery;
-import com.youlai.boot.system.model.vo.UserPageVO;
-import com.youlai.boot.system.model.vo.UserProfileVO;
+import com.youlai.boot.system.model.vo.UserPageVo;
+import com.youlai.boot.system.model.vo.UserProfileVo;
 import com.youlai.boot.system.model.form.*;
 
 import java.util.List;
@@ -25,9 +25,9 @@ public interface UserService extends IService<User> {
     /**
      * 用户分页列表
      *
-     * @return {@link IPage<UserPageVO>} 用户分页列表
+     * @return {@link IPage<UserPageVo>} 用户分页列表
      */
-    IPage<UserPageVO> getUserPage(UserPageQuery queryParams);
+    IPage<UserPageVo> getUserPage(UserPageQuery queryParams);
 
     /**
      * 获取用户表单数据
@@ -69,34 +69,37 @@ public interface UserService extends IService<User> {
      * 根据用户名获取认证信息
      *
      * @param username 用户名
-     * @return {@link UserAuthCredentials}
+     * @return {@link UserAuthInfo}
      */
+    UserAuthInfo getAuthInfoByUsername(String username);
 
-    UserAuthCredentials getAuthCredentialsByUsername(String username);
+    default UserAuthInfo getAuthCredentialsByUsername(String username) {
+        return getAuthInfoByUsername(username);
+    }
 
 
     /**
      * 获取导出用户列表
      *
      * @param queryParams 查询参数
-     * @return {@link List<UserExportDTO>} 导出用户列表
+     * @return {@link List<UserExportDto>} 导出用户列表
      */
-    List<UserExportDTO> listExportUsers(UserPageQuery queryParams);
+    List<UserExportDto> listExportUsers(UserPageQuery queryParams);
 
 
     /**
      * 获取登录用户信息
      *
-     * @return {@link CurrentUserDTO} 登录用户信息
+     * @return {@link CurrentUserDto} 登录用户信息
      */
-    CurrentUserDTO getCurrentUserInfo();
+    CurrentUserDto getCurrentUserInfo();
 
     /**
      * 获取个人中心用户信息
      *
-     * @return {@link UserProfileVO} 个人中心用户信息
+     * @return {@link UserProfileVo} 个人中心用户信息
      */
-    UserProfileVO getUserProfile(Long userId);
+    UserProfileVo getUserProfile(Long userId);
 
     /**
      * 修改个人中心用户信息
@@ -166,10 +169,14 @@ public interface UserService extends IService<User> {
      * 根据 openid 获取用户认证信息
      *
      * @param openId 用户名
-     * @return {@link UserAuthCredentials}
+     * @return {@link UserAuthInfo}
      */
 
-    UserAuthCredentials getAuthCredentialsByOpenId(String openId);
+    UserAuthInfo getAuthInfoByOpenId(String openId);
+
+    default UserAuthInfo getAuthCredentialsByOpenId(String openId) {
+        return getAuthInfoByOpenId(openId);
+    }
 
     /**
      * 根据微信 OpenID 注册或绑定用户
@@ -182,9 +189,13 @@ public interface UserService extends IService<User> {
      * 根据手机号获取用户认证信息
      *
      * @param mobile 手机号
-     * @return {@link UserAuthCredentials}
+     * @return {@link UserAuthInfo}
      */
-    UserAuthCredentials getAuthCredentialsByMobile(String mobile);
+    UserAuthInfo getAuthInfoByMobile(String mobile);
+
+    default UserAuthInfo getAuthCredentialsByMobile(String mobile) {
+        return getAuthInfoByMobile(mobile);
+    }
 
     /**
      * 根据手机号和OpenID注册用户
