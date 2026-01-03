@@ -14,7 +14,7 @@ import java.time.LocalDateTime;
  */
 @Data
 @Schema(description = "用户公告Vo")
-public class UserNoticePageVo {
+public class UserNoticePageVO {
 
     @Schema(description = "通知ID")
     private Long id;

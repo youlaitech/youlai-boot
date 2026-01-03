@@ -5,7 +5,7 @@ import lombok.Data;
 
 @Schema(description = "代码生成代码预览Vo")
 @Data
-public class CodegenPreviewVo {
+public class CodegenPreviewVO {
 
     @Schema(description = "生成文件路径")
     private String path;

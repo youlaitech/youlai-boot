@@ -8,7 +8,7 @@ import java.util.List;
 
 @Schema(description ="菜单视图对象")
 @Data
-public class MenuVo {
+public class MenuVO {
 
     @Schema(description = "菜单ID")
     private Long id;
@@ -48,7 +48,7 @@ public class MenuVo {
 
     @Schema(description = "子菜单")
     @JsonInclude(value = JsonInclude.Include.NON_NULL)
-    private List<MenuVo> children;
+    private List<MenuVO> children;
 }
 
  

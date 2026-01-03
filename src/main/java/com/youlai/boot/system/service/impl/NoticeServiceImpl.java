@@ -13,16 +13,16 @@ import com.youlai.boot.system.converter.NoticeConverter;
 import com.youlai.boot.system.enums.NoticePublishStatusEnum;
 import com.youlai.boot.system.enums.NoticeTargetEnum;
 import com.youlai.boot.system.mapper.NoticeMapper;
-import com.youlai.boot.system.model.bo.NoticeBo;
-import com.youlai.boot.system.model.dto.NoticeDto;
+import com.youlai.boot.system.model.bo.NoticeBO;
+import com.youlai.boot.system.model.dto.NoticeDTO;
 import com.youlai.boot.system.model.entity.Notice;
 import com.youlai.boot.system.model.entity.UserNotice;
 import com.youlai.boot.system.model.entity.User;
 import com.youlai.boot.system.model.form.NoticeForm;
 import com.youlai.boot.system.model.query.NoticePageQuery;
-import com.youlai.boot.system.model.vo.NoticePageVo;
-import com.youlai.boot.system.model.vo.UserNoticePageVo;
-import com.youlai.boot.system.model.vo.NoticeDetailVo;
+import com.youlai.boot.system.model.vo.NoticePageVO;
+import com.youlai.boot.system.model.vo.UserNoticePageVO;
+import com.youlai.boot.system.model.vo.NoticeDetailVO;
 import com.youlai.boot.system.service.NoticeService;
 import com.youlai.boot.system.service.UserNoticeService;
 import com.youlai.boot.system.service.UserOnlineService;
@@ -63,8 +63,8 @@ public class NoticeServiceImpl extends ServiceImpl<NoticeMapper, Notice> impleme
      * @return {@link IPage< NoticePageVo >} 通知公告分页列表
      */
     @Override
-    public IPage<NoticePageVo> getNoticePage(NoticePageQuery queryParams) {
-        Page<NoticeBo> noticePage = this.baseMapper.getNoticePage(
+    public IPage<NoticePageVO> getNoticePage(NoticePageQuery queryParams) {
+        Page<NoticeBO> noticePage = this.baseMapper.getNoticePage(
                 new Page<>(queryParams.getPageNum(), queryParams.getPageSize()),
                 queryParams
         );
@@ -215,13 +215,13 @@ public class NoticeServiceImpl extends ServiceImpl<NoticeMapper, Notice> impleme
             Set<String> receivers = targetUserList.stream().map(User::getUsername).collect(Collectors.toSet());
 
             Set<String> allOnlineUsers = userOnlineService.getOnlineUsers().stream()
-              .map(UserOnlineService.UserOnlineDto::getUsername)
+              .map(UserOnlineService.UserOnlineDTO::getUsername)
               .collect(Collectors.toSet());
 
             // 找出在线用户的通知接收者
             Set<String> onlineReceivers = new HashSet<>(CollectionUtil.intersection(receivers, allOnlineUsers));
 
-            NoticeDto noticeDto = new NoticeDto();
+            NoticeDTO noticeDto = new NoticeDTO();
             noticeDto.setId(id);
             noticeDto.setTitle(notice.getTitle());
             noticeDto.setType(notice.getType());
@@ -271,8 +271,8 @@ public class NoticeServiceImpl extends ServiceImpl<NoticeMapper, Notice> impleme
      * @return NoticeDetailVo 通知公告详情
      */
     @Override
-    public NoticeDetailVo getNoticeDetail(Long id) {
-        NoticeBo noticeBo = this.baseMapper.getNoticeDetail(id);
+    public NoticeDetailVO getNoticeDetail(Long id) {
+        NoticeBO noticeBo = this.baseMapper.getNoticeDetail(id);
         // 更新用户通知公告的阅读状态
         Long userId = SecurityUtils.getUserId();
         userNoticeService.update(new LambdaUpdateWrapper<UserNotice>()
@@ -291,7 +291,7 @@ public class NoticeServiceImpl extends ServiceImpl<NoticeMapper, Notice> impleme
      * @return 通知公告分页列表
      */
     @Override
-    public IPage<UserNoticePageVo> getMyNoticePage(NoticePageQuery queryParams) {
+    public IPage<UserNoticePageVO> getMyNoticePage(NoticePageQuery queryParams) {
         queryParams.setUserId(SecurityUtils.getUserId());
         return userNoticeService.getMyNoticePage(
                 new Page<>(queryParams.getPageNum(), queryParams.getPageSize()),

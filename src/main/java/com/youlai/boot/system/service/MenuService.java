@@ -6,8 +6,8 @@ import com.youlai.boot.system.model.form.MenuForm;
 import com.youlai.boot.common.model.Option;
 import com.youlai.boot.system.model.entity.Menu;
 import com.youlai.boot.system.model.query.MenuQuery;
-import com.youlai.boot.system.model.vo.MenuVo;
-import com.youlai.boot.system.model.vo.RouteVo;
+import com.youlai.boot.system.model.vo.MenuVO;
+import com.youlai.boot.system.model.vo.RouteVO;
 
 import java.util.List;
 import java.util.Set;
@@ -23,7 +23,7 @@ public interface MenuService extends IService<Menu> {
     /**
      * 获取菜单表格列表
      */
-    List<MenuVo> listMenus(MenuQuery queryParams);
+    List<MenuVO> listMenus(MenuQuery queryParams);
 
     /**
      * 获取菜单下拉列表
@@ -42,14 +42,14 @@ public interface MenuService extends IService<Menu> {
     /**
      * 获取当前用户的菜单路由列表
      */
-    List<RouteVo> listCurrentUserRoutes();
+    List<RouteVO> listCurrentUserRoutes();
 
     /**
      * 获取当前用户的菜单路由列表（指定数据源）
      *
      * @param datasource 数据源名称，如：master(主库)、naiveui(NaiveUI数据库)、template(模板数据库)
      */
-    List<RouteVo> listCurrentUserRoutes(String datasource);
+    List<RouteVO> listCurrentUserRoutes(String datasource);
 
     /**
      * 修改菜单显示状态

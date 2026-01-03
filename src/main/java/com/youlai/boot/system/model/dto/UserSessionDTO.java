@@ -12,7 +12,7 @@ import java.util.Set;
  * @since 3.0.0
  */
 @Data
-public class UserSessionDto {
+public class UserSessionDTO {
 
     /**
      * 用户名
@@ -29,7 +29,7 @@ public class UserSessionDto {
      */
     private long lastActiveTime;
 
-    public UserSessionDto(String username) {
+    public UserSessionDTO(String username) {
         this.username = username;
         this.sessionIds = new HashSet<>();
         this.lastActiveTime = System.currentTimeMillis();

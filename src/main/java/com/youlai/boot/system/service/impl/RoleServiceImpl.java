@@ -14,7 +14,7 @@ import com.youlai.boot.system.model.entity.Role;
 import com.youlai.boot.system.model.entity.RoleMenu;
 import com.youlai.boot.system.model.form.RoleForm;
 import com.youlai.boot.system.model.query.RolePageQuery;
-import com.youlai.boot.system.model.vo.RolePageVo;
+import com.youlai.boot.system.model.vo.RolePageVO;
 import com.youlai.boot.common.constant.SystemConstants;
 import com.youlai.boot.common.model.Option;
 import com.youlai.boot.security.util.SecurityUtils;
@@ -51,7 +51,7 @@ public class RoleServiceImpl extends ServiceImpl<RoleMapper, Role> implements Ro
      * @return {@link Page< RolePageVo >} – 角色分页列表
      */
     @Override
-    public Page<RolePageVo> getRolePage(RolePageQuery queryParams) {
+    public Page<RolePageVO> getRolePage(RolePageQuery queryParams) {
         // 查询参数
         int pageNum = queryParams.getPageNum();
         int pageSize = queryParams.getPageSize();

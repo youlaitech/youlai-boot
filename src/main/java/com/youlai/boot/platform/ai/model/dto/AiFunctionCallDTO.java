@@ -16,7 +16,7 @@ import java.util.Map;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class AiFunctionCallDto {
+public class AiFunctionCallDTO {
 
     /**
      * 函数名称

@@ -12,7 +12,7 @@ import com.youlai.boot.system.mapper.DeptMapper;
 import com.youlai.boot.system.model.entity.Dept;
 import com.youlai.boot.system.model.form.DeptForm;
 import com.youlai.boot.system.model.query.DeptQuery;
-import com.youlai.boot.system.model.vo.DeptVo;
+import com.youlai.boot.system.model.vo.DeptVO;
 import com.youlai.boot.common.constant.SystemConstants;
 import com.youlai.boot.common.enums.StatusEnum;
 import com.youlai.boot.common.model.Option;
@@ -42,7 +42,7 @@ public class DeptServiceImpl extends ServiceImpl<DeptMapper, Dept> implements De
      * 获取部门列表
      */
     @Override
-    public List<DeptVo> getDeptList(DeptQuery queryParams) {
+    public List<DeptVO> getDeptList(DeptQuery queryParams) {
         // 查询参数
         String keywords = queryParams.getKeywords();
         Integer status = queryParams.getStatus();
@@ -83,12 +83,12 @@ public class DeptServiceImpl extends ServiceImpl<DeptMapper, Dept> implements De
      * @param deptList 部门列表
      * @return 部门树形列表
      */
-    public List<DeptVo> recurDeptList(Long parentId, List<Dept> deptList) {
+    public List<DeptVO> recurDeptList(Long parentId, List<Dept> deptList) {
         return deptList.stream()
                 .filter(dept -> dept.getParentId().equals(parentId))
                 .map(dept -> {
-                    DeptVo deptVo = deptConverter.toVo(dept);
-                    List<DeptVo> children = recurDeptList(dept.getId(), deptList);
+                    DeptVO deptVo = deptConverter.toVo(dept);
+                    List<DeptVO> children = recurDeptList(dept.getId(), deptList);
                     deptVo.setChildren(children);
                     return deptVo;
                 }).toList();

@@ -11,7 +11,7 @@ import com.youlai.boot.system.mapper.ConfigMapper;
 import com.youlai.boot.system.model.entity.Config;
 import com.youlai.boot.system.model.form.ConfigForm;
 import com.youlai.boot.system.model.query.ConfigPageQuery;
-import com.youlai.boot.system.model.vo.ConfigVo;
+import com.youlai.boot.system.model.vo.ConfigVO;
 import com.youlai.boot.system.service.ConfigService;
 import com.youlai.boot.security.util.SecurityUtils;
 import jakarta.annotation.PostConstruct;
@@ -54,7 +54,7 @@ public class ConfigServiceImpl extends ServiceImpl<ConfigMapper, Config> impleme
      * @return 系统配置分页列表
      */
     @Override
-    public IPage<ConfigVo> page(ConfigPageQuery configPageQuery) {
+    public IPage<ConfigVO> page(ConfigPageQuery configPageQuery) {
         Page<Config> page = new Page<>(configPageQuery.getPageNum(), configPageQuery.getPageSize());
         String keywords = configPageQuery.getKeywords();
         LambdaQueryWrapper<Config> query = new LambdaQueryWrapper<Config>()

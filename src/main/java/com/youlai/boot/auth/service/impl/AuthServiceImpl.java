@@ -5,9 +5,9 @@ import cn.hutool.captcha.CaptchaUtil;
 import cn.hutool.captcha.generator.CodeGenerator;
 import cn.hutool.core.util.IdUtil;
 import cn.hutool.core.util.StrUtil;
-import com.youlai.boot.auth.model.dto.WxMiniAppCodeLoginDto;
-import com.youlai.boot.auth.model.dto.WxMiniAppPhoneLoginDto;
-import com.youlai.boot.auth.model.vo.CaptchaVo;
+import com.youlai.boot.auth.model.dto.WxMiniAppCodeLoginDTO;
+import com.youlai.boot.auth.model.dto.WxMiniAppPhoneLoginDTO;
+import com.youlai.boot.auth.model.vo.CaptchaVO;
 import com.youlai.boot.auth.service.AuthService;
 import com.youlai.boot.common.constant.RedisConstants;
 import com.youlai.boot.common.constant.SecurityConstants;
@@ -171,7 +171,7 @@ public class AuthServiceImpl implements AuthService {
      * @return 验证码
      */
     @Override
-    public CaptchaVo getCaptcha() {
+    public CaptchaVO getCaptcha() {
 
         String captchaType = captchaProperties.getType();
         int width = captchaProperties.getWidth();
@@ -207,7 +207,7 @@ public class AuthServiceImpl implements AuthService {
                 TimeUnit.SECONDS
         );
 
-        return CaptchaVo.builder()
+        return CaptchaVO.builder()
                 .captchaId(captchaId)
                 .captchaBase64(imageBase64Data)
                 .build();
@@ -231,7 +231,7 @@ public class AuthServiceImpl implements AuthService {
      * @return 访问令牌
      */
     @Override
-    public AuthenticationToken loginByWxMiniAppCode(WxMiniAppCodeLoginDto loginDto) {
+    public AuthenticationToken loginByWxMiniAppCode(WxMiniAppCodeLoginDTO loginDto) {
         // 1. 创建微信小程序认证令牌（未认证）
         WxMiniAppCodeAuthenticationToken authenticationToken = new WxMiniAppCodeAuthenticationToken(loginDto.getCode());
 
@@ -252,7 +252,7 @@ public class AuthServiceImpl implements AuthService {
      * @return 访问令牌
      */
     @Override
-    public AuthenticationToken loginByWxMiniAppPhone(WxMiniAppPhoneLoginDto loginDto) {
+    public AuthenticationToken loginByWxMiniAppPhone(WxMiniAppPhoneLoginDTO loginDto) {
         // 创建微信小程序手机号认证Token
         WxMiniAppPhoneAuthenticationToken authenticationToken = new WxMiniAppPhoneAuthenticationToken(
                 loginDto.getCode(),

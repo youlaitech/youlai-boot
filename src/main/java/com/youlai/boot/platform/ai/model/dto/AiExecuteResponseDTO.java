@@ -15,7 +15,7 @@ import lombok.NoArgsConstructor;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class AiExecuteResponseDto {
+public class AiExecuteResponseDTO {
 
     /**
      * 是否执行成功

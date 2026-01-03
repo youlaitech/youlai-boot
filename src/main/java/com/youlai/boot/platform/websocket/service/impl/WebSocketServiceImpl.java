@@ -101,7 +101,7 @@ public class WebSocketServiceImpl implements WebSocketService {
      *
      * @return 在线用户信息列表
      */
-    public List<UserSessionRegistry.OnlineUserDto> getOnlineUsers() {
+    public List<UserSessionRegistry.OnlineUserDTO> getOnlineUsers() {
         return userSessionRegistry.getOnlineUsers();
     }
 

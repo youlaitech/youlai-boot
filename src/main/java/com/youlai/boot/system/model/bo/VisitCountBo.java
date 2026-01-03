@@ -9,7 +9,7 @@ import lombok.Data;
  * @since 2.10.0
  */
 @Data
-public class VisitCountBo {
+public class VisitCountBO {
 
     /**
      * 日期 yyyy-MM-dd

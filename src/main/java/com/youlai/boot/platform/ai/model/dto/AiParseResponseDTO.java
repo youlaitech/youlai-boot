@@ -16,7 +16,7 @@ import java.util.List;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class AiParseResponseDto {
+public class AiParseResponseDTO {
 
     /**
      * 解析日志ID（用于关联执行记录）
@@ -31,7 +31,7 @@ public class AiParseResponseDto {
     /**
      * 解析后的函数调用列表
      */
-    private List<AiFunctionCallDto> functionCalls;
+    private List<AiFunctionCallDTO> functionCalls;
 
     /**
      * AI 的理解和说明

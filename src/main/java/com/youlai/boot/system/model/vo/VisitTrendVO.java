@@ -15,7 +15,7 @@ import java.util.List;
 @Schema(description = "访问趋势Vo")
 @Getter
 @Setter
-public class VisitTrendVo {
+public class VisitTrendVO {
 
     @Schema(description = "日期列表")
     private List<String> dates;

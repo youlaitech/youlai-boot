@@ -7,8 +7,8 @@ import com.youlai.boot.common.model.Option;
 import com.youlai.boot.core.web.Result;
 import com.youlai.boot.system.model.form.MenuForm;
 import com.youlai.boot.system.model.query.MenuQuery;
-import com.youlai.boot.system.model.vo.MenuVo;
-import com.youlai.boot.system.model.vo.RouteVo;
+import com.youlai.boot.system.model.vo.MenuVO;
+import com.youlai.boot.system.model.vo.RouteVO;
 import com.youlai.boot.system.service.MenuService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -38,8 +38,8 @@ public class MenuController {
     @Operation(summary = "菜单列表")
     @GetMapping
     @Log(value = "菜单列表", module = LogModuleEnum.MENU)
-    public Result<List<MenuVo>> getMenus(MenuQuery queryParams) {
-        List<MenuVo> menuList = menuService.listMenus(queryParams);
+    public Result<List<MenuVO>> getMenus(MenuQuery queryParams) {
+        List<MenuVO> menuList = menuService.listMenus(queryParams);
         return Result.success(menuList);
     }
 
@@ -55,8 +55,8 @@ public class MenuController {
 
     @Operation(summary = "当前用户菜单路由列表")
     @GetMapping("/routes")
-    public Result<List<RouteVo>> getCurrentUserRoutes() {
-        List<RouteVo> routeList = menuService.listCurrentUserRoutes();
+    public Result<List<RouteVO>> getCurrentUserRoutes() {
+        List<RouteVO> routeList = menuService.listCurrentUserRoutes();
         return Result.success(routeList);
     }
 

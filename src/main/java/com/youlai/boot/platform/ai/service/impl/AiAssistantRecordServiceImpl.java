@@ -10,13 +10,13 @@ import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.youlai.boot.platform.ai.mapper.AiAssistantRecordMapper;
-import com.youlai.boot.platform.ai.model.dto.AiExecuteRequestDto;
-import com.youlai.boot.platform.ai.model.dto.AiFunctionCallDto;
-import com.youlai.boot.platform.ai.model.dto.AiParseRequestDto;
-import com.youlai.boot.platform.ai.model.dto.AiParseResponseDto;
+import com.youlai.boot.platform.ai.model.dto.AiExecuteRequestDTO;
+import com.youlai.boot.platform.ai.model.dto.AiFunctionCallDTO;
+import com.youlai.boot.platform.ai.model.dto.AiParseRequestDTO;
+import com.youlai.boot.platform.ai.model.dto.AiParseResponseDTO;
 import com.youlai.boot.platform.ai.model.entity.AiAssistantRecord;
 import com.youlai.boot.platform.ai.model.query.AiAssistantPageQuery;
-import com.youlai.boot.platform.ai.model.vo.AiAssistantRecordVo;
+import com.youlai.boot.platform.ai.model.vo.AiAssistantRecordVO;
 import com.youlai.boot.platform.ai.service.AiAssistantRecordService;
 import com.youlai.boot.platform.ai.tools.UserTools;
 import com.youlai.boot.security.util.SecurityUtils;
@@ -64,12 +64,12 @@ public class AiAssistantRecordServiceImpl
   private final ChatClient chatClient;
 
   @Override
-  public AiParseResponseDto parseCommand(AiParseRequestDto request, HttpServletRequest httpRequest) {
+  public AiParseResponseDTO parseCommand(AiParseRequestDTO request, HttpServletRequest httpRequest) {
     long startTime = System.currentTimeMillis();
     String command = Optional.ofNullable(request.getCommand()).orElse("").trim();
 
     if (StrUtil.isBlank(command)) {
-      return AiParseResponseDto.builder()
+      return AiParseResponseDTO.builder()
         .success(false)
         .error("命令不能为空")
         .functionCalls(Collections.emptyList())
@@ -116,7 +116,7 @@ public class AiAssistantRecordServiceImpl
 
       this.save(commandRecord);
 
-      return AiParseResponseDto.builder()
+      return AiParseResponseDTO.builder()
         .parseLogId(commandRecord.getId())
         .success(parseResult.success())
         .functionCalls(parseResult.functionCalls())
@@ -142,7 +142,7 @@ public class AiAssistantRecordServiceImpl
     return SYSTEM_PROMPT;
   }
 
-  private String buildUserPrompt(AiParseRequestDto request) {
+  private String buildUserPrompt(AiParseRequestDTO request) {
     JSONObject payload = JSONUtil.createObj()
       .set("command", request.getCommand())
       .set("currentRoute", request.getCurrentRoute())
@@ -180,7 +180,7 @@ public class AiAssistantRecordServiceImpl
       String provider = jsonObject.getStr("provider");
       String model = jsonObject.getStr("model");
 
-      List<AiFunctionCallDto> functionCalls = toFunctionCallList(jsonObject.getJSONArray("functionCalls"));
+      List<AiFunctionCallDTO> functionCalls = toFunctionCallList(jsonObject.getJSONArray("functionCalls"));
 
       return new ParseResult(success, explanation, confidence, error, provider, model, functionCalls);
     } catch (Exception ex) {
@@ -188,12 +188,12 @@ public class AiAssistantRecordServiceImpl
     }
   }
 
-  private List<AiFunctionCallDto> toFunctionCallList(JSONArray array) {
+  private List<AiFunctionCallDTO> toFunctionCallList(JSONArray array) {
     if (array == null || array.isEmpty()) {
       return Collections.emptyList();
     }
 
-    List<AiFunctionCallDto> result = new ArrayList<>();
+    List<AiFunctionCallDTO> result = new ArrayList<>();
     for (Object element : array) {
       JSONObject functionJson = JSONUtil.parseObj(element);
       Map<String, Object> arguments = Optional.ofNullable(functionJson.getJSONObject("arguments"))
@@ -201,7 +201,7 @@ public class AiAssistantRecordServiceImpl
         }))
         .orElse(Collections.emptyMap());
 
-      result.add(AiFunctionCallDto.builder()
+      result.add(AiFunctionCallDTO.builder()
         .name(functionJson.getStr("name"))
         .description(functionJson.getStr("description"))
         .arguments(arguments)
@@ -217,17 +217,17 @@ public class AiAssistantRecordServiceImpl
     String error,
     String provider,
     String model,
-    List<AiFunctionCallDto> functionCalls
+    List<AiFunctionCallDTO> functionCalls
   ) {
   }
 
   @Override
-  public Object executeCommand(AiExecuteRequestDto request, HttpServletRequest httpRequest) throws Exception {
+  public Object executeCommand(AiExecuteRequestDTO request, HttpServletRequest httpRequest) throws Exception {
     Long userId = SecurityUtils.getUserId();
     String username = SecurityUtils.getUsername();
     String ipAddress = JakartaServletUtil.getClientIP(httpRequest);
 
-    AiFunctionCallDto functionCall = request.getFunctionCall();
+    AiFunctionCallDTO functionCall = request.getFunctionCall();
 
     AiAssistantRecord commandRecord;
     if (StrUtil.isNotBlank(request.getParseLogId())) {
@@ -264,7 +264,7 @@ public class AiAssistantRecordServiceImpl
     }
   }
 
-  private Object executeFunctionCall(AiFunctionCallDto functionCall) {
+  private Object executeFunctionCall(AiFunctionCallDTO functionCall) {
     String functionName = functionCall.getName();
     Map<String, Object> arguments = functionCall.getArguments();
 
@@ -294,8 +294,8 @@ public class AiAssistantRecordServiceImpl
   }
 
   @Override
-  public IPage<AiAssistantRecordVo> getRecordPage(AiAssistantPageQuery queryParams) {
-    Page<AiAssistantRecordVo> page = new Page<>(queryParams.getPageNum(), queryParams.getPageSize());
+  public IPage<AiAssistantRecordVO> getRecordPage(AiAssistantPageQuery queryParams) {
+    Page<AiAssistantRecordVO> page = new Page<>(queryParams.getPageNum(), queryParams.getPageSize());
     return this.baseMapper.getRecordPage(page, queryParams);
   }
 

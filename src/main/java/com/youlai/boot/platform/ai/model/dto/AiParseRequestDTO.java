@@ -10,7 +10,7 @@ import java.util.Map;
  * @since 3.0.0
  */
 @Data
-public class AiParseRequestDto {
+public class AiParseRequestDTO {
 
     /**
      * 用户输入的自然语言命令

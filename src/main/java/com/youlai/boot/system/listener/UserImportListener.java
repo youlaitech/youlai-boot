@@ -14,7 +14,7 @@ import com.youlai.boot.common.enums.StatusEnum;
 import com.youlai.boot.core.web.ExcelResult;
 import com.youlai.boot.system.converter.UserConverter;
 import com.youlai.boot.system.enums.DictCodeEnum;
-import com.youlai.boot.system.model.dto.UserImportDto;
+import com.youlai.boot.system.model.dto.UserImportDTO;
 import com.youlai.boot.system.model.entity.*;
 import com.youlai.boot.system.service.*;
 import lombok.Getter;
@@ -35,7 +35,7 @@ import java.util.stream.Collectors;
  * @since 2022/4/10
  */
 @Slf4j
-public class UserImportListener extends AnalysisEventListener<UserImportDto> {
+public class UserImportListener extends AnalysisEventListener<UserImportDTO> {
 
     /**
      * Excel 导入结果
@@ -85,7 +85,7 @@ public class UserImportListener extends AnalysisEventListener<UserImportDto> {
      * @param userImportDto 一行数据，类似于 {@link AnalysisContext#readRowHolder()}
      */
     @Override
-    public void invoke(UserImportDto userImportDto, AnalysisContext analysisContext) {
+    public void invoke(UserImportDTO userImportDto, AnalysisContext analysisContext) {
         log.info("解析到一条用户数据:{}", JSONUtil.toJsonStr(userImportDto));
 
         boolean validation = true;

@@ -6,7 +6,7 @@ import com.youlai.boot.common.model.Option;
 import com.youlai.boot.core.web.Result;
 import com.youlai.boot.system.model.form.DeptForm;
 import com.youlai.boot.system.model.query.DeptQuery;
-import com.youlai.boot.system.model.vo.DeptVo;
+import com.youlai.boot.system.model.vo.DeptVO;
 import com.youlai.boot.common.annotation.Log;
 import com.youlai.boot.system.service.DeptService;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -36,10 +36,10 @@ public class DeptController {
     @Operation(summary = "部门列表")
     @GetMapping
     @Log( value = "部门列表",module = LogModuleEnum.DEPT)
-    public Result<List<DeptVo>> getDeptList(
+    public Result<List<DeptVO>> getDeptList(
              DeptQuery queryParams
     ) {
-        List<DeptVo> list = deptService.getDeptList(queryParams);
+        List<DeptVO> list = deptService.getDeptList(queryParams);
         return Result.success(list);
     }
 

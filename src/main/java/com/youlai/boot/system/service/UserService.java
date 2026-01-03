@@ -4,12 +4,12 @@ import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.service.IService;
 import com.youlai.boot.common.model.Option;
 import com.youlai.boot.security.model.UserAuthInfo;
-import com.youlai.boot.system.model.dto.CurrentUserDto;
-import com.youlai.boot.system.model.dto.UserExportDto;
+import com.youlai.boot.system.model.dto.CurrentUserDTO;
+import com.youlai.boot.system.model.dto.UserExportDTO;
 import com.youlai.boot.system.model.entity.User;
 import com.youlai.boot.system.model.query.UserPageQuery;
-import com.youlai.boot.system.model.vo.UserPageVo;
-import com.youlai.boot.system.model.vo.UserProfileVo;
+import com.youlai.boot.system.model.vo.UserPageVO;
+import com.youlai.boot.system.model.vo.UserProfileVO;
 import com.youlai.boot.system.model.form.*;
 
 import java.util.List;
@@ -27,7 +27,7 @@ public interface UserService extends IService<User> {
      *
      * @return {@link IPage<UserPageVo>} 用户分页列表
      */
-    IPage<UserPageVo> getUserPage(UserPageQuery queryParams);
+    IPage<UserPageVO> getUserPage(UserPageQuery queryParams);
 
     /**
      * 获取用户表单数据
@@ -84,7 +84,7 @@ public interface UserService extends IService<User> {
      * @param queryParams 查询参数
      * @return {@link List<UserExportDto>} 导出用户列表
      */
-    List<UserExportDto> listExportUsers(UserPageQuery queryParams);
+    List<UserExportDTO> listExportUsers(UserPageQuery queryParams);
 
 
     /**
@@ -92,14 +92,14 @@ public interface UserService extends IService<User> {
      *
      * @return {@link CurrentUserDto} 登录用户信息
      */
-    CurrentUserDto getCurrentUserInfo();
+    CurrentUserDTO getCurrentUserInfo();
 
     /**
      * 获取个人中心用户信息
      *
      * @return {@link UserProfileVo} 个人中心用户信息
      */
-    UserProfileVo getUserProfile(Long userId);
+    UserProfileVO getUserProfile(Long userId);
 
     /**
      * 修改个人中心用户信息
