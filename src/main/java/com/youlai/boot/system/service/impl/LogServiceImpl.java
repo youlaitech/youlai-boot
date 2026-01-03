@@ -3,13 +3,13 @@ package com.youlai.boot.system.service.impl;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.youlai.boot.system.mapper.LogMapper;
-import com.youlai.boot.system.model.bo.VisitCountBo;
-import com.youlai.boot.system.model.bo.VisitStatsBo;
+import com.youlai.boot.system.model.bo.VisitCountBO;
+import com.youlai.boot.system.model.bo.VisitStatsBO;
 import com.youlai.boot.system.model.entity.Log;
 import com.youlai.boot.system.model.query.LogPageQuery;
-import com.youlai.boot.system.model.vo.LogPageVo;
-import com.youlai.boot.system.model.vo.VisitStatsVo;
-import com.youlai.boot.system.model.vo.VisitTrendVo;
+import com.youlai.boot.system.model.vo.LogPageVO;
+import com.youlai.boot.system.model.vo.VisitStatsVO;
+import com.youlai.boot.system.model.vo.VisitTrendVO;
 import com.youlai.boot.system.service.LogService;
 import org.springframework.stereotype.Service;
 
@@ -36,7 +36,7 @@ public class LogServiceImpl extends ServiceImpl<LogMapper, Log>
      * @return 日志分页列表
      */
     @Override
-    public Page<LogPageVo> getLogPage(LogPageQuery queryParams) {
+    public Page<LogPageVO> getLogPage(LogPageQuery queryParams) {
         return this.baseMapper.getLogPage(new Page<>(queryParams.getPageNum(), queryParams.getPageSize()),
                 queryParams);
     }
@@ -49,8 +49,8 @@ public class LogServiceImpl extends ServiceImpl<LogMapper, Log>
      * @return
      */
     @Override
-    public VisitTrendVo getVisitTrend(LocalDate startDate, LocalDate endDate) {
-        VisitTrendVo visitTrend = new VisitTrendVo();
+    public VisitTrendVO getVisitTrend(LocalDate startDate, LocalDate endDate) {
+        VisitTrendVO visitTrend = new VisitTrendVO();
         List<String> dates = new ArrayList<>();
 
         // 获取日期范围内的日期
@@ -61,12 +61,12 @@ public class LogServiceImpl extends ServiceImpl<LogMapper, Log>
         visitTrend.setDates(dates);
 
         // 获取访问量和访问 IP 数的统计数据
-        List<VisitCountBo> pvCounts = this.baseMapper.getPvCounts(dates.get(0) + " 00:00:00", dates.get(dates.size() - 1) + " 23:59:59");
-        List<VisitCountBo> ipCounts = this.baseMapper.getIpCounts(dates.get(0) + " 00:00:00", dates.get(dates.size() - 1) + " 23:59:59");
+        List<VisitCountBO> pvCounts = this.baseMapper.getPvCounts(dates.get(0) + " 00:00:00", dates.get(dates.size() - 1) + " 23:59:59");
+        List<VisitCountBO> ipCounts = this.baseMapper.getIpCounts(dates.get(0) + " 00:00:00", dates.get(dates.size() - 1) + " 23:59:59");
 
         // 将统计数据转换为 Map
-        Map<String, Integer> pvMap = pvCounts.stream().collect(Collectors.toMap(VisitCountBo::getDate, VisitCountBo::getCount));
-        Map<String, Integer> ipMap = ipCounts.stream().collect(Collectors.toMap(VisitCountBo::getDate, VisitCountBo::getCount));
+        Map<String, Integer> pvMap = pvCounts.stream().collect(Collectors.toMap(VisitCountBO::getDate, VisitCountBO::getCount));
+        Map<String, Integer> ipMap = ipCounts.stream().collect(Collectors.toMap(VisitCountBO::getDate, VisitCountBO::getCount));
 
         // 匹配日期和访问量/访问 IP 数
         List<Integer> pvList = new ArrayList<>();
@@ -87,11 +87,11 @@ public class LogServiceImpl extends ServiceImpl<LogMapper, Log>
      * 访问量统计
      */
     @Override
-    public VisitStatsVo getVisitStats() {
-        VisitStatsVo result = new VisitStatsVo();
+    public VisitStatsVO getVisitStats() {
+        VisitStatsVO result = new VisitStatsVO();
 
         // 访客数统计(UV)
-        VisitStatsBo uvStats = this.baseMapper.getUvStats();
+        VisitStatsBO uvStats = this.baseMapper.getUvStats();
         if(uvStats!=null){
             result.setTodayUvCount(uvStats.getTodayCount());
             result.setTotalUvCount(uvStats.getTotalCount());
@@ -99,7 +99,7 @@ public class LogServiceImpl extends ServiceImpl<LogMapper, Log>
         }
 
         // 浏览量统计(PV)
-        VisitStatsBo pvStats = this.baseMapper.getPvStats();
+        VisitStatsBO pvStats = this.baseMapper.getPvStats();
         if(pvStats!=null){
             result.setTodayPvCount(pvStats.getTodayCount());
             result.setTotalPvCount(pvStats.getTotalCount());

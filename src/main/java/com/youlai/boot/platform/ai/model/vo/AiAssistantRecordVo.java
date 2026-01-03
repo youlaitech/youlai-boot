@@ -16,7 +16,7 @@ import java.time.LocalDateTime;
  */
 @Data
 @Schema(description = "AI 助手行为记录Vo")
-public class AiAssistantRecordVo implements Serializable {
+public class AiAssistantRecordVO implements Serializable {
 
   @Schema(description = "主键ID")
   private String id;

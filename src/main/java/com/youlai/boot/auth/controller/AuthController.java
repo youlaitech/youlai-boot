@@ -1,8 +1,8 @@
 package com.youlai.boot.auth.controller;
 
-import com.youlai.boot.auth.model.dto.WxMiniAppCodeLoginDto;
-import com.youlai.boot.auth.model.dto.WxMiniAppPhoneLoginDto;
-import com.youlai.boot.auth.model.vo.CaptchaVo;
+import com.youlai.boot.auth.model.dto.WxMiniAppCodeLoginDTO;
+import com.youlai.boot.auth.model.dto.WxMiniAppPhoneLoginDTO;
+import com.youlai.boot.auth.model.vo.CaptchaVO;
 import com.youlai.boot.auth.model.dto.LoginRequest;
 import com.youlai.boot.common.enums.LogModuleEnum;
 import com.youlai.boot.core.web.Result;
@@ -34,8 +34,8 @@ public class AuthController {
 
     @Operation(summary = "获取验证码")
     @GetMapping("/captcha")
-    public Result<CaptchaVo> getCaptcha() {
-        CaptchaVo captcha = authService.getCaptcha();
+    public Result<CaptchaVO> getCaptcha() {
+        CaptchaVO captcha = authService.getCaptcha();
         return Result.success(captcha);
     }
 
@@ -81,14 +81,14 @@ public class AuthController {
 
     @Operation(summary = "微信小程序登录(Code)")
     @PostMapping("/wx/miniapp/code-login")
-    public Result<AuthenticationToken> loginByWxMiniAppCode(@RequestBody @Valid WxMiniAppCodeLoginDto loginDto) {
+    public Result<AuthenticationToken> loginByWxMiniAppCode(@RequestBody @Valid WxMiniAppCodeLoginDTO loginDto) {
         AuthenticationToken token = authService.loginByWxMiniAppCode(loginDto);
         return Result.success(token);
     }
 
     @Operation(summary = "微信小程序登录(手机号)")
     @PostMapping("/wx/miniapp/phone-login")
-    public Result<AuthenticationToken> loginByWxMiniAppPhone(@RequestBody @Valid WxMiniAppPhoneLoginDto loginDto) {
+    public Result<AuthenticationToken> loginByWxMiniAppPhone(@RequestBody @Valid WxMiniAppPhoneLoginDTO loginDto) {
         AuthenticationToken token = authService.loginByWxMiniAppPhone(loginDto);
         return Result.success(token);
     }

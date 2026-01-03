@@ -8,9 +8,9 @@ import com.youlai.boot.common.enums.LogModuleEnum;
 import com.youlai.boot.system.model.form.DictItemForm;
 import com.youlai.boot.system.model.query.DictItemPageQuery;
 import com.youlai.boot.system.model.query.DictPageQuery;
-import com.youlai.boot.system.model.vo.DictItemOptionVo;
-import com.youlai.boot.system.model.vo.DictItemPageVo;
-import com.youlai.boot.system.model.vo.DictPageVo;
+import com.youlai.boot.system.model.vo.DictItemOptionVO;
+import com.youlai.boot.system.model.vo.DictItemPageVO;
+import com.youlai.boot.system.model.vo.DictPageVO;
 import com.youlai.boot.common.annotation.RepeatSubmit;
 import com.youlai.boot.system.model.form.DictForm;
 import com.youlai.boot.common.annotation.Log;
@@ -50,10 +50,10 @@ public class DictController {
     @Operation(summary = "字典分页列表")
     @GetMapping("/page")
     @Log( value = "字典分页列表",module = LogModuleEnum.DICT)
-    public PageResult<DictPageVo> getDictPage(
+    public PageResult<DictPageVO> getDictPage(
             DictPageQuery queryParams
     ) {
-        Page<DictPageVo> result = dictService.getDictPage(queryParams);
+        Page<DictPageVO> result = dictService.getDictPage(queryParams);
         return PageResult.success(result);
     }
 
@@ -127,21 +127,21 @@ public class DictController {
     //---------------------------------------------------
     @Operation(summary = "字典项分页列表")
     @GetMapping("/{dictCode}/items/page")
-    public PageResult<DictItemPageVo> getDictItemPage(
+    public PageResult<DictItemPageVO> getDictItemPage(
             @PathVariable String dictCode,
             DictItemPageQuery queryParams
     ) {
         queryParams.setDictCode(dictCode);
-        Page<DictItemPageVo> result = dictItemService.getDictItemPage(queryParams);
+        Page<DictItemPageVO> result = dictItemService.getDictItemPage(queryParams);
         return PageResult.success(result);
     }
 
     @Operation(summary = "字典项列表")
     @GetMapping("/{dictCode}/items")
-    public Result<List<DictItemOptionVo>> getDictItems(
+    public Result<List<DictItemOptionVO>> getDictItems(
             @Parameter(description = "字典编码") @PathVariable String dictCode
     ) {
-        List<DictItemOptionVo> list = dictItemService.getDictItems(dictCode);
+        List<DictItemOptionVO> list = dictItemService.getDictItems(dictCode);
         return Result.success(list);
     }
 

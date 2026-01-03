@@ -10,7 +10,7 @@ import jakarta.validation.constraints.NotBlank;
  */
 @Schema(description = "微信小程序手机号登录请求参数")
 @Data
-public class WxMiniAppPhoneLoginDto {
+public class WxMiniAppPhoneLoginDTO {
 
     @Schema(description = "微信小程序登录时获取的code", requiredMode = Schema.RequiredMode.REQUIRED)
     @NotBlank(message = "code不能为空")

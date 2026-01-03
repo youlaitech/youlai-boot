@@ -21,8 +21,8 @@ import com.youlai.boot.platform.codegen.mapper.DatabaseMapper;
 import com.youlai.boot.platform.codegen.model.entity.GenTable;
 import com.youlai.boot.platform.codegen.model.entity.GenTableColumn;
 import com.youlai.boot.platform.codegen.model.query.TablePageQuery;
-import com.youlai.boot.platform.codegen.model.vo.CodegenPreviewVo;
-import com.youlai.boot.platform.codegen.model.vo.TablePageVo;
+import com.youlai.boot.platform.codegen.model.vo.CodegenPreviewVO;
+import com.youlai.boot.platform.codegen.model.vo.TablePageVO;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -61,8 +61,8 @@ public class CodegenServiceImpl implements CodegenService {
      * @param queryParams 查询参数
      * @return 分页结果
      */
-    public Page<TablePageVo> getTablePage(TablePageQuery queryParams) {
-        Page<TablePageVo> page = new Page<>(queryParams.getPageNum(), queryParams.getPageSize());
+    public Page<TablePageVO> getTablePage(TablePageQuery queryParams) {
+        Page<TablePageVO> page = new Page<>(queryParams.getPageNum(), queryParams.getPageSize());
         // 设置排除的表
         List<String> excludeTables = codegenProperties.getExcludeTables();
         queryParams.setExcludeTables(excludeTables);
@@ -77,9 +77,9 @@ public class CodegenServiceImpl implements CodegenService {
      * @return 预览数据
      */
     @Override
-    public List<CodegenPreviewVo> getCodegenPreviewData(String tableName, String pageType) {
+    public List<CodegenPreviewVO> getCodegenPreviewData(String tableName, String pageType) {
 
-        List<CodegenPreviewVo> list = new ArrayList<>();
+        List<CodegenPreviewVO> list = new ArrayList<>();
 
         GenTable genTable = genTableService.getOne(new LambdaQueryWrapper<GenTable>()
                 .eq(GenTable::getTableName, tableName)
@@ -100,7 +100,7 @@ public class CodegenServiceImpl implements CodegenService {
         // 遍历模板配置
         Map<String, CodegenProperties.TemplateConfig> templateConfigs = codegenProperties.getTemplateConfigs();
         for (Map.Entry<String, CodegenProperties.TemplateConfig> templateConfigEntry : templateConfigs.entrySet()) {
-            CodegenPreviewVo previewVo = new CodegenPreviewVo();
+            CodegenPreviewVO previewVo = new CodegenPreviewVO();
 
             CodegenProperties.TemplateConfig templateConfig = templateConfigEntry.getValue();
 
@@ -325,9 +325,9 @@ public class CodegenServiceImpl implements CodegenService {
      * @param ui        页面类型
      */
     private void generateAndZipCode(String tableName, ZipOutputStream zip, String ui) {
-        List<CodegenPreviewVo> codePreviewList = getCodegenPreviewData(tableName, ui);
+        List<CodegenPreviewVO> codePreviewList = getCodegenPreviewData(tableName, ui);
 
-        for (CodegenPreviewVo codePreview : codePreviewList) {
+        for (CodegenPreviewVO codePreview : codePreviewList) {
             String fileName = codePreview.getFileName();
             String content = codePreview.getContent();
             String path = codePreview.getPath();

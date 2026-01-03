@@ -13,7 +13,7 @@ import java.util.Set;
  */
 @Schema(description ="当前登录用户对象")
 @Data
-public class CurrentUserDto {
+public class CurrentUserDTO {
 
     @Schema(description="用户ID")
     private Long userId;

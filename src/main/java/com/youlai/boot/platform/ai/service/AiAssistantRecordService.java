@@ -2,12 +2,12 @@ package com.youlai.boot.platform.ai.service;
 
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.service.IService;
-import com.youlai.boot.platform.ai.model.dto.AiExecuteRequestDto;
-import com.youlai.boot.platform.ai.model.dto.AiParseRequestDto;
-import com.youlai.boot.platform.ai.model.dto.AiParseResponseDto;
+import com.youlai.boot.platform.ai.model.dto.AiExecuteRequestDTO;
+import com.youlai.boot.platform.ai.model.dto.AiParseRequestDTO;
+import com.youlai.boot.platform.ai.model.dto.AiParseResponseDTO;
 import com.youlai.boot.platform.ai.model.entity.AiAssistantRecord;
 import com.youlai.boot.platform.ai.model.query.AiAssistantPageQuery;
-import com.youlai.boot.platform.ai.model.vo.AiAssistantRecordVo;
+import com.youlai.boot.platform.ai.model.vo.AiAssistantRecordVO;
 import jakarta.servlet.http.HttpServletRequest;
 
 import java.util.List;
@@ -29,7 +29,7 @@ public interface AiAssistantRecordService extends IService<AiAssistantRecord> {
    * @param httpRequest HTTP 请求（用于获取 IP 等上下文）
    * @return 解析结果（包含 functionCalls 等信息）
    */
-  AiParseResponseDto parseCommand(AiParseRequestDto request, HttpServletRequest httpRequest);
+  AiParseResponseDTO parseCommand(AiParseRequestDTO request, HttpServletRequest httpRequest);
 
   /**
    * 执行已解析的命令。
@@ -39,7 +39,7 @@ public interface AiAssistantRecordService extends IService<AiAssistantRecord> {
    * @return 执行结果
    * @throws Exception 执行异常
    */
-  Object executeCommand(AiExecuteRequestDto request, HttpServletRequest httpRequest) throws Exception;
+  Object executeCommand(AiExecuteRequestDTO request, HttpServletRequest httpRequest) throws Exception;
 
   /**
    * 获取 AI 助手行为记录分页列表
@@ -47,7 +47,7 @@ public interface AiAssistantRecordService extends IService<AiAssistantRecord> {
    * @param queryParams 查询参数
    * @return 分页列表
    */
-  IPage<AiAssistantRecordVo> getRecordPage(AiAssistantPageQuery queryParams);
+  IPage<AiAssistantRecordVO> getRecordPage(AiAssistantPageQuery queryParams);
 
   /**
    * 删除 AI 助手行为记录。

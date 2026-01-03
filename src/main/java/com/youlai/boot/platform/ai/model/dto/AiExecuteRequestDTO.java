@@ -9,7 +9,7 @@ import lombok.Data;
  * @since 3.0.0
  */
 @Data
-public class AiExecuteRequestDto {
+public class AiExecuteRequestDTO {
 
     /**
      * 关联的解析日志ID
@@ -24,7 +24,7 @@ public class AiExecuteRequestDto {
     /**
      * 要执行的函数调用
      */
-    private AiFunctionCallDto functionCall;
+    private AiFunctionCallDTO functionCall;
 
     /**
      * 确认模式：auto=自动执行, manual=需要用户确认

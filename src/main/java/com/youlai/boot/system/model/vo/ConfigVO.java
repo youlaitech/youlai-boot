@@ -19,7 +19,7 @@ import java.io.Serializable;
 @Builder
 @EqualsAndHashCode(callSuper = false)
 @Schema(description = "系统配置Vo")
-public class ConfigVo {
+public class ConfigVO {
 
     @Schema(description = "主键")
     private Long id;

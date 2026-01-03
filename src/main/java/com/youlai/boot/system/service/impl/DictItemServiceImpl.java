@@ -8,8 +8,8 @@ import com.youlai.boot.system.mapper.DictItemMapper;
 import com.youlai.boot.system.model.entity.DictItem;
 import com.youlai.boot.system.model.form.DictItemForm;
 import com.youlai.boot.system.model.query.DictItemPageQuery;
-import com.youlai.boot.system.model.vo.DictItemOptionVo;
-import com.youlai.boot.system.model.vo.DictItemPageVo;
+import com.youlai.boot.system.model.vo.DictItemOptionVO;
+import com.youlai.boot.system.model.vo.DictItemPageVO;
 import com.youlai.boot.system.service.DictItemService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -36,10 +36,10 @@ public class DictItemServiceImpl extends ServiceImpl<DictItemMapper, DictItem> i
      * @return 字典项分页列表
      */
     @Override
-    public Page<DictItemPageVo> getDictItemPage(DictItemPageQuery queryParams) {
+    public Page<DictItemPageVO> getDictItemPage(DictItemPageQuery queryParams) {
         int pageNum = queryParams.getPageNum();
         int pageSize = queryParams.getPageSize();
-        Page<DictItemPageVo> page = new Page<>(pageNum, pageSize);
+        Page<DictItemPageVO> page = new Page<>(pageNum, pageSize);
 
         return this.baseMapper.getDictItemPage(page, queryParams);
     }
@@ -51,7 +51,7 @@ public class DictItemServiceImpl extends ServiceImpl<DictItemMapper, DictItem> i
      * @param dictCode 字典编码
      */
     @Override
-    public List<DictItemOptionVo> getDictItems(String dictCode) {
+    public List<DictItemOptionVO> getDictItems(String dictCode) {
         return this.list(
                         new LambdaQueryWrapper<DictItem>()
                                 .eq(DictItem::getDictCode, dictCode)
@@ -59,7 +59,7 @@ public class DictItemServiceImpl extends ServiceImpl<DictItemMapper, DictItem> i
                                 .orderByAsc(DictItem::getSort)
                 ).stream()
                 .map(item -> {
-                    DictItemOptionVo dictItemOptionVo = new DictItemOptionVo();
+                    DictItemOptionVO dictItemOptionVo = new DictItemOptionVO();
                     dictItemOptionVo.setLabel(item.getLabel());
                     dictItemOptionVo.setValue(item.getValue());
                     dictItemOptionVo.setTagType(item.getTagType());

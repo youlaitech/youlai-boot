@@ -18,7 +18,7 @@ import java.time.LocalDateTime;
 @Getter
 @Setter
 @Schema(description = "通知公告视图对象")
-public class NoticePageVo implements Serializable {
+public class NoticePageVO implements Serializable {
 
     @Serial
     private static final long serialVersionUID = 1L;

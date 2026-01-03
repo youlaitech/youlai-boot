@@ -2,11 +2,11 @@ package com.youlai.boot.system.mapper;
 
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
-import com.youlai.boot.system.model.bo.VisitCountBo;
-import com.youlai.boot.system.model.bo.VisitStatsBo;
+import com.youlai.boot.system.model.bo.VisitCountBO;
+import com.youlai.boot.system.model.bo.VisitStatsBO;
 import com.youlai.boot.system.model.entity.Log;
 import com.youlai.boot.system.model.query.LogPageQuery;
-import com.youlai.boot.system.model.vo.LogPageVo;
+import com.youlai.boot.system.model.vo.LogPageVO;
 import org.apache.ibatis.annotations.Mapper;
 
 import java.util.List;
@@ -24,7 +24,7 @@ public interface LogMapper extends BaseMapper<Log> {
     /**
      * 获取日志分页列表
      */
-    Page<LogPageVo> getLogPage(Page<LogPageVo> page, LogPageQuery queryParams);
+    Page<LogPageVO> getLogPage(Page<LogPageVO> page, LogPageQuery queryParams);
 
     /**
      * 统计浏览数(PV)
@@ -32,7 +32,7 @@ public interface LogMapper extends BaseMapper<Log> {
      * @param startDate 开始日期 yyyy-MM-dd
      * @param endDate   结束日期 yyyy-MM-dd
      */
-    List<VisitCountBo> getPvCounts(String startDate, String endDate);
+    List<VisitCountBO> getPvCounts(String startDate, String endDate);
 
     /**
      * 统计IP数
@@ -40,17 +40,17 @@ public interface LogMapper extends BaseMapper<Log> {
      * @param startDate 开始日期 yyyy-MM-dd
      * @param endDate   结束日期 yyyy-MM-dd
      */
-    List<VisitCountBo> getIpCounts(String startDate, String endDate);
+    List<VisitCountBO> getIpCounts(String startDate, String endDate);
 
     /**
      * 获取浏览量(PV)统计
      */
-    VisitStatsBo getPvStats();
+    VisitStatsBO getPvStats();
 
     /**
      * 获取访问IP统计
      */
-    VisitStatsBo getUvStats();
+    VisitStatsBO getUvStats();
 }
 
 

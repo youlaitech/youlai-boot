@@ -3,11 +3,11 @@ package com.youlai.boot.platform.ai.controller;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.youlai.boot.core.web.PageResult;
 import com.youlai.boot.core.web.Result;
-import com.youlai.boot.platform.ai.model.dto.AiExecuteRequestDto;
-import com.youlai.boot.platform.ai.model.dto.AiParseRequestDto;
-import com.youlai.boot.platform.ai.model.dto.AiParseResponseDto;
+import com.youlai.boot.platform.ai.model.dto.AiExecuteRequestDTO;
+import com.youlai.boot.platform.ai.model.dto.AiParseRequestDTO;
+import com.youlai.boot.platform.ai.model.dto.AiParseResponseDTO;
 import com.youlai.boot.platform.ai.model.query.AiAssistantPageQuery;
-import com.youlai.boot.platform.ai.model.vo.AiAssistantRecordVo;
+import com.youlai.boot.platform.ai.model.vo.AiAssistantRecordVO;
 import com.youlai.boot.platform.ai.service.AiAssistantRecordService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -41,17 +41,17 @@ public class AiAssistantController {
 
   @Operation(summary = "解析自然语言命令")
   @PostMapping("/parse")
-  public Result<AiParseResponseDto> parseCommand(
-    @RequestBody AiParseRequestDto request,
+  public Result<AiParseResponseDTO> parseCommand(
+    @RequestBody AiParseRequestDTO request,
     HttpServletRequest httpRequest
   ) {
     log.info("收到 AI 命令解析请求: {}", request.getCommand());
     try {
-      AiParseResponseDto response = aiAssistantRecordService.parseCommand(request, httpRequest);
+      AiParseResponseDTO response = aiAssistantRecordService.parseCommand(request, httpRequest);
       return Result.success(response);
     } catch (Exception e) {
       log.error("命令解析失败", e);
-      return Result.success(AiParseResponseDto.builder()
+      return Result.success(AiParseResponseDTO.builder()
         .success(false)
         .error(e.getMessage())
         .build());
@@ -61,7 +61,7 @@ public class AiAssistantController {
   @Operation(summary = "执行已解析的命令")
   @PostMapping("/execute")
   public Result<Object> executeCommand(
-    @RequestBody AiExecuteRequestDto request,
+    @RequestBody AiExecuteRequestDTO request,
     HttpServletRequest httpRequest
   ) {
     log.info("收到 AI 命令执行请求: {}", request.getFunctionCall().getName());
@@ -76,8 +76,8 @@ public class AiAssistantController {
 
   @Operation(summary = "获取 AI 命令记录分页列表")
   @GetMapping("/records")
-  public PageResult<AiAssistantRecordVo> getRecordPage(AiAssistantPageQuery queryParams) {
-    IPage<AiAssistantRecordVo> page = aiAssistantRecordService.getRecordPage(queryParams);
+  public PageResult<AiAssistantRecordVO> getRecordPage(AiAssistantPageQuery queryParams) {
+    IPage<AiAssistantRecordVO> page = aiAssistantRecordService.getRecordPage(queryParams);
     return PageResult.success(page);
   }
 

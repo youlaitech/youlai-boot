@@ -66,7 +66,7 @@ public class UserSessionRegistry {
         return sessions != null && !sessions.isEmpty();
     }
 
-    public List<OnlineUserDto> getOnlineUsers() {
+    public List<OnlineUserDTO> getOnlineUsers() {
         return userSessionsMap.entrySet().stream()
                 .map(entry -> {
                     String username = entry.getKey();
@@ -78,7 +78,7 @@ public class UserSessionRegistry {
                             .min()
                             .orElse(System.currentTimeMillis());
 
-                    return new OnlineUserDto(username, sessions.size(), earliestLoginTime);
+                    return new OnlineUserDTO(username, sessions.size(), earliestLoginTime);
                 })
                 .collect(Collectors.toList());
     }
@@ -95,7 +95,7 @@ public class UserSessionRegistry {
     @Data
     @AllArgsConstructor
     @NoArgsConstructor
-    public static class OnlineUserDto {
+    public static class OnlineUserDTO {
         private String username;
         private int sessionCount;
         private long loginTime;

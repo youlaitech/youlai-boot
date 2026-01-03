@@ -66,9 +66,9 @@ public class UserOnlineService {
      *
      * @return 在线用户名列表
      */
-    public List<UserOnlineDto> getOnlineUsers() {
+    public List<UserOnlineDTO> getOnlineUsers() {
         return onlineUsers.values().stream()
-                .map(info -> new UserOnlineDto(info.getUsername(), info.getLoginTime()))
+                .map(info -> new UserOnlineDTO(info.getUsername(), info.getLoginTime()))
                 .collect(Collectors.toList());
     }
 
@@ -127,7 +127,7 @@ public class UserOnlineService {
      * 用户在线Dto（用于返回给前端）
      */
     @Data
-    public static class UserOnlineDto {
+    public static class UserOnlineDTO {
         private final String username;
         private final long loginTime;
     }
@@ -139,7 +139,7 @@ public class UserOnlineService {
     private static class OnlineUsersChangeEvent {
         private String type;
         private int count;
-        private List<UserOnlineDto> users;
+        private List<UserOnlineDTO> users;
         private long timestamp;
     }
 } 

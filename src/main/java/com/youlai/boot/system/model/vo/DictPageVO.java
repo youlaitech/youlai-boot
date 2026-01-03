@@ -13,7 +13,7 @@ import lombok.Setter;
 @Schema(description = "字典分页对象")
 @Getter
 @Setter
-public class DictPageVo {
+public class DictPageVO {
 
     @Schema(description = "字典ID")
     private Long id;

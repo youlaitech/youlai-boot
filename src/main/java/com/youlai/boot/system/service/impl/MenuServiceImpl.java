@@ -17,8 +17,8 @@ import com.youlai.boot.system.mapper.MenuMapper;
 import com.youlai.boot.system.model.entity.Menu;
 import com.youlai.boot.system.model.form.MenuForm;
 import com.youlai.boot.system.model.query.MenuQuery;
-import com.youlai.boot.system.model.vo.MenuVo;
-import com.youlai.boot.system.model.vo.RouteVo;
+import com.youlai.boot.system.model.vo.MenuVO;
+import com.youlai.boot.system.model.vo.RouteVO;
 import com.youlai.boot.common.constant.SystemConstants;
 import com.youlai.boot.system.enums.MenuTypeEnum;
 import com.youlai.boot.common.enums.StatusEnum;
@@ -55,7 +55,7 @@ public class MenuServiceImpl extends ServiceImpl<MenuMapper, Menu> implements Me
      * @param queryParams {@link MenuQuery}
      */
     @Override
-    public List<MenuVo> listMenus(MenuQuery queryParams) {
+    public List<MenuVO> listMenus(MenuQuery queryParams) {
         List<Menu> menus = this.list(new LambdaQueryWrapper<Menu>()
                 .like(StrUtil.isNotBlank(queryParams.getKeywords()), Menu::getName, queryParams.getKeywords())
                 .orderByAsc(Menu::getSort)
@@ -88,13 +88,13 @@ public class MenuServiceImpl extends ServiceImpl<MenuMapper, Menu> implements Me
      * @param menuList 菜单列表
      * @return 菜单列表
      */
-    private List<MenuVo> buildMenuTree(Long parentId, List<Menu> menuList) {
+    private List<MenuVO> buildMenuTree(Long parentId, List<Menu> menuList) {
         return CollectionUtil.emptyIfNull(menuList)
                 .stream()
                 .filter(menu -> menu.getParentId().equals(parentId))
                 .map(entity -> {
-                    MenuVo menuVo = menuConverter.toVo(entity);
-                    List<MenuVo> children = buildMenuTree(entity.getId(), menuList);
+                    MenuVO menuVo = menuConverter.toVo(entity);
+                    List<MenuVO> children = buildMenuTree(entity.getId(), menuList);
                     menuVo.setChildren(children);
                     return menuVo;
                 }).toList();
@@ -142,7 +142,7 @@ public class MenuServiceImpl extends ServiceImpl<MenuMapper, Menu> implements Me
      * 获取当前用户的菜单路由列表
      */
     @Override
-    public List<RouteVo> listCurrentUserRoutes() {
+    public List<RouteVO> listCurrentUserRoutes() {
         Set<String> roleCodes = SecurityUtils.getRoles();
 
         if (CollectionUtil.isEmpty(roleCodes)) {
@@ -195,7 +195,7 @@ public class MenuServiceImpl extends ServiceImpl<MenuMapper, Menu> implements Me
      *                   - template: 模板项目菜单数据
      */
     @Override
-    public List<RouteVo> listCurrentUserRoutes(String datasource) {
+    public List<RouteVO> listCurrentUserRoutes(String datasource) {
         return listCurrentUserRoutes();
     }
 
@@ -207,13 +207,13 @@ public class MenuServiceImpl extends ServiceImpl<MenuMapper, Menu> implements Me
      * @param menuList 菜单列表
      * @return 路由层级列表
      */
-    private List<RouteVo> buildRoutes(Long parentId, List<Menu> menuList) {
-        List<RouteVo> routeList = new ArrayList<>();
+    private List<RouteVO> buildRoutes(Long parentId, List<Menu> menuList) {
+        List<RouteVO> routeList = new ArrayList<>();
 
         for (Menu menu : menuList) {
             if (menu.getParentId().equals(parentId)) {
-                RouteVo routeVo = toRouteVo(menu);
-                List<RouteVo> children = buildRoutes(menu.getId(), menuList);
+                RouteVO routeVo = toRouteVo(menu);
+                List<RouteVO> children = buildRoutes(menu.getId(), menuList);
                 if (!children.isEmpty()) {
                     routeVo.setChildren(children);
                 }
@@ -227,8 +227,8 @@ public class MenuServiceImpl extends ServiceImpl<MenuMapper, Menu> implements Me
     /**
      * 根据RouteBO创建RouteVo
      */
-    private RouteVo toRouteVo(Menu menu) {
-        RouteVo routeVo = new RouteVo();
+    private RouteVO toRouteVo(Menu menu) {
+        RouteVO routeVo = new RouteVO();
         String routePath = menu.getRoutePath();
         boolean externalLink = StrUtil.startWithAny(routePath, "http://", "https://");
 
@@ -249,7 +249,7 @@ public class MenuServiceImpl extends ServiceImpl<MenuMapper, Menu> implements Me
         // 外链无组件
         routeVo.setComponent(externalLink ? null : menu.getComponent());
 
-        RouteVo.Meta meta = new RouteVo.Meta();
+        RouteVO.Meta meta = new RouteVO.Meta();
         meta.setTitle(menu.getName());
         meta.setIcon(menu.getIcon());
         meta.setHidden(StatusEnum.DISABLE.getValue().equals(menu.getVisible()));

@@ -13,7 +13,7 @@ import lombok.Data;
 @Schema(description = "验证码信息")
 @Data
 @Builder
-public class CaptchaVo {
+public class CaptchaVO {
 
     @Schema(description = "验证码缓存 ID")
     private String captchaId;

@@ -10,7 +10,7 @@ import java.util.Set;
  * @since 3.0.0
  */
 @Data
-public class RolePermsBo {
+public class RolePermsBO {
 
     /**
      * 角色编码

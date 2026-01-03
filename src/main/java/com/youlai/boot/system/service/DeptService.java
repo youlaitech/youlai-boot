@@ -5,7 +5,7 @@ import com.youlai.boot.system.model.entity.Dept;
 import com.youlai.boot.common.model.Option;
 import com.youlai.boot.system.model.form.DeptForm;
 import com.youlai.boot.system.model.query.DeptQuery;
-import com.youlai.boot.system.model.vo.DeptVo;
+import com.youlai.boot.system.model.vo.DeptVO;
 
 import java.util.List;
 
@@ -21,7 +21,7 @@ public interface DeptService extends IService<Dept> {
      *
      * @return 部门列表
      */
-    List<DeptVo> getDeptList(DeptQuery queryParams);
+    List<DeptVO> getDeptList(DeptQuery queryParams);
 
     /**
      * 部门树形下拉选项

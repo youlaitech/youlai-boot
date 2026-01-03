@@ -22,16 +22,16 @@ import com.youlai.boot.platform.mail.service.MailService;
 import com.youlai.boot.system.converter.UserConverter;
 import com.youlai.boot.system.enums.DictCodeEnum;
 import com.youlai.boot.system.mapper.UserMapper;
-import com.youlai.boot.system.model.bo.UserBo;
-import com.youlai.boot.system.model.dto.CurrentUserDto;
-import com.youlai.boot.system.model.dto.UserExportDto;
+import com.youlai.boot.system.model.bo.UserBO;
+import com.youlai.boot.system.model.dto.CurrentUserDTO;
+import com.youlai.boot.system.model.dto.UserExportDTO;
 import com.youlai.boot.system.model.entity.DictItem;
 import com.youlai.boot.system.model.entity.User;
 import com.youlai.boot.system.model.entity.UserRole;
 import com.youlai.boot.system.model.form.*;
 import com.youlai.boot.system.model.query.UserPageQuery;
-import com.youlai.boot.system.model.vo.UserPageVo;
-import com.youlai.boot.system.model.vo.UserProfileVo;
+import com.youlai.boot.system.model.vo.UserPageVO;
+import com.youlai.boot.system.model.vo.UserProfileVO;
 import com.youlai.boot.system.service.*;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -84,18 +84,18 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
      * @return {@link IPage<UserPageVo>} 用户分页列表
      */
     @Override
-    public IPage<UserPageVo> getUserPage(UserPageQuery queryParams) {
+    public IPage<UserPageVO> getUserPage(UserPageQuery queryParams) {
 
         // 参数构建
         int pageNum = queryParams.getPageNum();
         int pageSize = queryParams.getPageSize();
-        Page<UserBo> page = new Page<>(pageNum, pageSize);
+        Page<UserBO> page = new Page<>(pageNum, pageSize);
 
         boolean isRoot = SecurityUtils.isRoot();
         queryParams.setIsRoot(isRoot);
 
         // 查询数据
-        Page<UserBo> userPage = this.baseMapper.getUserPage(page, queryParams);
+        Page<UserBO> userPage = this.baseMapper.getUserPage(page, queryParams);
 
         // 实体转换
         return userConverter.toPageVo(userPage);
@@ -403,12 +403,12 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
      * @return {@link List<UserExportDto>} 导出用户列表
      */
     @Override
-    public List<UserExportDto> listExportUsers(UserPageQuery queryParams) {
+    public List<UserExportDTO> listExportUsers(UserPageQuery queryParams) {
 
         boolean isRoot = SecurityUtils.isRoot();
         queryParams.setIsRoot(isRoot);
 
-        List<UserExportDto> exportUsers = this.baseMapper.listExportUsers(queryParams);
+        List<UserExportDTO> exportUsers = this.baseMapper.listExportUsers(queryParams);
         if (CollectionUtil.isNotEmpty(exportUsers)) {
             //获取性别的字典项
             Map<String, String> genderMap = dictItemService.list(
@@ -441,7 +441,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
      * @return {@link CurrentUserDto}   用户信息
      */
     @Override
-    public CurrentUserDto getCurrentUserInfo() {
+    public CurrentUserDTO getCurrentUserInfo() {
 
         String username = SecurityUtils.getUsername();
 
@@ -456,7 +456,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
                 )
         );
         // entity->Vo
-        CurrentUserDto userInfoVo = userConverter.toCurrentUserDto(user);
+        CurrentUserDTO userInfoVo = userConverter.toCurrentUserDto(user);
 
         // 用户角色集合
         Set<String> roles = SecurityUtils.getRoles();
@@ -477,8 +477,8 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
      * @return {@link UserProfileVo} 个人中心用户信息
      */
     @Override
-    public UserProfileVo getUserProfile(Long userId) {
-        UserBo entity = this.baseMapper.getUserProfile(userId);
+    public UserProfileVO getUserProfile(Long userId) {
+        UserBO entity = this.baseMapper.getUserProfile(userId);
         return userConverter.toProfileVo(entity);
     }
 

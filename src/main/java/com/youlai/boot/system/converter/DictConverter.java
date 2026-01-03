@@ -2,7 +2,7 @@ package com.youlai.boot.system.converter;
 
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.youlai.boot.system.model.entity.Dict;
-import com.youlai.boot.system.model.vo.DictPageVo;
+import com.youlai.boot.system.model.vo.DictPageVO;
 import com.youlai.boot.system.model.form.DictForm;
 import org.mapstruct.Mapper;
 
@@ -15,7 +15,7 @@ import org.mapstruct.Mapper;
 @Mapper(componentModel = "spring")
 public interface DictConverter {
 
-    Page<DictPageVo> toPageVo(Page<Dict> page);
+    Page<DictPageVO> toPageVo(Page<Dict> page);
 
     DictForm toForm(Dict entity);
 

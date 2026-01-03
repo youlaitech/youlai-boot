@@ -16,7 +16,7 @@ import java.time.LocalDateTime;
  */
 @Data
 @Schema(description = "系统日志分页Vo")
-public class LogPageVo implements Serializable {
+public class LogPageVO implements Serializable {
 
     @Schema(description = "主键")
     private Long id;
