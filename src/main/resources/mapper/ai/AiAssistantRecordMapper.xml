@@ -4,7 +4,7 @@
   "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.youlai.boot.platform.ai.mapper.AiAssistantRecordMapper">
 
-  <resultMap id="AiAssistantRecordResultMap" type="com.youlai.boot.platform.ai.model.vo.AiAssistantRecordVo">
+  <resultMap id="AiAssistantRecordResultMap" type="com.youlai.boot.platform.ai.model.vo.AiAssistantRecordVO">
     <id property="id" column="id"/>
     <result property="userId" column="user_id"/>
     <result property="username" column="username"/>

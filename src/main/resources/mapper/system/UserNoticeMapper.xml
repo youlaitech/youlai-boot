@@ -3,7 +3,7 @@
 <mapper namespace="com.youlai.boot.system.mapper.UserNoticeMapper">
 
     <!-- 获取我的通知分页列表 -->
-    <select id="getMyNoticePage" resultType="com.youlai.boot.system.model.vo.UserNoticePageVo">
+    <select id="getMyNoticePage" resultType="com.youlai.boot.system.model.vo.UserNoticePageVO">
         SELECT
             t2.id,
             t2.title,

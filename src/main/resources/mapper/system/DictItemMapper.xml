@@ -5,7 +5,7 @@
 <mapper namespace="com.youlai.boot.system.mapper.DictItemMapper">
 
     <!-- 获取字典项分页列表 -->
-    <select id="getDictItemPage" resultType="com.youlai.boot.system.model.vo.DictItemPageVo">
+    <select id="getDictItemPage" resultType="com.youlai.boot.system.model.vo.DictItemPageVO">
         SELECT
             id,
             dict_code,

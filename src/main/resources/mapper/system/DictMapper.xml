@@ -4,7 +4,7 @@
         "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.youlai.boot.system.mapper.DictMapper">
     <!-- 字典分页列表 -->
-    <select id="getDictPage" resultType="com.youlai.boot.system.model.vo.DictPageVo">
+    <select id="getDictPage" resultType="com.youlai.boot.system.model.vo.DictPageVO">
         SELECT
             t1.id,
             t1.name,

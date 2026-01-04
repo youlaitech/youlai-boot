@@ -6,7 +6,7 @@
 <mapper namespace="com.youlai.boot.system.mapper.LogMapper">
 
     <!-- 日志分页列表 mysql版本 -->
-    <select id="getLogPage" resultType="com.youlai.boot.system.model.vo.LogPageVo" databaseId="mysql">
+    <select id="getLogPage" resultType="com.youlai.boot.system.model.vo.LogPageVO" databaseId="mysql">
         SELECT
             t1.id,
             t1.module,
@@ -48,7 +48,7 @@
             t1.create_time DESC
     </select>
     <!-- 日志分页列表 dm版本 -->
-    <select id="getLogPage" resultType="com.youlai.boot.system.model.vo.LogPageVo" databaseId="dm">
+    <select id="getLogPage" resultType="com.youlai.boot.system.model.vo.LogPageVO" databaseId="dm">
         SELECT
         t1.id,
         t1.module,
@@ -91,7 +91,7 @@
     </select>
 
     <!-- 获取访问量日统计列表  -->
-    <select id="getPvCounts" resultType="com.youlai.boot.system.model.bo.VisitCountBo">
+    <select id="getPvCounts" resultType="com.youlai.boot.system.model.bo.VisitCountBO">
         SELECT
             COUNT(1) AS count,
             DATE_FORMAT(create_time,'%Y-%m-%d') AS date
@@ -105,7 +105,7 @@
     </select>
 
     <!-- 获取IP日统计列表-->
-    <select id="getIpCounts" resultType="com.youlai.boot.system.model.bo.VisitCountBo">
+    <select id="getIpCounts" resultType="com.youlai.boot.system.model.bo.VisitCountBO">
         SELECT
             COUNT(DISTINCT ip) AS count,
             DATE_FORMAT(create_time, '%Y-%m-%d') AS date
@@ -119,7 +119,7 @@
     </select>
 
     <!-- 获取访问量(PV)统计数据 mysql版本-->
-    <select id="getPvStats" resultType="com.youlai.boot.system.model.bo.VisitStatsBo" databaseId="mysql">
+    <select id="getPvStats" resultType="com.youlai.boot.system.model.bo.VisitStatsBO" databaseId="mysql">
         SELECT
             COUNT(CASE WHEN DATE(create_time) = CURDATE() THEN 1 END) AS todayCount,
             COUNT(*) AS totalCount,
@@ -138,7 +138,7 @@
             is_deleted = 0
     </select>
     <!-- 获取访问量(PV)统计数据 dm-->
-    <select id="getPvStats" resultType="com.youlai.boot.system.model.bo.VisitStatsBo" databaseId="dm">
+    <select id="getPvStats" resultType="com.youlai.boot.system.model.bo.VisitStatsBO" databaseId="dm">
         SELECT
             COUNT(CASE WHEN TRUNC(create_time) = TRUNC(SYSDATE) THEN 1 END) AS todayCount,
             COUNT(*) AS totalCount,
@@ -161,7 +161,7 @@
     </select>
 
     <!-- 获取IP统计数据 mysql版本-->
-    <select id="getUvStats" resultType="com.youlai.boot.system.model.bo.VisitStatsBo" databaseId="mysql">
+    <select id="getUvStats" resultType="com.youlai.boot.system.model.bo.VisitStatsBO" databaseId="mysql">
             SELECT
                 COUNT(DISTINCT CASE WHEN DATE(create_time) = CURDATE() THEN ip END) AS todayCount,
                 COUNT(DISTINCT ip) AS totalCount,
@@ -180,7 +180,7 @@
                 is_deleted = 0
     </select>
     <!-- 获取IP统计数据 dm版本-->
-    <select id="getUvStats" resultType="com.youlai.boot.system.model.bo.VisitStatsBo" databaseId="dm">
+    <select id="getUvStats" resultType="com.youlai.boot.system.model.bo.VisitStatsBO" databaseId="dm">
         SELECT COUNT(DISTINCT CASE WHEN TRUNC(create_time) = TRUNC(SYSDATE) THEN ip END) AS todayCount,
                COUNT(DISTINCT ip)                                                        AS totalCount,
                ROUND(

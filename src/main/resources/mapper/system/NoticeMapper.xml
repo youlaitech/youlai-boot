@@ -3,7 +3,7 @@
 <mapper namespace="com.youlai.boot.system.mapper.NoticeMapper">
 
     <!-- 获取通知公告分页列表 -->
-    <select id="getNoticePage" resultType="com.youlai.boot.system.model.bo.NoticeBo">
+    <select id="getNoticePage" resultType="com.youlai.boot.system.model.bo.NoticeBO">
         SELECT
                 t1.id,
                 t1.title,
@@ -42,7 +42,7 @@
     </select>
 
     <!-- 获取通知公告详情 -->
-    <select id="getNoticeDetail" resultType="com.youlai.boot.system.model.bo.NoticeBo">
+    <select id="getNoticeDetail" resultType="com.youlai.boot.system.model.bo.NoticeBO">
         SELECT
             t1.id,
             t1.title,
