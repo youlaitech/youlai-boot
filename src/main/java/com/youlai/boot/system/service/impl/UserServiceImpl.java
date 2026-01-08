@@ -12,13 +12,13 @@ import com.youlai.boot.common.constant.RedisConstants;
 import com.youlai.boot.common.constant.SystemConstants;
 import com.youlai.boot.core.exception.BusinessException;
 import com.youlai.boot.common.model.Option;
+import com.youlai.boot.platform.mail.service.MailService;
 import com.youlai.boot.platform.sms.enums.SmsTypeEnum;
 import com.youlai.boot.platform.sms.service.SmsService;
 import com.youlai.boot.security.model.UserAuthInfo;
 import com.youlai.boot.security.service.PermissionService;
 import com.youlai.boot.security.token.TokenManager;
 import com.youlai.boot.security.util.SecurityUtils;
-import com.youlai.boot.platform.mail.service.MailService;
 import com.youlai.boot.system.converter.UserConverter;
 import com.youlai.boot.system.enums.DictCodeEnum;
 import com.youlai.boot.system.mapper.UserMapper;
@@ -29,7 +29,7 @@ import com.youlai.boot.system.model.entity.DictItem;
 import com.youlai.boot.system.model.entity.User;
 import com.youlai.boot.system.model.entity.UserRole;
 import com.youlai.boot.system.model.form.*;
-import com.youlai.boot.system.model.query.UserPageQuery;
+import com.youlai.boot.system.model.query.UserQuery;
 import com.youlai.boot.system.model.vo.UserPageVO;
 import com.youlai.boot.system.model.vo.UserProfileVO;
 import com.youlai.boot.system.service.*;
@@ -84,7 +84,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
      * @return {@link IPage<UserPageVo>} 用户分页列表
      */
     @Override
-    public IPage<UserPageVO> getUserPage(UserPageQuery queryParams) {
+    public IPage<UserPageVO> getUserPage(UserQuery queryParams) {
 
         // 参数构建
         int pageNum = queryParams.getPageNum();
@@ -403,7 +403,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
      * @return {@link List<UserExportDto>} 导出用户列表
      */
     @Override
-    public List<UserExportDTO> listExportUsers(UserPageQuery queryParams) {
+    public List<UserExportDTO> listExportUsers(UserQuery queryParams) {
 
         boolean isRoot = SecurityUtils.isRoot();
         queryParams.setIsRoot(isRoot);

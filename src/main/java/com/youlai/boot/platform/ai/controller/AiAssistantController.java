@@ -6,7 +6,7 @@ import com.youlai.boot.core.web.Result;
 import com.youlai.boot.platform.ai.model.dto.AiExecuteRequestDTO;
 import com.youlai.boot.platform.ai.model.dto.AiParseRequestDTO;
 import com.youlai.boot.platform.ai.model.dto.AiParseResponseDTO;
-import com.youlai.boot.platform.ai.model.query.AiAssistantPageQuery;
+import com.youlai.boot.platform.ai.model.query.AiAssistantQuery;
 import com.youlai.boot.platform.ai.model.vo.AiAssistantRecordVO;
 import com.youlai.boot.platform.ai.service.AiAssistantRecordService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -76,7 +76,7 @@ public class AiAssistantController {
 
   @Operation(summary = "获取 AI 命令记录分页列表")
   @GetMapping("/records")
-  public PageResult<AiAssistantRecordVO> getRecordPage(AiAssistantPageQuery queryParams) {
+  public PageResult<AiAssistantRecordVO> getRecordPage(AiAssistantQuery queryParams) {
     IPage<AiAssistantRecordVO> page = aiAssistantRecordService.getRecordPage(queryParams);
     return PageResult.success(page);
   }

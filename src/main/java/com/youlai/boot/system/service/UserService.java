@@ -7,7 +7,7 @@ import com.youlai.boot.security.model.UserAuthInfo;
 import com.youlai.boot.system.model.dto.CurrentUserDTO;
 import com.youlai.boot.system.model.dto.UserExportDTO;
 import com.youlai.boot.system.model.entity.User;
-import com.youlai.boot.system.model.query.UserPageQuery;
+import com.youlai.boot.system.model.query.UserQuery;
 import com.youlai.boot.system.model.vo.UserPageVO;
 import com.youlai.boot.system.model.vo.UserProfileVO;
 import com.youlai.boot.system.model.form.*;
@@ -27,7 +27,7 @@ public interface UserService extends IService<User> {
      *
      * @return {@link IPage<UserPageVo>} 用户分页列表
      */
-    IPage<UserPageVO> getUserPage(UserPageQuery queryParams);
+    IPage<UserPageVO> getUserPage(UserQuery queryParams);
 
     /**
      * 获取用户表单数据
@@ -84,7 +84,7 @@ public interface UserService extends IService<User> {
      * @param queryParams 查询参数
      * @return {@link List<UserExportDto>} 导出用户列表
      */
-    List<UserExportDTO> listExportUsers(UserPageQuery queryParams);
+    List<UserExportDTO> listExportUsers(UserQuery queryParams);
 
 
     /**

@@ -7,7 +7,7 @@ import com.youlai.boot.config.property.CodegenProperties;
 import com.youlai.boot.common.enums.LogModuleEnum;
 import com.youlai.boot.platform.codegen.service.CodegenService;
 import com.youlai.boot.platform.codegen.model.form.GenConfigForm;
-import com.youlai.boot.platform.codegen.model.query.TablePageQuery;
+import com.youlai.boot.platform.codegen.model.query.TableQuery;
 import com.youlai.boot.platform.codegen.model.vo.CodegenPreviewVO;
 import com.youlai.boot.platform.codegen.model.vo.TablePageVO;
 import com.youlai.boot.common.annotation.Log;
@@ -44,10 +44,10 @@ public class CodegenController {
     private final CodegenProperties codegenProperties;
 
     @Operation(summary = "获取数据表分页列表")
-    @GetMapping("/table/page")
+    @GetMapping("/table")
     @Log(value = "代码生成分页列表", module = LogModuleEnum.OTHER)
     public PageResult<TablePageVO> getTablePage(
-            TablePageQuery queryParams
+            TableQuery queryParams
     ) {
         Page<TablePageVO> result = codegenService.getTablePage(queryParams);
         return PageResult.success(result);

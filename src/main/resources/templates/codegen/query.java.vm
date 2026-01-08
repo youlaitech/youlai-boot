@@ -1,6 +1,6 @@
 package ${packageName}.${moduleName}.${subpackageName};
 
-import ${packageName}.common.base.BasePageQuery;
+import ${packageName}.common.base.BaseQuery;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Getter;
 import lombok.Setter;
@@ -21,7 +21,7 @@ import java.math.BigDecimal;
 @Schema(description ="$!{businessName}查询对象")
 @Getter
 @Setter
-public class ${entityName}Query extends BasePageQuery {
+public class ${entityName}Query extends BaseQuery {
 
 #if($fieldConfigs)
     #foreach($fieldConfig in ${fieldConfigs})

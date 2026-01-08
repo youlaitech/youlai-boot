@@ -6,7 +6,7 @@ import com.baomidou.mybatisplus.extension.service.IService;
 import com.youlai.boot.system.model.entity.Role;
 import com.youlai.boot.common.model.Option;
 import com.youlai.boot.system.model.form.RoleForm;
-import com.youlai.boot.system.model.query.RolePageQuery;
+import com.youlai.boot.system.model.query.RoleQuery;
 import com.youlai.boot.system.model.vo.RolePageVO;
 
 import java.util.List;
@@ -26,7 +26,7 @@ public interface RoleService extends IService<Role> {
      * @param queryParams
      * @return
      */
-    Page<RolePageVO> getRolePage(RolePageQuery queryParams);
+    Page<RolePageVO> getRolePage(RoleQuery queryParams);
 
 
     /**

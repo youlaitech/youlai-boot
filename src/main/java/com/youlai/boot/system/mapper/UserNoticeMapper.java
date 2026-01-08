@@ -4,7 +4,7 @@ import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.youlai.boot.system.model.entity.UserNotice;
-import com.youlai.boot.system.model.query.NoticePageQuery;
+import com.youlai.boot.system.model.query.NoticeQuery;
 import com.youlai.boot.system.model.vo.NoticePageVO;
 import com.youlai.boot.system.model.vo.UserNoticePageVO;
 import org.apache.ibatis.annotations.Mapper;
@@ -25,5 +25,5 @@ public interface UserNoticeMapper extends BaseMapper<UserNotice> {
      * @param queryParams 查询参数
      * @return 通知公告分页列表
      */
-    IPage<UserNoticePageVO> getMyNoticePage(Page<NoticePageVO> page, @Param("queryParams") NoticePageQuery queryParams);
+    IPage<UserNoticePageVO> getMyNoticePage(Page<NoticePageVO> page, @Param("queryParams") NoticeQuery queryParams);
 }

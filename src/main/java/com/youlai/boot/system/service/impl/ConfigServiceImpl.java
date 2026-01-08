@@ -10,7 +10,7 @@ import com.youlai.boot.system.converter.ConfigConverter;
 import com.youlai.boot.system.mapper.ConfigMapper;
 import com.youlai.boot.system.model.entity.Config;
 import com.youlai.boot.system.model.form.ConfigForm;
-import com.youlai.boot.system.model.query.ConfigPageQuery;
+import com.youlai.boot.system.model.query.ConfigQuery;
 import com.youlai.boot.system.model.vo.ConfigVO;
 import com.youlai.boot.system.service.ConfigService;
 import com.youlai.boot.security.util.SecurityUtils;
@@ -50,13 +50,13 @@ public class ConfigServiceImpl extends ServiceImpl<ConfigMapper, Config> impleme
     /**
      * 分页查询系统配置
      *
-     * @param configPageQuery 查询参数
+     * @param queryParams 查询参数
      * @return 系统配置分页列表
      */
     @Override
-    public IPage<ConfigVO> page(ConfigPageQuery configPageQuery) {
-        Page<Config> page = new Page<>(configPageQuery.getPageNum(), configPageQuery.getPageSize());
-        String keywords = configPageQuery.getKeywords();
+    public IPage<ConfigVO> page(ConfigQuery queryParams) {
+        Page<Config> page = new Page<>(queryParams.getPageNum(), queryParams.getPageSize());
+        String keywords = queryParams.getKeywords();
         LambdaQueryWrapper<Config> query = new LambdaQueryWrapper<Config>()
                 .and(StringUtils.isNotBlank(keywords),
                     q -> q.like(Config::getConfigKey, keywords)

@@ -23,7 +23,6 @@
             sys_log t1
             LEFT JOIN sys_user t2 ON t1.create_by = t2.id
         <where>
-            t1.is_deleted = 0
             <if test="queryParams.keywords != null and queryParams.keywords != ''">
                 AND (
                     t1.content LIKE concat('%',#{queryParams.keywords},'%')
@@ -47,48 +46,6 @@
         ORDER BY
             t1.create_time DESC
     </select>
-    <!-- 日志分页列表 dm版本 -->
-    <select id="getLogPage" resultType="com.youlai.boot.system.model.vo.LogPageVO" databaseId="dm">
-        SELECT
-        t1.id,
-        t1.module,
-        t1.content,
-        t1.request_uri,
-        t1.ip,
-        t1.province || ' ' || t1.city AS region,
-        t1.execution_time,
-        t1.browser || ' ' || t1.browser_version AS browser,
-        t1.os,
-        t1.create_time,
-        t2.nickname AS operator
-        FROM
-        sys_log t1
-        LEFT JOIN sys_user t2 ON t1.create_by = t2.id
-        <where>
-            t1.is_deleted = 0
-            <if test="queryParams.keywords != null and queryParams.keywords != ''">
-                AND (
-                t1.content LIKE concat('%',#{queryParams.keywords},'%')
-                OR
-                t1.ip LIKE concat('%',#{queryParams.keywords},'%')
-                OR
-                t2.nickname LIKE concat('%',#{queryParams.keywords},'%')
-                )
-            </if>
-            <if test="queryParams.createTime != null and queryParams.createTime.size > 0">
-                <if test="queryParams.createTime[0] != null and queryParams.createTime[0] != ''">
-                    <bind name="startDate" value="queryParams.createTime[0].length() == 10 ? queryParams.createTime[0] + ' 00:00:00' : queryParams.createTime[0]"/>
-                    AND t1.create_time &gt;= #{startDate}
-                </if>
-                <if test="queryParams.createTime[1] != null and queryParams.createTime[1] != ''">
-                    <bind name="endDate" value="queryParams.createTime[1].length() == 10 ? queryParams.createTime[1] + ' 23:59:59' : queryParams.createTime[1]"/>
-                    AND t1.create_time &lt;= #{endDate}
-                </if>
-            </if>
-        </where>
-        ORDER BY
-        t1.create_time DESC
-    </select>
 
     <!-- 获取访问量日统计列表  -->
     <select id="getPvCounts" resultType="com.youlai.boot.system.model.bo.VisitCountBO">
@@ -99,7 +56,6 @@
             sys_log
         WHERE
             create_time BETWEEN #{startDate} AND #{endDate}
-          AND is_deleted = 0
         GROUP BY
             DATE_FORMAT(create_time, '%Y-%m-%d')
     </select>
@@ -113,7 +69,6 @@
             sys_log
         WHERE
             create_time BETWEEN #{startDate} AND #{endDate}
-          AND is_deleted = 0
         GROUP BY
             DATE_FORMAT(create_time, '%Y-%m-%d')
     </select>
@@ -134,30 +89,6 @@
                     2) AS growthRate
         FROM
             sys_log
-        WHERE
-            is_deleted = 0
-    </select>
-    <!-- 获取访问量(PV)统计数据 dm-->
-    <select id="getPvStats" resultType="com.youlai.boot.system.model.bo.VisitStatsBO" databaseId="dm">
-        SELECT
-            COUNT(CASE WHEN TRUNC(create_time) = TRUNC(SYSDATE) THEN 1 END) AS todayCount,
-            COUNT(*) AS totalCount,
-            ROUND(
-                CASE
-                    WHEN COUNT(CASE WHEN TRUNC(create_time) = TRUNC(SYSDATE) - 1
-                    AND TO_CHAR(create_time, 'HH24:MI:SS') &lt;= TO_CHAR(SYSDATE, 'HH24:MI:SS') THEN 1 END) = 0 THEN 0
-                ELSE
-                    (COUNT(CASE WHEN TRUNC(create_time) = TRUNC(SYSDATE) THEN 1 END) -
-                    COUNT(CASE WHEN TRUNC(create_time) = TRUNC(SYSDATE) - 1
-                    AND TO_CHAR(create_time, 'HH24:MI:SS') &lt;= TO_CHAR(SYSDATE, 'HH24:MI:SS') THEN 1 END)) /
-                    COUNT(CASE WHEN TRUNC(create_time) = TRUNC(SYSDATE) - 1
-                    AND TO_CHAR(create_time, 'HH24:MI:SS') &lt;= TO_CHAR(SYSDATE, 'HH24:MI:SS') THEN 1 END)
-                END,
-            2) AS growthRate
-        FROM
-        sys_log
-        WHERE
-        is_deleted = 0
     </select>
 
     <!-- 获取IP统计数据 mysql版本-->
@@ -176,33 +107,6 @@
                 2) AS growthRate
             FROM
                 sys_log
-            WHERE
-                is_deleted = 0
-    </select>
-    <!-- 获取IP统计数据 dm版本-->
-    <select id="getUvStats" resultType="com.youlai.boot.system.model.bo.VisitStatsBO" databaseId="dm">
-        SELECT COUNT(DISTINCT CASE WHEN TRUNC(create_time) = TRUNC(SYSDATE) THEN ip END) AS todayCount,
-               COUNT(DISTINCT ip)                                                        AS totalCount,
-               ROUND(
-                       CASE
-                           WHEN COUNT(DISTINCT CASE
-                                                   WHEN TRUNC(create_time) = TRUNC(SYSDATE - 1)
-                                                       THEN ip END) = 0
-                               THEN 0
-                           ELSE
-                               (COUNT(DISTINCT CASE
-                                                   WHEN TRUNC(create_time) = TRUNC(SYSDATE)
-                                                       THEN ip END) -
-                                COUNT(DISTINCT CASE
-                                                   WHEN TRUNC(create_time) = TRUNC(SYSDATE - 1)
-                                                       THEN ip END)) * 1.0 /
-                               COUNT(DISTINCT CASE
-                                                  WHEN TRUNC(create_time) = TRUNC(SYSDATE - 1)
-                                                      THEN ip END)
-                           END,
-                       2)                                                                AS growthRate
-        FROM sys_log
-        WHERE is_deleted = 0
     </select>
 
 </mapper>

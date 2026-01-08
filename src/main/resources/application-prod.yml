@@ -1,5 +1,5 @@
 server:
-  port: 8989
+  port: 8000
 
 spring:
   datasource:
@@ -318,4 +318,3 @@ ai:
   rate-limit:
     max-executions-per-minute: 10
     max-executions-per-day: 100
-

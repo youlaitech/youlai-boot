@@ -6,8 +6,8 @@ import com.youlai.boot.core.web.PageResult;
 import com.youlai.boot.core.web.Result;
 import com.youlai.boot.common.enums.LogModuleEnum;
 import com.youlai.boot.system.model.form.DictItemForm;
-import com.youlai.boot.system.model.query.DictItemPageQuery;
-import com.youlai.boot.system.model.query.DictPageQuery;
+import com.youlai.boot.system.model.query.DictItemQuery;
+import com.youlai.boot.system.model.query.DictQuery;
 import com.youlai.boot.system.model.vo.DictItemOptionVO;
 import com.youlai.boot.system.model.vo.DictItemPageVO;
 import com.youlai.boot.system.model.vo.DictPageVO;
@@ -48,10 +48,10 @@ public class DictController {
     // 字典相关接口
     //---------------------------------------------------
     @Operation(summary = "字典分页列表")
-    @GetMapping("/page")
+    @GetMapping
     @Log( value = "字典分页列表",module = LogModuleEnum.DICT)
     public PageResult<DictPageVO> getDictPage(
-            DictPageQuery queryParams
+            DictQuery queryParams
     ) {
         Page<DictPageVO> result = dictService.getDictPage(queryParams);
         return PageResult.success(result);
@@ -59,7 +59,7 @@ public class DictController {
 
 
     @Operation(summary = "字典列表")
-    @GetMapping
+    @GetMapping("/options")
     public Result<List<Option<String>>> getDictList() {
         List<Option<String>> list = dictService.getDictList();
         return Result.success(list);
@@ -126,10 +126,10 @@ public class DictController {
     // 字典项相关接口
     //---------------------------------------------------
     @Operation(summary = "字典项分页列表")
-    @GetMapping("/{dictCode}/items/page")
+    @GetMapping("/{dictCode}/items")
     public PageResult<DictItemPageVO> getDictItemPage(
             @PathVariable String dictCode,
-            DictItemPageQuery queryParams
+            DictItemQuery queryParams
     ) {
         queryParams.setDictCode(dictCode);
         Page<DictItemPageVO> result = dictItemService.getDictItemPage(queryParams);
@@ -137,7 +137,7 @@ public class DictController {
     }
 
     @Operation(summary = "字典项列表")
-    @GetMapping("/{dictCode}/items")
+    @GetMapping("/{dictCode}/items/options")
     public Result<List<DictItemOptionVO>> getDictItems(
             @Parameter(description = "字典编码") @PathVariable String dictCode
     ) {

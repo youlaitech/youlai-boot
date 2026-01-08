@@ -1,6 +1,6 @@
 package com.youlai.boot.system.model.query;
 
-import com.youlai.boot.common.base.BasePageQuery;
+import com.youlai.boot.common.base.BaseQuery;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -8,7 +8,7 @@ import lombok.EqualsAndHashCode;
 import java.util.List;
 
 /**
- * 通知公告分页查询对象
+ * 通知公告查询对象
  *
  * @author youlaitech
  * @since 2024-08-27 10:31
@@ -16,7 +16,7 @@ import java.util.List;
 @Data
 @EqualsAndHashCode(callSuper = false)
 @Schema(description ="通知公告查询对象")
-public class NoticePageQuery extends BasePageQuery {
+public class NoticeQuery extends BaseQuery {
 
     @Schema(description = "通知标题")
     private String title;

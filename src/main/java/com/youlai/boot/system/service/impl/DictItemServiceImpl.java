@@ -7,7 +7,7 @@ import com.youlai.boot.system.converter.DictItemConverter;
 import com.youlai.boot.system.mapper.DictItemMapper;
 import com.youlai.boot.system.model.entity.DictItem;
 import com.youlai.boot.system.model.form.DictItemForm;
-import com.youlai.boot.system.model.query.DictItemPageQuery;
+import com.youlai.boot.system.model.query.DictItemQuery;
 import com.youlai.boot.system.model.vo.DictItemOptionVO;
 import com.youlai.boot.system.model.vo.DictItemPageVO;
 import com.youlai.boot.system.service.DictItemService;
@@ -36,7 +36,7 @@ public class DictItemServiceImpl extends ServiceImpl<DictItemMapper, DictItem> i
      * @return 字典项分页列表
      */
     @Override
-    public Page<DictItemPageVO> getDictItemPage(DictItemPageQuery queryParams) {
+    public Page<DictItemPageVO> getDictItemPage(DictItemQuery queryParams) {
         int pageNum = queryParams.getPageNum();
         int pageSize = queryParams.getPageSize();
         Page<DictItemPageVO> page = new Page<>(pageNum, pageSize);

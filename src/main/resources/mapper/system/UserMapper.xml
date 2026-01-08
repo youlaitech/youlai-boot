@@ -72,84 +72,8 @@
             u.id
         <choose>
             <!-- 如果排序参数都传入 -->
-            <when test="queryParams.field != null and queryParams.field != '' and queryParams.direction != null">
-                ORDER BY u.${queryParams.field} ${queryParams.direction}
-            </when>
-            <!-- 默认排序 -->
-            <otherwise>
-                ORDER BY u.update_time DESC, u.create_time DESC
-            </otherwise>
-        </choose>
-    </select>
-    <!-- 用户分页列表 dm版本-->
-    <select id="getUserPage" resultType="com.youlai.boot.system.model.bo.UserBO" databaseId="dm">
-        SELECT
-        u.id,
-        u.username,
-        u.nickname,
-        u.mobile,
-        u.gender,
-        u.avatar,
-        u.STATUS,
-        u.email,
-        d.NAME AS dept_name,
-        LISTAGG(r.name, ',') WITHIN GROUP (ORDER BY r.name) AS roleNames,
-        u.create_time
-        FROM
-        sys_user u
-        LEFT JOIN sys_dept d ON u.dept_id = d.id
-        LEFT JOIN sys_user_role sur ON u.id = sur.user_id
-        LEFT JOIN sys_role r ON sur.role_id = r.id
-        <where>
-            u.is_deleted = 0
-            <!-- 非超级管理员用户限制查看超级管理员  -->
-            <if test="!queryParams.isRoot">
-                AND NOT EXISTS (
-                SELECT
-                1
-                FROM sys_user_role sur
-                INNER JOIN sys_role r ON sur.role_id = r.id
-                WHERE
-                sur.user_id = u.id
-                AND r.code = '${@com.youlai.boot.common.constant.SystemConstants@ROOT_ROLE_CODE}'
-                )
-            </if>
-            <if test='queryParams.keywords!=null and queryParams.keywords.trim() neq ""'>
-                AND (
-                u.username LIKE CONCAT('%',#{queryParams.keywords},'%')
-                OR u.nickname LIKE CONCAT('%',#{queryParams.keywords},'%')
-                OR u.mobile LIKE CONCAT('%',#{queryParams.keywords},'%')
-                )
-            </if>
-            <if test='queryParams.status!=null'>
-                AND u.status = #{queryParams.status}
-            </if>
-            <if test='queryParams.deptId!=null'>
-                AND concat(',',concat(d.tree_path,',',d.id),',') like concat('%,',#{queryParams.deptId},',%')
-            </if>
-            <if test="queryParams.createTime != null and queryParams.createTime.size > 0">
-                <if test="queryParams.createTime[0] != null and queryParams.createTime[0] != ''">
-                    <bind name="startDate" value="queryParams.createTime[0].length() == 10 ? queryParams.createTime[0] + ' 00:00:00' : queryParams.createTime[0]"/>
-                    AND u.create_time &gt;= #{startDate}
-                </if>
-                <if test="queryParams.createTime[1] != null and queryParams.createTime[1] != ''">
-                    <bind name="endDate" value="queryParams.createTime[1].length() == 10 ? queryParams.createTime[1] + ' 23:59:59' : queryParams.createTime[1]"/>
-                    AND u.create_time &lt;= #{endDate}
-                </if>
-            </if>
-            <if test="queryParams.roleIds != null and queryParams.roleIds.size() > 0">
-                AND sur.role_id IN
-                <foreach item="roleId" collection="queryParams.roleIds" open="(" separator="," close=")">
-                    #{roleId}
-                </foreach>
-            </if>
-        </where>
-        GROUP BY
-        u.id
-        <choose>
-            <!-- 如果排序参数都传入 -->
-            <when test="queryParams.field != null and queryParams.field != '' and queryParams.direction != null">
-                ORDER BY u.${queryParams.field} ${queryParams.direction}
+            <when test="queryParams.sortBy != null and queryParams.sortBy != '' and queryParams.order != null">
+                ORDER BY u.${queryParams.sortBy} ${queryParams.order}
             </when>
             <!-- 默认排序 -->
             <otherwise>
@@ -314,28 +238,6 @@
             u.email,
             d.NAME AS deptName,
             GROUP_CONCAT(r.NAME) AS roleNames,
-            u.create_time
-        FROM
-            sys_user u
-                LEFT JOIN sys_dept d ON u.dept_id = d.id
-                LEFT JOIN sys_user_role sur ON u.id = sur.user_id
-                LEFT JOIN sys_role r ON sur.role_id = r.id
-        WHERE
-            u.id = #{userId} AND u.is_deleted = 0
-    </select>
-    <!-- 根据用户ID获取用户详情 dm版本-->
-    <select id="getUserProfile" resultType="com.youlai.boot.system.model.bo.UserBO" databaseId="dm">
-        SELECT
-            u.id,
-            u.username,
-            u.nickname,
-            u.mobile,
-            u.gender,
-            u.avatar,
-            u.STATUS,
-            u.email,
-            d.NAME AS deptName,
-            LISTAGG(r.name, ',') WITHIN GROUP (ORDER BY r.name) AS roleNames,
             u.create_time
         FROM
             sys_user u

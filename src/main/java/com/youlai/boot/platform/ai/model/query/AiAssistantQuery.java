@@ -8,15 +8,15 @@ import lombok.Setter;
 import java.util.List;
 
 /**
- * AI 助手行为记录分页查询对象
+ * AI 助手行为记录查询对象
  *
  * @author Ray.Hao
  * @since 3.0.0
  */
-@Schema(description = "AI 助手行为记录分页查询对象")
+@Schema(description = "AI 助手行为记录查询对象")
 @Getter
 @Setter
-public class AiAssistantPageQuery extends BaseQuery {
+public class AiAssistantQuery extends BaseQuery {
 
   @Schema(description = "关键字(原始命令/函数名称/用户名)")
   private String keywords;

@@ -4,7 +4,7 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.IService;
 import com.youlai.boot.system.model.entity.DictItem;
 import com.youlai.boot.system.model.form.DictItemForm;
-import com.youlai.boot.system.model.query.DictItemPageQuery;
+import com.youlai.boot.system.model.query.DictItemQuery;
 import com.youlai.boot.system.model.vo.DictItemOptionVO;
 import com.youlai.boot.system.model.vo.DictItemPageVO;
 
@@ -24,7 +24,7 @@ public interface DictItemService extends IService<DictItem> {
      * @param queryParams 查询参数
      * @return 字典项分页列表
      */
-    Page<DictItemPageVO> getDictItemPage(DictItemPageQuery queryParams);
+    Page<DictItemPageVO> getDictItemPage(DictItemQuery queryParams);
 
     /**
      * 获取字典项列表

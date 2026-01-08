@@ -20,7 +20,7 @@ import com.youlai.boot.core.exception.BusinessException;
 import com.youlai.boot.platform.codegen.mapper.DatabaseMapper;
 import com.youlai.boot.platform.codegen.model.entity.GenTable;
 import com.youlai.boot.platform.codegen.model.entity.GenTableColumn;
-import com.youlai.boot.platform.codegen.model.query.TablePageQuery;
+import com.youlai.boot.platform.codegen.model.query.TableQuery;
 import com.youlai.boot.platform.codegen.model.vo.CodegenPreviewVO;
 import com.youlai.boot.platform.codegen.model.vo.TablePageVO;
 import lombok.RequiredArgsConstructor;
@@ -61,7 +61,7 @@ public class CodegenServiceImpl implements CodegenService {
      * @param queryParams 查询参数
      * @return 分页结果
      */
-    public Page<TablePageVO> getTablePage(TablePageQuery queryParams) {
+    public Page<TablePageVO> getTablePage(TableQuery queryParams) {
         Page<TablePageVO> page = new Page<>(queryParams.getPageNum(), queryParams.getPageSize());
         // 设置排除的表
         List<String> excludeTables = codegenProperties.getExcludeTables();

@@ -7,7 +7,7 @@ import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.youlai.boot.security.util.SecurityUtils;
 import com.youlai.boot.system.mapper.UserNoticeMapper;
 import com.youlai.boot.system.model.entity.UserNotice;
-import com.youlai.boot.system.model.query.NoticePageQuery;
+import com.youlai.boot.system.model.query.NoticeQuery;
 import com.youlai.boot.system.model.vo.NoticePageVO;
 import com.youlai.boot.system.model.vo.UserNoticePageVO;
 import com.youlai.boot.system.service.UserNoticeService;
@@ -51,7 +51,7 @@ public class UserNoticeServiceImpl extends ServiceImpl<UserNoticeMapper, UserNot
      * @return 通知公告分页列表
      */
     @Override
-    public IPage<UserNoticePageVO> getMyNoticePage(Page<NoticePageVO> page, NoticePageQuery queryParams) {
+    public IPage<UserNoticePageVO> getMyNoticePage(Page<NoticePageVO> page, NoticeQuery queryParams) {
         return this.getBaseMapper().getMyNoticePage(
                 new Page<>(queryParams.getPageNum(), queryParams.getPageSize()),
                 queryParams

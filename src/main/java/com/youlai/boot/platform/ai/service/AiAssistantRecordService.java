@@ -6,7 +6,7 @@ import com.youlai.boot.platform.ai.model.dto.AiExecuteRequestDTO;
 import com.youlai.boot.platform.ai.model.dto.AiParseRequestDTO;
 import com.youlai.boot.platform.ai.model.dto.AiParseResponseDTO;
 import com.youlai.boot.platform.ai.model.entity.AiAssistantRecord;
-import com.youlai.boot.platform.ai.model.query.AiAssistantPageQuery;
+import com.youlai.boot.platform.ai.model.query.AiAssistantQuery;
 import com.youlai.boot.platform.ai.model.vo.AiAssistantRecordVO;
 import jakarta.servlet.http.HttpServletRequest;
 
@@ -47,7 +47,7 @@ public interface AiAssistantRecordService extends IService<AiAssistantRecord> {
    * @param queryParams 查询参数
    * @return 分页列表
    */
-  IPage<AiAssistantRecordVO> getRecordPage(AiAssistantPageQuery queryParams);
+  IPage<AiAssistantRecordVO> getRecordPage(AiAssistantQuery queryParams);
 
   /**
    * 删除 AI 助手行为记录。

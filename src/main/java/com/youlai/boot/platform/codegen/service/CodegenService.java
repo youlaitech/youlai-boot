@@ -1,7 +1,7 @@
 package com.youlai.boot.platform.codegen.service;
 
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
-import com.youlai.boot.platform.codegen.model.query.TablePageQuery;
+import com.youlai.boot.platform.codegen.model.query.TableQuery;
 import com.youlai.boot.platform.codegen.model.vo.CodegenPreviewVO;
 import com.youlai.boot.platform.codegen.model.vo.TablePageVO;
 
@@ -21,7 +21,7 @@ public interface CodegenService {
      * @param queryParams 查询参数
      * @return
      */
-    Page<TablePageVO> getTablePage(TablePageQuery queryParams);
+    Page<TablePageVO> getTablePage(TableQuery queryParams);
 
     /**
      * 获取预览生成代码

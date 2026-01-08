@@ -5,7 +5,7 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.youlai.boot.system.model.bo.VisitCountBO;
 import com.youlai.boot.system.model.bo.VisitStatsBO;
 import com.youlai.boot.system.model.entity.Log;
-import com.youlai.boot.system.model.query.LogPageQuery;
+import com.youlai.boot.system.model.query.LogQuery;
 import com.youlai.boot.system.model.vo.LogPageVO;
 import org.apache.ibatis.annotations.Mapper;
 
@@ -24,7 +24,7 @@ public interface LogMapper extends BaseMapper<Log> {
     /**
      * 获取日志分页列表
      */
-    Page<LogPageVO> getLogPage(Page<LogPageVO> page, LogPageQuery queryParams);
+    Page<LogPageVO> getLogPage(Page<LogPageVO> page, LogQuery queryParams);
 
     /**
      * 统计浏览数(PV)

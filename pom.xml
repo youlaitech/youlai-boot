@@ -62,6 +62,8 @@
 
         <!-- 阿里 TransmittableThreadLocal (支持异步场景的ThreadLocal传递) -->
         <transmittable-thread-local.version>2.14.5</transmittable-thread-local.version>
+
+        <spring-ai-openai.version>1.1.2</spring-ai-openai.version>
     </properties>
 
     <dependencies>
@@ -281,13 +283,7 @@
         <dependency>
             <groupId>org.springframework.ai</groupId>
             <artifactId>spring-ai-starter-model-openai</artifactId>
-            <version>1.1.2</version>
-        </dependency>
-
-        <dependency>
-            <groupId>com.dameng</groupId>
-            <artifactId>DmJdbcDriver8</artifactId>
-            <version>8.1.4.181</version>
+            <version>${spring-ai-openai.version}</version>
         </dependency>
 
     </dependencies>

@@ -3,7 +3,6 @@ package com.youlai.boot.system.controller;
 import cn.idev.excel.EasyExcel;
 import cn.idev.excel.ExcelWriter;
 import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
-import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.youlai.boot.common.annotation.Log;
 import com.youlai.boot.common.annotation.RepeatSubmit;
 import com.youlai.boot.common.enums.LogModuleEnum;
@@ -18,7 +17,7 @@ import com.youlai.boot.system.model.dto.UserExportDTO;
 import com.youlai.boot.system.model.dto.UserImportDTO;
 import com.youlai.boot.system.model.entity.User;
 import com.youlai.boot.system.model.form.*;
-import com.youlai.boot.system.model.query.UserPageQuery;
+import com.youlai.boot.system.model.query.UserQuery;
 import com.youlai.boot.system.model.dto.CurrentUserDTO;
 import com.youlai.boot.system.model.vo.UserPageVO;
 import com.youlai.boot.system.model.vo.UserProfileVO;
@@ -56,14 +55,13 @@ public class UserController {
 
     private final UserService userService;
 
-    @Operation(summary = "用户分页列表")
-    @GetMapping("/page")
-    @Log(value = "用户分页列表", module = LogModuleEnum.USER)
-    public PageResult<UserPageVO> getUserPage(
-            @Valid UserPageQuery queryParams
+    @Operation(summary = "用户列表")
+    @GetMapping
+    @Log(value = "用户列表", module = LogModuleEnum.USER)
+    public PageResult<UserPageVO> getUserList(
+            @Valid UserQuery queryParams
     ) {
-        IPage<UserPageVO> result = userService.getUserPage(queryParams);
-        return PageResult.success(result);
+        return PageResult.success(userService.getUserPage(queryParams));
     }
 
     @Operation(summary = "新增用户")
@@ -168,7 +166,7 @@ public class UserController {
     @GetMapping("/export")
     @PreAuthorize("@ss.hasPerm('sys:user:export')")
     @Log(value = "导出用户", module = LogModuleEnum.USER)
-    public void exportUsers(UserPageQuery queryParams, HttpServletResponse response) throws IOException {
+    public void exportUsers(UserQuery queryParams, HttpServletResponse response) throws IOException {
         String fileName = "用户列表.xlsx";
         response.setContentType("application/vnd.openxmlformats-officedocument.spreadsheetml.sheet");
         response.setHeader("Content-Disposition", "attachment; filename=" + URLEncoder.encode(fileName, StandardCharsets.UTF_8));

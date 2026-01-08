@@ -19,7 +19,7 @@ import com.youlai.boot.system.model.entity.Notice;
 import com.youlai.boot.system.model.entity.UserNotice;
 import com.youlai.boot.system.model.entity.User;
 import com.youlai.boot.system.model.form.NoticeForm;
-import com.youlai.boot.system.model.query.NoticePageQuery;
+import com.youlai.boot.system.model.query.NoticeQuery;
 import com.youlai.boot.system.model.vo.NoticePageVO;
 import com.youlai.boot.system.model.vo.UserNoticePageVO;
 import com.youlai.boot.system.model.vo.NoticeDetailVO;
@@ -63,7 +63,7 @@ public class NoticeServiceImpl extends ServiceImpl<NoticeMapper, Notice> impleme
      * @return {@link IPage< NoticePageVo >} 通知公告分页列表
      */
     @Override
-    public IPage<NoticePageVO> getNoticePage(NoticePageQuery queryParams) {
+    public IPage<NoticePageVO> getNoticePage(NoticeQuery queryParams) {
         Page<NoticeBO> noticePage = this.baseMapper.getNoticePage(
                 new Page<>(queryParams.getPageNum(), queryParams.getPageSize()),
                 queryParams
@@ -291,8 +291,11 @@ public class NoticeServiceImpl extends ServiceImpl<NoticeMapper, Notice> impleme
      * @return 通知公告分页列表
      */
     @Override
-    public IPage<UserNoticePageVO> getMyNoticePage(NoticePageQuery queryParams) {
-        queryParams.setUserId(SecurityUtils.getUserId());
+    public IPage<UserNoticePageVO> getMyNoticePage(
+            NoticeQuery queryParams
+    ) {
+        Long userId = SecurityUtils.getUserId();
+        queryParams.setUserId(userId);
         return userNoticeService.getMyNoticePage(
                 new Page<>(queryParams.getPageNum(), queryParams.getPageSize()),
                 queryParams

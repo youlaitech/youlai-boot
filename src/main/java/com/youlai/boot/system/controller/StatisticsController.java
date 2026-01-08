@@ -20,7 +20,7 @@ import java.time.LocalDate;
  */
 @Tag(name = "11.统计分析")
 @RestController
-@RequestMapping("/api/v1/statistics")
+@RequestMapping("/statistics")
 @RequiredArgsConstructor
 public class StatisticsController {
 

@@ -4,7 +4,7 @@ import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.youlai.boot.platform.ai.model.entity.AiAssistantRecord;
-import com.youlai.boot.platform.ai.model.query.AiAssistantPageQuery;
+import com.youlai.boot.platform.ai.model.query.AiAssistantQuery;
 import com.youlai.boot.platform.ai.model.vo.AiAssistantRecordVO;
 import org.apache.ibatis.annotations.Mapper;
 
@@ -18,5 +18,5 @@ public interface AiAssistantRecordMapper extends BaseMapper<AiAssistantRecord> {
    * @param queryParams 查询参数
    * @return 分页结果
    */
-  IPage<AiAssistantRecordVO> getRecordPage(Page<AiAssistantRecordVO> page, AiAssistantPageQuery queryParams);
+  IPage<AiAssistantRecordVO> getRecordPage(Page<AiAssistantRecordVO> page, AiAssistantQuery queryParams);
 }

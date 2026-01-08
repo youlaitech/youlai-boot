@@ -30,6 +30,8 @@ public interface UserConverter {
 
     Page<UserPageVO> toPageVo(Page<UserBO> bo);
 
+    List<UserPageVO> toPageVo(List<UserBO> bo);
+
     UserForm toForm(User entity);
 
     @InheritInverseConfiguration(name = "toForm")

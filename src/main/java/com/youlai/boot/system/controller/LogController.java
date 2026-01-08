@@ -2,7 +2,7 @@ package com.youlai.boot.system.controller;
 
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.youlai.boot.core.web.PageResult;
-import com.youlai.boot.system.model.query.LogPageQuery;
+import com.youlai.boot.system.model.query.LogQuery;
 import com.youlai.boot.system.model.vo.LogPageVO;
 import com.youlai.boot.system.service.LogService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -25,9 +25,9 @@ public class LogController {
     private final LogService logService;
 
     @Operation(summary = "日志分页列表")
-    @GetMapping("/page")
+    @GetMapping
     public PageResult<LogPageVO> getLogPage(
-             LogPageQuery queryParams
+             LogQuery queryParams
     ) {
         Page<LogPageVO> result = logService.getLogPage(queryParams);
         return PageResult.success(result);

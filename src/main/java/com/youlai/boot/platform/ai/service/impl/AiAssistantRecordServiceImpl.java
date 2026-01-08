@@ -15,7 +15,7 @@ import com.youlai.boot.platform.ai.model.dto.AiFunctionCallDTO;
 import com.youlai.boot.platform.ai.model.dto.AiParseRequestDTO;
 import com.youlai.boot.platform.ai.model.dto.AiParseResponseDTO;
 import com.youlai.boot.platform.ai.model.entity.AiAssistantRecord;
-import com.youlai.boot.platform.ai.model.query.AiAssistantPageQuery;
+import com.youlai.boot.platform.ai.model.query.AiAssistantQuery;
 import com.youlai.boot.platform.ai.model.vo.AiAssistantRecordVO;
 import com.youlai.boot.platform.ai.service.AiAssistantRecordService;
 import com.youlai.boot.platform.ai.tools.UserTools;
@@ -294,13 +294,16 @@ public class AiAssistantRecordServiceImpl
   }
 
   @Override
-  public IPage<AiAssistantRecordVO> getRecordPage(AiAssistantPageQuery queryParams) {
+  public IPage<AiAssistantRecordVO> getRecordPage(AiAssistantQuery queryParams) {
     Page<AiAssistantRecordVO> page = new Page<>(queryParams.getPageNum(), queryParams.getPageSize());
     return this.baseMapper.getRecordPage(page, queryParams);
   }
 
   @Override
   public boolean deleteRecords(List<Long> ids) {
+    if (ids == null || ids.isEmpty()) {
+      return true;
+    }
     return this.removeByIds(ids);
   }
 

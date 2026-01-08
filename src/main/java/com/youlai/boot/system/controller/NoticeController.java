@@ -4,7 +4,7 @@ import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.youlai.boot.core.web.PageResult;
 import com.youlai.boot.core.web.Result;
 import com.youlai.boot.system.model.form.NoticeForm;
-import com.youlai.boot.system.model.query.NoticePageQuery;
+import com.youlai.boot.system.model.query.NoticeQuery;
 import com.youlai.boot.system.model.vo.NoticeDetailVO;
 import com.youlai.boot.system.model.vo.NoticePageVO;
 import com.youlai.boot.system.model.vo.UserNoticePageVO;
@@ -36,9 +36,9 @@ public class NoticeController {
     private final UserNoticeService userNoticeService;
 
     @Operation(summary = "通知公告分页列表")
-    @GetMapping("/page")
+    @GetMapping
     @PreAuthorize("@ss.hasPerm('sys:notice:list')")
-    public PageResult<NoticePageVO> getNoticePage(NoticePageQuery queryParams) {
+    public PageResult<NoticePageVO> getNoticePage(NoticeQuery queryParams) {
         IPage<NoticePageVO> result = noticeService.getNoticePage(queryParams);
         return PageResult.success(result);
     }
@@ -121,7 +121,7 @@ public class NoticeController {
     @Operation(summary = "获取我的通知公告分页列表")
     @GetMapping("/my")
     public PageResult<UserNoticePageVO> getMyNoticePage(
-            NoticePageQuery queryParams
+            NoticeQuery queryParams
     ) {
         IPage<UserNoticePageVO> result = noticeService.getMyNoticePage(queryParams);
         return PageResult.success(result);

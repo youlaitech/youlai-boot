@@ -3,7 +3,7 @@ package com.youlai.boot.system.service;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.youlai.boot.system.model.entity.Log;
 import com.baomidou.mybatisplus.extension.service.IService;
-import com.youlai.boot.system.model.query.LogPageQuery;
+import com.youlai.boot.system.model.query.LogQuery;
 import com.youlai.boot.system.model.vo.LogPageVO;
 import com.youlai.boot.system.model.vo.VisitStatsVO;
 import com.youlai.boot.system.model.vo.VisitTrendVO;
@@ -22,7 +22,7 @@ public interface LogService extends IService<Log> {
     /**
      * 获取日志分页列表
      */
-    Page<LogPageVO> getLogPage(LogPageQuery queryParams);
+    Page<LogPageVO> getLogPage(LogQuery queryParams);
 
 
     /**
