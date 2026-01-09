@@ -33,7 +33,7 @@ public class ${entityName}Controller  {
     private final ${entityName}Service ${entityLowerCamel}Service;
 
     @Operation(summary = "$!{businessName}分页列表")
-    @GetMapping("/page")
+    @GetMapping
     @PreAuthorize("@ss.hasPerm('${moduleName}:${entityKebab}:query')")
     public PageResult<${entityName}Vo> get${entityName}Page(${entityName}Query queryParams ) {
         IPage<${entityName}Vo> result = ${entityLowerCamel}Service.get${entityName}Page(queryParams);

@@ -148,7 +148,7 @@
                 size="small"
                 link
                 icon="edit"
-                @click="handleOpenDialog(scope.row.id)"
+                @click="handleOpenDialog(String(scope.row.id))"
             >
               编辑
             </el-button>
@@ -158,7 +158,7 @@
                 size="small"
                 link
                 icon="delete"
-                @click="handleDelete(scope.row.id)"
+                @click="handleDelete(String(scope.row.id))"
             >
               删除
             </el-button>
@@ -274,22 +274,22 @@
   });
 
   import ${entityName}API from "@/api/${moduleName}/${entityKebab}";
-  import type { ${entityName}PageVo, ${entityName}Form, ${entityName}PageQuery } from "@/api/types";
+  import type { ${entityName}Item, ${entityName}Form, ${entityName}QueryParams } from "@/types/api";
 
   const queryFormRef = ref();
   const dataFormRef = ref();
 
   const loading = ref(false);
-  const removeIds = ref<number[]>([]);
+  const removeIds = ref<string[]>([]);
   const total = ref(0);
 
-  const queryParams = reactive<${entityName}PageQuery>({
+  const queryParams = reactive<${entityName}QueryParams>({
     pageNum: 1,
     pageSize: 10,
   });
 
   // $!{businessName}表格数据
-  const pageData = ref<${entityName}PageVo[]>([]);
+  const pageData = ref<${entityName}Item[]>([]);
 
   // 弹窗
   const dialog = reactive({
@@ -315,9 +315,9 @@
   function handleQuery() {
     loading.value = true;
           ${entityName}API.getPage(queryParams)
-        .then((data) => {
-          pageData.value = data.list;
-          total.value = data.total;
+        .then((res) => {
+          pageData.value = res.data;
+          total.value = res.page?.total ?? 0;
         })
         .finally(() => {
           loading.value = false;
@@ -333,11 +333,11 @@
 
   /** 行复选框选中记录选中ID集合 */
   function handleSelectionChange(selection: any) {
-    removeIds.value = selection.map((item: any) => item.id);
+    removeIds.value = selection.map((item: any) => String(item.id));
   }
 
   /** 打开$!{businessName}弹窗 */
-  function handleOpenDialog(id?: number) {
+  function handleOpenDialog(id?: string) {
     dialog.visible = true;
     if (id) {
       dialog.title = "修改$!{businessName}";
@@ -385,7 +385,7 @@
   }
 
   /** 删除$!{businessName} */
-  function handleDelete(id?: number) {
+  function handleDelete(id?: string) {
     const ids = [id || removeIds.value].join(",");
     if (!ids) {
       ElMessage.warning("请勾选删除项");

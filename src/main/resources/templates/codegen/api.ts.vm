@@ -1,13 +1,13 @@
 import request from "@/utils/request";
-import type { ${entityName}Form, ${entityName}PageQuery, ${entityName}PageVo } from "@/api/types";
+import type { ${entityName}Form, ${entityName}QueryParams, ${entityName}Item } from "@/types/api";
 
 const ${entityUpperSnake}_BASE_URL = "/api/v1/${entityKebab}";
 
 const ${entityName}API = {
     /** 获取${businessName}分页数据 */
-    getPage(queryParams?: ${entityName}PageQuery) {
-        return request<any, PageResult<${entityName}PageVo[]>>({
-            url: `${${entityUpperSnake}_BASE_URL}/page`,
+    getPage(queryParams?: ${entityName}QueryParams) {
+        return request<any, PageResult<${entityName}Item>>({
+            url: `${${entityUpperSnake}_BASE_URL}`,
             method: "get",
             params: queryParams,
         });
@@ -18,7 +18,7 @@ const ${entityName}API = {
      * @param id ${businessName}ID
      * @returns ${businessName}表单数据
      */
-    getFormData(id: number) {
+    getFormData(id: string) {
         return request<any, ${entityName}Form>({
             url: `${${entityUpperSnake}_BASE_URL}/${id}/form`,
             method: "get",

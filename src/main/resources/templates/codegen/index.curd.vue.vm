@@ -1,7 +1,7 @@
 <template>
   <div class="app-container h-full flex flex-1 flex-col">
     <!-- 搜索 -->
-    <page-search
+    <PageSearch
       ref="searchRef"
       :search-config="searchConfig"
       @query-click="handleQueryClick"
@@ -14,10 +14,10 @@
       </template>
 #end
 #end
-    </page-search>
+    </PageSearch>
 
     <!-- 列表 -->
-    <page-content
+    <PageContent
       ref="contentRef"
       :content-config="contentConfig"
       @add-click="handleAddClick"
@@ -34,10 +34,10 @@
       </template>
 #end
 #end
-    </page-content>
+    </PageContent>
 
     <!-- 新增 -->
-    <page-modal ref="addModalRef" :modal-config="addModalConfig" @submit-click="handleSubmitClick">
+    <PageModal ref="addModalRef" :modal-config="addModalConfig" @submit-click="handleSubmitClick">
 #foreach($fieldConfig in $fieldConfigs)
 #if($fieldConfig.isShowInForm == 1 && $fieldConfig.formType != "HIDDEN" && $fieldConfig.dictType && $fieldConfig.dictType.trim() != "")
       <template #$fieldConfig.fieldName="scope">
@@ -45,10 +45,10 @@
       </template>
 #end
 #end
-    </page-modal>
+    </PageModal>
 
     <!-- 编辑 -->
-    <page-modal ref="editModalRef" :modal-config="editModalConfig" @submit-click="handleSubmitClick">
+    <PageModal ref="editModalRef" :modal-config="editModalConfig" @submit-click="handleSubmitClick">
 #foreach($fieldConfig in $fieldConfigs)
 #if($fieldConfig.isShowInForm == 1 && $fieldConfig.formType != "HIDDEN" && $fieldConfig.dictType && $fieldConfig.dictType.trim() != "")
       <template #$fieldConfig.fieldName="scope">
@@ -56,7 +56,7 @@
       </template>
 #end
 #end
-    </page-modal>
+    </PageModal>
   </div>
 </template>
 
@@ -64,7 +64,7 @@
 defineOptions({ name: "$entityName" });
 
 import ${entityName}API from "@/api/${moduleName}/${entityKebab}";
-import type { ${entityName}Form, ${entityName}PageQuery } from "@/api/types";
+import type { ${entityName}Form, ${entityName}QueryParams } from "@/types/api";
 import type { IObject, IModalConfig, IContentConfig, ISearchConfig } from "@/components/CURD/types";
 import usePage from "@/components/CURD/usePage";
 
@@ -135,7 +135,7 @@ const searchConfig: ISearchConfig = reactive({
 });
 
 // 列表配置
-const contentConfig: IContentConfig<${entityName}PageQuery> = reactive({
+const contentConfig: IContentConfig<${entityName}QueryParams> = reactive({
   // 权限前缀
   permPrefix: "${moduleName}:${entityKebab}",
   table: {
@@ -151,8 +151,8 @@ const contentConfig: IContentConfig<${entityName}PageQuery> = reactive({
   // 数据解析函数
   parseData(res: any) {
     return {
-      total: res.total,
-      list: res.list,
+      total: res?.page?.total ?? 0,
+      list: res?.data ?? [],
     };
   },
   // 分页配置
@@ -358,7 +358,7 @@ const editModalConfig: IModalConfig<${entityName}Form> = reactive({
 const handleOperateClick = (data: IObject) => {
   if (data.name === "edit") {
     handleEditClick(data.row, async () => {
-      return await ${entityName}API.getFormData(data.row.id);
+      return await ${entityName}API.getFormData(String(data.row.id));
     });
   }
 };

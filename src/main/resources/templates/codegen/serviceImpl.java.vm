@@ -40,11 +40,11 @@ public class ${entityName}ServiceImpl extends ServiceImpl<${entityName}Mapper, $
     */
     @Override
     public IPage<${entityName}Vo> get${entityName}Page(${entityName}Query queryParams) {
-        Page<${entityName}Vo> pageVo = this.baseMapper.get${entityName}Page(
+        Page<${entityName}Vo> pageResult = this.baseMapper.get${entityName}Page(
                 new Page<>(queryParams.getPageNum(), queryParams.getPageSize()),
                 queryParams
         );
-        return pageVo;
+        return pageResult;
     }
     
     /**

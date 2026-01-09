@@ -2,8 +2,10 @@
  * ${entityName} $!{businessName}类型定义
  */
 
-/** $!{businessName}分页查询参数 */
-export interface ${entityName}PageQuery extends PageQuery {
+ import type { BaseQueryParams } from "./common";
+
+/** $!{businessName}查询参数 */
+export interface ${entityName}QueryParams extends BaseQueryParams {
 #foreach($fieldConfig in $fieldConfigs)
   #if($fieldConfig.isShowInQuery)
     #if("$!fieldConfig.fieldComment" != "")
@@ -34,8 +36,11 @@ export interface ${entityName}Form {
 #end
 }
 
-/** $!{businessName}分页对象 */
-export interface ${entityName}PageVo {
+/** $!{businessName}详情对象 */
+export type ${entityName}Detail = ${entityName}Item & ${entityName}Form;
+
+/** $!{businessName}列表项 */
+export interface ${entityName}Item {
 #foreach($fieldConfig in $fieldConfigs)
   #if($fieldConfig.isShowInList)
     #if("$!fieldConfig.fieldComment" != "")
