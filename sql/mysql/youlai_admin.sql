@@ -10,7 +10,7 @@ CREATE DATABASE IF NOT EXISTS youlai_admin CHARACTER SET utf8mb4 DEFAULT COLLATE
 
 
 -- ----------------------------
--- 2. 创建表 && 数据初始化
+-- 2. 创建表 && 数据初始化 
 -- ----------------------------
 USE youlai_admin;
 
