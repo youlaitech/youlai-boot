@@ -11,7 +11,7 @@ spring:
 
   ai:
     openai:
-      api-key: ${QWEN_API_KEY:sk-c2941d05bf2f411ca80424fcd1eb4e07}
+      api-key: ${QWEN_API_KEY:sk-c2941d05bf2f411ca80424fcd1exxxxx}
       base-url: https://dashscope.aliyuncs.com/compatible-mode
       chat:
         enabled: true
@@ -114,15 +114,15 @@ oss:
   # MinIO 对象存储服务
   minio:
     # 服务Endpoint
-    endpoint: http://111.229.83.153:9000
+    endpoint: http://localhost:9000
     # 访问凭据
     access-key: minioadmin
     # 凭据密钥
-    secret-key: Youlai@2025
+    secret-key: minioadmin
     # 存储桶名称
     bucket-name: public
     # (可选)自定义域名，如果配置了域名，生成的文件URL是域名格式，未配置则URL则是IP格式 (eg: https://www.youlai.tech/storage)
-    custom-domain: https://www.youlai.tech/storage
+    custom-domain: 
   # 阿里云OSS对象存储服务
   aliyun:
     # 服务Endpoint
