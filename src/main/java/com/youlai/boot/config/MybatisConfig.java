@@ -45,9 +45,6 @@ public class MybatisConfig {
         String type = dbType == null ? "mysql" : dbType.toLowerCase();
         if ("postgres".equals(type) || "postgresql".equals(type)) {
             mpDbType = DbType.POSTGRE_SQL;
-        } else if ("dm".equals(type) || "dameng".equals(type)) {
-            // 达梦更接近 Oracle 语法，这里选择 ORACLE 方言以获得较好兼容性
-            mpDbType = DbType.ORACLE;
         }
         interceptor.addInnerInterceptor(new PaginationInnerInterceptor(mpDbType));
 
@@ -71,7 +68,6 @@ public class MybatisConfig {
     public DatabaseIdProvider databaseIdProvider() {
         DatabaseIdProvider databaseIdProvider = new VendorDatabaseIdProvider();
         Properties properties = new Properties();
-        properties.setProperty("DM", "dm");
         properties.setProperty("MySQL", "mysql");
         databaseIdProvider.setProperties(properties);
         return databaseIdProvider;

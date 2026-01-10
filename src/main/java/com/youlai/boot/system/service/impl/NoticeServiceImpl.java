@@ -250,7 +250,7 @@ public class NoticeServiceImpl extends ServiceImpl<NoticeMapper, Notice> impleme
             throw new BusinessException("通知公告未发布或已撤回");
         }
 
-        notice.setPublishStatus(NoticePublishStatusEnum.REVoKED.getValue());
+        notice.setPublishStatus(NoticePublishStatusEnum.REVOKED.getValue());
         notice.setRevokeTime(LocalDateTime.now());
         notice.setUpdateBy(SecurityUtils.getUserId());
 

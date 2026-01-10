@@ -16,7 +16,7 @@ public enum NoticePublishStatusEnum implements IBaseEnum<Integer> {
 
     UNPUBLISHED(0, "未发布"),
     PUBLISHED(1, "已发布"),
-    REVoKED(-1, "已撤回");
+    REVOKED(-1, "已撤回");
 
 
     private final Integer value;
