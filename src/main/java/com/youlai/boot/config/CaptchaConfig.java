@@ -32,7 +32,7 @@ public class CaptchaConfig {
         String codeType = captchaProperties.getCode().getType();
         int codeLength = captchaProperties.getCode().getLength();
         if ("math".equalsIgnoreCase(codeType)) {
-            return new MathGenerator(codeLength);
+            return new MathGenerator(codeLength, false);
         } else if ("random".equalsIgnoreCase(codeType)) {
             return new RandomGenerator(codeLength);
         } else {
