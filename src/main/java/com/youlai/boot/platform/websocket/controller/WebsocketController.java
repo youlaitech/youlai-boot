@@ -22,7 +22,7 @@ import java.security.Principal;
  * @since 2.3.0
  */
 @RestController
-@RequestMapping("/websocket")
+@RequestMapping("/api/v1/websocket")
 @RequiredArgsConstructor
 @Slf4j
 public class WebsocketController {
