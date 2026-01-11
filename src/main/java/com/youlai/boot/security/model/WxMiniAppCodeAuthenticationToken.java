@@ -24,7 +24,7 @@ public class WxMiniAppCodeAuthenticationToken extends AbstractAuthenticationToke
      */
     public WxMiniAppCodeAuthenticationToken(Object principal) {
         // 没有授权信息时，设置为 null
-        super(null);
+        super((Collection<? extends GrantedAuthority>) null);
         this.principal = principal;
         // 默认未认证
         this.setAuthenticated(false);

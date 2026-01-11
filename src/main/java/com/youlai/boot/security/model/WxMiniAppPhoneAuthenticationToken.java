@@ -28,7 +28,7 @@ public class WxMiniAppPhoneAuthenticationToken extends AbstractAuthenticationTok
      * @param iv 初始向量
      */
     public WxMiniAppPhoneAuthenticationToken(String code, String encryptedData, String iv) {
-        super(null);
+        super((Collection<? extends GrantedAuthority>) null);
         this.principal = code;
         this.encryptedData = encryptedData;
         this.iv = iv;

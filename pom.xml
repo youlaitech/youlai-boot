@@ -12,7 +12,7 @@
     <parent>
         <groupId>org.springframework.boot</groupId>
         <artifactId>spring-boot-starter-parent</artifactId>
-        <version>3.5.6</version> <!-- lookup parent from repository -->
+        <version>4.0.1</version> <!-- lookup parent from repository -->
         <relativePath/>
     </parent>
 
@@ -24,7 +24,8 @@
 
         <mysql-connector-j.version>9.1.0</mysql-connector-j.version>
         <druid.version>1.2.24</druid.version>
-        <mybatis-plus.version>3.5.5</mybatis-plus.version>
+        <!-- Spring Boot 4.x 必须使用更新的版本 -->
+        <mybatis-plus.version>3.5.15</mybatis-plus.version>
         <dynamic-datasource.version>4.3.1</dynamic-datasource.version>
 
         <knife4j.version>4.5.0</knife4j.version>
@@ -43,7 +44,8 @@
         <aliyun-sdk-oss.version>3.16.3</aliyun-sdk-oss.version>
 
         <!-- redisson 分布式锁 -->
-        <redisson.version>3.51.0</redisson.version>
+        <!-- Spring Boot 4.x 必须使用更新的版本 -->
+        <redisson.version>4.1.0</redisson.version>
 
         <!-- 自动代码生成 -->
         <mybatis-plus-generator.version>3.5.6</mybatis-plus-generator.version>
@@ -63,7 +65,8 @@
         <!-- 阿里 TransmittableThreadLocal (支持异步场景的ThreadLocal传递) -->
         <transmittable-thread-local.version>2.14.5</transmittable-thread-local.version>
 
-        <spring-ai-openai.version>1.1.2</spring-ai-openai.version>
+        <!-- Spring Boot 4.x 必须使用更新的版本 -->
+        <spring-ai-openai.version>2.0.0-M1</spring-ai-openai.version>
     </properties>
 
     <dependencies>
@@ -121,9 +124,10 @@
             <artifactId>spring-boot-starter-cache</artifactId>
         </dependency>
 
+        <!-- Spring Boot 4.x 已改名 -->
         <dependency>
             <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-starter-aop</artifactId>
+            <artifactId>spring-boot-starter-aspectj</artifactId>
         </dependency>
 
         <dependency>
@@ -154,9 +158,15 @@
             <version>${druid.version}</version>
         </dependency>
 
+        <!-- Spring Boot 4.x 必须使用boot4版本 -->
         <dependency>
             <groupId>com.baomidou</groupId>
-            <artifactId>mybatis-plus-spring-boot3-starter</artifactId>
+            <artifactId>mybatis-plus-spring-boot4-starter</artifactId>
+            <version>${mybatis-plus.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>com.baomidou</groupId>
+            <artifactId>mybatis-plus-jsqlparser</artifactId>
             <version>${mybatis-plus.version}</version>
         </dependency>
 

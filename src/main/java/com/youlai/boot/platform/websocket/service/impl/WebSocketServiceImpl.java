@@ -13,7 +13,7 @@ import java.util.List;
 
 /**
  * WebSocket 服务实现类
- * 
+ *
  * 核心功能：
  * - 用户在线状态管理（支持多设备登录）
  * - 消息推送（广播、点对点）
@@ -145,7 +145,7 @@ public class WebSocketServiceImpl implements WebSocketService {
 
     /**
      * 手动触发在线用户数量广播
-     * 
+     *
      * 供外部服务（如定时任务）调用
      */
     public void notifyOnlineUsersChange() {

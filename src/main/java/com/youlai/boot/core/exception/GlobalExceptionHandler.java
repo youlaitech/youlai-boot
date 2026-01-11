@@ -1,7 +1,7 @@
 package com.youlai.boot.core.exception;
 
 import cn.hutool.core.util.StrUtil;
-import com.fasterxml.jackson.core.JsonProcessingException;
+import tools.jackson.core.JacksonException;
 import com.youlai.boot.core.web.Result;
 import com.youlai.boot.core.web.ResultCode;
 import jakarta.servlet.ServletException;
@@ -143,11 +143,11 @@ public class GlobalExceptionHandler {
     /**
      * 处理 JSON 处理异常
      * <p>
-     * 当处理 JSON 数据时发生错误，会抛出 JsonProcessingException 异常。
+     * 当处理 JSON 数据时发生错误，会抛出 JacksonException 异常。
      */
-    @ExceptionHandler(JsonProcessingException.class)
+    @ExceptionHandler(JacksonException.class)
     @ResponseStatus(HttpStatus.BAD_REQUEST)
-    public <T> Result<T> handleJsonProcessingException(JsonProcessingException e) {
+    public <T> Result<T> handleJacksonException(JacksonException e) {
         log.error("Json转换异常，异常原因：{}", e.getMessage(), e);
         return Result.failed(e.getMessage());
     }
