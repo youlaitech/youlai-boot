@@ -33,7 +33,7 @@ public class SmsAuthenticationToken extends AbstractAuthenticationToken {
      */
     public SmsAuthenticationToken(Object principal, Object credentials) {
         // 没有授权信息时，设置为 null
-        super(null);
+        super((Collection<? extends GrantedAuthority>) null);
         this.principal = principal;
         this.credentials = credentials;
         // 默认未认证

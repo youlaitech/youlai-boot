@@ -1,12 +1,5 @@
 package com.youlai.boot.config;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.SerializationFeature;
-import com.fasterxml.jackson.databind.module.SimpleModule;
-import com.fasterxml.jackson.databind.ser.std.ToStringSerializer;
-import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
-import com.fasterxml.jackson.datatype.jsr310.deser.LocalDateTimeDeserializer;
-import com.fasterxml.jackson.datatype.jsr310.ser.LocalDateTimeSerializer;
 import jakarta.validation.Validation;
 import jakarta.validation.Validator;
 import jakarta.validation.ValidatorFactory;
@@ -15,16 +8,18 @@ import org.hibernate.validator.HibernateValidator;
 import org.springframework.beans.factory.config.AutowireCapableBeanFactory;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.http.converter.HttpMessageConverter;
-import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter;
+import org.springframework.http.converter.HttpMessageConverters;
+import org.springframework.http.converter.json.JacksonJsonHttpMessageConverter;
 import org.springframework.validation.beanvalidation.SpringConstraintValidatorFactory;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
+import tools.jackson.databind.cfg.DateTimeFeature;
+import tools.jackson.databind.json.JsonMapper;
+import tools.jackson.databind.module.SimpleModule;
+import tools.jackson.databind.ser.std.ToStringSerializer;
 
 import java.math.BigInteger;
 import java.text.SimpleDateFormat;
-import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
-import java.util.List;
 import java.util.TimeZone;
 
 /**
@@ -40,36 +35,27 @@ public class WebMvcConfig implements WebMvcConfigurer {
     private static final DateTimeFormatter DATE_TIME_FORMATTER = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
 
     /**
-     * 配置消息转换器
+     * Spring Boot 4.x 已经使用Jackson 3.x
+     * Jackson 3.x已经自带JavaTimeModule，不再需要手工注册
      *
-     * @param converters 消息转换器列表
+     * @param converterBuilder the builder to configure
      */
     @Override
-    public void configureMessageConverters(List<HttpMessageConverter<?>> converters) {
-        MappingJackson2HttpMessageConverter jackson2HttpMessageConverter = new MappingJackson2HttpMessageConverter();
-        ObjectMapper objectMapper = new ObjectMapper();
-
-        // 注册 JavaTimeModule（替代手动注册 LocalDateTimeSerializer）
-        JavaTimeModule javaTimeModule = new JavaTimeModule();
-        // 返回指定字符串格式
-        javaTimeModule.addSerializer(LocalDateTime.class, new LocalDateTimeSerializer(DATE_TIME_FORMATTER));
-        // 反序列化，接受前端传来的格式
-        javaTimeModule.addDeserializer(LocalDateTime.class, new LocalDateTimeDeserializer(DATE_TIME_FORMATTER));
-        objectMapper.registerModule(javaTimeModule);
+    public void configureMessageConverters(HttpMessageConverters.ServerBuilder converterBuilder) {
+        JsonMapper.Builder builder = JsonMapper.builder();
 
         // 配置全局日期格式和时区
-        objectMapper.disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS);
-        objectMapper.setDateFormat(new SimpleDateFormat("yyyy-MM-dd HH:mm:ss"));
-        objectMapper.setTimeZone(TimeZone.getTimeZone("GMT+8"));
+        builder.disable(DateTimeFeature.WRITE_DATES_AS_TIMESTAMPS);
+        builder.defaultDateFormat(new SimpleDateFormat("yyyy-MM-dd HH:mm:ss"));
+        builder.defaultTimeZone(TimeZone.getTimeZone("GMT+8"));
 
         // 处理 Long/BigInteger 的精度问题
         SimpleModule simpleModule = new SimpleModule();
         simpleModule.addSerializer(Long.class, ToStringSerializer.instance);
         simpleModule.addSerializer(BigInteger.class, ToStringSerializer.instance);
-        objectMapper.registerModule(simpleModule);
+        builder.addModule(simpleModule);
 
-        jackson2HttpMessageConverter.setObjectMapper(objectMapper);
-        converters.add(1, jackson2HttpMessageConverter);
+        converterBuilder.addCustomConverter(new JacksonJsonHttpMessageConverter(builder));
     }
 
     /**
