@@ -12,22 +12,21 @@
    <a href="https://github.com/haoxianrui/youlai-boot" target="_blank">
      <img alt="有来技术" src="https://img.shields.io/github/stars/haoxianrui/youlai-boot.svg?style=social&label=Stars"/>
    </a>
-
-     <a href="https://gitcode.com/youlai/youlai-boot" target="_blank">
-    <img alt="有来技术" src="https://gitcode.com/youlai/youlai-boot/star/badge.svg"/>
-
-  </a>
 </div>
 
-<div align="center">
-  <a target="_blank" href="https://vue.youlai.tech/">🖥️ 在线预览</a> |  <a target="_blank" href="https://youlai.blog.csdn.net/article/details/145178880">📑 阅读文档</a> |  <a target="_blank" href="https://www.youlai.tech/youlai-boot">🌐 官网</a>
-</div>
+<p align="center">
+  <a target="_blank" href="https://vue.youlai.tech/">🖥️ 在线预览</a>
+  <span>&nbsp;|&nbsp;</span>
+  <a target="_blank" href="https://youlai.blog.csdn.net/article/details/145178880">📑 阅读文档</a>
+  <span>&nbsp;|&nbsp;</span>
+  <a target="_blank" href="https://www.youlai.tech/youlai-boot">🌐 官网</a>
+</p>
 
 ## 📢 项目简介
 
-基于 JDK 17、Spring Boot 4、Spring Security 、JWT、Redis、Mybatis-Plus、Vue
-3、Element-Plus 构建的前后端分离单体权限管理系统。
-[Mybatis-Flex 版本](https://gitee.com/youlaiorg/youlai-boot-flex)
+基于 JDK 17、Spring Boot 4、Spring Security（随 Spring Boot 4.x）
+、JWT、Redis、Mybatis-Plus、Vue 3、Element-Plus 构建的前后端分离单体权限管理系统
+。 [Mybatis-Flex 版本](https://gitee.com/youlaiorg/youlai-boot-flex)
 
 - **🚀 开发框架**: 使用 Spring Boot 4 和 Vue 3，以及 Element-Plus 等主流技术栈，
   实时更新。
