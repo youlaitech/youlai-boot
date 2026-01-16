@@ -16,7 +16,7 @@ import org.springframework.web.bind.annotation.*;
  * @author Ray.Hao
  * @since 2.10.0
  */
-@Tag(name = "10.日志接口")
+@Tag(name = "09.日志接口")
 @RestController
 @RequestMapping("/api/v1/logs")
 @RequiredArgsConstructor

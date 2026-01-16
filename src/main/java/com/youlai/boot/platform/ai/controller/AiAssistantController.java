@@ -10,27 +10,21 @@ import com.youlai.boot.platform.ai.model.query.AiAssistantQuery;
 import com.youlai.boot.platform.ai.model.vo.AiAssistantRecordVO;
 import com.youlai.boot.platform.ai.service.AiAssistantRecordService;
 import io.swagger.v3.oas.annotations.Operation;
-import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.Arrays;
-import java.util.List;
-import java.util.stream.Collectors;
-
 /**
  * AI 助手控制器
  * <p>
- * 负责 AI 命令的解析、执行、记录管理及回滚操作，
- * 表示一次 AI 助手完整的指令生命周期。
+ * 负责 AI 命令的解析、执行与记录查询。
  *
  * @author Ray.Hao
  * @since 3.0.0
  */
-@Tag(name = "AI 助手接口")
+@Tag(name = "13.AI 助手接口")
 @RestController
 @RequestMapping("/api/v1/ai/assistant")
 @RequiredArgsConstructor
@@ -81,29 +75,5 @@ public class AiAssistantController {
     return PageResult.success(page);
   }
 
-  @Operation(summary = "删除 AI 命令记录")
-  @DeleteMapping("/records/{ids}")
-  public Result<Void> deleteRecords(
-    @Parameter(description = "记录ID，多个以英文逗号(,)分割")
-    @PathVariable String ids
-  ) {
-    List<Long> idList = Arrays.stream(ids.split(","))
-      .filter(s -> s != null && !s.isBlank())
-      .map(String::trim)
-      .map(Long::valueOf)
-      .collect(Collectors.toList());
-
-    boolean removed = aiAssistantRecordService.deleteRecords(idList);
-    return Result.judge(removed);
-  }
-
-  @Operation(summary = "撤销命令执行")
-  @PostMapping("/records/{recordId}/rollback")
-  public Result<Void> rollbackCommand(
-    @Parameter(description = "记录ID")
-    @PathVariable String recordId
-  ) {
-    aiAssistantRecordService.rollbackCommand(recordId);
-    return Result.success();
-  }
+  // 记录类接口按需扩展，当前开放 parse/execute/records
 }

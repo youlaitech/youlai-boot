@@ -83,8 +83,9 @@ public class CodegenController {
     @GetMapping("/{tableName}/preview")
     @Log(value = "预览生成代码", module = LogModuleEnum.OTHER)
     public Result<List<CodegenPreviewVO>> getTablePreviewData(@PathVariable String tableName,
-                                                              @RequestParam(value = "pageType", required = false, defaultValue = "classic") String pageType) {
-        List<CodegenPreviewVO> list = codegenService.getCodegenPreviewData(tableName, pageType);
+                                                              @RequestParam(value = "pageType", required = false, defaultValue = "classic") String pageType,
+                                                              @RequestParam(value = "type", required = false, defaultValue = "ts") String type) {
+        List<CodegenPreviewVO> list = codegenService.getCodegenPreviewData(tableName, pageType, type);
         return Result.success(list);
     }
 
@@ -92,9 +93,10 @@ public class CodegenController {
     @GetMapping("/{tableName}/download")
     @Log(value = "下载代码", module = LogModuleEnum.OTHER)
     public void downloadZip(HttpServletResponse response, @PathVariable String tableName,
-                            @RequestParam(value = "pageType", required = false, defaultValue = "classic") String pageType) {
+                            @RequestParam(value = "pageType", required = false, defaultValue = "classic") String pageType,
+                            @RequestParam(value = "type", required = false, defaultValue = "ts") String type) {
         String[] tableNames = tableName.split(",");
-        byte[] data = codegenService.downloadCode(tableNames, pageType);
+        byte[] data = codegenService.downloadCode(tableNames, pageType, type);
 
         response.reset();
         response.setHeader("Content-Disposition", "attachment; filename=" + URLEncoder.encode(codegenProperties.getDownloadFileName(), StandardCharsets.UTF_8));

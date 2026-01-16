@@ -299,26 +299,4 @@ public class AiAssistantRecordServiceImpl
     return this.baseMapper.getRecordPage(page, queryParams);
   }
 
-  @Override
-  public boolean deleteRecords(List<Long> ids) {
-    if (ids == null || ids.isEmpty()) {
-      return true;
-    }
-    return this.removeByIds(ids);
-  }
-
-  @Override
-  public void rollbackCommand(String logId) {
-    AiAssistantRecord commandRecord = this.getById(logId);
-    if (commandRecord == null) {
-      throw new RuntimeException("命令记录不存在");
-    }
-
-    if (commandRecord.getExecuteStatus() == null || commandRecord.getExecuteStatus() != 1) {
-      throw new RuntimeException("只能撤销成功执行的命令");
-    }
-
-    log.info("撤销命令执行: logId={}, function={}", logId, commandRecord.getFunctionName());
-    throw new UnsupportedOperationException("回滚功能尚未实现");
-  }
 }

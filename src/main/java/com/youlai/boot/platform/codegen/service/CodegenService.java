@@ -29,12 +29,12 @@ public interface CodegenService {
      * @param tableName 表名
      * @return
      */
-    List<CodegenPreviewVO> getCodegenPreviewData(String tableName, String pageType);
+    List<CodegenPreviewVO> getCodegenPreviewData(String tableName, String pageType, String type);
 
     /**
      * 下载代码
      * @param tableNames 表名
      * @return
      */
-    byte[] downloadCode(String[] tableNames, String pageType);
+    byte[] downloadCode(String[] tableNames, String pageType, String type);
 }

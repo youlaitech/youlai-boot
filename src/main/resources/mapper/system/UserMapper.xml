@@ -27,17 +27,15 @@
         <where>
             u.is_deleted = 0
             <!-- 非超级管理员用户限制查看超级管理员  -->
-            <if test="!queryParams.isRoot">
-                AND NOT EXISTS (
-                SELECT
-                    1
-                FROM sys_user_role sur
-                    INNER JOIN sys_role r ON sur.role_id = r.id
-                WHERE
-                    sur.user_id = u.id
-                    AND r.code = '${@com.youlai.boot.common.constant.SystemConstants@ROOT_ROLE_CODE}'
-                )
-            </if>
+            AND NOT EXISTS (
+            SELECT
+                1
+            FROM sys_user_role sur
+                INNER JOIN sys_role r ON sur.role_id = r.id
+            WHERE
+                sur.user_id = u.id
+                AND r.code = '${@com.youlai.boot.common.constant.SystemConstants@ROOT_ROLE_CODE}'
+            )
             <if test='queryParams.keywords!=null and queryParams.keywords.trim() neq ""'>
                 AND (
                     u.username LIKE CONCAT('%',#{queryParams.keywords},'%')
@@ -199,7 +197,6 @@
                 LEFT JOIN sys_dept d ON u.dept_id = d.id
         <where>
             u.is_deleted = 0
-            <if test="!isRoot">
             AND NOT EXISTS (
                 SELECT
                     1
@@ -209,7 +206,6 @@
                     sur.user_id = u.id
                     AND r.code = '${@com.youlai.boot.common.constant.SystemConstants@ROOT_ROLE_CODE}'
             )
-            </if>
             <if test='keywords!=null and keywords.trim() neq ""'>
                 AND (u.username LIKE CONCAT('%',#{keywords},'%')
                 OR u.nickname LIKE CONCAT('%',#{keywords},'%')

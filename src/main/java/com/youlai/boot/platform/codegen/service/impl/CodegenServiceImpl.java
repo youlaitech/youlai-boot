@@ -71,13 +71,59 @@ public class CodegenServiceImpl implements CodegenService {
     }
 
     /**
+     * 解析前端模板路径
+     *
+     * @param templateName 模板标识
+     * @param templateConfig 模板配置
+     * @param frontendType 前端类型
+     * @return 模板路径
+     */
+    private String resolveFrontendTemplatePath(String templateName,
+                                               CodegenProperties.TemplateConfig templateConfig,
+                                               String frontendType) {
+        if (!"js".equals(frontendType)) {
+            return templateConfig.getTemplatePath();
+        }
+        if ("API".equals(templateName)) {
+            return "codegen/api.js.vm";
+        }
+        if ("VIEW".equals(templateName)) {
+            return "codegen/index.js.vue.vm";
+        }
+        if ("API_TYPES".equals(templateName)) {
+            return "codegen/api-types.js.vm";
+        }
+        return templateConfig.getTemplatePath();
+    }
+
+    /**
+     * 解析前端文件后缀
+     *
+     * @param templateName 模板标识
+     * @param templateConfig 模板配置
+     * @param frontendType 前端类型
+     * @return 文件后缀
+     */
+    private String resolveFrontendExtension(String templateName,
+                                            CodegenProperties.TemplateConfig templateConfig,
+                                            String frontendType) {
+        if (!"js".equals(frontendType)) {
+            return templateConfig.getExtension();
+        }
+        if ("API".equals(templateName) || "API_TYPES".equals(templateName)) {
+            return ".js";
+        }
+        return templateConfig.getExtension();
+    }
+
+    /**
      * 获取预览生成代码
      *
      * @param tableName 表名
      * @return 预览数据
      */
     @Override
-    public List<CodegenPreviewVO> getCodegenPreviewData(String tableName, String pageType) {
+    public List<CodegenPreviewVO> getCodegenPreviewData(String tableName, String pageType, String type) {
 
         List<CodegenPreviewVO> list = new ArrayList<>();
 
@@ -99,18 +145,25 @@ public class CodegenServiceImpl implements CodegenService {
 
         // 遍历模板配置
         Map<String, CodegenProperties.TemplateConfig> templateConfigs = codegenProperties.getTemplateConfigs();
+        String frontendType = StrUtil.blankToDefault(type, "ts").toLowerCase();
         for (Map.Entry<String, CodegenProperties.TemplateConfig> templateConfigEntry : templateConfigs.entrySet()) {
             CodegenPreviewVO previewVo = new CodegenPreviewVO();
 
             CodegenProperties.TemplateConfig templateConfig = templateConfigEntry.getValue();
 
+            String templateName = templateConfigEntry.getKey();
+            if ("js".equals(frontendType) && "API_TYPES".equals(templateName)) {
+                continue;
+            }
+
+            String effectiveTemplatePath = resolveFrontendTemplatePath(templateName, templateConfig, frontendType);
+            String extension = resolveFrontendExtension(templateName, templateConfig, frontendType);
+
             /* 1. 生成文件名 UserController */
             // User Role Menu Dept
             String entityName = genTable.getEntityName();
             // Controller Service Mapper Entity
-            String templateName = templateConfigEntry.getKey();
             // .java .ts .vue
-            String extension = templateConfig.getExtension();
 
             // 文件名 UserController.java
             String fileName = getFileName(entityName, templateName, extension);
@@ -131,7 +184,13 @@ public class CodegenServiceImpl implements CodegenService {
             // 将模板文件中的变量替换为具体的值 生成代码内容
             // 优先使用保存的 ui，没有则使用请求参数
             String finalType = StrUtil.blankToDefault(genTable.getPageType(), pageType);
-            String content = getCodeContent(templateConfig, genTable, fieldConfigs, finalType);
+            String content = getCodeContent(
+                    effectiveTemplatePath,
+                    templateConfig.getSubpackageName(),
+                    genTable,
+                    fieldConfigs,
+                    finalType
+            );
             previewVo.setContent(content);
 
             list.add(previewVo);
@@ -232,7 +291,11 @@ public class CodegenServiceImpl implements CodegenService {
      * @param pageType       前端页面类型
      * @return 渲染后的代码内容
      */
-    private String getCodeContent(CodegenProperties.TemplateConfig templateConfig, GenTable genTable, List<GenTableColumn> fieldConfigs, String pageType) {
+    private String getCodeContent(String templatePath,
+                                  String subpackageName,
+                                  GenTable genTable,
+                                  List<GenTableColumn> fieldConfigs,
+                                  String pageType) {
 
         Map<String, Object> bindMap = new HashMap<>();
 
@@ -240,7 +303,7 @@ public class CodegenServiceImpl implements CodegenService {
 
         bindMap.put("packageName", genTable.getPackageName());
         bindMap.put("moduleName", genTable.getModuleName());
-        bindMap.put("subpackageName", templateConfig.getSubpackageName());
+        bindMap.put("subpackageName", subpackageName);
         bindMap.put("date", DateUtil.format(new Date(), "yyyy-MM-dd HH:mm"));
         bindMap.put("entityName", entityName);
         bindMap.put("tableName", genTable.getTableName());
@@ -282,9 +345,13 @@ public class CodegenServiceImpl implements CodegenService {
 
         TemplateEngine templateEngine = TemplateUtil.createEngine(new TemplateConfig("templates", TemplateConfig.ResourceMode.CLASSPATH));
         // 根据 ui 选择不同的前端页面模板：默认 index.vue.vm；封装版使用 index.curd.vue.vm
-        String path = templateConfig.getTemplatePath();
-        if ("curd".equalsIgnoreCase(pageType) && path.endsWith("index.vue.vm")) {
-            path = path.replace("index.vue.vm", "index.curd.vue.vm");
+        String path = templatePath;
+        if ("curd".equalsIgnoreCase(pageType)) {
+            if (path.endsWith("index.js.vue.vm")) {
+                path = path.replace("index.js.vue.vm", "index.curd.js.vue.vm");
+            } else if (path.endsWith("index.vue.vm")) {
+                path = path.replace("index.vue.vm", "index.curd.vue.vm");
+            }
         }
         Template template = templateEngine.getTemplate(path);
 
@@ -299,13 +366,13 @@ public class CodegenServiceImpl implements CodegenService {
      * @return zip 压缩文件字节数组
      */
     @Override
-    public byte[] downloadCode(String[] tableNames, String ui) {
+    public byte[] downloadCode(String[] tableNames, String ui, String type) {
         try (ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
              ZipOutputStream zip = new ZipOutputStream(outputStream)) {
 
             // 遍历每个表名，生成对应的代码并压缩到 zip 文件中
             for (String tableName : tableNames) {
-                generateAndZipCode(tableName, zip, ui);
+                generateAndZipCode(tableName, zip, ui, type);
             }
             // 确保所有压缩数据写入输出流，避免数据残留在内存缓冲区引发的数据不完整
             zip.finish();
@@ -324,8 +391,8 @@ public class CodegenServiceImpl implements CodegenService {
      * @param zip       压缩文件输出流
      * @param ui        页面类型
      */
-    private void generateAndZipCode(String tableName, ZipOutputStream zip, String ui) {
-        List<CodegenPreviewVO> codePreviewList = getCodegenPreviewData(tableName, ui);
+    private void generateAndZipCode(String tableName, ZipOutputStream zip, String ui, String type) {
+        List<CodegenPreviewVO> codePreviewList = getCodegenPreviewData(tableName, ui, type);
 
         for (CodegenPreviewVO codePreview : codePreviewList) {
             String fileName = codePreview.getFileName();

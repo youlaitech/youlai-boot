@@ -267,29 +267,28 @@
   </div>
 </template>
 
-<script setup lang="ts">
+<script setup>
   defineOptions({
     name: "${entityName}",
     inheritAttrs: false,
   });
 
   import ${entityName}API from "@/api/${moduleName}/${entityKebab}";
-  import type { ${entityName}Item, ${entityName}Form, ${entityName}QueryParams } from "@/types/api";
 
   const queryFormRef = ref();
   const dataFormRef = ref();
 
   const loading = ref(false);
-  const removeIds = ref<string[]>([]);
+  const removeIds = ref([]);
   const total = ref(0);
 
-  const queryParams = reactive<${entityName}QueryParams>({
+  const queryParams = reactive({
     pageNum: 1,
     pageSize: 10,
   });
 
   // $!{businessName}表格数据
-  const pageData = ref<${entityName}Item[]>([]);
+  const pageData = ref([]);
 
   // 弹窗
   const dialog = reactive({
@@ -298,7 +297,7 @@
   });
 
   // $!{businessName}表单数据
-  const formData = reactive<${entityName}Form>({});
+  const formData = reactive({});
 
   // $!{businessName}表单校验规则
   const rules = reactive({
@@ -326,18 +325,18 @@
 
   /** 重置$!{businessName}查询 */
   function handleResetQuery() {
-    queryFormRef.value!.resetFields();
+    queryFormRef.value?.resetFields();
     queryParams.pageNum = 1;
     handleQuery();
   }
 
   /** 行复选框选中记录选中ID集合 */
-  function handleSelectionChange(selection: any) {
-    removeIds.value = selection.map((item: any) => String(item.id));
+  function handleSelectionChange(selection) {
+    removeIds.value = selection.map((item) => String(item.id));
   }
 
   /** 打开$!{businessName}弹窗 */
-  function handleOpenDialog(id?: string) {
+  function handleOpenDialog(id) {
     dialog.visible = true;
     if (id) {
       dialog.title = "修改$!{businessName}";
@@ -351,7 +350,7 @@
 
   /** 提交$!{businessName}表单 */
   function handleSubmit() {
-    dataFormRef.value.validate((valid: any) => {
+    dataFormRef.value?.validate((valid) => {
       if (valid) {
         loading.value = true;
         const id = formData.id;
@@ -379,13 +378,13 @@
   /** 关闭$!{businessName}弹窗 */
   function handleCloseDialog() {
     dialog.visible = false;
-    dataFormRef.value.resetFields();
-    dataFormRef.value.clearValidate();
+    dataFormRef.value?.resetFields();
+    dataFormRef.value?.clearValidate();
     formData.id = undefined;
   }
 
   /** 删除$!{businessName} */
-  function handleDelete(id?: string) {
+  function handleDelete(id) {
     const ids = [id || removeIds.value].join(",");
     if (!ids) {
       ElMessage.warning("请勾选删除项");

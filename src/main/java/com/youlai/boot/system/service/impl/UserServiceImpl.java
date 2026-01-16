@@ -491,9 +491,17 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
     @Override
     public boolean updateUserProfile(UserProfileForm formData) {
         Long userId = SecurityUtils.getUserId();
-        User entity = userConverter.toEntity(formData);
-        entity.setId(userId);
-        return this.updateById(entity);
+
+        if (formData.getNickname() == null && formData.getAvatar() == null && formData.getGender() == null) {
+            throw new BusinessException("请修改至少一个字段");
+        }
+
+        return this.update(new LambdaUpdateWrapper<User>()
+                .eq(User::getId, userId)
+                .set(formData.getNickname() != null, User::getNickname, formData.getNickname())
+                .set(formData.getAvatar() != null, User::getAvatar, formData.getAvatar())
+                .set(formData.getGender() != null, User::getGender, formData.getGender())
+        );
     }
 
     /**
@@ -523,7 +531,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
         }
 
         // 判断新密码和确认密码是否一致
-        if (passwordEncoder.matches(data.getNewPassword(), data.getConfirmPassword())) {
+        if (!Objects.equals(data.getNewPassword(), data.getConfirmPassword())) {
             throw new BusinessException("新密码和确认密码不一致");
         }
 
@@ -569,6 +577,15 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
     @Override
     public boolean sendMobileCode(String mobile) {
 
+        Long currentUserId = SecurityUtils.getUserId();
+        long mobileCount = this.count(new LambdaQueryWrapper<User>()
+                .eq(User::getMobile, mobile)
+                .ne(User::getId, currentUserId)
+        );
+        if (mobileCount > 0) {
+            throw new BusinessException("手机号已被其他账号绑定");
+        }
+
         // String code = String.valueOf((int) ((Math.random() * 9 + 1) * 1000));
         // TODO 为了方便测试，验证码固定为 1234，实际开发中在配置了厂商短信服务后，可以使用上面的随机验证码
         String code = "1234";
@@ -600,6 +617,10 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
             throw new BusinessException("用户不存在");
         }
 
+        if (!passwordEncoder.matches(form.getPassword(), currentUser.getPassword())) {
+            throw new BusinessException("当前密码错误");
+        }
+
         // 校验验证码
         String inputVerifyCode = form.getCode();
         String mobile = form.getMobile();
@@ -614,7 +635,15 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
         if (!inputVerifyCode.equals(cachedVerifyCode)) {
             throw new BusinessException("验证码错误");
         }
-        // 验证完成删除验证码
+
+        long mobileCount = this.count(new LambdaQueryWrapper<User>()
+                .eq(User::getMobile, mobile)
+                .ne(User::getId, currentUserId)
+        );
+        if (mobileCount > 0) {
+            throw new BusinessException("手机号已被其他账号绑定");
+        }
+
         redisTemplate.delete(cacheKey);
 
         // 更新手机号码
@@ -632,6 +661,15 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
      */
     @Override
     public void sendEmailCode(String email) {
+
+        Long currentUserId = SecurityUtils.getUserId();
+        long emailCount = this.count(new LambdaQueryWrapper<User>()
+                .eq(User::getEmail, email)
+                .ne(User::getId, currentUserId)
+        );
+        if (emailCount > 0) {
+            throw new BusinessException("邮箱已被其他账号绑定");
+        }
 
         // String code = String.valueOf((int) ((Math.random() * 9 + 1) * 1000));
         // TODO 为了方便测试，验证码固定为 1234，实际开发中在配置了邮箱服务后，可以使用上面的随机验证码
@@ -659,6 +697,10 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
             throw new BusinessException("用户不存在");
         }
 
+        if (!passwordEncoder.matches(form.getPassword(), currentUser.getPassword())) {
+            throw new BusinessException("当前密码错误");
+        }
+
         // 获取前端输入的验证码
         String inputVerifyCode = form.getCode();
 
@@ -674,7 +716,15 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
         if (!inputVerifyCode.equals(cachedVerifyCode)) {
             throw new BusinessException("验证码错误");
         }
-        // 验证完成删除验证码
+
+        long emailCount = this.count(new LambdaQueryWrapper<User>()
+                .eq(User::getEmail, email)
+                .ne(User::getId, currentUserId)
+        );
+        if (emailCount > 0) {
+            throw new BusinessException("邮箱已被其他账号绑定");
+        }
+
         redisTemplate.delete(redisCacheKey);
 
         // 更新邮箱地址
@@ -682,6 +732,66 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
                 new LambdaUpdateWrapper<User>()
                         .eq(User::getId, currentUserId)
                         .set(User::getEmail, email)
+        );
+    }
+
+    /**
+     * 解绑手机号
+     *
+     * @param form 表单数据
+     * @return true|false
+     */
+    @Override
+    public boolean unbindMobile(PasswordVerifyForm form) {
+
+        Long currentUserId = SecurityUtils.getUserId();
+        User currentUser = this.getById(currentUserId);
+
+        if (currentUser == null) {
+            throw new BusinessException("用户不存在");
+        }
+
+        if (StrUtil.isBlank(currentUser.getMobile())) {
+            throw new BusinessException("当前账号未绑定手机号");
+        }
+
+        if (!passwordEncoder.matches(form.getPassword(), currentUser.getPassword())) {
+            throw new BusinessException("当前密码错误");
+        }
+
+        return this.update(new LambdaUpdateWrapper<User>()
+                .eq(User::getId, currentUserId)
+                .set(User::getMobile, null)
+        );
+    }
+
+    /**
+     * 解绑邮箱
+     *
+     * @param form 表单数据
+     * @return true|false
+     */
+    @Override
+    public boolean unbindEmail(PasswordVerifyForm form) {
+
+        Long currentUserId = SecurityUtils.getUserId();
+        User currentUser = this.getById(currentUserId);
+
+        if (currentUser == null) {
+            throw new BusinessException("用户不存在");
+        }
+
+        if (StrUtil.isBlank(currentUser.getEmail())) {
+            throw new BusinessException("当前账号未绑定邮箱");
+        }
+
+        if (!passwordEncoder.matches(form.getPassword(), currentUser.getPassword())) {
+            throw new BusinessException("当前密码错误");
+        }
+
+        return this.update(new LambdaUpdateWrapper<User>()
+                .eq(User::getId, currentUserId)
+                .set(User::getEmail, null)
         );
     }
 

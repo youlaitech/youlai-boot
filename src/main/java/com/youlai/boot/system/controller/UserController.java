@@ -125,6 +125,17 @@ public class UserController {
         return Result.judge(result);
     }
 
+    @Operation(summary = "重置指定用户密码")
+    @PutMapping(value = "/{userId}/password/reset")
+    @PreAuthorize("@ss.hasPerm('sys:user:reset-password')")
+    public Result<?> resetUserPassword(
+            @Parameter(description = "用户ID") @PathVariable Long userId,
+            @RequestParam String password
+    ) {
+        boolean result = userService.resetUserPassword(userId, password);
+        return Result.judge(result);
+    }
+
     @Operation(summary = "获取当前登录用户信息")
     @GetMapping("/me")
     @Log(value = "获取当前登录用户信息", module = LogModuleEnum.USER)
@@ -176,6 +187,13 @@ public class UserController {
                 .doWrite(exportUserList);
     }
 
+    @Operation(summary = "获取用户下拉选项")
+    @GetMapping("/options")
+    public Result<List<Option<String>>> listUserOptions() {
+        List<Option<String>> list = userService.listUserOptions();
+        return Result.success(list);
+    }
+
     @Operation(summary = "获取个人中心用户信息")
     @GetMapping("/profile")
     @Log(value = "获取个人中心用户信息", module = LogModuleEnum.USER)
@@ -193,16 +211,6 @@ public class UserController {
         return Result.judge(result);
     }
 
-    @Operation(summary = "重置指定用户密码")
-    @PutMapping(value = "/{userId}/password/reset")
-    @PreAuthorize("@ss.hasPerm('sys:user:reset-password')")
-    public Result<?> resetUserPassword(
-            @Parameter(description = "用户ID") @PathVariable Long userId,
-            @RequestParam String password
-    ) {
-        boolean result = userService.resetUserPassword(userId, password);
-        return Result.judge(result);
-    }
 
     @Operation(summary = "当前用户修改密码")
     @PutMapping(value = "/password")
@@ -232,6 +240,15 @@ public class UserController {
         return Result.judge(result);
     }
 
+    @Operation(summary = "解绑手机号")
+    @DeleteMapping(value = "/mobile")
+    public Result<?> unbindMobile(
+            @RequestBody @Validated PasswordVerifyForm data
+    ) {
+        boolean result = userService.unbindMobile(data);
+        return Result.judge(result);
+    }
+
     @Operation(summary = "发送邮箱验证码（绑定或更换邮箱）")
     @PostMapping(value = "/email/code")
     public Result<Void> sendEmailCode(
@@ -250,10 +267,14 @@ public class UserController {
         return Result.judge(result);
     }
 
-    @Operation(summary = "获取用户下拉选项")
-    @GetMapping("/options")
-    public Result<List<Option<String>>> listUserOptions() {
-        List<Option<String>> list = userService.listUserOptions();
-        return Result.success(list);
+    @Operation(summary = "解绑邮箱")
+    @DeleteMapping(value = "/email")
+    public Result<?> unbindEmail(
+            @RequestBody @Validated PasswordVerifyForm data
+    ) {
+        boolean result = userService.unbindEmail(data);
+        return Result.judge(result);
     }
+
+   
 }

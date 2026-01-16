@@ -1,0 +1,369 @@
+<template>
+  <div class="app-container h-full flex flex-1 flex-col">
+    <!-- 搜索 -->
+    <PageSearch
+      ref="searchRef"
+      :search-config="searchConfig"
+      @query-click="handleQueryClick"
+      @reset-click="handleResetClick"
+    >
+#foreach($fieldConfig in $fieldConfigs)
+#if($fieldConfig.isShowInQuery == 1 && $fieldConfig.dictType && $fieldConfig.dictType.trim() != "")
+      <template #$fieldConfig.fieldName="scope">
+        <Dict v-model="scope.formData[scope.prop]" code="$fieldConfig.dictType" v-bind="scope.attrs" />
+      </template>
+#end
+#end
+    </PageSearch>
+
+    <!-- 列表 -->
+    <PageContent
+      ref="contentRef"
+      :content-config="contentConfig"
+      @add-click="handleAddClick"
+      @export-click="handleExportClick"
+      @search-click="handleSearchClick"
+      @toolbar-click="handleToolbarClick"
+      @operate-click="handleOperateClick"
+      @filter-change="handleFilterChange"
+    >
+#foreach($fieldConfig in $fieldConfigs)
+#if($fieldConfig.isShowInList == 1 && $fieldConfig.dictType && $fieldConfig.dictType.trim() != "")
+      <template #$fieldConfig.fieldName="scope">
+        <DictLabel v-model="scope.row[scope.prop]" code="$fieldConfig.dictType" />
+      </template>
+#end
+#end
+    </PageContent>
+
+    <!-- 新增 -->
+    <PageModal ref="addModalRef" :modal-config="addModalConfig" @submit-click="handleSubmitClick">
+#foreach($fieldConfig in $fieldConfigs)
+#if($fieldConfig.isShowInForm == 1 && $fieldConfig.formType != "HIDDEN" && $fieldConfig.dictType && $fieldConfig.dictType.trim() != "")
+      <template #$fieldConfig.fieldName="scope">
+        <Dict v-model="scope.formData[scope.prop]" code="$fieldConfig.dictType" v-bind="scope.attrs" />
+      </template>
+#end
+#end
+    </PageModal>
+
+    <!-- 编辑 -->
+    <PageModal ref="editModalRef" :modal-config="editModalConfig" @submit-click="handleSubmitClick">
+#foreach($fieldConfig in $fieldConfigs)
+#if($fieldConfig.isShowInForm == 1 && $fieldConfig.formType != "HIDDEN" && $fieldConfig.dictType && $fieldConfig.dictType.trim() != "")
+      <template #$fieldConfig.fieldName="scope">
+        <Dict v-model="scope.formData[scope.prop]" code="$fieldConfig.dictType" v-bind="scope.attrs" />
+      </template>
+#end
+#end
+    </PageModal>
+  </div>
+</template>
+
+<script setup>
+defineOptions({ name: "$entityName" });
+
+import ${entityName}API from "@/api/${moduleName}/${entityKebab}";
+import usePage from "@/components/CURD/usePage";
+
+// 组合式 CRUD
+const {
+  searchRef,
+  contentRef,
+  addModalRef,
+  editModalRef,
+  handleQueryClick,
+  handleResetClick,
+  handleAddClick,
+  handleEditClick,
+  handleSubmitClick,
+  handleExportClick,
+  handleSearchClick,
+  handleFilterChange,
+} = usePage();
+
+// 搜索配置
+const searchConfig = reactive({
+  pageName: "${moduleName}:${entityKebab}",
+  formItems: [
+#foreach($fieldConfig in $fieldConfigs)
+#if($fieldConfig.isShowInQuery == 1)
+#if($fieldConfig.dictType && $fieldConfig.dictType.trim() != "")
+    {
+      type: "custom",
+      slotName: "$fieldConfig.fieldName",
+      label: "$fieldConfig.fieldComment",
+      prop: "$fieldConfig.fieldName",
+      attrs: {
+        placeholder: "$fieldConfig.fieldComment",
+        clearable: true,
+        style: { width: "200px" },
+      },
+    },
+#else
+    {
+#if($fieldConfig.javaType == "String")
+      type: "input",
+#elseif($fieldConfig.javaType == "Integer" || $fieldConfig.javaType == "Long")
+      type: "input-number",
+#elseif($fieldConfig.javaType == "Date" || $fieldConfig.javaType == "LocalDateTime")
+      type: "date-picker",
+#else
+      type: "input",
+#end
+      label: "$fieldConfig.fieldComment",
+      prop: "$fieldConfig.fieldName",
+      attrs: {
+        placeholder: "$fieldConfig.fieldComment",
+#if($fieldConfig.javaType == "Date" || $fieldConfig.javaType == "LocalDateTime")
+        type: "daterange",
+        "range-separator": "~",
+        "start-placeholder": "开始时间",
+        "end-placeholder": "截止时间",
+        "value-format": "YYYY-MM-DD",
+#end
+        clearable: true,
+        style: { width: "200px" },
+      },
+    },
+#end
+#end
+#end
+  ],
+});
+
+// 列表配置
+const contentConfig = reactive({
+  // 权限前缀
+  pageName: "${moduleName}:${entityKebab}",
+  table: {
+    border: true,
+    highlightCurrentRow: true,
+  },
+  // 主键
+  pk: "id",
+  // 列表查询接口
+  indexAction: ${entityName}API.getPage,
+  // 删除接口
+  deleteAction: ${entityName}API.deleteByIds,
+  // 数据解析函数
+  parseData(res) {
+    return {
+      total: res?.page?.total ?? 0,
+      list: res?.data ?? [],
+    };
+  },
+  // 分页配置
+  pagination: {
+    background: true,
+    layout: "total, sizes, prev, pager, next, jumper",
+    pageSize: 20,
+    pageSizes: [10, 20, 30, 50],
+  },
+  // 工具栏配置
+  toolbar: ["add", "delete"],
+  defaultToolbar: ["refresh", "filter"],
+  // 表格列配置
+  cols: [
+    { type: "selection", width: 55, align: "center" },
+#foreach($fieldConfig in $fieldConfigs)
+#if($fieldConfig.isShowInList == 1)
+#if($fieldConfig.dictType && $fieldConfig.dictType.trim() != "")
+    {
+      label: "$fieldConfig.fieldComment",
+      prop: "$fieldConfig.fieldName",
+      templet: "custom",
+      slotName: "$fieldConfig.fieldName"
+    },
+#else
+    { label: "$fieldConfig.fieldComment", prop: "$fieldConfig.fieldName" },
+#end
+#end
+#end
+    {
+      label: "操作",
+      prop: "operation",
+      width: 220,
+      templet: "tool",
+      operat: ["edit", "delete"],
+    },
+  ],
+});
+
+// 新增配置
+const addModalConfig = reactive({
+  // 权限前缀
+  pageName: "${moduleName}:${entityKebab}",
+  // 主键
+  pk: "id",
+  // 弹窗配置
+  dialog: {
+    title: "新增$!{entityComment}",
+    width: 800,
+    draggable: true,
+  },
+  form: {
+    labelWidth: 100,
+  },
+  // 表单项配置
+  formItems: [
+#foreach($fieldConfig in $fieldConfigs)
+#if($fieldConfig.isShowInForm == 1 && $fieldConfig.formType != "HIDDEN")
+#if($fieldConfig.dictType && $fieldConfig.dictType.trim() != "")
+    {
+      type: "custom",
+      label: "$fieldConfig.fieldComment",
+      prop: "$fieldConfig.fieldName",
+      slotName: "$fieldConfig.fieldName",
+      attrs: {
+        placeholder: "$fieldConfig.fieldComment",
+        style: { width: "100%" }
+      },
+#if($fieldConfig.isRequired == 1)
+      rules: [{ required: true, message: "$fieldConfig.fieldComment不能为空", trigger: "change" }],
+#end
+    },
+#else
+    {
+#if($fieldConfig.javaType == "String")
+#if($fieldConfig.fieldName.contains("password") || $fieldConfig.fieldName.contains("pwd"))
+      type: "input",
+      attrs: {
+        type: "password",
+        placeholder: "$fieldConfig.fieldComment",
+        showPassword: true
+      },
+#if($fieldConfig.isRequired == 1)
+      rules: [{ required: true, message: "$fieldConfig.fieldComment不能为空", trigger: "blur" }],
+#end
+#elseif($fieldConfig.fieldName.contains("email"))
+      type: "input",
+      attrs: {
+        placeholder: "$fieldConfig.fieldComment",
+        maxlength: 50
+      },
+      rules: [
+#if($fieldConfig.isRequired == 1)
+        { required: true, message: "$fieldConfig.fieldComment不能为空", trigger: "blur" },
+#end
+        { pattern: /\w[-\w.+]*@([A-Za-z0-9][-A-Za-z0-9]+\.)+[A-Za-z]{2,14}/, message: "请输入正确的邮箱地址", trigger: "blur" }
+      ],
+#elseif($fieldConfig.fieldName.contains("mobile") || $fieldConfig.fieldName.contains("phone"))
+      type: "input",
+      attrs: {
+        placeholder: "$fieldConfig.fieldComment",
+        maxlength: 11
+      },
+      rules: [
+#if($fieldConfig.isRequired == 1)
+        { required: true, message: "$fieldConfig.fieldComment不能为空", trigger: "blur" },
+#end
+        { pattern: /^1[3|4|5|6|7|8|9][0-9]\d{8}$/, message: "请输入正确的手机号码", trigger: "blur" }
+      ],
+#else
+      type: "input",
+      attrs: {
+        placeholder: "$fieldConfig.fieldComment"
+      },
+#if($fieldConfig.isRequired == 1)
+      rules: [{ required: true, message: "$fieldConfig.fieldComment不能为空", trigger: "blur" }],
+#end
+#end
+#elseif($fieldConfig.javaType == "Integer" || $fieldConfig.javaType == "Long")
+      type: "input-number",
+      attrs: {
+        placeholder: "$fieldConfig.fieldComment",
+        style: { width: "100%" }
+      },
+#if($fieldConfig.isRequired == 1)
+      rules: [{ required: true, message: "$fieldConfig.fieldComment不能为空", trigger: "blur" }],
+#end
+#elseif($fieldConfig.javaType == "BigDecimal" || $fieldConfig.javaType == "Double")
+      type: "input-number",
+      attrs: {
+        placeholder: "$fieldConfig.fieldComment",
+        precision: 2,
+        style: { width: "100%" }
+      },
+#if($fieldConfig.isRequired == 1)
+      rules: [{ required: true, message: "$fieldConfig.fieldComment不能为空", trigger: "blur" }],
+#end
+#elseif($fieldConfig.javaType == "Date" || $fieldConfig.javaType == "LocalDateTime")
+      type: "date-picker",
+      attrs: {
+        type: "datetime",
+        placeholder: "$fieldConfig.fieldComment",
+        format: "YYYY-MM-DD HH:mm:ss",
+        "value-format": "YYYY-MM-DD HH:mm:ss",
+        style: { width: "100%" }
+      },
+#if($fieldConfig.isRequired == 1)
+      rules: [{ required: true, message: "$fieldConfig.fieldComment不能为空", trigger: "change" }],
+#end
+#elseif($fieldConfig.javaType == "Boolean" || $fieldConfig.fieldName.contains("status"))
+      type: "switch",
+      attrs: {
+        activeText: "启用",
+        inactiveText: "禁用",
+        activeValue: 1,
+        inactiveValue: 0
+      },
+      initialValue: 1,
+#else
+      type: "input",
+      attrs: {
+        placeholder: "$fieldConfig.fieldComment"
+      },
+#if($fieldConfig.isRequired == 1)
+      rules: [{ required: true, message: "$fieldConfig.fieldComment不能为空", trigger: "blur" }],
+#end
+#end
+      label: "$fieldConfig.fieldComment",
+      prop: "$fieldConfig.fieldName",
+    },
+#end
+#end
+#end
+  ],
+  // 提交函数
+  formAction(data) {
+    if (data.id) {
+      // 编辑
+      return ${entityName}API.update(data.id, data);
+    } else {
+      // 新增
+      return ${entityName}API.create(data);
+    }
+  },
+});
+
+// 编辑配置
+const editModalConfig = reactive({
+  pageName: "${moduleName}:${entityKebab}",
+  component: "drawer",
+  drawer: {
+    title: "编辑$!{entityComment}",
+    size: 500,
+  },
+  pk: "id",
+  formAction(data) {
+    return ${entityName}API.update(data.id, data);
+  },
+  formItems: addModalConfig.formItems, // 复用新增的表单项
+});
+
+// 处理操作按钮点击
+const handleOperateClick = (data) => {
+  if (data.name === "edit") {
+    handleEditClick(data.row, async () => {
+      return await ${entityName}API.getFormData(String(data.row.id));
+    });
+  }
+};
+
+// 处理工具栏按钮点击（删除等）
+const handleToolbarClick = (name) => {
+  console.log(name);
+};
+
+</script>

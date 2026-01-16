@@ -18,7 +18,7 @@ import java.time.LocalDate;
  * @author Ray.Hao
  * @since 2025-12-15
  */
-@Tag(name = "11.统计分析")
+@Tag(name = "12.统计分析")
 @RestController
 @RequestMapping("/api/v1/statistics")
 @RequiredArgsConstructor

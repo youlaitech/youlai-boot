@@ -159,6 +159,22 @@ public interface UserService extends IService<User> {
     boolean bindOrChangeEmail(EmailUpdateForm data);
 
     /**
+     * 解绑手机号
+     *
+     * @param data 表单数据
+     * @return {@link Boolean} 是否解绑成功
+     */
+    boolean unbindMobile(PasswordVerifyForm data);
+
+    /**
+     * 解绑邮箱
+     *
+     * @param data 表单数据
+     * @return {@link Boolean} 是否解绑成功
+     */
+    boolean unbindEmail(PasswordVerifyForm data);
+
+    /**
      * 获取用户选项列表
      *
      * @return {@link List<Option<String>>} 用户选项列表

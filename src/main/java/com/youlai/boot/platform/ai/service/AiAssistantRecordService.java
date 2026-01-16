@@ -49,18 +49,4 @@ public interface AiAssistantRecordService extends IService<AiAssistantRecord> {
    */
   IPage<AiAssistantRecordVO> getRecordPage(AiAssistantQuery queryParams);
 
-  /**
-   * 删除 AI 助手行为记录。
-   *
-   * @param ids 记录ID列表
-   * @return 是否删除成功
-   */
-  boolean deleteRecords(List<Long> ids);
-
-  /**
-   * 撤销命令执行
-   *
-   * @param logId 记录ID
-   */
-  void rollbackCommand(String logId);
 }
