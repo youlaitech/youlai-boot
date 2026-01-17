@@ -7,7 +7,7 @@
     <groupId>com.youlai</groupId>
     <artifactId>youlai-boot</artifactId>
     <version>4.0.0</version>
-    <description>基于 Java 17 + SpringBoot 3 + Spring Security 构建的权限管理系统。</description>
+    <description>基于 Java 17 + SpringBoot 4 + Spring Security 构建的权限管理系统。</description>
 
     <parent>
         <groupId>org.springframework.boot</groupId>

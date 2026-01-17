@@ -98,7 +98,7 @@
     <el-card shadow="never">
       <div class="mb-10px">
         <el-button
-            v-hasPerm="['${moduleName}:${entityKebab}:add']"
+            v-hasPerm="['${moduleName}:${entityKebab}:create']"
             type="success"
             icon="plus"
             @click="handleOpenDialog()"
@@ -143,7 +143,7 @@
         <el-table-column fixed="right" label="操作" width="220">
           <template #default="scope">
             <el-button
-                v-hasPerm="['${moduleName}:${entityKebab}:edit']"
+                v-hasPerm="['${moduleName}:${entityKebab}:update']"
                 type="primary"
                 size="small"
                 link

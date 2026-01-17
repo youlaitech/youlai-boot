@@ -34,7 +34,7 @@ public class ${entityName}Controller  {
 
     @Operation(summary = "$!{businessName}分页列表")
     @GetMapping
-    @PreAuthorize("@ss.hasPerm('${moduleName}:${entityKebab}:query')")
+    @PreAuthorize("@ss.hasPerm('${moduleName}:${entityKebab}:list')")
     public PageResult<${entityName}Vo> get${entityName}Page(${entityName}Query queryParams ) {
         IPage<${entityName}Vo> result = ${entityLowerCamel}Service.get${entityName}Page(queryParams);
         return PageResult.success(result);
@@ -42,7 +42,7 @@ public class ${entityName}Controller  {
 
     @Operation(summary = "新增${businessName}")
     @PostMapping
-    @PreAuthorize("@ss.hasPerm('${moduleName}:${entityKebab}:add')")
+    @PreAuthorize("@ss.hasPerm('${moduleName}:${entityKebab}:create')")
     public Result<Void> save${entityName}(@RequestBody @Valid ${entityName}Form formData ) {
         boolean result = ${entityLowerCamel}Service.save${entityName}(formData);
         return Result.judge(result);
@@ -50,7 +50,7 @@ public class ${entityName}Controller  {
 
     @Operation(summary = "获取${businessName}表单数据")
     @GetMapping("/{id}/form")
-    @PreAuthorize("@ss.hasPerm('${moduleName}:${entityKebab}:edit')")
+    @PreAuthorize("@ss.hasPerm('${moduleName}:${entityKebab}:update')")
     public Result<${entityName}Form> get${entityName}Form(
         @Parameter(description = "$!{businessName}ID") @PathVariable Long id
     ) {
@@ -60,7 +60,7 @@ public class ${entityName}Controller  {
 
     @Operation(summary = "修改${businessName}")
     @PutMapping(value = "/{id}")
-    @PreAuthorize("@ss.hasPerm('${moduleName}:${entityKebab}:edit')")
+    @PreAuthorize("@ss.hasPerm('${moduleName}:${entityKebab}:update')")
     public Result<Void> update${entityName}(
             @Parameter(description = "$!{businessName}ID") @PathVariable Long id,
             @RequestBody @Validated ${entityName}Form formData
