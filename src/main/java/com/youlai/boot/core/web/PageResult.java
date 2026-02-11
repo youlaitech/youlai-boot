@@ -1,7 +1,6 @@
 package com.youlai.boot.core.web;
 
 import com.baomidou.mybatisplus.core.metadata.IPage;
-import com.fasterxml.jackson.annotation.JsonInclude;
 import lombok.Data;
 
 import java.io.Serializable;
@@ -21,13 +20,7 @@ public class PageResult<T> implements Serializable {
 
     private String msg;
 
-    private List<T> data;
-
-    /**
-     * 分页元信息；非分页接口不显示此字段
-     */
-    @JsonInclude(JsonInclude.Include.NON_NULL)
-    private Page page;
+    private PageData<T> data;
 
     /**
      * 构建分页结果（MyBatis-Plus {@link IPage}）。
@@ -43,13 +36,10 @@ public class PageResult<T> implements Serializable {
                 (page == null || page.getRecords() == null)
                         ? Collections.emptyList()
                         : page.getRecords();
-        result.setData(records);
-
-        Page pageMeta = new Page();
-        pageMeta.setPageNum(page != null ? page.getCurrent() : 1L);
-        pageMeta.setPageSize(page != null ? page.getSize() : 0L);
-        pageMeta.setTotal(page != null ? page.getTotal() : 0L);
-        result.setPage(pageMeta);
+        PageData<T> pageData = new PageData<>();
+        pageData.setList(records);
+        pageData.setTotal(page != null ? page.getTotal() : 0L);
+        result.setData(pageData);
 
         return result;
     }
@@ -63,17 +53,17 @@ public class PageResult<T> implements Serializable {
         PageResult<T> result = new PageResult<>();
         result.setCode(ResultCode.SUCCESS.getCode());
         result.setMsg(ResultCode.SUCCESS.getMsg());
-        result.setData(list != null ? list : Collections.emptyList());
-        result.setPage(null);
+        PageData<T> pageData = new PageData<>();
+        pageData.setList(list != null ? list : Collections.emptyList());
+        pageData.setTotal(0L);
+        result.setData(pageData);
         return result;
     }
 
     @Data
-    public static class Page {
+    public static class PageData<T> {
 
-        private long pageNum;
-
-        private long pageSize;
+        private List<T> list;
 
         private long total;
     }

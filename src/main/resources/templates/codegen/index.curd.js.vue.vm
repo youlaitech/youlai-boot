@@ -149,8 +149,8 @@ const contentConfig = reactive({
   // 数据解析函数
   parseData(res) {
     return {
-      total: res?.page?.total ?? 0,
-      list: res?.data ?? [],
+      total: res?.total ?? 0,
+      list: res?.list ?? [],
     };
   },
   // 分页配置

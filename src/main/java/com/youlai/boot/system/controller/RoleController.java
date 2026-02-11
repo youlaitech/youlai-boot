@@ -102,7 +102,7 @@ public class RoleController {
     }
 
     @Operation(summary = "获取角色的菜单ID集合")
-    @GetMapping("/{roleId}/menuIds")
+    @GetMapping("/{roleId}/menu-ids")
     public Result<List<Long>> getRoleMenuIds(
             @Parameter(description = "角色ID") @PathVariable Long roleId
     ) {
