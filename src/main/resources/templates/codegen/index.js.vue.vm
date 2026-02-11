@@ -14,7 +14,7 @@
                       />
                     #elseif($fieldConfig.formType == "SELECT")
                         #if($fieldConfig.dictType && $fieldConfig.dictType.trim() != "")
-                          <Dict v-model="queryParams.$fieldConfig.fieldName" code="$fieldConfig.dictType" />
+                          <DictSelect v-model="queryParams.$fieldConfig.fieldName" code="$fieldConfig.dictType" />
                         #else
                           <el-select v-model="queryParams.$fieldConfig.fieldName" placeholder="请选择$fieldConfig.fieldComment">
                             <el-option :key="1" :value="1" label="选项一"/>
@@ -23,7 +23,7 @@
                         #end
                     #elseif($fieldConfig.formType == "RADIO")
                         #if($fieldConfig.dictType && $fieldConfig.dictType.trim() != "")
-                          <Dict v-model="formData.$fieldConfig.fieldName" type="radio" code="$fieldConfig.dictType" />
+                          <DictSelect v-model="queryParams.$fieldConfig.fieldName" type="radio" code="$fieldConfig.dictType" />
                         #else
                           <el-radio-group v-model="queryParams.$fieldConfig.fieldName">
                             <el-radio :key="1" :value="1">选项一</el-radio>
@@ -32,7 +32,7 @@
                         #end
                     #elseif($fieldConfig.formType == "CHECK_BOX")
                         #if($fieldConfig.dictType && $fieldConfig.dictType.trim() != "")
-                          <Dict v-model="formData.$fieldConfig.fieldName" type="checkbox" code="$fieldConfig.dictType" />
+                          <DictSelect v-model="queryParams.$fieldConfig.fieldName" type="checkbox" code="$fieldConfig.dictType" />
                         #else
                           <el-checkbox-group v-model="queryParams.$fieldConfig.fieldName">
                             <el-checkbox :key="1" :label="1">选项一</el-checkbox>
@@ -126,7 +126,7 @@
             #if($fieldConfig.dictType && $fieldConfig.dictType.trim() != "")
               <el-table-column label="$fieldConfig.fieldComment" width="150" align="center">
                 <template #default="scope">
-                  <DictLabel v-model="scope.row.$fieldConfig.fieldName" code="$fieldConfig.dictType" />
+                  <DictTag v-model="scope.row.$fieldConfig.fieldName" code="$fieldConfig.dictType" />
                 </template>
               </el-table-column>
             #else
@@ -193,7 +193,7 @@
                       />
                     #elseif($fieldConfig.formType == "SELECT")
                         #if($fieldConfig.dictType && $fieldConfig.dictType.trim() != "")
-                          <Dict v-model="formData.$fieldConfig.fieldName" code="$fieldConfig.dictType" />
+                          <DictSelect v-model="formData.$fieldConfig.fieldName" code="$fieldConfig.dictType" />
                         #else
                           <el-select v-model="formData.$fieldConfig.fieldName" placeholder="请选择$fieldConfig.fieldComment">
                             <el-option :value="0" label="选项一"/>
@@ -202,7 +202,7 @@
                         #end
                     #elseif($fieldConfig.formType == "RADIO")
                         #if($fieldConfig.dictType && $fieldConfig.dictType.trim() != "")
-                          <Dict v-model="queryParams.$fieldConfig.fieldName" type="radio" code="$fieldConfig.dictType" />
+                          <DictSelect v-model="formData.$fieldConfig.fieldName" type="radio" code="$fieldConfig.dictType" />
                         #else
                           <el-radio-group v-model="formData.$fieldConfig.fieldName">
                             <el-radio :value="0">选项一</el-radio>
@@ -211,7 +211,7 @@
                         #end
                     #elseif($fieldConfig.formType == "CHECK_BOX")
                         #if($fieldConfig.dictType && $fieldConfig.dictType.trim() != "")
-                          <Dict v-model="queryParams.$fieldConfig.fieldName" type="checkbox" code="$fieldConfig.dictType" />
+                          <DictSelect v-model="formData.$fieldConfig.fieldName" type="checkbox" code="$fieldConfig.dictType" />
                         #else
                           <el-checkbox-group v-model="formData.$fieldConfig.fieldName">
                             <el-checkbox :value="0">选项一</el-checkbox>

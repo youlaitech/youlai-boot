@@ -10,7 +10,7 @@
 #foreach($fieldConfig in $fieldConfigs)
 #if($fieldConfig.isShowInQuery == 1 && $fieldConfig.dictType && $fieldConfig.dictType.trim() != "")
       <template #$fieldConfig.fieldName="scope">
-        <Dict v-model="scope.formData[scope.prop]" code="$fieldConfig.dictType" v-bind="scope.attrs" />
+        <DictSelect v-model="scope.formData[scope.prop]" code="$fieldConfig.dictType" v-bind="scope.attrs" />
       </template>
 #end
 #end
@@ -30,7 +30,7 @@
 #foreach($fieldConfig in $fieldConfigs)
 #if($fieldConfig.isShowInList == 1 && $fieldConfig.dictType && $fieldConfig.dictType.trim() != "")
       <template #$fieldConfig.fieldName="scope">
-        <DictLabel v-model="scope.row[scope.prop]" code="$fieldConfig.dictType" />
+        <DictTag v-model="scope.row[scope.prop]" code="$fieldConfig.dictType" />
       </template>
 #end
 #end
@@ -41,7 +41,7 @@
 #foreach($fieldConfig in $fieldConfigs)
 #if($fieldConfig.isShowInForm == 1 && $fieldConfig.formType != "HIDDEN" && $fieldConfig.dictType && $fieldConfig.dictType.trim() != "")
       <template #$fieldConfig.fieldName="scope">
-        <Dict v-model="scope.formData[scope.prop]" code="$fieldConfig.dictType" v-bind="scope.attrs" />
+        <DictSelect v-model="scope.formData[scope.prop]" code="$fieldConfig.dictType" v-bind="scope.attrs" />
       </template>
 #end
 #end
@@ -52,7 +52,7 @@
 #foreach($fieldConfig in $fieldConfigs)
 #if($fieldConfig.isShowInForm == 1 && $fieldConfig.formType != "HIDDEN" && $fieldConfig.dictType && $fieldConfig.dictType.trim() != "")
       <template #$fieldConfig.fieldName="scope">
-        <Dict v-model="scope.formData[scope.prop]" code="$fieldConfig.dictType" v-bind="scope.attrs" />
+        <DictSelect v-model="scope.formData[scope.prop]" code="$fieldConfig.dictType" v-bind="scope.attrs" />
       </template>
 #end
 #end
