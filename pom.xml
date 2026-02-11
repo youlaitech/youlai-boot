@@ -58,15 +58,10 @@
         <aliyun.java.sdk.core.version>4.7.6</aliyun.java.sdk.core.version>
         <aliyun.java.sdk.dysmsapi.version>2.2.1</aliyun.java.sdk.dysmsapi.version>
 
-        <!-- 微信 jdk -->
-        <weixin-java.version>4.7.7.B</weixin-java.version>
         <caffeine.version>2.9.3</caffeine.version>
 
         <!-- 阿里 TransmittableThreadLocal (支持异步场景的ThreadLocal传递) -->
         <transmittable-thread-local.version>2.14.5</transmittable-thread-local.version>
-
-        <!-- Spring Boot 4.x 必须使用更新的版本 -->
-        <spring-ai-openai.version>2.0.0-M1</spring-ai-openai.version>
     </properties>
 
     <dependencies>
@@ -269,12 +264,6 @@
             <version>${aliyun.java.sdk.dysmsapi.version}</version>
         </dependency>
 
-        <dependency>
-            <groupId>com.github.binarywang</groupId>
-            <artifactId>weixin-java-miniapp</artifactId>
-            <version>${weixin-java.version}</version>
-        </dependency>
-
         <!-- 本地缓存 -->
         <dependency>
             <groupId>com.github.ben-manes.caffeine</groupId>
@@ -288,14 +277,7 @@
             <artifactId>dynamic-datasource-spring-boot3-starter</artifactId>
             <version>${dynamic-datasource.version}</version>
         </dependency>-->
-
-        <!-- Spring AI OpenAI（兼容通义千问、DeepSeek等） -->
-        <dependency>
-            <groupId>org.springframework.ai</groupId>
-            <artifactId>spring-ai-starter-model-openai</artifactId>
-            <version>${spring-ai-openai.version}</version>
-        </dependency>
-
+        
     </dependencies>
 
     <build>

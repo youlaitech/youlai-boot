@@ -8,19 +8,6 @@ spring:
     url: jdbc:mysql://www.youlai.tech:3306/youlai_admin?zeroDateTimeBehavior=convertToNull&useUnicode=true&characterEncoding=UTF-8&serverTimezone=Asia/Shanghai&autoReconnect=true&allowMultiQueries=true
     username: youlai
     password: 123456
-
-  ai:
-    openai:
-      api-key: ${QWEN_API_KEY:sk-c2941d05bf2f411ca80424fcd1exxxxx}
-      base-url: https://dashscope.aliyuncs.com/compatible-mode
-      chat:
-        enabled: true
-        options:
-          model: qwen-plus
-          temperature: 0.7
-          response-format:
-            type: json_object
-
   data:
     redis:
       database: 11
@@ -85,19 +72,18 @@ mybatis-plus:
 security:
   session:
     type: jwt # 会话方式 [jwt|redis-token]
-    access-token-time-to-live: 7200   # 访问令牌 有效期(单位：秒)，默认 2 小时，-1 表示永不过期
-    refresh-token-time-to-live: 604800   # 刷新令牌有效期(单位：秒)，默认 7 天，-1 表示永不过期
+    access-token-time-to-live: 7200 # 访问令牌 有效期(单位：秒)，默认 2 小时，-1 表示永不过期
+    refresh-token-time-to-live: 604800 # 刷新令牌有效期(单位：秒)，默认 7 天，-1 表示永不过期
     jwt:
       secret-key: SecretKey012345678901234567890123456789012345678901234567890123456789 # JWT密钥(HS256算法至少32字符)
     redis-token:
       allow-multi-login: true # 是否允许多设备登录
   # 安全白名单路径，仅跳过 AuthorizationFilter 过滤器，还是会走 Spring Security 的其他过滤器(CSRF、CORS等)
   ignore-urls:
-    - /api/v1/auth/login/**       # 登录接口(账号密码登录、手机验证码登录和微信登录)
-    - /api/v1/auth/captcha        # 验证码获取接口
-    - /api/v1/auth/refresh-token  # 刷新令牌接口
-    - //api/v1/auth/wx/miniapp/code-login # 微信小程序code登陆
-    - /ws/**                      # WebSocket接口
+    - /api/v1/auth/login/** # 登录接口(账号密码登录、手机验证码登录和微信登录)
+    - /api/v1/auth/captcha # 验证码获取接口
+    - /api/v1/auth/refresh-token # 刷新令牌接口
+    - /ws/** # WebSocket接口
   # 非安全端点路径，完全绕过 Spring Security 的过滤器
   unsecured-urls:
     - ${springdoc.swagger-ui.path}
@@ -122,7 +108,7 @@ oss:
     # 存储桶名称
     bucket-name: public
     # (可选)自定义域名，如果配置了域名，生成的文件URL是域名格式，未配置则URL则是IP格式 (eg: https://www.youlai.tech/storage)
-    custom-domain: 
+    custom-domain:
   # 阿里云OSS对象存储服务
   aliyun:
     # 服务Endpoint
@@ -157,28 +143,27 @@ sms:
 # springdoc 配置文档: https://springdoc.org/properties.html
 springdoc:
   swagger-ui:
-    path: /swagger-ui.html         # Swagger UI 访问路径
-    operationsSorter: alpha        # 接口按方法名排序
-    tags-sorter: alpha             # 标签按字母排序
+    path: /swagger-ui.html # Swagger UI 访问路径
+    operationsSorter: alpha # 接口按方法名排序
+    tags-sorter: alpha # 标签按字母排序
   api-docs:
-    path: /v3/api-docs             # OpenAPI JSON 地址
-  group-configs:                   # 分组配置
-    - group: '系统管理'             # 分组名称
-      paths-to-match: "/**"        # 匹配的请求路径
-      packages-to-scan:            # 扫描的 Controller 包，限制只生成指定包的接口文档
+    path: /v3/api-docs # OpenAPI JSON 地址
+  group-configs: # 分组配置
+    - group: "系统管理" # 分组名称
+      paths-to-match: "/**" # 匹配的请求路径
+      packages-to-scan: # 扫描的 Controller 包，限制只生成指定包的接口文档
         - com.youlai.boot.auth.controller
         - com.youlai.boot.system.controller
         - com.youlai.boot.platform.file.controller
         - com.youlai.boot.platform.codegen.controller
-  default-flat-param-object: true  # 将对象参数扁平化显示在文档中
+  default-flat-param-object: true # 将对象参数扁平化显示在文档中
 
 # knife4j 配置
 knife4j:
-  enable: true       # 是否启用 Knife4j 增强功能
-  production: false  # 是否启用生产环境保护（true=生产环境隐藏文档，false=开发环境可访问）
+  enable: true # 是否启用 Knife4j 增强功能
+  production: false # 是否启用生产环境保护（true=生产环境隐藏文档，false=开发环境可访问）
   setting:
     language: zh_cn
-
 
 # xxl-job 定时任务配置
 xxl:

@@ -1,8 +1,6 @@
 package com.youlai.boot.system.model.entity;
 
-import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableName;
-import com.fasterxml.jackson.annotation.JsonInclude;
 import com.youlai.boot.common.base.BaseEntity;
 import lombok.Getter;
 import lombok.Setter;
@@ -74,9 +72,4 @@ public class User extends BaseEntity {
      * 是否删除(0-否 1-是)
      */
     private Integer isDeleted;
-
-    /**
-     * 微信 OpenID
-     */
-    private String openid;
 }

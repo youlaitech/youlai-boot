@@ -1,6 +1,5 @@
 package com.youlai.boot.config;
 
-import cn.binarywang.wx.miniapp.api.WxMaService;
 import cn.hutool.captcha.generator.CodeGenerator;
 import cn.hutool.core.util.ArrayUtil;
 import com.youlai.boot.config.property.SecurityProperties;
@@ -10,8 +9,6 @@ import com.youlai.boot.security.filter.TokenAuthenticationFilter;
 import com.youlai.boot.security.handler.MyAccessDeniedHandler;
 import com.youlai.boot.security.handler.MyAuthenticationEntryPoint;
 import com.youlai.boot.security.provider.SmsAuthenticationProvider;
-import com.youlai.boot.security.provider.WxMiniAppCodeAuthenticationProvider;
-import com.youlai.boot.security.provider.WxMiniAppPhoneAuthenticationProvider;
 import com.youlai.boot.security.token.TokenManager;
 import com.youlai.boot.security.service.SysUserDetailsService;
 import com.youlai.boot.system.service.ConfigService;
@@ -50,7 +47,6 @@ public class SecurityConfig {
     private final PasswordEncoder passwordEncoder;
 
     private final TokenManager tokenManager;
-    private final WxMaService wxMaService;
     private final UserService userService;
     private final SysUserDetailsService userDetailsService;
 
@@ -125,22 +121,6 @@ public class SecurityConfig {
     }
 
     /**
-     * 微信小程序Code认证Provider
-     */
-    @Bean
-    public WxMiniAppCodeAuthenticationProvider wxMiniAppCodeAuthenticationProvider() {
-        return new WxMiniAppCodeAuthenticationProvider(userService, wxMaService);
-    }
-
-    /**
-     * 微信小程序手机号认证Provider
-     */
-    @Bean
-    public WxMiniAppPhoneAuthenticationProvider wxMiniAppPhoneAuthenticationProvider() {
-        return new WxMiniAppPhoneAuthenticationProvider(userService, wxMaService);
-    }
-
-    /**
      * 短信验证码认证 Provider
      */
     @Bean
@@ -154,14 +134,10 @@ public class SecurityConfig {
     @Bean
     public AuthenticationManager authenticationManager(
             DaoAuthenticationProvider daoAuthenticationProvider,
-            WxMiniAppCodeAuthenticationProvider wxMiniAppCodeAuthenticationProvider,
-            WxMiniAppPhoneAuthenticationProvider wxMiniAppPhoneAuthenticationProvider,
             SmsAuthenticationProvider smsAuthenticationProvider
     ) {
         return new ProviderManager(
                 daoAuthenticationProvider,
-                wxMiniAppCodeAuthenticationProvider,
-                wxMiniAppPhoneAuthenticationProvider,
                 smsAuthenticationProvider
         );
     }

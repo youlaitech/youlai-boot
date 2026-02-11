@@ -136,10 +136,9 @@ CREATE TABLE `sys_menu`  (
 -- ----------------------------
 -- Records of sys_menu
 -- ----------------------------
--- 顶级目录（1-9）：系统/代码生成/AI助手/文档/接口文档/组件/演示/多级/路由
+-- 顶级目录（1-9）：系统/代码生成/文档/接口文档/组件/演示/多级/路由
 INSERT INTO `sys_menu` VALUES (1, 0, '0', '系统管理', 'C', '', '/system', 'Layout', NULL, NULL, NULL, 1, 1, 'system', '/system/user', now(), now(), NULL);
 INSERT INTO `sys_menu` VALUES (2, 0, '0', '代码生成', 'C', '', '/codegen', 'Layout', NULL, NULL, NULL, 1, 2, 'code', '/codegen/index', now(), now(), NULL);
-INSERT INTO `sys_menu` VALUES (3, 0, '0', 'AI助手', 'C', '', '/ai', 'Layout', NULL, NULL, NULL, 1, 3, 'ai', '/ai/command-record', now(), now(), NULL);
 INSERT INTO `sys_menu` VALUES (4, 0, '0', '平台文档', 'C', '', '/doc', 'Layout', NULL, NULL, NULL, 1, 4, 'document', '', now(), now(), NULL);
 INSERT INTO `sys_menu` VALUES (5, 0, '0', '接口文档', 'C', '', '/api', 'Layout', NULL, NULL, NULL, 1, 5, 'api', '', now(), now(), NULL);
 INSERT INTO `sys_menu` VALUES (6, 0, '0', '组件封装', 'C', '', '/component', 'Layout', NULL, NULL, NULL, 1, 6, 'menu', '', now(), now(), NULL);
@@ -207,9 +206,6 @@ INSERT INTO `sys_menu` VALUES (2806, 280, '0,1,280', '通知撤回', 'B', NULL, 
 
 -- 代码生成
 INSERT INTO `sys_menu` VALUES (310, 2, '0,2', '代码生成', 'M', 'Codegen', 'codegen', 'codegen/index', NULL, NULL, 1, 1, 1, 'code', NULL, now(), now(), NULL);
-
--- AI 助手
-INSERT INTO `sys_menu` VALUES (401, 3, '0,3', 'AI命令记录', 'M', 'ai', 'ai', 'ai/index', NULL, NULL, 1, 1, 1, 'document', NULL, now(), now(), NULL);
 
 -- 平台文档（外链通过 route_path 识别）
 INSERT INTO `sys_menu` VALUES (501, 4, '0,4', '平台文档(外链)', 'M', NULL, 'https://juejin.cn/post/7228990409909108793', '', NULL, NULL, NULL, 1, 1, 'document', '', now(), now(), NULL);
@@ -298,7 +294,7 @@ CREATE TABLE `sys_role_menu`  (
 -- ============================================
 -- 系统管理员角色菜单权限（role_id=2）
 -- 顶级目录
-INSERT INTO `sys_role_menu` VALUES (2, 1), (2, 2), (2, 3), (2, 4), (2, 5), (2, 6), (2, 7), (2, 8), (2, 9);
+INSERT INTO `sys_role_menu` VALUES (2, 1), (2, 2), (2, 4), (2, 5), (2, 6), (2, 7), (2, 8), (2, 9);
 -- 系统管理
 INSERT INTO `sys_role_menu` VALUES (2, 210), (2, 2101), (2, 2102), (2, 2103), (2, 2104), (2, 2105), (2, 2106), (2, 2107);
 INSERT INTO `sys_role_menu` VALUES (2, 220), (2, 2201), (2, 2202), (2, 2203), (2, 2204), (2, 2205);
@@ -311,8 +307,6 @@ INSERT INTO `sys_role_menu` VALUES (2, 270), (2, 2701), (2, 2702), (2, 2703), (2
 INSERT INTO `sys_role_menu` VALUES (2, 280), (2, 2801), (2, 2802), (2, 2803), (2, 2804), (2, 2805), (2, 2806);
 -- 代码生成
 INSERT INTO `sys_role_menu` VALUES (2, 310);
--- AI 助手
-INSERT INTO `sys_role_menu` VALUES (2, 401);
 -- 平台文档
 INSERT INTO `sys_role_menu` VALUES (2, 501), (2, 502), (2, 503), (2, 504);
 -- 接口文档
@@ -344,7 +338,6 @@ CREATE TABLE `sys_user`  (
                              `update_time` datetime COMMENT '更新时间',
                              `update_by` bigint COMMENT '修改人ID',
                              `is_deleted` tinyint(1) DEFAULT 0 COMMENT '逻辑删除标识(0-未删除 1-已删除)',
-                             `openid` char(28) COMMENT '微信 openid',
                              PRIMARY KEY (`id`) USING BTREE,
                              UNIQUE KEY `uk_username` (`username`)
 ) ENGINE = InnoDB CHARACTER SET = utf8mb4 COMMENT = '系统用户表';
@@ -531,38 +524,3 @@ INSERT INTO `sys_user_notice` VALUES (7, 7, 2, 1, NULL, now(), now(), 0);
 INSERT INTO `sys_user_notice` VALUES (8, 8, 2, 1, NULL, now(), now(), 0);
 INSERT INTO `sys_user_notice` VALUES (9, 9, 2, 1, NULL, now(), now(), 0);
 INSERT INTO `sys_user_notice` VALUES (10, 10, 2, 1, NULL, now(), now(), 0);
-
--- ----------------------------
--- AI 命令记录表
--- ----------------------------
-DROP TABLE IF EXISTS `ai_assistant_record`;
-CREATE TABLE `ai_assistant_record` (
-                                  `id` bigint NOT NULL AUTO_INCREMENT COMMENT '主键ID',
-                                  `user_id` bigint DEFAULT NULL COMMENT '用户ID',
-                                  `username` varchar(64) DEFAULT NULL COMMENT '用户名',
-                                  `original_command` text COMMENT '原始命令',
-                                  `ai_provider` varchar(32) DEFAULT NULL COMMENT 'AI 供应商(qwen/openai/deepseek/gemini等)',
-                                  `ai_model` varchar(64) DEFAULT NULL COMMENT 'AI 模型名称(qwen-plus/qwen-max/gpt-4-turbo等)',
-                                  `parse_status` tinyint DEFAULT '0' COMMENT '解析是否成功(0-失败, 1-成功)',
-                                  `function_calls` text COMMENT '解析出的函数调用列表(JSON)',
-                                  `explanation` varchar(500) DEFAULT NULL COMMENT 'AI的理解说明',
-                                  `confidence` decimal(3,2) DEFAULT NULL COMMENT '置信度(0.00-1.00)',
-                                  `parse_error_message` text COMMENT '解析错误信息',
-                                  `input_tokens` int DEFAULT NULL COMMENT '输入Token数量',
-                                  `output_tokens` int DEFAULT NULL COMMENT '输出Token数量',
-                                  `parse_duration_ms` int DEFAULT NULL COMMENT '解析耗时(毫秒)',
-                                  `function_name` varchar(255) DEFAULT NULL COMMENT '执行的函数名称',
-                                  `function_arguments` text COMMENT '函数参数(JSON)',
-                                  `execute_status` tinyint(1) DEFAULT NULL COMMENT '执行状态(0-待执行, 1-成功, -1-失败)',
-                                  `execute_error_message` text COMMENT '执行错误信息',
-                                  `ip_address` varchar(128) DEFAULT NULL COMMENT 'IP地址',
-                                  `create_time` datetime DEFAULT NULL COMMENT '创建时间',
-                                  `update_time` datetime DEFAULT NULL COMMENT '更新时间',
-                                  PRIMARY KEY (`id`),
-                                  KEY `idx_user_id` (`user_id`),
-                                  KEY `idx_create_time` (`create_time`),
-                                  KEY `idx_provider` (`ai_provider`),
-                                  KEY `idx_model` (`ai_model`),
-                                  KEY `idx_parse_status` (`parse_status`),
-                                  KEY `idx_execute_status` (`execute_status`)
-) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8mb4 COMMENT='AI 助手行为记录表（解析、执行、审计）';

@@ -5,8 +5,6 @@ import cn.hutool.captcha.CaptchaUtil;
 import cn.hutool.captcha.generator.CodeGenerator;
 import cn.hutool.core.util.IdUtil;
 import cn.hutool.core.util.StrUtil;
-import com.youlai.boot.auth.model.dto.WxMiniAppCodeLoginDTO;
-import com.youlai.boot.auth.model.dto.WxMiniAppPhoneLoginDTO;
 import com.youlai.boot.auth.model.vo.CaptchaVO;
 import com.youlai.boot.auth.service.AuthService;
 import com.youlai.boot.common.constant.RedisConstants;
@@ -17,8 +15,6 @@ import com.youlai.boot.platform.sms.enums.SmsTypeEnum;
 import com.youlai.boot.platform.sms.service.SmsService;
 import com.youlai.boot.security.model.AuthenticationToken;
 import com.youlai.boot.security.model.SmsAuthenticationToken;
-import com.youlai.boot.security.model.WxMiniAppCodeAuthenticationToken;
-import com.youlai.boot.security.model.WxMiniAppPhoneAuthenticationToken;
 import com.youlai.boot.security.token.TokenManager;
 import com.youlai.boot.security.util.SecurityUtils;
 import lombok.RequiredArgsConstructor;
@@ -82,27 +78,6 @@ public class AuthServiceImpl implements AuthService {
                 tokenManager.generateToken(authentication);
         SecurityContextHolder.getContext().setAuthentication(authentication);
         return authenticationTokenResponse;
-    }
-
-    /**
-     * 微信一键授权登录
-     *
-     * @param code 微信登录code
-     * @return 访问令牌
-     */
-    @Override
-    public AuthenticationToken loginByWechat(String code) {
-        // 1. 创建用户微信认证的令牌（未认证）
-        WxMiniAppCodeAuthenticationToken authenticationToken = new WxMiniAppCodeAuthenticationToken(code);
-
-        // 2. 执行认证（认证中）
-        Authentication authentication = authenticationManager.authenticate(authenticationToken);
-
-        // 3. 认证成功后生成 JWT 令牌，并存入 Security 上下文，供登录日志 AOP 使用（已认证）
-        AuthenticationToken token = tokenManager.generateToken(authentication);
-        SecurityContextHolder.getContext().setAuthentication(authentication);
-
-        return token;
     }
 
     /**
@@ -222,52 +197,6 @@ public class AuthServiceImpl implements AuthService {
     @Override
     public AuthenticationToken refreshToken(String refreshToken) {
         return tokenManager.refreshToken(refreshToken);
-    }
-
-    /**
-     * 微信小程序Code登录
-     *
-     * @param loginDto 登录参数
-     * @return 访问令牌
-     */
-    @Override
-    public AuthenticationToken loginByWxMiniAppCode(WxMiniAppCodeLoginDTO loginDto) {
-        // 1. 创建微信小程序认证令牌（未认证）
-        WxMiniAppCodeAuthenticationToken authenticationToken = new WxMiniAppCodeAuthenticationToken(loginDto.getCode());
-
-        // 2. 执行认证（认证中）
-        Authentication authentication = authenticationManager.authenticate(authenticationToken);
-
-        // 3. 认证成功后生成 JWT 令牌，并存入 Security 上下文，供登录日志 AOP 使用（已认证）
-        AuthenticationToken token = tokenManager.generateToken(authentication);
-        SecurityContextHolder.getContext().setAuthentication(authentication);
-
-        return token;
-    }
-
-    /**
-     * 微信小程序手机号登录
-     *
-     * @param loginDto 登录参数
-     * @return 访问令牌
-     */
-    @Override
-    public AuthenticationToken loginByWxMiniAppPhone(WxMiniAppPhoneLoginDTO loginDto) {
-        // 创建微信小程序手机号认证Token
-        WxMiniAppPhoneAuthenticationToken authenticationToken = new WxMiniAppPhoneAuthenticationToken(
-                loginDto.getCode(),
-                loginDto.getEncryptedData(),
-                loginDto.getIv()
-        );
-
-        // 执行认证
-        Authentication authentication = authenticationManager.authenticate(authenticationToken);
-
-        // 认证成功后生成JWT令牌，并存入Security上下文
-        AuthenticationToken token = tokenManager.generateToken(authentication);
-        SecurityContextHolder.getContext().setAuthentication(authentication);
-
-        return token;
     }
 
 }

@@ -182,26 +182,6 @@ public interface UserService extends IService<User> {
     List<Option<String>> listUserOptions();
 
     /**
-     * 根据 openid 获取用户认证信息
-     *
-     * @param openId 用户名
-     * @return {@link UserAuthInfo}
-     */
-
-    UserAuthInfo getAuthInfoByOpenId(String openId);
-
-    default UserAuthInfo getAuthCredentialsByOpenId(String openId) {
-        return getAuthInfoByOpenId(openId);
-    }
-
-    /**
-     * 根据微信 OpenID 注册或绑定用户
-     *
-     * @param openId 微信 OpenID
-     */
-    boolean registerOrBindWechatUser(String openId);
-
-    /**
      * 根据手机号获取用户认证信息
      *
      * @param mobile 手机号
@@ -212,23 +192,5 @@ public interface UserService extends IService<User> {
     default UserAuthInfo getAuthCredentialsByMobile(String mobile) {
         return getAuthInfoByMobile(mobile);
     }
-
-    /**
-     * 根据手机号和OpenID注册用户
-     *
-     * @param mobile 手机号
-     * @param openId 微信OpenID
-     * @return 是否成功
-     */
-    boolean registerUserByMobileAndOpenId(String mobile, String openId);
-
-    /**
-     * 绑定用户微信OpenID
-     *
-     * @param userId 用户ID
-     * @param openId 微信OpenID
-     * @return 是否成功
-     */
-    boolean bindUserOpenId(Long userId, String openId);
 
 }

@@ -1,7 +1,5 @@
 package com.youlai.boot.auth.controller;
 
-import com.youlai.boot.auth.model.dto.WxMiniAppCodeLoginDTO;
-import com.youlai.boot.auth.model.dto.WxMiniAppPhoneLoginDTO;
 import com.youlai.boot.auth.model.vo.CaptchaVO;
 import com.youlai.boot.auth.model.dto.LoginRequest;
 import com.youlai.boot.common.enums.LogModuleEnum;
@@ -67,30 +65,6 @@ public class AuthController {
     ) {
         authService.sendSmsLoginCode(mobile);
         return Result.success();
-    }
-
-    @Operation(summary = "微信授权登录(Web)")
-    @PostMapping("/login/wechat")
-    @Log(value = "微信登录", module = LogModuleEnum.LOGIN)
-    public Result<AuthenticationToken> loginByWechat(
-            @Parameter(description = "微信授权码", example = "code") @RequestParam String code
-    ) {
-        AuthenticationToken loginResult = authService.loginByWechat(code);
-        return Result.success(loginResult);
-    }
-
-    @Operation(summary = "微信小程序登录(Code)")
-    @PostMapping("/wx/miniapp/code-login")
-    public Result<AuthenticationToken> loginByWxMiniAppCode(@RequestBody @Valid WxMiniAppCodeLoginDTO loginDto) {
-        AuthenticationToken token = authService.loginByWxMiniAppCode(loginDto);
-        return Result.success(token);
-    }
-
-    @Operation(summary = "微信小程序登录(手机号)")
-    @PostMapping("/wx/miniapp/phone-login")
-    public Result<AuthenticationToken> loginByWxMiniAppPhone(@RequestBody @Valid WxMiniAppPhoneLoginDTO loginDto) {
-        AuthenticationToken token = authService.loginByWxMiniAppPhone(loginDto);
-        return Result.success(token);
     }
 
     @Operation(summary = "退出登录")
