@@ -10,7 +10,7 @@ import java.util.Set;
 /**
  * 角色菜单业务接口
  *
- * @author haoxr
+ * @author Ray.Hao
  * @since 2.5.0
  */
 public interface RoleMenuService extends IService<RoleMenu> {
@@ -45,10 +45,12 @@ public interface RoleMenuService extends IService<RoleMenu> {
     void refreshRolePermsCache(String oldRoleCode, String newRoleCode);
 
     /**
-     * 获取角色权限集合
+     * 获取角色权限集合（带缓存）
+     * <p>
+     * 采用 Read-Through 缓存策略，缓存未命中时自动回源数据库
      *
-     * @param roles 角色编码集合
+     * @param roleCodes 角色编码集合
      * @return 权限集合
      */
-    Set<String> getRolePermsByRoleCodes(Set<String> roles);
+    Set<String> getRolePermsByRoleCodes(Set<String> roleCodes);
 }

@@ -4,10 +4,14 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.util.List;
 import java.util.Set;
 
 /**
- * 在线用户信息对象
+ * 用户会话信息
+ * <p>
+ * 存储在Token中的用户会话快照，包含用户身份、数据权限和角色权限信息。
+ * 用于Redis-Token模式下的会话管理，支持在线用户查询和会话控制。
  *
  * @author wangtao
  * @since 2025/2/27 10:31
@@ -15,7 +19,7 @@ import java.util.Set;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class OnlineUser {
+public class UserSession {
 
     /**
      * 用户ID
@@ -33,10 +37,9 @@ public class OnlineUser {
     private Long deptId;
 
     /**
-     * 数据权限范围
-     * <p>定义用户可访问的数据范围，如全部、本部门或自定义范围</p>
+     * 数据权限列表
      */
-    private Integer dataScope;
+    private List<RoleDataScope> dataScopes;
 
     /**
      * 角色权限集合

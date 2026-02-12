@@ -6,13 +6,19 @@ import com.youlai.boot.system.model.entity.UserRole;
 
 import java.util.List;
 
+/**
+ * 用户角色业务接口
+ *
+ * @author Ray.Hao
+ * @since 0.0.1
+ */
 public interface UserRoleService extends IService<UserRole> {
 
     /**
      * 保存用户角色
      *
-     * @param userId
-     * @param roleIds
+     * @param userId 用户ID
+     * @param roleIds 角色ID列表
      * @return
      */
     void saveUserRoles(Long userId, List<Long> roleIds);

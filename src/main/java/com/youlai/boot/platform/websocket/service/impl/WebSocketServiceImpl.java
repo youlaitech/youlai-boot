@@ -1,6 +1,7 @@
 package com.youlai.boot.platform.websocket.service.impl;
 
 import com.youlai.boot.platform.websocket.dto.DictChangeEvent;
+import com.youlai.boot.platform.websocket.dto.OnlineUserDTO;
 import com.youlai.boot.platform.websocket.dto.TextMessage;
 import com.youlai.boot.platform.websocket.publisher.WebSocketPublisher;
 import com.youlai.boot.platform.websocket.session.UserSessionRegistry;
@@ -101,7 +102,7 @@ public class WebSocketServiceImpl implements WebSocketService {
      *
      * @return 在线用户信息列表
      */
-    public List<UserSessionRegistry.OnlineUserDTO> getOnlineUsers() {
+    public List<OnlineUserDTO> getOnlineUsers() {
         return userSessionRegistry.getOnlineUsers();
     }
 

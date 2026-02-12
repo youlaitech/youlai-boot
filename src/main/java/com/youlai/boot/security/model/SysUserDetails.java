@@ -3,15 +3,13 @@ package com.youlai.boot.security.model;
 import cn.hutool.core.collection.CollectionUtil;
 import cn.hutool.core.util.ObjectUtil;
 import com.youlai.boot.common.constant.SecurityConstants;
-import com.youlai.boot.security.model.UserAuthInfo;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
-import java.util.Collection;
-import java.util.Collections;
+import java.util.*;
 import java.util.stream.Collectors;
 
 /**
@@ -53,9 +51,11 @@ public class SysUserDetails implements UserDetails {
     private Long deptId;
 
     /**
-     * 数据权限范围
+     * 数据权限列表
+     * <p>
+     * 存储用户所有角色的数据权限范围，用于实现多角色权限合并（并集策略）
      */
-    private Integer dataScope;
+    private List<RoleDataScope> dataScopes;
 
     /**
      * 用户角色权限集合
@@ -73,7 +73,7 @@ public class SysUserDetails implements UserDetails {
         this.password = user.getPassword();
         this.enabled = ObjectUtil.equal(user.getStatus(), 1);
         this.deptId = user.getDeptId();
-        this.dataScope = user.getDataScope();
+        this.dataScopes = user.getDataScopes();
 
         // 初始化角色权限集合
         this.authorities = CollectionUtil.isNotEmpty(user.getRoles())
@@ -103,5 +103,27 @@ public class SysUserDetails implements UserDetails {
     @Override
     public boolean isEnabled() {
         return this.enabled;
+    }
+
+    /**
+     * 判断是否包含"全部数据"权限
+     *
+     * @return 是否有全部数据权限
+     */
+    public boolean hasAllDataScope() {
+        if (CollectionUtil.isEmpty(dataScopes)) {
+            return false;
+        }
+        return dataScopes.stream()
+                .anyMatch(scope -> scope.getDataScope() == 1);
+    }
+
+    /**
+     * 获取数据权限列表
+     *
+     * @return 数据权限列表，永不为null
+     */
+    public List<RoleDataScope> getDataScopes() {
+        return dataScopes != null ? dataScopes : Collections.emptyList();
     }
 }

@@ -26,18 +26,15 @@ public interface JwtClaimConstants {
     String DEPT_ID = "deptId";
 
     /**
-     * 数据权限
+     * 数据权限列表
+     * <p>
+     * 存储用户所有角色的数据权限范围，用于实现多角色权限合并（并集策略）
      */
-    String DATA_SCOPE = "dataScope";
+    String DATA_SCOPES = "dataScopes";
 
     /**
      * 权限(角色Code)集合
      */
     String AUTHORITIES = "authorities";
-
-    /**
-     * 安全版本号，用于按用户失效历史令牌
-     */
-    String SECURITY_VERSION = "securityVersion";
 
 }

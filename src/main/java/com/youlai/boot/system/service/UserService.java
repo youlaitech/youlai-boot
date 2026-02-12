@@ -25,7 +25,7 @@ public interface UserService extends IService<User> {
     /**
      * 用户分页列表
      *
-     * @return {@link IPage<UserPageVo>} 用户分页列表
+     * @return {@link IPage<UserPageVO>} 用户分页列表
      */
     IPage<UserPageVO> getUserPage(UserQuery queryParams);
 
@@ -82,7 +82,7 @@ public interface UserService extends IService<User> {
      * 获取导出用户列表
      *
      * @param queryParams 查询参数
-     * @return {@link List<UserExportDto>} 导出用户列表
+     * @return {@link List<UserExportDTO>} 导出用户列表
      */
     List<UserExportDTO> listExportUsers(UserQuery queryParams);
 
@@ -90,14 +90,14 @@ public interface UserService extends IService<User> {
     /**
      * 获取登录用户信息
      *
-     * @return {@link CurrentUserDto} 登录用户信息
+     * @return {@link CurrentUserDTO} 登录用户信息
      */
     CurrentUserDTO getCurrentUserInfo();
 
     /**
      * 获取个人中心用户信息
      *
-     * @return {@link UserProfileVo} 个人中心用户信息
+     * @return {@link UserProfileVO} 个人中心用户信息
      */
     UserProfileVO getUserProfile(Long userId);
 

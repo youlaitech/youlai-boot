@@ -3,6 +3,7 @@ package com.youlai.boot.config.property;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Pattern;
 import lombok.Data;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.stereotype.Component;
@@ -53,7 +54,8 @@ public class SecurityProperties {
          *   <li>redis-token - 基于Redis的有状态认证</li>
          * </ul>
          */
-        @NotNull
+        @NotNull(message = "会话类型不能为空")
+        @Pattern(regexp = "jwt|redis-token", message = "会话类型只能是 jwt 或 redis-token")
         private String type;
 
         /**

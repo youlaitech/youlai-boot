@@ -15,8 +15,8 @@ import com.youlai.boot.common.model.Option;
 import com.youlai.boot.platform.mail.service.MailService;
 import com.youlai.boot.platform.sms.enums.SmsTypeEnum;
 import com.youlai.boot.platform.sms.service.SmsService;
+import com.youlai.boot.security.model.RoleDataScope;
 import com.youlai.boot.security.model.UserAuthInfo;
-import com.youlai.boot.security.service.PermissionService;
 import com.youlai.boot.security.token.TokenManager;
 import com.youlai.boot.security.util.SecurityUtils;
 import com.youlai.boot.system.converter.UserConverter;
@@ -62,7 +62,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
 
     private final RoleService roleService;
 
-    private final PermissionService permissionService;
+    private final RoleMenuService roleMenuService;
 
     private final SmsService smsService;
 
@@ -81,7 +81,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
      * 获取用户分页列表
      *
      * @param queryParams 查询参数
-     * @return {@link IPage<UserPageVo>} 用户分页列表
+     * @return {@link IPage<UserPageVO>} 用户分页列表
      */
     @Override
     public IPage<UserPageVO> getUserPage(UserQuery queryParams) {
@@ -215,9 +215,9 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
         UserAuthInfo userAuthInfo = this.baseMapper.getAuthInfoByUsername(username);
         if (userAuthInfo != null) {
             Set<String> roles = userAuthInfo.getRoles();
-            // 获取最大范围的数据权限
-            Integer dataScope = roleService.getMaximumDataScope(roles);
-            userAuthInfo.setDataScope(dataScope);
+            // 获取数据权限列表（用于并集策略）
+            List<RoleDataScope> dataScopes = roleService.getRoleDataScopes(roles);
+            userAuthInfo.setDataScopes(dataScopes);
         }
         return userAuthInfo;
     }
@@ -236,9 +236,9 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
         UserAuthInfo userAuthInfo = this.baseMapper.getAuthInfoByMobile(mobile);
         if (userAuthInfo != null) {
             Set<String> roles = userAuthInfo.getRoles();
-            // 获取最大范围的数据权限
-            Integer dataScope = roleService.getMaximumDataScope(roles);
-            userAuthInfo.setDataScope(dataScope);
+            // 获取数据权限列表（用于并集策略）
+            List<RoleDataScope> dataScopes = roleService.getRoleDataScopes(roles);
+            userAuthInfo.setDataScopes(dataScopes);
         }
         return userAuthInfo;
     }
@@ -247,7 +247,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
      * 获取导出用户列表
      *
      * @param queryParams 查询参数
-     * @return {@link List<UserExportDto>} 导出用户列表
+     * @return {@link List<UserExportDTO>} 导出用户列表
      */
     @Override
     public List<UserExportDTO> listExportUsers(UserQuery queryParams) {
@@ -285,7 +285,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
     /**
      * 获取登录用户信息
      *
-     * @return {@link CurrentUserDto}   用户信息
+     * @return {@link CurrentUserDTO}   用户信息
      */
     @Override
     public CurrentUserDTO getCurrentUserInfo() {
@@ -311,7 +311,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
 
         // 用户权限集合
         if (CollectionUtil.isNotEmpty(roles)) {
-            Set<String> perms = permissionService.getRolePermsFormCache(roles);
+            Set<String> perms = roleMenuService.getRolePermsByRoleCodes(roles);
             userInfoVo.setPerms(perms);
         }
         return userInfoVo;
@@ -321,7 +321,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
      * 获取个人中心用户信息
      *
      * @param userId 用户ID
-     * @return {@link UserProfileVo} 个人中心用户信息
+     * @return {@link UserProfileVO} 个人中心用户信息
      */
     @Override
     public UserProfileVO getUserProfile(Long userId) {

@@ -13,7 +13,7 @@ import java.util.List;
 /**
  * 用户公告状态服务类
  *
- * @author youlaitech
+ * @author Theo
  * @since 2024-08-28 16:56
  */
 public interface UserNoticeService extends IService<UserNotice> {

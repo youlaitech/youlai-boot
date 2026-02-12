@@ -24,4 +24,27 @@
             </choose>
         </where>
     </select>
+
+    <!-- 获取角色的数据权限信息列表 -->
+    <select id="getRoleDataScopeList" resultType="java.util.Map">
+        SELECT
+            code,
+            data_scope
+        FROM
+            sys_role
+        <where>
+            <choose>
+                <when test="roleCodes!=null and roleCodes.size>0">
+                    AND code IN
+                    <foreach collection="roleCodes" item="roleCode" separator="," open="(" close=")">
+                        #{roleCode}
+                    </foreach>
+                </when>
+                <otherwise>
+                    id = -1
+                </otherwise>
+            </choose>
+            AND is_deleted = 0
+        </where>
+    </select>
 </mapper>

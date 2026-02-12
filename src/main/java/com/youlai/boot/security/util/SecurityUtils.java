@@ -71,16 +71,6 @@ public class SecurityUtils {
     }
 
     /**
-     * 获取数据权限范围
-     *
-     * @return Integer
-     */
-    public static Integer getDataScope() {
-        return getUser().map(SysUserDetails::getDataScope).orElse(null);
-    }
-
-
-    /**
      * 获取角色集合
      *
      * @return 角色集合

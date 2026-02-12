@@ -8,7 +8,8 @@ import com.youlai.boot.core.exception.BusinessException;
 import com.youlai.boot.core.web.ResultCode;
 import com.youlai.boot.config.property.SecurityProperties;
 import com.youlai.boot.security.model.AuthenticationToken;
-import com.youlai.boot.security.model.OnlineUser;
+import com.youlai.boot.security.model.UserSession;
+import com.youlai.boot.security.model.RoleDataScope;
 import com.youlai.boot.security.model.SysUserDetails;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.data.redis.core.RedisTemplate;
@@ -26,7 +27,15 @@ import java.util.stream.Collectors;
 /**
  * Redis Token 管理器
  * <p>
- * 用于生成、解析、校验、刷新 Redis Token
+ * 实现基于Redis的有状态认证，支持：
+ * <ul>
+ *   <li>Access Token + Refresh Token 双令牌机制</li>
+ *   <li>单设备/多设备登录控制</li>
+ *   <li>用户级会话失效</li>
+ *   <li>在线用户管理</li>
+ * </ul>
+ * <p>
+ * 与JWT模式相比，Redis模式支持主动踢人、在线用户查询等功能
  *
  * @author Ray.Hao
  * @since 2024/11/15
@@ -55,19 +64,19 @@ public class RedisTokenManager implements TokenManager {
         String accessToken = IdUtil.fastSimpleUUID();
         String refreshToken = IdUtil.fastSimpleUUID();
 
-        // 构建用户在线信息
-        OnlineUser onlineUser = new OnlineUser(
+        // 构建用户会话信息
+        UserSession userSession = new UserSession(
                 user.getUserId(),
                 user.getUsername(),
                 user.getDeptId(),
-                user.getDataScope(),
+                user.getDataScopes(),
                 user.getAuthorities().stream()
                         .map(GrantedAuthority::getAuthority)
                         .collect(Collectors.toSet())
         );
 
         // 存储访问令牌、刷新令牌和刷新令牌映射
-        storeTokensInRedis(accessToken, refreshToken, onlineUser);
+        storeTokensInRedis(accessToken, refreshToken, userSession);
 
         // 单设备登录控制
         handleSingleDeviceLogin(user.getUserId(), accessToken);
@@ -87,13 +96,13 @@ public class RedisTokenManager implements TokenManager {
      */
     @Override
     public Authentication parseToken(String token) {
-        OnlineUser onlineUser = (OnlineUser) redisTemplate.opsForValue().get(formatTokenKey(token));
-        if (onlineUser == null) return null;
+        UserSession userSession = (UserSession) redisTemplate.opsForValue().get(formatTokenKey(token));
+        if (userSession == null) return null;
 
         // 构建用户权限集合
         Set<SimpleGrantedAuthority> authorities = null;
 
-        Set<String> roles = onlineUser.getRoles();
+        Set<String> roles = userSession.getRoles();
         if (CollectionUtil.isNotEmpty(roles)) {
             authorities = roles.stream()
                     .map(SimpleGrantedAuthority::new)
@@ -101,7 +110,7 @@ public class RedisTokenManager implements TokenManager {
         }
 
         // 构建用户详情对象
-        SysUserDetails userDetails = buildUserDetails(onlineUser, authorities);
+        SysUserDetails userDetails = buildUserDetails(userSession, authorities);
         return new UsernamePasswordAuthenticationToken(userDetails, null, authorities);
     }
 
@@ -135,12 +144,12 @@ public class RedisTokenManager implements TokenManager {
      */
     @Override
     public AuthenticationToken refreshToken(String refreshToken) {
-        OnlineUser onlineUser = (OnlineUser) redisTemplate.opsForValue()
+        UserSession userSession = (UserSession) redisTemplate.opsForValue()
                 .get(StrUtil.format(RedisConstants.Auth.REFRESH_TOKEN_USER, refreshToken));
-        if (onlineUser == null) {
+        if (userSession == null) {
             throw new BusinessException(ResultCode.REFRESH_TOKEN_INVALID);
         }
-        Object oldAccessTokenValue = redisTemplate.opsForValue().get(StrUtil.format(RedisConstants.Auth.USER_ACCESS_TOKEN, onlineUser.getUserId()));
+        Object oldAccessTokenValue = redisTemplate.opsForValue().get(StrUtil.format(RedisConstants.Auth.USER_ACCESS_TOKEN, userSession.getUserId()));
         // 删除旧的访问令牌记录
         Optional.of(oldAccessTokenValue)
                 .map(String.class::cast)
@@ -148,7 +157,7 @@ public class RedisTokenManager implements TokenManager {
 
         // 生成新访问令牌并存储
         String newAccessToken = IdUtil.fastSimpleUUID();
-        storeAccessToken(newAccessToken, onlineUser);
+        storeAccessToken(newAccessToken, userSession);
 
         int accessTtl = securityProperties.getSession().getAccessTokenTimeToLive();
         return AuthenticationToken.builder()
@@ -166,14 +175,16 @@ public class RedisTokenManager implements TokenManager {
     @Override
     public void invalidateToken(String token) {
         Object value = redisTemplate.opsForValue().get(formatTokenKey(token));
-        if (value instanceof OnlineUser onlineUser) {
-            Long userId = onlineUser.getUserId();
+        if (value instanceof UserSession userSession) {
+            Long userId = userSession.getUserId();
             invalidateUserSessions(userId);
         }
     }
 
     /**
      * 使指定用户的所有会话失效
+     * <p>
+     * 适用场景：用户修改密码、管理员强制下线、账号封禁等
      *
      * @param userId 用户ID
      */
@@ -207,24 +218,26 @@ public class RedisTokenManager implements TokenManager {
      *
      * @param accessToken  访问令牌
      * @param refreshToken 刷新令牌
-     * @param onlineUser   在线用户信息
+     * @param userSession  用户会话信息
      */
-    private void storeTokensInRedis(String accessToken, String refreshToken, OnlineUser onlineUser) {
+    private void storeTokensInRedis(String accessToken, String refreshToken, UserSession userSession) {
         // 访问令牌 -> 用户信息
-        setRedisValue(formatTokenKey(accessToken), onlineUser, securityProperties.getSession().getAccessTokenTimeToLive());
+        setRedisValue(formatTokenKey(accessToken), userSession, securityProperties.getSession().getAccessTokenTimeToLive());
 
         // 刷新令牌 -> 用户信息
         String refreshTokenKey = StrUtil.format(RedisConstants.Auth.REFRESH_TOKEN_USER, refreshToken);
-        setRedisValue(refreshTokenKey, onlineUser, securityProperties.getSession().getRefreshTokenTimeToLive());
+        setRedisValue(refreshTokenKey, userSession, securityProperties.getSession().getRefreshTokenTimeToLive());
 
         // 用户ID -> 刷新令牌
-        setRedisValue(StrUtil.format(RedisConstants.Auth.USER_REFRESH_TOKEN, onlineUser.getUserId()),
+        setRedisValue(StrUtil.format(RedisConstants.Auth.USER_REFRESH_TOKEN, userSession.getUserId()),
                 refreshToken,
                 securityProperties.getSession().getRefreshTokenTimeToLive());
     }
 
     /**
      * 处理单设备登录控制
+     * <p>
+     * 当配置不允许多设备登录时，新登录会使旧Token失效
      *
      * @param userId      用户ID
      * @param accessToken 新生成的访问令牌
@@ -247,27 +260,27 @@ public class RedisTokenManager implements TokenManager {
      * 存储新的访问令牌
      *
      * @param newAccessToken 新访问令牌
-     * @param onlineUser     在线用户信息
+     * @param userSession    用户会话信息
      */
-    private void storeAccessToken(String newAccessToken, OnlineUser onlineUser) {
-        setRedisValue(StrUtil.format(RedisConstants.Auth.ACCESS_TOKEN_USER, newAccessToken), onlineUser, securityProperties.getSession().getAccessTokenTimeToLive());
-        String userAccessKey = StrUtil.format(RedisConstants.Auth.USER_ACCESS_TOKEN, onlineUser.getUserId());
+    private void storeAccessToken(String newAccessToken, UserSession userSession) {
+        setRedisValue(StrUtil.format(RedisConstants.Auth.ACCESS_TOKEN_USER, newAccessToken), userSession, securityProperties.getSession().getAccessTokenTimeToLive());
+        String userAccessKey = StrUtil.format(RedisConstants.Auth.USER_ACCESS_TOKEN, userSession.getUserId());
         setRedisValue(userAccessKey, newAccessToken, securityProperties.getSession().getAccessTokenTimeToLive());
     }
 
     /**
      * 构建用户详情对象
      *
-     * @param onlineUser  在线用户信息
+     * @param userSession 用户会话信息
      * @param authorities 权限集合
      * @return SysUserDetails 用户详情
      */
-    private SysUserDetails buildUserDetails(OnlineUser onlineUser, Set<SimpleGrantedAuthority> authorities) {
+    private SysUserDetails buildUserDetails(UserSession userSession, Set<SimpleGrantedAuthority> authorities) {
         SysUserDetails userDetails = new SysUserDetails();
-        userDetails.setUserId(onlineUser.getUserId());
-        userDetails.setUsername(onlineUser.getUsername());
-        userDetails.setDeptId(onlineUser.getDeptId());
-        userDetails.setDataScope(onlineUser.getDataScope());
+        userDetails.setUserId(userSession.getUserId());
+        userDetails.setUsername(userSession.getUsername());
+        userDetails.setDeptId(userSession.getDeptId());
+        userDetails.setDataScopes(userSession.getDataScopes());
         userDetails.setAuthorities(authorities);
         return userDetails;
     }

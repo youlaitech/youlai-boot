@@ -7,6 +7,7 @@ import cn.hutool.core.util.StrUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import com.youlai.boot.common.enums.DataScopeEnum;
 import com.youlai.boot.core.exception.BusinessException;
 import com.youlai.boot.system.converter.RoleConverter;
 import com.youlai.boot.system.mapper.RoleMapper;
@@ -18,6 +19,7 @@ import com.youlai.boot.system.model.vo.RolePageVO;
 import com.youlai.boot.common.constant.SystemConstants;
 import com.youlai.boot.common.model.Option;
 import com.youlai.boot.security.util.SecurityUtils;
+import com.youlai.boot.system.service.RoleDeptService;
 import com.youlai.boot.system.service.RoleMenuService;
 import com.youlai.boot.system.service.RoleService;
 import com.youlai.boot.system.service.UserRoleService;
@@ -41,6 +43,7 @@ import java.util.Set;
 public class RoleServiceImpl extends ServiceImpl<RoleMapper, Role> implements RoleService {
 
     private final RoleMenuService roleMenuService;
+    private final RoleDeptService roleDeptService;
     private final UserRoleService userRoleService;
     private final RoleConverter roleConverter;
 
@@ -48,7 +51,7 @@ public class RoleServiceImpl extends ServiceImpl<RoleMapper, Role> implements Ro
      * 角色分页列表
      *
      * @param queryParams 角色查询参数
-     * @return {@link Page< RolePageVo >} – 角色分页列表
+     * @return {@link Page< RolePageVO >} – 角色分页列表
      */
     @Override
     public Page<RolePageVO> getRolePage(RoleQuery queryParams) {
@@ -99,6 +102,7 @@ public class RoleServiceImpl extends ServiceImpl<RoleMapper, Role> implements Ro
      * @return {@link Boolean}
      */
     @Override
+    @Transactional(rollbackFor = Exception.class)
     public boolean saveRole(RoleForm roleForm) {
 
         Long roleId = roleForm.getId();
@@ -123,6 +127,16 @@ public class RoleServiceImpl extends ServiceImpl<RoleMapper, Role> implements Ro
 
         boolean result = this.saveOrUpdate(role);
         if (result) {
+            // 保存自定义数据权限部门
+            Long savedRoleId = role.getId();
+            if (DataScopeEnum.CUSTOM.getValue().equals(roleForm.getDataScope())) {
+                // 自定义数据权限时，保存角色部门关联
+                roleDeptService.saveRoleDepts(savedRoleId, roleForm.getDeptIds());
+            } else {
+                // 非自定义数据权限时，删除原有部门关联
+                roleDeptService.deleteByRoleId(savedRoleId);
+            }
+
             // 判断角色编码或状态是否修改，修改了则刷新权限缓存
             if (oldRole != null
                     && (
@@ -144,7 +158,13 @@ public class RoleServiceImpl extends ServiceImpl<RoleMapper, Role> implements Ro
     @Override
     public RoleForm getRoleForm(Long roleId) {
         Role entity = this.getById(roleId);
-        return roleConverter.toForm(entity);
+        RoleForm roleForm = roleConverter.toForm(entity);
+        // 如果是自定义数据权限，查询关联的部门ID列表
+        if (roleForm != null && DataScopeEnum.CUSTOM.getValue().equals(roleForm.getDataScope())) {
+            List<Long> deptIds = roleDeptService.getDeptIdsByRoleId(roleId);
+            roleForm.setDeptIds(deptIds);
+        }
+        return roleForm;
     }
 
     /**
@@ -252,6 +272,72 @@ public class RoleServiceImpl extends ServiceImpl<RoleMapper, Role> implements Ro
     public Integer getMaximumDataScope(Set<String> roles) {
         Integer dataScope = this.baseMapper.getMaximumDataScope(roles);
         return dataScope;
+    }
+
+    /**
+     * 获取角色的部门ID列表（自定义数据权限）
+     *
+     * @param roleId 角色ID
+     * @return 部门ID列表
+     */
+    @Override
+    public List<Long> getRoleDeptIds(Long roleId) {
+        return roleDeptService.getDeptIdsByRoleId(roleId);
+    }
+
+    /**
+     * 获取用户所有角色的数据权限列表
+     * <p>
+     * 用于实现多角色数据权限合并（并集策略）
+     *
+     * @param roleCodes 角色编码集合
+     * @return 角色数据权限列表
+     */
+    @Override
+    public List<RoleDataScope> getRoleDataScopes(Set<String> roleCodes) {
+        if (CollectionUtil.isEmpty(roleCodes)) {
+            return List.of();
+        }
+
+        // 获取角色的数据权限信息
+        List<Map<String, Object>> roleDataScopeList = this.baseMapper.getRoleDataScopeList(roleCodes);
+        if (CollectionUtil.isEmpty(roleDataScopeList)) {
+            return List.of();
+        }
+
+        // 获取所有自定义数据权限的角色编码
+        List<String> customRoleCodes = roleDataScopeList.stream()
+                .filter(map -> DataScopeEnum.CUSTOM.getValue().equals(map.get("data_scope")))
+                .map(map -> (String) map.get("code"))
+                .toList();
+
+        // 批量获取自定义角色的部门ID
+        Map<String, List<Long>> customDeptIdsMap = new java.util.HashMap<>();
+        if (CollectionUtil.isNotEmpty(customRoleCodes)) {
+            // 查询每个角色关联的部门ID
+            for (String roleCode : customRoleCodes) {
+                // 根据角色编码获取角色ID
+                Role role = this.getOne(new LambdaQueryWrapper<Role>()
+                        .eq(Role::getCode, roleCode)
+                        .select(Role::getId));
+                if (role != null) {
+                    List<Long> deptIds = roleDeptService.getDeptIdsByRoleId(role.getId());
+                    customDeptIdsMap.put(roleCode, deptIds);
+                }
+            }
+        }
+
+        // 构建角色数据权限列表
+        return roleDataScopeList.stream()
+                .map(map -> {
+                    String code = (String) map.get("code");
+                    Integer dataScope = (Integer) map.get("data_scope");
+                    if (DataScopeEnum.CUSTOM.getValue().equals(dataScope)) {
+                        return RoleDataScope.custom(code, customDeptIdsMap.getOrDefault(code, List.of()));
+                    }
+                    return new RoleDataScope(code, dataScope, null);
+                })
+                .toList();
     }
 
 }

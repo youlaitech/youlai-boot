@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.youlai.boot.system.mapper.RoleDeptMapper">
+
+    <!-- 根据角色ID获取部门ID列表 -->
+    <select id="getDeptIdsByRoleId" resultType="java.lang.Long">
+        SELECT dept_id
+        FROM sys_role_dept
+        WHERE role_id = #{roleId}
+    </select>
+
+    <!-- 根据角色编码集合获取所有部门ID列表 -->
+    <select id="getDeptIdsByRoleCodes" resultType="java.lang.Long">
+        SELECT DISTINCT rd.dept_id
+        FROM sys_role_dept rd
+        INNER JOIN sys_role r ON rd.role_id = r.id
+        WHERE r.code IN
+        <foreach collection="roleCodes" item="roleCode" separator="," open="(" close=")">
+            #{roleCode}
+        </foreach>
+        AND r.is_deleted = 0
+    </select>
+
+</mapper>

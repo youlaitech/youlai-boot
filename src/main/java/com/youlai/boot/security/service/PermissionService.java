@@ -2,18 +2,21 @@ package com.youlai.boot.security.service;
 
 import cn.hutool.core.collection.CollectionUtil;
 import cn.hutool.core.util.StrUtil;
-import com.youlai.boot.common.constant.RedisConstants;
 import com.youlai.boot.security.util.SecurityUtils;
+import com.youlai.boot.system.service.RoleMenuService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Component;
 import org.springframework.util.PatternMatchUtils;
 
-import java.util.*;
+import java.util.Set;
 
 /**
- * SpringSecurity 权限校验
+ * Spring Security 权限校验组件
+ * <p>
+ * 用于 SpEL 表达式权限校验，如：@PreAuthorize("@ss.hasPerm('sys:user:add')")
+ * <p>
+ * 权限数据来源：{@link RoleMenuService#getRolePermsByRoleCodes}（带 Redis 缓存）
  *
  * @author Ray.Hao
  * @since 0.0.1
@@ -23,19 +26,21 @@ import java.util.*;
 @Slf4j
 public class PermissionService {
 
-    private final RedisTemplate<String, Object> redisTemplate;
+    private final RoleMenuService roleMenuService;
 
     /**
      * 判断当前登录用户是否拥有操作权限
+     * <p>
+     * 支持通配符匹配，如：权限码 "sys:user:*" 可匹配 "sys:user:add"、"sys:user:delete" 等
      *
      * @param requiredPerm 所需权限
      * @return 是否有权限
      */
     public boolean hasPerm(String requiredPerm) {
-
         if (StrUtil.isBlank(requiredPerm)) {
             return false;
         }
+
         // 超级管理员放行
         if (SecurityUtils.isRoot()) {
             return true;
@@ -47,52 +52,21 @@ public class PermissionService {
             return false;
         }
 
-        // 获取当前登录用户的所有角色的权限列表
-        Set<String> rolePerms = this.getRolePermsFormCache(roleCodes);
+        // 获取当前登录用户的所有角色的权限列表（从缓存读取）
+        Set<String> rolePerms = roleMenuService.getRolePermsByRoleCodes(roleCodes);
         if (CollectionUtil.isEmpty(rolePerms)) {
             return false;
         }
-        // 判断当前登录用户的所有角色的权限列表中是否包含所需权限
+
+        // 判断权限列表中是否包含所需权限（支持通配符）
         boolean hasPermission = rolePerms.stream()
-                .anyMatch(rolePerm ->
-                        // 匹配权限，支持通配符(* 等)
-                        PatternMatchUtils.simpleMatch(rolePerm, requiredPerm)
-                );
+                .anyMatch(rolePerm -> PatternMatchUtils.simpleMatch(rolePerm, requiredPerm));
 
         if (!hasPermission) {
-            log.error("用户无操作权限：{}",requiredPerm);
+            log.warn("用户无操作权限：userId={}, username={}, requiredPerm={}",
+                    SecurityUtils.getUserId(), SecurityUtils.getUsername(), requiredPerm);
         }
         return hasPermission;
-    }
-
-
-    /**
-     * 从缓存中获取角色权限列表
-     *
-     * @param roleCodes 角色编码集合
-     * @return 角色权限列表
-     */
-    public Set<String> getRolePermsFormCache(Set<String> roleCodes) {
-        if (CollectionUtil.isEmpty(roleCodes)) {
-            return Collections.emptySet();
-        }
-
-        // 构建缓存Key
-        String cacheKey = RedisConstants.System.ROLE_PERMS;
-
-        Set<String> perms = new HashSet<>();
-        Collection<Object> roleCodesAsObjects = new ArrayList<>(roleCodes);
-        List<Object> rolePermsList = redisTemplate.opsForHash().multiGet(cacheKey, roleCodesAsObjects);
-
-        for (Object rolePermsObj : rolePermsList) {
-            if (rolePermsObj instanceof Set) {
-                @SuppressWarnings("unchecked")
-                Set<String> rolePerms = (Set<String>) rolePermsObj;
-                perms.addAll(rolePerms);
-            }
-        }
-
-        return perms;
     }
 
 }

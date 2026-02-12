@@ -25,10 +25,8 @@ import com.youlai.boot.system.model.vo.UserNoticePageVO;
 import com.youlai.boot.system.model.vo.NoticeDetailVO;
 import com.youlai.boot.system.service.NoticeService;
 import com.youlai.boot.system.service.UserNoticeService;
-import com.youlai.boot.system.service.UserOnlineService;
 import com.youlai.boot.system.service.UserService;
-import com.youlai.boot.platform.websocket.publisher.WebSocketPublisher;
-import com.youlai.boot.platform.websocket.topic.WebSocketTopics;
+import com.youlai.boot.platform.websocket.service.WebSocketService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -53,14 +51,13 @@ public class NoticeServiceImpl extends ServiceImpl<NoticeMapper, Notice> impleme
     private final NoticeConverter noticeConverter;
     private final UserNoticeService userNoticeService;
     private final UserService userService;
-    private final WebSocketPublisher webSocketPublisher;
-    private final UserOnlineService userOnlineService;
+    private final WebSocketService webSocketService;
 
     /**
      * 获取通知公告分页列表
      *
      * @param queryParams 查询参数
-     * @return {@link IPage< NoticePageVo >} 通知公告分页列表
+     * @return {@link IPage< NoticePageVO >} 通知公告分页列表
      */
     @Override
     public IPage<NoticePageVO> getNoticePage(NoticeQuery queryParams) {
@@ -214,9 +211,10 @@ public class NoticeServiceImpl extends ServiceImpl<NoticeMapper, Notice> impleme
 
             Set<String> receivers = targetUserList.stream().map(User::getUsername).collect(Collectors.toSet());
 
-            Set<String> allOnlineUsers = userOnlineService.getOnlineUsers().stream()
-              .map(UserOnlineService.UserOnlineDTO::getUsername)
-              .collect(Collectors.toSet());
+            // 获取在线用户名集合
+            Set<String> allOnlineUsers = webSocketService.getOnlineUsers().stream()
+                    .map(dto -> dto.getUsername())
+                    .collect(Collectors.toSet());
 
             // 找出在线用户的通知接收者
             Set<String> onlineReceivers = new HashSet<>(CollectionUtil.intersection(receivers, allOnlineUsers));
@@ -227,7 +225,8 @@ public class NoticeServiceImpl extends ServiceImpl<NoticeMapper, Notice> impleme
             noticeDto.setType(notice.getType());
             noticeDto.setPublishTime(notice.getPublishTime());
 
-            onlineReceivers.forEach(receiver -> webSocketPublisher.publishToUser(receiver, WebSocketTopics.USER_QUEUE_MESSAGE, noticeDto));
+            // 向在线接收者推送通知
+            onlineReceivers.forEach(receiver -> webSocketService.sendNotification(receiver, noticeDto));
         }
         return publishResult;
     }
@@ -268,7 +267,7 @@ public class NoticeServiceImpl extends ServiceImpl<NoticeMapper, Notice> impleme
     /**
      *
      * @param id 通知公告ID
-     * @return NoticeDetailVo 通知公告详情
+     * @return NoticeDetailVO 通知公告详情
      */
     @Override
     public NoticeDetailVO getNoticeDetail(Long id) {

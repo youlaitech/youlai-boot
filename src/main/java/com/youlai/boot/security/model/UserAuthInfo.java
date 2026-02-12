@@ -2,6 +2,7 @@ package com.youlai.boot.security.model;
 
 import lombok.Data;
 
+import java.util.List;
 import java.util.Set;
 
 /**
@@ -52,7 +53,9 @@ public class UserAuthInfo {
     private Set<String> roles;
 
     /**
-     * 数据权限范围
+     * 数据权限列表
+     * <p>
+     * 存储用户所有角色的数据权限范围，用于实现多角色权限合并（并集策略）
      */
-    private Integer dataScope;
+    private List<RoleDataScope> dataScopes;
 }
