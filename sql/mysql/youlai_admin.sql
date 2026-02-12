@@ -299,7 +299,7 @@ CREATE TABLE `sys_role_dept`  (
                                   `role_id` bigint NOT NULL COMMENT '角色ID',
                                   `dept_id` bigint NOT NULL COMMENT '部门ID',
                                   UNIQUE INDEX `uk_roleid_deptid`(`role_id` ASC, `dept_id` ASC) USING BTREE COMMENT '角色部门唯一索引'
-) ENGINE = InnoDB CHARACTER SET = utf8mb4 COMMENT = '角色部门关联表(用于自定义数据权限)';
+) ENGINE = InnoDB CHARACTER SET = utf8mb4 COMMENT = '角色部门关联表';
 
 -- ============================================
 -- 系统管理员角色菜单权限（role_id=2）

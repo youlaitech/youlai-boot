@@ -29,7 +29,6 @@ import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.stereotype.Service;
 
 import java.util.*;
-import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
 /**
@@ -39,7 +38,7 @@ import java.util.stream.Collectors;
  * <ul>
  *   <li>Access Token + Refresh Token 双令牌机制</li>
  *   <li>Token 撤销（jti黑名单）</li>
- *   <li>用户级会话失效（tokenValidAfter）</li>
+ *   <li>用户级会话失效（tokenVersion）</li>
  *   <li>多角色数据权限存储</li>
  * </ul>
  *
@@ -49,9 +48,6 @@ import java.util.stream.Collectors;
 @ConditionalOnProperty(value = "security.session.type", havingValue = "jwt")
 @Service
 public class JwtTokenManager implements TokenManager {
-
-    /** tokenValidAfter 默认过期时间（7天），避免Redis内存泄漏 */
-    private static final long TOKEN_VALID_AFTER_TTL_SECONDS = 7 * 24 * 60 * 60;
 
     private final SecurityProperties securityProperties;
     private final RedisTemplate<String, Object> redisTemplate;
@@ -158,7 +154,7 @@ public class JwtTokenManager implements TokenManager {
      * <ol>
      *   <li>签名验证 + 过期时间检查</li>
      *   <li>刷新令牌类型校验（仅刷新场景）</li>
-     *   <li>tokenValidAfter 校验（用户级会话失效）</li>
+     *   <li>tokenVersion 校验（用户级会话失效）</li>
      *   <li>jti 黑名单校验（单Token撤销）</li>
      * </ol>
      *
@@ -182,21 +178,19 @@ public class JwtTokenManager implements TokenManager {
                     return false;
                 }
             }
-            // 2. 校验 tokenValidAfter（用于按用户维度失效历史 Token）
-            //    场景示例：用户修改密码、被管理员强制下线、手动“踢所有端”后，更新 tokenValidAfter，早于该时间签发的 Token 全部失效
+            // 2. 校验 tokenVersion（用于按用户维度失效历史 Token）
+            //    场景示例：用户修改密码、被管理员强制下线、手动"踢所有端"后，递增 tokenVersion，
+            //    之前签发的 Token 因版本号不匹配而失效
             Long userId = payloads.getLong(JwtClaimConstants.USER_ID);
             if (userId != null) {
-                Object issuedAtObj = payloads.get(JWTPayload.ISSUED_AT);
-                long issuedAtSeconds = 0;
-                if (issuedAtObj instanceof Date issuedAtDate) {
-                    issuedAtSeconds = issuedAtDate.getTime() / 1000;
-                }
+                Integer tokenVersion = payloads.getInt(JwtClaimConstants.TOKEN_VERSION);
+                
+                String versionKey = StrUtil.format(RedisConstants.Auth.USER_TOKEN_VERSION, userId);
+                Object currentVersionObj = redisTemplate.opsForValue().get(versionKey);
+                int currentVersion = currentVersionObj != null ? Convert.toInt(currentVersionObj) : 0;
 
-                String validAfterKey = StrUtil.format(RedisConstants.Auth.USER_TOKEN_VALID_AFTER, userId);
-                Object validAfterObj = redisTemplate.opsForValue().get(validAfterKey);
-                long validAfterSeconds = validAfterObj != null ? Convert.toLong(validAfterObj) : 0;
-
-                if (issuedAtSeconds < validAfterSeconds) {
+                // 版本号不匹配则 Token 无效（新签发的 Token 版本号必须 >= Redis 中的版本号）
+                if (tokenVersion == null || tokenVersion < currentVersion) {
                     return false;
                 }
             }
@@ -273,13 +267,14 @@ public class JwtTokenManager implements TokenManager {
     /**
      * 失效指定用户的所有会话
      * <p>
-     * 通过更新用户 tokenValidAfter 时间戳，使早于该时间签发的 Token 全部失效。
+     * 通过递增用户 tokenVersion，使该用户之前签发的所有 Token 因版本号不匹配而失效。
      * <p>
      * 适用场景：
      * <ul>
      *   <li>用户修改密码</li>
      *   <li>管理员强制下线用户</li>
      *   <li>用户主动踢出所有设备</li>
+     *   <li>用户被禁用</li>
      * </ul>
      *
      * @param userId 用户ID
@@ -290,10 +285,9 @@ public class JwtTokenManager implements TokenManager {
             return;
         }
 
-        String validAfterKey = StrUtil.format(RedisConstants.Auth.USER_TOKEN_VALID_AFTER, userId);
-        long nowSeconds = System.currentTimeMillis() / 1000;
-        // 设置过期时间，避免Redis内存泄漏
-        redisTemplate.opsForValue().set(validAfterKey, nowSeconds, TOKEN_VALID_AFTER_TTL_SECONDS, TimeUnit.SECONDS);
+        String versionKey = StrUtil.format(RedisConstants.Auth.USER_TOKEN_VERSION, userId);
+        // 递增版本号，无需设置 TTL（版本号永久有效，避免 TTL 过期导致的安全问题）
+        redisTemplate.opsForValue().increment(versionKey);
     }
 
     /**
@@ -341,6 +335,7 @@ public class JwtTokenManager implements TokenManager {
      *   <li>dataScopes - 数据权限列表</li>
      *   <li>authorities - 角色权限集合</li>
      *   <li>tokenType - 是否为刷新令牌</li>
+     *   <li>tokenVersion - Token版本号（用于会话失效控制）</li>
      *   <li>iat/exp - 签发/过期时间</li>
      *   <li>jti - Token唯一标识（用于撤销）</li>
      * </ul>
@@ -376,6 +371,16 @@ public class JwtTokenManager implements TokenManager {
                 .map(GrantedAuthority::getAuthority)
                 .collect(Collectors.toSet());
         payload.put(JwtClaimConstants.AUTHORITIES, roles);
+
+        // 获取当前用户的 Token 版本号，用于会话失效控制
+        Long userId = userDetails.getUserId();
+        int tokenVersion = 0;
+        if (userId != null) {
+            String versionKey = StrUtil.format(RedisConstants.Auth.USER_TOKEN_VERSION, userId);
+            Object versionObj = redisTemplate.opsForValue().get(versionKey);
+            tokenVersion = versionObj != null ? Convert.toInt(versionObj) : 0;
+        }
+        payload.put(JwtClaimConstants.TOKEN_VERSION, tokenVersion);
 
         Date now = new Date();
         payload.put(JWTPayload.ISSUED_AT, now);

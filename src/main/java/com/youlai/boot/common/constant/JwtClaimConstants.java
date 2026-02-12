@@ -37,4 +37,12 @@ public interface JwtClaimConstants {
      */
     String AUTHORITIES = "authorities";
 
+    /**
+     * Token 版本号
+     * <p>
+     * 用于用户级会话失效，当用户修改密码、被禁用、强制下线时递增版本号，
+     * 使该用户之前签发的所有 Token 失效。
+     */
+    String TOKEN_VERSION = "tokenVersion";
+
 }

@@ -37,8 +37,8 @@ public interface RedisConstants {
         // 已撤销 Token 的 JTI（单端退出/会话注销）：如果 jti 在撤销列表中，则 Token 立即无效
         String BLACKLIST_TOKEN = "auth:token:blacklist:{}";
         String REVOKED_JTI = BLACKLIST_TOKEN;
-        // 用户 Token 生效起点（用于按用户失效历史 JWT）：token.iat < tokenValidAfter => token 无效
-        String USER_TOKEN_VALID_AFTER = "auth:user:token_valid_after:{}";
+        // 用户 Token 版本号（用于按用户失效历史 JWT）：token.tokenVersion != redis.tokenVersion => token 无效
+        String USER_TOKEN_VERSION = "auth:user:token_version:{}";
     }
 
     /**
