@@ -2,6 +2,7 @@ package com.youlai.boot.security.model;
 
 import org.springframework.security.authentication.AbstractAuthenticationToken;
 import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.AuthorityUtils;
 
 import java.io.Serial;
 import java.util.Collection;
@@ -48,7 +49,7 @@ public class SmsAuthenticationToken extends AbstractAuthenticationToken {
      * @param verifyCode  短信验证码
      */
     public SmsAuthenticationToken(String mobile, String verifyCode) {
-        super(null);
+        super(AuthorityUtils.NO_AUTHORITIES);
         this.principal = mobile;
         this.credentials = verifyCode;
         setAuthenticated(false);

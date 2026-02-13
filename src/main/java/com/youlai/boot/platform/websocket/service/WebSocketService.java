@@ -1,5 +1,9 @@
 package com.youlai.boot.platform.websocket.service;
 
+import com.youlai.boot.platform.websocket.dto.OnlineUserDTO;
+
+import java.util.List;
+
 /**
  * WebSocket服务接口
  * <p>
@@ -43,4 +47,11 @@ public interface WebSocketService {
      * @param message  通知消息内容
      */
     void sendNotification(String username, Object message);
-} 
+
+    /**
+     * 获取在线用户列表
+     *
+     * @return 在线用户信息列表
+     */
+    List<OnlineUserDTO> getOnlineUsers();
+}

@@ -8,6 +8,7 @@ import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.youlai.boot.core.exception.BusinessException;
+import com.youlai.boot.platform.websocket.dto.OnlineUserDTO;
 import com.youlai.boot.security.util.SecurityUtils;
 import com.youlai.boot.system.converter.NoticeConverter;
 import com.youlai.boot.system.enums.NoticePublishStatusEnum;
@@ -213,7 +214,7 @@ public class NoticeServiceImpl extends ServiceImpl<NoticeMapper, Notice> impleme
 
             // 获取在线用户名集合
             Set<String> allOnlineUsers = webSocketService.getOnlineUsers().stream()
-                    .map(dto -> dto.getUsername())
+                    .map(OnlineUserDTO::getUsername)
                     .collect(Collectors.toSet());
 
             // 找出在线用户的通知接收者

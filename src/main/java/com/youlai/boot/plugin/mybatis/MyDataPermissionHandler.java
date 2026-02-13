@@ -16,11 +16,11 @@ import net.sf.jsqlparser.expression.operators.conditional.OrExpression;
 import net.sf.jsqlparser.expression.operators.relational.EqualsTo;
 import net.sf.jsqlparser.expression.operators.relational.ExpressionList;
 import net.sf.jsqlparser.expression.operators.relational.InExpression;
+import net.sf.jsqlparser.expression.operators.relational.ParenthesedExpressionList;
 import net.sf.jsqlparser.schema.Column;
 import net.sf.jsqlparser.schema.Table;
 import net.sf.jsqlparser.statement.select.PlainSelect;
-import net.sf.jsqlparser.statement.select.Select;
-import net.sf.jsqlparser.statement.select.SubSelect;
+import net.sf.jsqlparser.statement.select.ParenthesedSelect;
 
 import java.lang.reflect.Method;
 import java.util.List;
@@ -145,7 +145,7 @@ public class MyDataPermissionHandler implements DataPermissionHandler {
         }
 
         // 用括号包裹并集条件
-        Expression finalExpression = new Parenthesis(unionExpression);
+        Expression finalExpression = new ParenthesedExpressionList<>(unionExpression);
 
         if (where == null) {
             return finalExpression;
@@ -250,8 +250,8 @@ public class MyDataPermissionHandler implements DataPermissionHandler {
         subSelectBody.setWhere(whereClause);
 
         // 构建子查询
-        SubSelect subSelect = new SubSelect();
-        subSelect.setSelectBody(subSelectBody);
+        ParenthesedSelect subSelect = new ParenthesedSelect();
+        subSelect.setSelect(subSelectBody);
 
         // 构建 IN 表达式
         return new InExpression(deptColumn, subSelect);
