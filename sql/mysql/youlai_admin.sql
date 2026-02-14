@@ -271,15 +271,10 @@ CREATE TABLE `sys_role`  (
 INSERT INTO `sys_role` VALUES (1, '超级管理员', 'ROOT', 1, 1, 1, NULL, now(), NULL, now(), 0);
 INSERT INTO `sys_role` VALUES (2, '系统管理员', 'ADMIN', 2, 1, 1, NULL, now(), NULL, NULL, 0);
 INSERT INTO `sys_role` VALUES (3, '访问游客', 'GUEST', 3, 1, 3, NULL, now(), NULL, now(), 0);
-INSERT INTO `sys_role` VALUES (4, '系统管理员1', 'ADMIN1', 4, 1, 1, NULL, now(), NULL, NULL, 0);
-INSERT INTO `sys_role` VALUES (5, '系统管理员2', 'ADMIN2', 5, 1, 1, NULL, now(), NULL, NULL, 0);
-INSERT INTO `sys_role` VALUES (6, '系统管理员3', 'ADMIN3', 6, 1, 1, NULL, now(), NULL, NULL, 0);
-INSERT INTO `sys_role` VALUES (7, '系统管理员4', 'ADMIN4', 7, 1, 1, NULL, now(), NULL, NULL, 0);
-INSERT INTO `sys_role` VALUES (8, '系统管理员5', 'ADMIN5', 8, 1, 1, NULL, now(), NULL, NULL, 0);
-INSERT INTO `sys_role` VALUES (9, '系统管理员6', 'ADMIN6', 9, 1, 1, NULL, now(), NULL, NULL, 0);
-INSERT INTO `sys_role` VALUES (10, '系统管理员7', 'ADMIN7', 10, 1, 1, NULL, now(), NULL, NULL, 0);
-INSERT INTO `sys_role` VALUES (11, '系统管理员8', 'ADMIN8', 11, 1, 1, NULL, now(), NULL, NULL, 0);
-INSERT INTO `sys_role` VALUES (12, '系统管理员9', 'ADMIN9', 12, 1, 1, NULL, now(), NULL, NULL, 0);
+INSERT INTO `sys_role` VALUES (4, '部门主管', 'DEPT_MANAGER', 4, 1, 2, NULL, now(), NULL, now(), 0);
+INSERT INTO `sys_role` VALUES (5, '部门成员', 'DEPT_MEMBER', 5, 1, 3, NULL, now(), NULL, now(), 0);
+INSERT INTO `sys_role` VALUES (6, '普通员工', 'EMPLOYEE', 6, 1, 4, NULL, now(), NULL, now(), 0);
+INSERT INTO `sys_role` VALUES (7, '自定义权限用户', 'CUSTOM_USER', 7, 1, 5, NULL, now(), NULL, now(), 0);
 
 -- ----------------------------
 -- Table structure for sys_role_menu
@@ -301,6 +296,12 @@ CREATE TABLE `sys_role_dept`  (
                                   UNIQUE INDEX `uk_roleid_deptid`(`role_id` ASC, `dept_id` ASC) USING BTREE COMMENT '角色部门唯一索引'
 ) ENGINE = InnoDB CHARACTER SET = utf8mb4 COMMENT = '角色部门关联表';
 
+-- ----------------------------
+-- Records of sys_role_dept
+-- ----------------------------
+INSERT IGNORE INTO `sys_role_dept` VALUES (7, 1);
+INSERT IGNORE INTO `sys_role_dept` VALUES (7, 2);
+
 -- ============================================
 -- 系统管理员角色菜单权限（role_id=2）
 -- 顶级目录
@@ -315,6 +316,22 @@ INSERT INTO `sys_role_menu` VALUES (2, 251), (2, 2511), (2, 2512), (2, 2513), (2
 INSERT INTO `sys_role_menu` VALUES (2, 260);
 INSERT INTO `sys_role_menu` VALUES (2, 270), (2, 2701), (2, 2702), (2, 2703), (2, 2704), (2, 2705);
 INSERT INTO `sys_role_menu` VALUES (2, 280), (2, 2801), (2, 2802), (2, 2803), (2, 2804), (2, 2805), (2, 2806);
+
+INSERT IGNORE INTO `sys_role_menu` VALUES (4, 1);
+INSERT IGNORE INTO `sys_role_menu` VALUES (4, 210), (4, 2101), (4, 2102), (4, 2103), (4, 2104), (4, 2105), (4, 2106), (4, 2107);
+INSERT IGNORE INTO `sys_role_menu` VALUES (4, 220), (4, 2201), (4, 2202), (4, 2203), (4, 2204), (4, 2205);
+
+INSERT IGNORE INTO `sys_role_menu` VALUES (5, 1);
+INSERT IGNORE INTO `sys_role_menu` VALUES (5, 210), (5, 2101), (5, 2102), (5, 2103), (5, 2104), (5, 2105), (5, 2106), (5, 2107);
+INSERT IGNORE INTO `sys_role_menu` VALUES (5, 220), (5, 2201), (5, 2202), (5, 2203), (5, 2204), (5, 2205);
+
+INSERT IGNORE INTO `sys_role_menu` VALUES (6, 1);
+INSERT IGNORE INTO `sys_role_menu` VALUES (6, 210), (6, 2101), (6, 2102), (6, 2103), (6, 2104), (6, 2105), (6, 2106), (6, 2107);
+INSERT IGNORE INTO `sys_role_menu` VALUES (6, 220), (6, 2201), (6, 2202), (6, 2203), (6, 2204), (6, 2205);
+
+INSERT IGNORE INTO `sys_role_menu` VALUES (7, 1);
+INSERT IGNORE INTO `sys_role_menu` VALUES (7, 210), (7, 2101), (7, 2102), (7, 2103), (7, 2104), (7, 2105), (7, 2106), (7, 2107);
+INSERT IGNORE INTO `sys_role_menu` VALUES (7, 220), (7, 2201), (7, 2202), (7, 2203), (7, 2204), (7, 2205);
 -- 代码生成
 INSERT INTO `sys_role_menu` VALUES (2, 310);
 -- 平台文档
@@ -358,6 +375,10 @@ CREATE TABLE `sys_user`  (
 INSERT INTO `sys_user` VALUES (1, 'root', '有来技术', 0, '$2a$10$xVWsNOhHrCxh5UbpCE7/HuJ.PAOKcYAqRxD2CO2nVnJS.IAXkr5aq', NULL, 'https://foruda.gitee.com/images/1723603502796844527/03cdca2a_716974.gif', '18812345677', 1, 'youlaitech@163.com', now(), NULL, now(), NULL, 0);
 INSERT INTO `sys_user` VALUES (2, 'admin', '系统管理员', 1, '$2a$10$xVWsNOhHrCxh5UbpCE7/HuJ.PAOKcYAqRxD2CO2nVnJS.IAXkr5aq', 1, 'https://foruda.gitee.com/images/1723603502796844527/03cdca2a_716974.gif', '18812345678', 1, 'youlaitech@163.com', now(), NULL, now(), NULL, 0);
 INSERT INTO `sys_user` VALUES (3, 'test', '测试小用户', 1, '$2a$10$xVWsNOhHrCxh5UbpCE7/HuJ.PAOKcYAqRxD2CO2nVnJS.IAXkr5aq', 3, 'https://foruda.gitee.com/images/1723603502796844527/03cdca2a_716974.gif', '18812345679', 1, 'youlaitech@163.com', now(), NULL, now(), NULL, 0);
+INSERT INTO `sys_user` VALUES (4, 'dept_manager', '部门主管', 1, '$2a$10$xVWsNOhHrCxh5UbpCE7/HuJ.PAOKcYAqRxD2CO2nVnJS.IAXkr5aq', 1, 'https://foruda.gitee.com/images/1723603502796844527/03cdca2a_716974.gif', '18812345680', 1, 'manager@youlaitech.com', now(), NULL, now(), NULL, 0);
+INSERT INTO `sys_user` VALUES (5, 'dept_member', '部门成员', 1, '$2a$10$xVWsNOhHrCxh5UbpCE7/HuJ.PAOKcYAqRxD2CO2nVnJS.IAXkr5aq', 1, 'https://foruda.gitee.com/images/1723603502796844527/03cdca2a_716974.gif', '18812345681', 1, 'member@youlaitech.com', now(), NULL, now(), NULL, 0);
+INSERT INTO `sys_user` VALUES (6, 'employee', '普通员工', 1, '$2a$10$xVWsNOhHrCxh5UbpCE7/HuJ.PAOKcYAqRxD2CO2nVnJS.IAXkr5aq', 2, 'https://foruda.gitee.com/images/1723603502796844527/03cdca2a_716974.gif', '18812345682', 1, 'employee@youlaitech.com', now(), NULL, now(), NULL, 0);
+INSERT INTO `sys_user` VALUES (7, 'custom_user', '自定义权限用户', 1, '$2a$10$xVWsNOhHrCxh5UbpCE7/HuJ.PAOKcYAqRxD2CO2nVnJS.IAXkr5aq', NULL, 'https://foruda.gitee.com/images/1723603502796844527/03cdca2a_716974.gif', '18812345683', 1, 'custom@youlaitech.com', now(), NULL, now(), NULL, 0);
 
 -- ----------------------------
 -- Table structure for sys_user_role
@@ -372,9 +393,13 @@ CREATE TABLE `sys_user_role`  (
 -- ----------------------------
 -- Records of sys_user_role
 -- ----------------------------
-INSERT INTO `sys_user_role` VALUES (1, 1);
-INSERT INTO `sys_user_role` VALUES (2, 2);
-INSERT INTO `sys_user_role` VALUES (3, 3);
+INSERT IGNORE INTO `sys_user_role` VALUES (1, 1);
+INSERT IGNORE INTO `sys_user_role` VALUES (2, 2);
+INSERT IGNORE INTO `sys_user_role` VALUES (3, 3);
+INSERT IGNORE INTO `sys_user_role` VALUES (4, 4);
+INSERT IGNORE INTO `sys_user_role` VALUES (5, 5);
+INSERT IGNORE INTO `sys_user_role` VALUES (6, 6);
+INSERT IGNORE INTO `sys_user_role` VALUES (7, 7);
 
 
 -- ----------------------------

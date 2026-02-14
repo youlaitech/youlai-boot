@@ -19,4 +19,12 @@ public interface UserRoleMapper extends BaseMapper<UserRole> {
      * @param roleId 角色ID
      */
     int countUsersByRoleId(Long roleId);
+
+    /**
+     * 获取角色绑定的用户ID集合
+     *
+     * @param roleId 角色ID
+     * @return 用户ID集合
+     */
+    java.util.List<Long> listUserIdsByRoleId(Long roleId);
 }

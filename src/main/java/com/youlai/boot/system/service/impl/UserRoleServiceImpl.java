@@ -94,4 +94,12 @@ public class UserRoleServiceImpl extends ServiceImpl<UserRoleMapper, UserRole> i
     int count = this.baseMapper.countUsersByRoleId(roleId);
     return count > 0;
   }
+
+  @Override
+  public List<Long> listUserIdsByRoleId(Long roleId) {
+    if (roleId == null) {
+      return List.of();
+    }
+    return this.baseMapper.listUserIdsByRoleId(roleId);
+  }
 }

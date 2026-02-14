@@ -25,11 +25,15 @@ public class RolePageVO {
     @Schema(description="排序")
     private Integer sort;
 
+    @Schema(description="数据权限(1-所有数据 2-部门及子部门数据 3-本部门数据 4-本人数据 5-自定义部门数据)")
+    private Integer dataScope;
+
+    @Schema(description="数据权限名称")
+    private String dataScopeLabel;
+
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     private LocalDateTime createTime;
 
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     private LocalDateTime updateTime;
 }
-
- 

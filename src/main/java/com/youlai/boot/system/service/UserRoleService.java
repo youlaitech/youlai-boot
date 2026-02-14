@@ -30,4 +30,12 @@ public interface UserRoleService extends IService<UserRole> {
      * @return true：已分配 false：未分配
      */
     boolean hasAssignedUsers(Long roleId);
+
+    /**
+     * 获取角色绑定的用户ID集合
+     *
+     * @param roleId 角色ID
+     * @return 用户ID集合
+     */
+    List<Long> listUserIdsByRoleId(Long roleId);
 }

@@ -14,13 +14,8 @@ import net.sf.jsqlparser.expression.*;
 import net.sf.jsqlparser.expression.operators.conditional.AndExpression;
 import net.sf.jsqlparser.expression.operators.conditional.OrExpression;
 import net.sf.jsqlparser.expression.operators.relational.EqualsTo;
-import net.sf.jsqlparser.expression.operators.relational.ExpressionList;
-import net.sf.jsqlparser.expression.operators.relational.InExpression;
-import net.sf.jsqlparser.expression.operators.relational.ParenthesedExpressionList;
 import net.sf.jsqlparser.schema.Column;
-import net.sf.jsqlparser.schema.Table;
-import net.sf.jsqlparser.statement.select.PlainSelect;
-import net.sf.jsqlparser.statement.select.ParenthesedSelect;
+import net.sf.jsqlparser.parser.CCJSqlParserUtil;
 
 import java.lang.reflect.Method;
 import java.util.List;
@@ -89,7 +84,7 @@ public class MyDataPermissionHandler implements DataPermissionHandler {
                     return where;
                 }
                 // 使用并集策略过滤
-                return dataScopeFilterWithUnion(annotation, dataScopes, where);
+                return dataScopeFilterWithUnion(mappedStatementId, annotation, dataScopes, where);
             }
         }
         return where;
@@ -119,7 +114,8 @@ public class MyDataPermissionHandler implements DataPermissionHandler {
      * @param where       原始查询条件
      * @return 追加权限过滤后的查询条件
      */
-    private Expression dataScopeFilterWithUnion(DataPermission annotation, List<RoleDataScope> dataScopes, Expression where) {
+    @SneakyThrows
+    private Expression dataScopeFilterWithUnion(String mappedStatementId, DataPermission annotation, List<RoleDataScope> dataScopes, Expression where) {
         String deptAlias = annotation.deptAlias();
         String deptIdColumnName = annotation.deptIdColumnName();
         String userAlias = annotation.userAlias();
@@ -145,13 +141,17 @@ public class MyDataPermissionHandler implements DataPermissionHandler {
         }
 
         // 用括号包裹并集条件
-        Expression finalExpression = new ParenthesedExpressionList<>(unionExpression);
+        Expression finalExpression = CCJSqlParserUtil.parseCondExpression("(" + unionExpression + ")");
 
         if (where == null) {
+            log.debug("DataPermission applied. mappedStatementId={}, segment={}", mappedStatementId, finalExpression);
             return finalExpression;
         }
 
-        return new AndExpression(where, finalExpression);
+        Expression combined = new AndExpression(where, finalExpression);
+        log.debug("DataPermission applied. mappedStatementId={}, originWhere={}, segment={}, combined={}",
+                mappedStatementId, where, finalExpression, combined);
+        return combined;
     }
 
     /**
@@ -226,35 +226,15 @@ public class MyDataPermissionHandler implements DataPermissionHandler {
      * @param deptId     部门ID
      * @return IN 子查询表达式
      */
+    @SneakyThrows
     private Expression buildDeptAndSubExpression(Column deptColumn, Long deptId) {
-        // 构建子查询: SELECT id FROM sys_dept WHERE id = ? OR FIND_IN_SET(?, tree_path)
-        PlainSelect subSelectBody = new PlainSelect();
-        subSelectBody.setFromItem(new Table(DEPT_TABLE));
-        subSelectBody.addSelectItems(new Column(DEPT_ID_COLUMN));
-
-        // WHERE id = ?
-        EqualsTo idEquals = new EqualsTo();
-        idEquals.setLeftExpression(new Column(DEPT_ID_COLUMN));
-        idEquals.setRightExpression(new LongValue(deptId));
-
-        // FIND_IN_SET(?, tree_path)
-        Function findInSet = new Function();
-        findInSet.setName("FIND_IN_SET");
-        findInSet.setParameters(new ExpressionList<>(
-                new LongValue(deptId),
-                new Column(DEPT_TREE_PATH_COLUMN)
-        ));
-
-        // WHERE id = ? OR FIND_IN_SET(?, tree_path)
-        OrExpression whereClause = new OrExpression(idEquals, findInSet);
-        subSelectBody.setWhere(whereClause);
-
-        // 构建子查询
-        ParenthesedSelect subSelect = new ParenthesedSelect();
-        subSelect.setSelect(subSelectBody);
-
-        // 构建 IN 表达式
-        return new InExpression(deptColumn, subSelect);
+        // 使用字符串解析，避免不同 JSqlParser 版本下 InExpression/ItemsList 渲染差异导致 SQL 语法错误
+        // SQL: dept_id IN (SELECT id FROM sys_dept WHERE id = ? OR FIND_IN_SET(?, tree_path))
+        String columnName = deptColumn.toString();
+        String sql = columnName + " IN (SELECT " + DEPT_ID_COLUMN + " FROM " + DEPT_TABLE +
+                " WHERE " + DEPT_ID_COLUMN + " = " + deptId +
+                " OR FIND_IN_SET(" + deptId + ", " + DEPT_TREE_PATH_COLUMN + "))";
+        return CCJSqlParserUtil.parseCondExpression(sql);
     }
 
     /**
@@ -266,6 +246,7 @@ public class MyDataPermissionHandler implements DataPermissionHandler {
      * @param customDeptIds 自定义部门ID列表
      * @return IN 表达式，如果没有部门则返回 1=0
      */
+    @SneakyThrows
     private Expression buildCustomDeptExpression(Column deptColumn, List<Long> customDeptIds) {
         if (CollectionUtil.isEmpty(customDeptIds)) {
             // 没有自定义部门，返回 1=0（无权限）
@@ -275,13 +256,11 @@ public class MyDataPermissionHandler implements DataPermissionHandler {
             return falseCondition;
         }
 
-        // 构建 IN 表达式列表
-        ExpressionList<Expression> deptIdList = new ExpressionList<>();
-        for (Long deptId : customDeptIds) {
-            deptIdList.addExpression(new LongValue(deptId));
-        }
-
-        return new InExpression(deptColumn, deptIdList);
+        // 使用字符串解析，确保渲染始终为 IN (..)
+        String columnName = deptColumn.toString();
+        String ids = customDeptIds.stream().map(String::valueOf).reduce((a, b) -> a + "," + b).orElse("");
+        String sql = columnName + " IN (" + ids + ")";
+        return CCJSqlParserUtil.parseCondExpression(sql);
     }
 
 }

@@ -20,6 +20,10 @@ import java.util.List;
 @Mapper(componentModel = "spring")
 public interface RoleConverter {
 
+    @Mapping(target = "dataScope", source = "dataScope")
+    @Mapping(target = "dataScopeLabel", expression = "java(com.youlai.boot.common.enums.DataScopeEnum.getByValue(role.getDataScope()) == null ? null : com.youlai.boot.common.enums.DataScopeEnum.getByValue(role.getDataScope()).getLabel())")
+    RolePageVO toPageVo(Role role);
+
     Page<RolePageVO> toPageVo(Page<Role> page);
 
     @Mappings({
