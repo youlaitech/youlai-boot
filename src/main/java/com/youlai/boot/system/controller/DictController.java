@@ -1,7 +1,7 @@
 package com.youlai.boot.system.controller;
 
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
-import com.youlai.boot.shared.dto.Option;
+import com.youlai.boot.common.model.Option;
 import com.youlai.boot.common.result.PageResult;
 import com.youlai.boot.common.result.Result;
 import com.youlai.boot.common.enums.ActionTypeEnum;
@@ -17,7 +17,7 @@ import com.youlai.boot.system.model.form.DictForm;
 import com.youlai.boot.common.annotation.Log;
 import com.youlai.boot.system.service.DictItemService;
 import com.youlai.boot.system.service.DictService;
-import com.youlai.boot.interfaces.sse.service.SseService;
+import com.youlai.boot.module.sse.service.SseService;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import io.swagger.v3.oas.annotations.Operation;

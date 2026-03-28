@@ -1,6 +1,6 @@
 package com.youlai.boot.system.model.form;
 
-import com.youlai.boot.shared.dto.KeyValue;
+import com.youlai.boot.common.model.KeyValue;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 import org.hibernate.validator.constraints.Range;

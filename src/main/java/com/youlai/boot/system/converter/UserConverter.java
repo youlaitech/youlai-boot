@@ -1,7 +1,7 @@
 package com.youlai.boot.system.converter;
 
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
-import com.youlai.boot.shared.dto.Option;
+import com.youlai.boot.common.model.Option;
 import com.youlai.boot.system.model.entity.SysUser;
 import com.youlai.boot.system.model.vo.CurrentUserVO;
 import com.youlai.boot.system.model.form.UserForm;

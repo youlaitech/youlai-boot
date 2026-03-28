@@ -1,9 +1,8 @@
 package com.youlai.boot.framework.security.config;
 
 import cn.binarywang.wx.miniapp.api.WxMaService;
-import com.youlai.boot.framework.integration.captcha.service.CaptchaService;
+import com.youlai.boot.framework.captcha.service.CaptchaService;
 import cn.hutool.core.util.ArrayUtil;
-import com.youlai.boot.config.property.SecurityProperties;
 import com.youlai.boot.framework.web.filter.RateLimiterFilter;
 import com.youlai.boot.framework.security.filter.CaptchaValidationFilter;
 import com.youlai.boot.framework.security.filter.TokenAuthenticationFilter;
@@ -32,9 +31,6 @@ import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
-import org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerMapping;
-
-import java.util.*;
 
 /**
  * Spring Security 配置类
@@ -58,10 +54,6 @@ public class SecurityConfig {
     private final CaptchaService captchaService;
     private final ConfigService configService;
     private final SecurityProperties securityProperties;
-
-    private final WxMaService wxMaService;
-
-    private final RequestMappingHandlerMapping requestMappingHandlerMapping;
 
     /**
      * 配置安全过滤链 SecurityFilterChain

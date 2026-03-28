@@ -8,7 +8,7 @@ import com.youlai.boot.common.annotation.RepeatSubmit;
 import com.youlai.boot.common.enums.ActionTypeEnum;
 import com.youlai.boot.common.enums.LogModuleEnum;
 import com.youlai.boot.framework.security.util.SecurityUtils;
-import com.youlai.boot.shared.dto.Option;
+import com.youlai.boot.common.model.Option;
 import com.youlai.boot.common.result.ExcelResult;
 import com.youlai.boot.common.result.PageResult;
 import com.youlai.boot.common.result.Result;

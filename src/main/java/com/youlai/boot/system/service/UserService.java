@@ -2,7 +2,7 @@ package com.youlai.boot.system.service;
 
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.service.IService;
-import com.youlai.boot.shared.dto.Option;
+import com.youlai.boot.common.model.Option;
 import com.youlai.boot.framework.security.model.UserAuthInfo;
 import com.youlai.boot.system.model.vo.CurrentUserVO;
 import com.youlai.boot.system.model.vo.UserExportVO;

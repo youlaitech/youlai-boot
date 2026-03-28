@@ -35,7 +35,7 @@
     </select>
 
     <!-- 查询数据库表元数据 mysql版本-->
-    <select id="getTableMetadata" resultType="com.youlai.boot.module.codegen.model.bo.TableMetaData" databaseId="mysql">
+    <select id="getTableMetadata" resultType="com.youlai.boot.module.codegen.model.vo.TableMetaVO" databaseId="mysql">
         SELECT
             TABLE_NAME ,
             TABLE_COMMENT ,
@@ -50,7 +50,7 @@
     </select>
 
     <!-- 获取数据库表字段元数据 mysql版本-->
-    <select id="getTableColumns" resultType="com.youlai.boot.module.codegen.model.bo.ColumnMetaData" databaseId="mysql">
+    <select id="getTableColumns" resultType="com.youlai.boot.module.codegen.model.vo.ColumnMetaVO" databaseId="mysql">
         SELECT
             COLUMN_NAME,
             DATA_TYPE,

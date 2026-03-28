@@ -3,7 +3,7 @@ package com.youlai.boot.system.service;
 import com.baomidou.mybatisplus.extension.service.IService;
 import com.youlai.boot.module.codegen.model.entity.GenTable;
 import com.youlai.boot.system.model.form.MenuForm;
-import com.youlai.boot.shared.dto.Option;
+import com.youlai.boot.common.model.Option;
 import com.youlai.boot.system.model.entity.Menu;
 import com.youlai.boot.system.model.query.MenuQuery;
 import com.youlai.boot.system.model.vo.MenuVO;

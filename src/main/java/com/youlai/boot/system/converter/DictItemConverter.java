@@ -4,7 +4,7 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.youlai.boot.system.model.entity.DictItem;
 import com.youlai.boot.system.model.form.DictItemForm;
 import com.youlai.boot.system.model.vo.DictPageVO;
-import com.youlai.boot.shared.dto.Option;
+import com.youlai.boot.common.model.Option;
 import org.mapstruct.Mapper;
 
 import java.util.List;

@@ -2,7 +2,7 @@ package com.youlai.boot.system.service;
 
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.IService;
-import com.youlai.boot.shared.dto.Option;
+import com.youlai.boot.common.model.Option;
 import com.youlai.boot.system.model.entity.Dict;
 import com.youlai.boot.system.model.form.DictForm;
 import com.youlai.boot.system.model.query.DictQuery;

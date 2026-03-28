@@ -3,7 +3,7 @@ package com.youlai.boot.framework.security.util;
 import cn.hutool.core.collection.CollectionUtil;
 import cn.hutool.core.util.StrUtil;
 import com.youlai.boot.common.constant.SecurityConstants;
-import com.youlai.boot.shared.constant.SystemConstants;
+import com.youlai.boot.common.constant.SystemConstants;
 import com.youlai.boot.framework.security.model.RoleDataScope;
 import com.youlai.boot.framework.security.model.SysUserDetails;
 import jakarta.servlet.http.HttpServletRequest;

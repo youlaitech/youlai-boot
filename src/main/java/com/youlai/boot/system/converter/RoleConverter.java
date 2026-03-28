@@ -3,7 +3,7 @@ package com.youlai.boot.system.converter;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.youlai.boot.system.model.entity.Role;
 import com.youlai.boot.system.model.vo.RolePageVO;
-import com.youlai.boot.shared.dto.Option;
+import com.youlai.boot.common.model.Option;
 import com.youlai.boot.system.model.form.RoleForm;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
@@ -21,7 +21,7 @@ import java.util.List;
 public interface RoleConverter {
 
     @Mapping(target = "dataScope", source = "dataScope")
-    @Mapping(target = "dataScopeLabel", expression = "java(com.youlai.boot.shared.enums.DataScopeEnum.getByValue(role.getDataScope()) == null ? null : com.youlai.boot.shared.enums.DataScopeEnum.getByValue(role.getDataScope()).getLabel())")
+    @Mapping(target = "dataScopeLabel", expression = "java(com.youlai.boot.common.enums.DataScopeEnum.getByValue(role.getDataScope()) == null ? null : com.youlai.boot.common.enums.DataScopeEnum.getByValue(role.getDataScope()).getLabel())")
     RolePageVO toPageVo(Role role);
 
     Page<RolePageVO> toPageVo(Page<Role> page);

@@ -14,7 +14,7 @@ import com.youlai.boot.common.constant.RedisConstants;
 import com.youlai.boot.common.constant.SecurityConstants;
 import com.youlai.boot.common.exception.BusinessException;
 import com.youlai.boot.common.result.ResultCode;
-import com.youlai.boot.config.property.SecurityProperties;
+import com.youlai.boot.framework.security.config.SecurityProperties;
 import com.youlai.boot.framework.security.model.AuthenticationToken;
 import com.youlai.boot.framework.security.model.RoleDataScope;
 import org.apache.commons.lang3.StringUtils;

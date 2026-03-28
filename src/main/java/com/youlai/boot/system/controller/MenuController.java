@@ -4,7 +4,7 @@ import com.youlai.boot.common.annotation.Log;
 import com.youlai.boot.common.annotation.RepeatSubmit;
 import com.youlai.boot.common.enums.ActionTypeEnum;
 import com.youlai.boot.common.enums.LogModuleEnum;
-import com.youlai.boot.shared.dto.Option;
+import com.youlai.boot.common.model.Option;
 import com.youlai.boot.common.result.Result;
 import com.youlai.boot.system.model.form.MenuForm;
 import com.youlai.boot.system.model.query.MenuQuery;

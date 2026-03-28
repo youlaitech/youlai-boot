@@ -1,6 +1,6 @@
 package com.youlai.boot.security.token;
 
-import com.youlai.boot.config.property.SecurityProperties;
+import com.youlai.boot.framework.security.config.SecurityProperties;
 import com.youlai.boot.framework.security.model.AuthenticationToken;
 import com.youlai.boot.framework.security.model.RoleDataScope;
 import com.youlai.boot.framework.security.model.SysUserDetails;

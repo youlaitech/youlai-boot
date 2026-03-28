@@ -3,7 +3,7 @@ package com.youlai.boot.module.codegen.controller;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.youlai.boot.common.result.PageResult;
 import com.youlai.boot.common.result.Result;
-import com.youlai.boot.config.property.CodegenProperties;
+import com.youlai.boot.module.codegen.config.CodegenProperties;
 import com.youlai.boot.common.enums.ActionTypeEnum;
 import com.youlai.boot.common.enums.LogModuleEnum;
 import com.youlai.boot.module.codegen.service.CodegenService;

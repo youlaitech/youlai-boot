@@ -2,8 +2,8 @@ package com.youlai.boot.module.codegen.mapper;
 
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
-import com.youlai.boot.module.codegen.model.bo.ColumnMetaData;
-import com.youlai.boot.module.codegen.model.bo.TableMetaData;
+import com.youlai.boot.module.codegen.model.vo.ColumnMetaVO;
+import com.youlai.boot.module.codegen.model.vo.TableMetaVO;
 import com.youlai.boot.module.codegen.model.query.TableQuery;
 import com.youlai.boot.module.codegen.model.vo.TablePageVO;
 import org.apache.ibatis.annotations.Mapper;
@@ -35,13 +35,7 @@ public interface DatabaseMapper extends BaseMapper {
      * @param tableName
      * @return
      */
-    List<ColumnMetaData> getTableColumns(String tableName);
+    List<ColumnMetaVO> getTableColumns(String tableName);
 
-    /**
-     * 获取表元数据
-     *
-     * @param tableName
-     * @return
-     */
-    TableMetaData getTableMetadata(String tableName);
+    TableMetaVO getTableMetadata(String tableName);
 }

@@ -6,7 +6,7 @@ import com.youlai.boot.common.enums.LogModuleEnum;
 import com.youlai.boot.common.result.Result;
 import com.youlai.boot.auth.service.AuthService;
 import com.youlai.boot.common.annotation.Log;
-import com.youlai.boot.framework.integration.captcha.model.CaptchaInfo;
+import com.youlai.boot.framework.captcha.model.CaptchaInfo;
 import com.youlai.boot.framework.security.model.AuthenticationToken;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;

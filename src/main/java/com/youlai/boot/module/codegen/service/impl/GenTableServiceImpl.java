@@ -11,12 +11,12 @@ import com.youlai.boot.module.codegen.enums.FormTypeEnum;
 import com.youlai.boot.module.codegen.enums.JavaTypeEnum;
 import com.youlai.boot.module.codegen.enums.QueryTypeEnum;
 import com.youlai.boot.common.exception.BusinessException;
-import com.youlai.boot.config.property.CodegenProperties;
+import com.youlai.boot.module.codegen.config.CodegenProperties;
 import com.youlai.boot.module.codegen.converter.CodegenConverter;
 import com.youlai.boot.module.codegen.mapper.DatabaseMapper;
 import com.youlai.boot.module.codegen.mapper.GenTableMapper;
-import com.youlai.boot.module.codegen.model.bo.ColumnMetaData;
-import com.youlai.boot.module.codegen.model.bo.TableMetaData;
+import com.youlai.boot.module.codegen.model.vo.ColumnMetaVO;
+import com.youlai.boot.module.codegen.model.vo.TableMetaVO;
 import com.youlai.boot.module.codegen.model.entity.GenTable;
 import com.youlai.boot.module.codegen.model.entity.GenTableColumn;
 import com.youlai.boot.module.codegen.model.form.GenConfigForm;
@@ -72,7 +72,7 @@ public class GenTableServiceImpl extends ServiceImpl<GenTableMapper, GenTable> i
 
         // 如果没有代码生成配置，则根据表的元数据生成默认配置
         if (genTable == null) {
-            TableMetaData tableMetadata = databaseMapper.getTableMetadata(tableName);
+            TableMetaVO tableMetadata = databaseMapper.getTableMetadata(tableName);
             Assert.isTrue(tableMetadata != null, "未找到表元数据");
 
             genTable = new GenTable();
@@ -100,7 +100,7 @@ public class GenTableServiceImpl extends ServiceImpl<GenTableMapper, GenTable> i
         List<GenTableColumn> genTableColumns = new ArrayList<>();
 
         // 获取表的列
-        List<ColumnMetaData> tableColumns = databaseMapper.getTableColumns(tableName);
+        List<ColumnMetaVO> tableColumns = databaseMapper.getTableColumns(tableName);
         if (CollectionUtil.isNotEmpty(tableColumns)) {
             // 查询字段生成配置
             List<GenTableColumn> fieldConfigList = genTableColumnService.list(
@@ -113,7 +113,7 @@ public class GenTableServiceImpl extends ServiceImpl<GenTableMapper, GenTable> i
                     .filter(Objects::nonNull) // 过滤掉空值
                     .max(Integer::compareTo)
                     .orElse(0);
-            for (ColumnMetaData tableColumn : tableColumns) {
+            for (ColumnMetaVO tableColumn : tableColumns) {
                 // 根据列名获取字段生成配置
                 String columnName = tableColumn.getColumnName();
                 GenTableColumn fieldConfig = fieldConfigList.stream()
@@ -150,16 +150,16 @@ public class GenTableServiceImpl extends ServiceImpl<GenTableMapper, GenTable> i
     /**
      * 创建默认字段配置
      *
-     * @param columnMetaData 表字段元数据
+     * @param columnMetaVO 表字段元数据
      * @return
      */
-    private GenTableColumn createDefaultFieldConfig(ColumnMetaData columnMetaData) {
+    private GenTableColumn createDefaultFieldConfig(ColumnMetaVO columnMetaVO) {
         GenTableColumn fieldConfig = new GenTableColumn();
-        fieldConfig.setColumnName(columnMetaData.getColumnName());
-        fieldConfig.setColumnType(columnMetaData.getDataType());
-        fieldConfig.setFieldComment(columnMetaData.getColumnComment());
-        fieldConfig.setFieldName(StrUtil.toCamelCase(columnMetaData.getColumnName()));
-        fieldConfig.setIsRequired("YES".equals(columnMetaData.getIsNullable()) ? 0 : 1);
+        fieldConfig.setColumnName(columnMetaVO.getColumnName());
+        fieldConfig.setColumnType(columnMetaVO.getDataType());
+        fieldConfig.setFieldComment(columnMetaVO.getColumnComment());
+        fieldConfig.setFieldName(StrUtil.toCamelCase(columnMetaVO.getColumnName()));
+        fieldConfig.setIsRequired("YES".equals(columnMetaVO.getIsNullable()) ? 0 : 1);
 
         String columnType = StrUtil.blankToDefault(fieldConfig.getColumnType(), "").toLowerCase();
         if ("date".equals(columnType)) {
@@ -171,7 +171,7 @@ public class GenTableServiceImpl extends ServiceImpl<GenTableMapper, GenTable> i
         }
 
         fieldConfig.setQueryType(QueryTypeEnum.EQ);
-        fieldConfig.setMaxLength(columnMetaData.getCharacterMaximumLength());
+        fieldConfig.setMaxLength(columnMetaVO.getCharacterMaximumLength());
         return fieldConfig;
     }
 

@@ -3,7 +3,7 @@ package com.youlai.boot.framework.web.filter;
 import cn.hutool.core.convert.Convert;
 import cn.hutool.core.util.StrUtil;
 import com.youlai.boot.common.constant.RedisConstants;
-import com.youlai.boot.shared.constant.SystemConstants;
+import com.youlai.boot.common.constant.SystemConstants;
 import com.youlai.boot.common.result.ResultCode;
 import com.youlai.boot.common.util.IPUtils;
 import com.youlai.boot.common.result.ResponseWriter;

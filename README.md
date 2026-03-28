@@ -104,15 +104,20 @@ youlai-boot
 ├── docker/                          # Docker 部署
 ├── sql/                             # 数据库脚本
 ├── src/main/java/com/youlai/boot/
-│   ├── auth/                        # 认证模块
-│   ├── system/                      # 系统模块（用户、角色、菜单、部门）
-│   ├── module/                      # 业务模块（文件、代码生成）
-│   ├── framework/                   # 技术中台（安全、缓存、持久化、集成）
-│   ├── interfaces/                  # 对外接口（SSE）
-│   ├── shared/                      # 跨模块共享（DTO、枚举、常量）
-│   ├── common/                      # 基础能力（结果、异常、切面、工具）
-│   ├── config/                      # 全局配置
-│   └── YouLaiBootApplication.java   # 启动类
+│   ├── auth/                        # 认证授权业务
+│   ├── common/                      # 全局通用（常量、枚举、工具类、统一响应结果）
+│   ├── framework/                   # 底层技术基座（高内聚积木块）
+│   │   ├── cache/                   # Redis/Caffeine 缓存
+│   │   ├── captcha/                 # 验证码
+│   │   ├── integration/             # SMS/Mail/WxMa 集成
+│   │   ├── job/                     # XxlJob 定时任务
+│   │   ├── mybatis/                 # 数据库/MP配置/拦截器
+│   │   ├── openapi/                 # OpenAPI/Swagger 文档
+│   │   ├── security/                # 鉴权过滤器/Token机制
+│   │   └── web/                     # 跨域/全局异常/限流/Jackson
+│   ├── module/                      # 业务模块（File、Codegen 等）
+│   ├── system/                      # 核心系统模块（用户/角色/菜单/部门）
+│   └── YouLaiBootApplication.java    # 启动类
 └── pom.xml                          # Maven 配置
 ```
 

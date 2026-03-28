@@ -1,6 +1,5 @@
 package com.youlai.boot.framework.integration.mail.config;
 
-import com.youlai.boot.config.property.MailProperties;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;

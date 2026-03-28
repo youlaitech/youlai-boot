@@ -1,6 +1,6 @@
 package com.youlai.boot.auth.service;
 
-import com.youlai.boot.framework.integration.captcha.model.CaptchaInfo;
+import com.youlai.boot.framework.captcha.model.CaptchaInfo;
 import com.youlai.boot.framework.security.model.AuthenticationToken;
 
 /**

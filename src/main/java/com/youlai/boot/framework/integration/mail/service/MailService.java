@@ -1,6 +1,6 @@
 package com.youlai.boot.framework.integration.mail.service;
 
-import com.youlai.boot.config.property.MailProperties;
+import com.youlai.boot.framework.integration.mail.config.MailProperties;
 import jakarta.mail.MessagingException;
 import jakarta.mail.internet.MimeMessage;
 import lombok.RequiredArgsConstructor;
@@ -16,7 +16,7 @@ import java.io.File;
 /**
  * 邮件服务
  *
- * @author Ray
+ * @author Ray.Hao
  * @since 2024/8/17
  */
 @Service

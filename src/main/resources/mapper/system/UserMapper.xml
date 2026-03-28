@@ -34,7 +34,7 @@
                 INNER JOIN sys_role r ON sur.role_id = r.id
             WHERE
                 sur.user_id = u.id
-                AND r.code = '${@com.youlai.boot.shared.constant.SystemConstants@ROOT_ROLE_CODE}'
+                AND r.code = '${@com.youlai.boot.common.constant.SystemConstants@ROOT_ROLE_CODE}'
             )
             <if test='queryParams.keywords!=null and queryParams.keywords.trim() neq ""'>
                 AND (
@@ -186,7 +186,7 @@
                     INNER JOIN sys_role r ON sur.role_id = r.id
                 WHERE
                     sur.user_id = u.id
-                    AND r.code = '${@com.youlai.boot.shared.constant.SystemConstants@ROOT_ROLE_CODE}'
+                    AND r.code = '${@com.youlai.boot.common.constant.SystemConstants@ROOT_ROLE_CODE}'
             )
             <if test='keywords!=null and keywords.trim() neq ""'>
                 AND (u.username LIKE CONCAT('%',#{keywords},'%')

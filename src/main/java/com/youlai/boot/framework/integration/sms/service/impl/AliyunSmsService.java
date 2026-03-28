@@ -8,7 +8,7 @@ import com.aliyuncs.IAcsClient;
 import com.aliyuncs.exceptions.ClientException;
 import com.aliyuncs.http.MethodType;
 import com.aliyuncs.profile.DefaultProfile;
-import com.youlai.boot.config.property.AliyunSmsProperties;
+import com.youlai.boot.framework.integration.sms.config.AliyunSmsProperties;
 import com.youlai.boot.framework.integration.sms.enums.SmsTypeEnum;
 import com.youlai.boot.framework.integration.sms.service.SmsService;
 import lombok.RequiredArgsConstructor;
