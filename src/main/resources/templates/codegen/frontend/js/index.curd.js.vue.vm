@@ -1,5 +1,5 @@
 <template>
-  <div class="app-container h-full flex flex-1 flex-col">
+  <div class="page-container h-full flex flex-1 flex-col">
     <!-- 搜索 -->
     <PageSearch
       ref="searchRef"

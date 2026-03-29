@@ -10,7 +10,7 @@ import java.util.Collection;
 /**
  * 微信小程序认证 Token
  */
-public class WechatMiniAuthenticationToken extends AbstractAuthenticationToken {
+public class WxMaAuthenticationToken extends AbstractAuthenticationToken {
 
     @Serial
     private static final long serialVersionUID = 622L;
@@ -34,7 +34,7 @@ public class WechatMiniAuthenticationToken extends AbstractAuthenticationToken {
      *
      * @param code 微信小程序code
      */
-    public WechatMiniAuthenticationToken(String code) {
+    public WxMaAuthenticationToken(String code) {
         super(AuthorityUtils.NO_AUTHORITIES);
         this.principal = code;
         this.credentials = null;
@@ -47,7 +47,7 @@ public class WechatMiniAuthenticationToken extends AbstractAuthenticationToken {
      * @param principal   用户详情（SysUserDetails）
      * @param authorities 授权信息
      */
-    public WechatMiniAuthenticationToken(Object principal, Collection<? extends GrantedAuthority> authorities) {
+    public WxMaAuthenticationToken(Object principal, Collection<? extends GrantedAuthority> authorities) {
         super(authorities);
         this.principal = principal;
         this.credentials = null;
@@ -57,8 +57,8 @@ public class WechatMiniAuthenticationToken extends AbstractAuthenticationToken {
     /**
      * 创建已认证的 Token（静态工厂方法）
      */
-    public static WechatMiniAuthenticationToken authenticated(Object principal, Collection<? extends GrantedAuthority> authorities) {
-        return new WechatMiniAuthenticationToken(principal, authorities);
+    public static WxMaAuthenticationToken authenticated(Object principal, Collection<? extends GrantedAuthority> authorities) {
+        return new WxMaAuthenticationToken(principal, authorities);
     }
 
     @Override

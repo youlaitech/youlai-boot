@@ -1,6 +1,6 @@
 <template>
-  <div class="app-container">
-    <div class="filter-section">
+  <div class="page-container">
+    <el-card class="page-search" shadow="never">
       <el-form ref="queryFormRef" :model="queryParams" :inline="true" label-width="auto">
         #foreach($fieldConfig in $fieldConfigs)
           #if($fieldConfig.isShowInQuery == 1)
@@ -88,16 +88,16 @@
             </el-form-item>
           #end
         #end
-        <el-form-item class="search-buttons">
+        <el-form-item>
           <el-button type="primary" icon="search" @click="handleQuery">搜索</el-button>
           <el-button icon="refresh" @click="handleResetQuery">重置</el-button>
         </el-form-item>
       </el-form>
-    </div>
+    </el-card>
 
-    <el-card shadow="hover" class="table-section">
-      <div class="table-section__toolbar">
-        <div class="table-section__toolbar--actions">
+    <el-card class="page-content" shadow="never">
+      <div class="page-toolbar">
+        <div class="page-toolbar__left">
           <el-button
               v-hasPerm="['${moduleName}:${entityKebab}:create']"
               type="success"
@@ -121,7 +121,6 @@
         border
         stripe
         highlight-current-row
-        class="table-section__content"
         row-key="id"
         @selection-change="handleSelectionChange"
       >
@@ -171,13 +170,15 @@
         </el-table-column>
       </el-table>
 
-      <pagination
-          v-if="total > 0"
-          v-model:total="total"
-          v-model:page="queryParams.pageNum"
-          v-model:limit="queryParams.pageSize"
-          @pagination="fetchList"
-      />
+      <div class="page-pagination">
+        <pagination
+            v-if="total > 0"
+            v-model:total="total"
+            v-model:page="queryParams.pageNum"
+            v-model:limit="queryParams.pageSize"
+            @pagination="fetchList"
+        />
+      </div>
     </el-card>
 
     <!-- $!{businessName}表单弹窗 -->
@@ -277,7 +278,7 @@
   import { ElMessage, ElMessageBox, type FormInstance, type FormRules } from "element-plus";
   import { useTableSelection } from "@/composables";
   import ${entityName}API from "@/api/${moduleName}/${entityKebab}";
-  import type { ${entityName}Item, ${entityName}Form, ${entityName}QueryParams } from "@/types/api";
+  import type { ${entityName}Item, ${entityName}Form, ${entityName}QueryParams } from "@/api/${moduleName}/${entityKebab}";
 
   defineOptions({
     name: "${entityName}",

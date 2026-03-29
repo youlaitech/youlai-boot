@@ -6,7 +6,7 @@ import cn.hutool.core.util.ObjectUtil;
 import com.youlai.boot.framework.security.exception.NeedBindMobileException;
 import com.youlai.boot.framework.security.model.SysUserDetails;
 import com.youlai.boot.framework.security.model.UserAuthInfo;
-import com.youlai.boot.framework.security.model.WechatMiniAuthenticationToken;
+import com.youlai.boot.framework.security.model.WxMaAuthenticationToken;
 import com.youlai.boot.framework.security.service.SysUserDetailsService;
 import com.youlai.boot.system.model.entity.UserSocial;
 import lombok.RequiredArgsConstructor;
@@ -23,7 +23,7 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
  */
 @Slf4j
 @RequiredArgsConstructor
-public class WechatMiniAuthenticationProvider implements AuthenticationProvider {
+public class WxMaAuthenticationProvider implements AuthenticationProvider {
 
     private final WxMaService wxMaService;
     private final SysUserDetailsService sysUserDetailsService;
@@ -76,7 +76,7 @@ public class WechatMiniAuthenticationProvider implements AuthenticationProvider 
 
             log.info("微信小程序登录成功：username={}, openid={}", userAuthInfo.getUsername(), openid);
 
-            return WechatMiniAuthenticationToken.authenticated(userDetails, userDetails.getAuthorities());
+            return WxMaAuthenticationToken.authenticated(userDetails, userDetails.getAuthorities());
 
         } catch (WxErrorException e) {
             log.error("微信小程序登录失败：调用微信接口异常，code={}", code, e);
@@ -86,7 +86,7 @@ public class WechatMiniAuthenticationProvider implements AuthenticationProvider 
 
     @Override
     public boolean supports(Class<?> authentication) {
-        return WechatMiniAuthenticationToken.class.isAssignableFrom(authentication);
+        return WxMaAuthenticationToken.class.isAssignableFrom(authentication);
     }
 
 }
