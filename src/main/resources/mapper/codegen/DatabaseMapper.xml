@@ -3,10 +3,10 @@
         PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <!--suppress ALL -->
-<mapper namespace="com.youlai.boot.module.codegen.mapper.DatabaseMapper">
+<mapper namespace="com.youlai.boot.codegen.mapper.DatabaseMapper">
 
     <!-- 查询数据库表分页 mysql版本-->
-    <select id="getTablePage" resultType="com.youlai.boot.module.codegen.model.vo.TablePageVO" databaseId="mysql">
+    <select id="getTablePage" resultType="com.youlai.boot.codegen.model.vo.TablePageVO" databaseId="mysql">
         SELECT
             t1.TABLE_NAME ,
             t1.TABLE_COMMENT ,
@@ -35,7 +35,7 @@
     </select>
 
     <!-- 查询数据库表元数据 mysql版本-->
-    <select id="getTableMetadata" resultType="com.youlai.boot.module.codegen.model.vo.TableMetaVO" databaseId="mysql">
+    <select id="getTableMetadata" resultType="com.youlai.boot.codegen.model.vo.TableMetaVO" databaseId="mysql">
         SELECT
             TABLE_NAME ,
             TABLE_COMMENT ,
@@ -50,7 +50,7 @@
     </select>
 
     <!-- 获取数据库表字段元数据 mysql版本-->
-    <select id="getTableColumns" resultType="com.youlai.boot.module.codegen.model.vo.ColumnMetaVO" databaseId="mysql">
+    <select id="getTableColumns" resultType="com.youlai.boot.codegen.model.vo.ColumnMetaVO" databaseId="mysql">
         SELECT
             COLUMN_NAME,
             DATA_TYPE,

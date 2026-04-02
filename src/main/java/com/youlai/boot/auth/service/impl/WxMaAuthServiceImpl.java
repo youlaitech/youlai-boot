@@ -11,7 +11,7 @@ import com.youlai.boot.common.constant.RedisConstants;
 import com.youlai.boot.framework.security.exception.NeedBindMobileException;
 import com.youlai.boot.framework.security.model.AuthenticationToken;
 import com.youlai.boot.framework.security.model.SysUserDetails;
-import com.youlai.boot.framework.security.model.WechatMiniAuthenticationToken;
+import com.youlai.boot.framework.security.model.WxMaAuthenticationToken;
 import com.youlai.boot.framework.security.token.TokenManager;
 import com.youlai.boot.system.enums.SocialPlatformEnum;
 import com.youlai.boot.system.model.entity.SysUser;
@@ -55,7 +55,7 @@ public class WxMaAuthServiceImpl implements WxMaAuthService {
      */
     @Override
     public WxMaLoginResp silentLogin(String code) {
-        WechatMiniAuthenticationToken token = new WechatMiniAuthenticationToken(code);
+        WxMaAuthenticationToken token = new WxMaAuthenticationToken(code);
 
         try {
             Authentication authentication = authenticationManager.authenticate(token);

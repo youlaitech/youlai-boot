@@ -20,4 +20,4 @@ CMD java \
     -jar /app.jar
 
 # 暴露端口
-EXPOSE 8989
+EXPOSE 8000

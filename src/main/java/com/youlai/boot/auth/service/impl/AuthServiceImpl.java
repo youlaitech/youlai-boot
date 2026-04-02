@@ -11,7 +11,6 @@ import com.youlai.boot.framework.security.token.TokenManager;
 import com.youlai.boot.framework.security.util.SecurityUtils;
 import com.youlai.boot.framework.integration.sms.enums.SmsTypeEnum;
 import com.youlai.boot.framework.integration.sms.service.SmsService;
-import com.youlai.boot.system.service.LogService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.redis.core.RedisTemplate;
@@ -42,7 +41,7 @@ public class AuthServiceImpl implements AuthService {
     private final SmsService smsService;
     private final RedisTemplate<String, Object> redisTemplate;
     private final CaptchaService captchaService;
-    private final LogService logService;
+
     /**
      * 用户名密码登录
      *

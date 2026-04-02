@@ -9,7 +9,7 @@ import com.youlai.boot.framework.security.filter.TokenAuthenticationFilter;
 import com.youlai.boot.framework.security.handler.MyAccessDeniedHandler;
 import com.youlai.boot.framework.security.handler.MyAuthenticationEntryPoint;
 import com.youlai.boot.framework.security.provider.SmsAuthenticationProvider;
-import com.youlai.boot.framework.security.provider.WechatMiniAuthenticationProvider;
+import com.youlai.boot.framework.security.provider.WxMaAuthenticationProvider;
 import com.youlai.boot.framework.security.token.TokenManager;
 import com.youlai.boot.framework.security.service.SysUserDetailsService;
 import com.youlai.boot.system.service.ConfigService;
@@ -132,11 +132,11 @@ public class SecurityConfig {
      * 微信小程序认证 Provider
      */
     @Bean
-    public WechatMiniAuthenticationProvider wechatMiniAuthenticationProvider(
+    public WxMaAuthenticationProvider wechatMiniAuthenticationProvider(
             WxMaService wxMaService,
             SysUserDetailsService sysUserDetailsService
     ) {
-        return new WechatMiniAuthenticationProvider(wxMaService, sysUserDetailsService);
+        return new WxMaAuthenticationProvider(wxMaService, sysUserDetailsService);
     }
 
     /**
@@ -146,7 +146,7 @@ public class SecurityConfig {
     public AuthenticationManager authenticationManager(
             DaoAuthenticationProvider daoAuthenticationProvider,
             SmsAuthenticationProvider smsAuthenticationProvider,
-            WechatMiniAuthenticationProvider wechatMiniAuthenticationProvider
+            WxMaAuthenticationProvider wechatMiniAuthenticationProvider
     ) {
         return new ProviderManager(
                 daoAuthenticationProvider,
