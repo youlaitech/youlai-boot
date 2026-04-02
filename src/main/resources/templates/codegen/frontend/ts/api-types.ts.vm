@@ -2,7 +2,7 @@
  * ${entityName} $!{businessName}类型定义
  */
 
- import type { BaseQueryParams } from "./common";
+import type { BaseQueryParams } from "@/api/common";
 
 /** $!{businessName}查询参数 */
 export interface ${entityName}QueryParams extends BaseQueryParams {

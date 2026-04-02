@@ -146,12 +146,12 @@ public class SecurityConfig {
     public AuthenticationManager authenticationManager(
             DaoAuthenticationProvider daoAuthenticationProvider,
             SmsAuthenticationProvider smsAuthenticationProvider,
-            WxMaAuthenticationProvider wechatMiniAuthenticationProvider
+            WxMaAuthenticationProvider wxMaAuthenticationProvider
     ) {
         return new ProviderManager(
                 daoAuthenticationProvider,
                 smsAuthenticationProvider,
-                wechatMiniAuthenticationProvider
+            wxMaAuthenticationProvider
         );
     }
 

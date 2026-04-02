@@ -1,5 +1,5 @@
 <template>
-  <div class="app-container h-full flex flex-1 flex-col">
+  <div class="page-container h-full flex flex-1 flex-col">
     <!-- 搜索 -->
     <PageSearch
       ref="searchRef"
@@ -64,7 +64,7 @@
 defineOptions({ name: "$entityName" });
 
 import ${entityName}API from "@/api/${moduleName}/${entityKebab}";
-import type { ${entityName}Form, ${entityName}QueryParams } from "@/types/api";
+import type { ${entityName}Form, ${entityName}QueryParams } from "@/api/${moduleName}/${entityKebab}";
 import type { IObject, IModalConfig, IContentConfig, ISearchConfig } from "@/components/CURD/types";
 import usePage from "@/components/CURD/usePage";
 
@@ -151,8 +151,8 @@ const contentConfig: IContentConfig<${entityName}QueryParams> = reactive({
   // 数据解析函数
   parseData(res: any) {
     return {
-      total: res?.page?.total ?? 0,
-      list: res?.data ?? [],
+      total: res?.total ?? 0,
+      list: res?.list ?? [],
     };
   },
   // 分页配置
