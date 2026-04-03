@@ -84,7 +84,7 @@ security:
     - /api/v1/auth/captcha # 验证码获取接口
     - /api/v1/auth/sms/code # 发送登录短信验证码
     - /api/v1/auth/refresh-token # 刷新令牌接口
-    - /api/v1/wechat/miniapp/auth/** # 微信小程序认证接口(静默登录/手机号快捷登录/绑定手机号)
+    - /api/v1/wxma/auth/** # 微信小程序认证接口(静默登录/手机号快捷登录/绑定手机号)
     - /api/v1/logs/** # 日志接口(访问日志列表)
   # 非安全端点路径，完全绕过 Spring Security 的过滤器
   unsecured-urls:

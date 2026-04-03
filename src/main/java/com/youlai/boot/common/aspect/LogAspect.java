@@ -52,6 +52,9 @@ public class LogAspect {
     public Object around(ProceedingJoinPoint pjp, Log logAnnotation) throws Throwable {
 
         long startTime = System.currentTimeMillis();
+        // 在方法执行前获取用户信息，避免 logout 等操作清除 SecurityContext 后无法获取
+        Long userId = SecurityUtils.getUserId();
+        String username = SecurityUtils.getUsername();
         Object result = null;
         Exception exception = null;
 
@@ -63,7 +66,16 @@ public class LogAspect {
             throw e;
         } finally {
             long executionTime = System.currentTimeMillis() - startTime;
-            saveLogAsync(logAnnotation, executionTime, exception);
+            // fallback：登录等场景在 proceed() 前未认证，需在 proceed() 后获取
+            if (userId == null) {
+                userId = SecurityUtils.getUserId();
+                username = SecurityUtils.getUsername();
+            }
+            try {
+                saveLogAsync(logAnnotation, executionTime, exception, userId, username);
+            } catch (Exception ex) {
+                log.error("保存操作日志失败", ex);
+            }
         }
     }
 
@@ -71,7 +83,7 @@ public class LogAspect {
      * 异步保存日志
      */
     @Async
-    public void saveLogAsync(Log logAnnotation, long executionTime, Exception exception) {
+    public void saveLogAsync(Log logAnnotation, long executionTime, Exception exception, Long userId, String username) {
         try {
             ServletRequestAttributes attributes = (ServletRequestAttributes) RequestContextHolder.getRequestAttributes();
             if (attributes == null) {
@@ -96,10 +108,6 @@ public class LogAspect {
                     city = StrUtil.blankToDefault(parts[3], null);
                 }
             }
-
-            // 获取当前用户信息
-            Long userId = SecurityUtils.getUserId();
-            String username = SecurityUtils.getUsername();
 
             // 构建日志实体
             LogModuleEnum module = logAnnotation.module();
