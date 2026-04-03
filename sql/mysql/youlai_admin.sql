@@ -411,7 +411,7 @@ CREATE TABLE `sys_log` (
     `action_type` TINYINT NOT NULL COMMENT '操作类型，数字枚举，参考 ActionType 枚举',
     `title` VARCHAR(100) NOT NULL COMMENT '前端显示标题',
     `content` TEXT COMMENT '自定义日志内容',
-    `operator_id` BIGINT NOT NULL COMMENT '操作人ID',
+    `operator_id` BIGINT COMMENT '操作人ID',
     `operator_name` VARCHAR(50) COMMENT '操作人名称',
     `request_uri` VARCHAR(255) COMMENT '请求路径',
     `request_method` VARCHAR(10) COMMENT '请求方法',
