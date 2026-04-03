@@ -1,8 +1,9 @@
 package com.youlai.boot.message.registry;
 
 import com.youlai.boot.message.dto.OnlineUserDTO;
-import jakarta.annotation.PreDestroy;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.context.event.ContextClosedEvent;
+import org.springframework.context.event.EventListener;
 import org.springframework.stereotype.Component;
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 
@@ -198,7 +199,7 @@ public class SseSessionRegistry {
     /**
      * 容器关闭时主动断开所有 SSE 连接，避免阻塞应用停止
      */
-    @PreDestroy
+    @EventListener(ContextClosedEvent.class)
     public void destroy() {
         int count = emitterUserMap.size();
         if (count == 0) {
