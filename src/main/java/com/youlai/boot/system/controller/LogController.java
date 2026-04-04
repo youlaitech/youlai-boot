@@ -44,7 +44,7 @@ public class LogController {
     }
 
     @Operation(summary = "访问趋势统计")
-    @GetMapping("/views/trend")
+    @GetMapping("/analytics/trend")
     public Result<VisitTrendVO> getVisitTrend(
             @Parameter(description = "开始时间", example = "2024-01-01") @RequestParam String startDate,
             @Parameter(description = "结束时间", example = "2024-12-31") @RequestParam String endDate
@@ -56,7 +56,7 @@ public class LogController {
     }
 
     @Operation(summary = "访问统计概览")
-    @GetMapping("/views")
+    @GetMapping("/analytics/overview")
     public Result<VisitOverviewVO> getVisitOverview() {
         VisitOverviewVO result = logService.getVisitStats();
         return Result.success(result);
