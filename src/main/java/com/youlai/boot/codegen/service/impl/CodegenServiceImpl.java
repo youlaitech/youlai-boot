@@ -224,11 +224,9 @@ public class CodegenServiceImpl implements CodegenService {
         } else if ("MapperXml".equals(templateName)) {
             return entityName + "Mapper" + extension;
         } else if ("API".equals(templateName)) {
-            // 生成 user.ts 命名
-            return StrUtil.toSymbolCase(entityName, '-') + extension;
+            return "index" + extension;
         } else if ("API_TYPES".equals(templateName)) {
-            // 生成 types/api/user.ts
-            return StrUtil.toSymbolCase(entityName, '-') + extension;
+            return "types" + extension;
         } else if ("VIEW".equals(templateName)) {
             return "index.vue";
         }
@@ -255,18 +253,18 @@ public class CodegenServiceImpl implements CodegenService {
                     + File.separator + moduleName
             );
         } else if ("API".equals(templateName)) {
-            // path = "src/api/system";
             path = (codegenProperties.getFrontendAppName()
                     + File.separator + "src"
-                    + File.separator + subPackageName
+                    + File.separator + "api"
                     + File.separator + moduleName
+                    + File.separator + StrUtil.toSymbolCase(entityName, '-')
             );
         } else if ("API_TYPES".equals(templateName)) {
-            // path = "src/types/api";
             path = (codegenProperties.getFrontendAppName()
                     + File.separator + "src"
-                    + File.separator + "types"
                     + File.separator + "api"
+                    + File.separator + moduleName
+                    + File.separator + StrUtil.toSymbolCase(entityName, '-')
             );
         } else if ("VIEW".equals(templateName)) {
             // path = "src/views/system/user";

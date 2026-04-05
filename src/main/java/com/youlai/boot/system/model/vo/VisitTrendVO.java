@@ -23,8 +23,8 @@ public class VisitTrendVO {
     @Schema(description = "浏览量(PV)")
     private List<Integer> pvList;
 
-    @Schema(description = "IP数")
-    private List<Integer> ipList;
+    @Schema(description = "访客数(UV)")
+    private List<Integer> uvList;
 }
 
  
