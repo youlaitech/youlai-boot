@@ -1,55 +1,81 @@
-<div align="center">
-   <img alt="logo" width="100" height="100" src="https://foruda.gitee.com/images/1733417239320800627/3c5290fe_716974.png">
-   <h2>youlai-boot</h2>
-   <p><b>Spring Boot 4 权限管理系统</b></p>
-   <img alt="Java" src="https://img.shields.io/badge/Java-17-brightgreen.svg"/>
-   <img alt="Spring Boot" src="https://img.shields.io/badge/SpringBoot-4.0.1-green.svg"/>
-   <img alt="License" src="https://img.shields.io/badge/License-Apache%202.0-blue.svg"/>
-   <a href="https://gitee.com/youlaiorg/youlai-boot" target="_blank">
-     <img alt="Gitee" src="https://gitee.com/youlaiorg/youlai-boot/badge/star.svg"/>
-   </a>
-   <a href="https://github.com/haoxianrui/youlai-boot" target="_blank">
-     <img alt="GitHub" src="https://img.shields.io/github/stars/haoxianrui/youlai-boot.svg?style=social&label=Stars"/>
-   </a>
-   <a href="https://gitcode.com/youlai/youlai-boot" target="_blank">
-     <img alt="GitCode" src="https://gitcode.com/youlai/youlai-boot/star/badge.svg"/>
-   </a>
-</div>
+<p align="center">
+  <img alt="youlai-boot" width="120" src="https://foruda.gitee.com/images/1733417239320800627/3c5290fe_716974.png">
+</p>
+
+<h1 align="center">youlai-boot</h1>
 
 <p align="center">
-  <a target="_blank" href="https://vue.youlai.tech/">🖥️ 在线预览</a>
-  <span>&nbsp;|&nbsp;</span>
-  <a target="_blank" href="https://www.youlai.tech/youlai-boot">📑 官方文档</a>
-  <span>&nbsp;|&nbsp;</span>
-  <a target="_blank" href="https://www.youlai.tech">🌐 官网</a>
+  <strong>Spring Boot 4 企业级权限管理系统后端</strong>
+</p>
+
+<p align="center">
+  <a href="https://www.youlai.tech/docs/admin/backend/java/"><img src="https://img.shields.io/badge/文档-youlai.tech-blue?style=flat-square&logo=data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAyNTYgMjU2Ij48cGF0aCBmaWxsPSIjMzc4M2E0IiBkPSJNMjQ4IDExMUwzMSAxNDljMTQuNSA0LjkgMjkuNiAyMi41IDQ0LjIgMS44IDguNyAzLjEgMTcuNCAxIDEyLjhjLTIuOSA3LjItNi43IDEzLjUtMTIuOCAxNy40eiIvPjwvc3ZnPg==" alt="Documentation"></a>
+  <a href="https://vue.youlai.tech"><img src="https://img.shields.io/badge/在线预览-vue.youlai.tech-10B981?style=flat-square&logo=data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAyNTYgMjU2Ij48cGF0aCBmaWxsPSIjZmZmIiBkPSJNMjQ4IDExMUwzMSAxNDljMTQuNSA0LjkgMjkuNiAyMi41IDQ0LjIgMS44IDguNyAzLjEgMTcuNCAxIDEyLjhjLTIuOSA3LjItNi43IDEzLjUtMTIuOCAxNy40eiIvPjwvc3ZnPg==" alt="Demo"></a>
+  <a href="LICENSE"><img src="https://img.shields.io/badge/License-Apache%202.0-blue?style=flat-square"></a>
+</p>
+
+<p align="center">
+  <a href="https://gitee.com/youlaiorg/youlai-boot/stargazers"><img src="https://gitee.com/youlaiorg/youlai-boot/badge/star.svg?style=flat-square"></a>
+  <a href="https://github.com/haoxianrui/youlai-boot"><img src="https://img.shields.io/github/stars/haoxianrui/youlai-boot?style=social&label=Star"></a>
 </p>
 
 ---
 
-## 📢 项目简介
+> [English](#) | 简体中文
 
-基于 **JDK 17 + Spring Boot 4 + Spring Security** 构建的前后端分离权限管理系统，是 [**vue3-element-admin**](https://gitee.com/youlaiorg/vue3-element-admin) 的 Java 后端实现。
+---
 
-### 为什么选择 youlai-boot？
+## 🎯 项目定位
 
-| 特性              | 说明                                                  |
-| ----------------- | ----------------------------------------------------- |
-| 🚀 **最新技术栈** | Spring Boot 4 + JDK 17，持续跟进最新版本              |
-| 🔐 **企业级认证** | Spring Security + JWT + Redis，支持令牌续期、多端互斥 |
-| 🔑 **细粒度权限** | RBAC 模型，接口级 + 按钮级权限控制                    |
-| 🛠️ **开箱即用**   | 用户、角色、菜单、部门、字典等核心模块                |
-| 📦 **代码生成**   | 内置代码生成器，快速构建 CRUD 功能                    |
-| 🌐 **完整生态**   | Web 管理前端 + 移动端配套项目，多语言后端支持         |
+一套 **Spring Boot 4 后端权限管理系统**，配套前端 [vue3-element-admin](https://gitee.com/youlaiorg/vue3-element-admin)，并提供 **6 种语言实现**（Java / Node.js / Go / Python / PHP / C#），共享同一套 API 规范与数据库结构。
 
-## 🌈 相关项目
+**适合场景**：企业中后台管理系统的后端学习参考、二次开发基础脚手架。
 
-| 项目 | 技术栈 | 说明 |
-| --- | --- | --- |
-| [vue3-element-admin](https://gitee.com/youlaiorg/vue3-element-admin) | Vue 3 + Element Plus | 配套前端 |
-| [vue3-element-template](https://gitee.com/youlaiorg/vue3-element-template) | Vue 3 + Element Plus | 前端精简模板 |
-| [youlai-boot-tenant](https://gitee.com/youlaiorg/youlai-boot-tenant) | Spring Boot 4 | 多租户 SaaS 版 |
-| [youlai-boot-flex](https://gitee.com/youlaiorg/youlai-boot-flex) | Spring Boot 3 + MyBatis-Flex | MyBatis-Flex 版 |
-| [youlai-app](https://gitee.com/youlaiorg/youlai-app) | Vue 3 + uni-app | 移动端应用 |
+---
+
+## ✨ 核心能力
+
+| 能力 | 说明 |
+|------|------|
+| 🔐 **安全体系** | Spring Security + JWT + Redis 多端互斥、令牌续期、验证码防刷 |
+| 🛡️ **细粒度权限** | RBAC 五级：数据权限 → 菜单 → 按钮 → 接口 → 字段级 |
+| ⚡ **代码生成器** | 可视化配置表单，一键生成 Entity/VO/Controller/Service/CRUD 前后端代码 |
+| 📦 **模块齐全** | 用户、角色、菜单、部门、字典、文件、定时任务、消息中心、操作日志 |
+| 🌐 **多租户 SaaS** | 数据隔离 + 租户配置，独立 [youlai-boot-tenant](https://gitee.com/youlaiorg/youlai-boot-tenant) 版本 |
+| 🔌 **实时通信** | 内置 SSE 推送服务（在线用户数、字典同步、通知广播） |
+| 📱 **生态完整** | 配套移动端 [youlai-app](https://gitee.com/youlaiorg/youlai-app)（UniApp）+ 完整[技术文档](https://www.youlai.tech/docs/admin/) |
+
+## 🏗️ 技术栈
+
+```
+┌─────────────────────────────────────────────┐
+│                  youlai-boot                 │
+│                                             │
+│  ┌───────────┐  ┌──────────┐  ┌───────────┐ │
+│  │  Spring   │  │  MyBatis │  │   Redis   │ │
+│  │  Security │  │   Plus   │  │  + JWT   │ │
+│  └─────┬─────┘  └────┬─────┘  └─────┬─────┘ │
+│        │              │             │        │
+│  ┌─────▼──────────────▼─────────────▼───┐  │
+│  │           Spring Boot 4               │  │
+│  │           JDK 17 (LTS)                │  │
+│  └───────────────────────────────────────┘  │
+│                                             │
+│  ┌──────────┐  ┌──────────┐  ┌──────────┐  │
+│  │ Swagger  │  │ XXL-JOB  │  │  MinIO   │  │
+│  │ (接口文档) │  │(定时任务) │  │(文件存储) │  │
+│  └──────────┘  └──────────┘  └──────────┘  │
+│                                             │
+│  MySQL 8.0 · Redis 7 · Docker Compose     │
+└─────────────────────────────────────────────┘
+```
+
+<!-- 截图占位：建议替换为系统实际运行截图（登录页 + 首页 + 权限管理） -->
+<p align="center">
+  <!-- TODO: 替换为系统截图 -->
+  <img alt="系统截图" width="800" src="https://via.placeholder.com/800x450/e8f0fe/2563eb?text=System+Screenshot+Placeholder">
+</p>
+<p align="center"><em>↑ 系统运行效果（待补充实际截图）</em></p>
 
 ---
 
@@ -57,119 +83,113 @@
 
 ### 环境要求
 
-- JDK 17+
-- MySQL 5.7+/8.0+
-- Redis 6.0+
+| 组件 | 版本 |
+|------|------|
+| JDK | 17+ |
+| MySQL | 8.0+ / 5.7+ |
+| Redis | 6.0+ |
 
-### 启动步骤
-
-**1. 克隆项目**
+### 本地启动
 
 ```bash
+# 1. 克隆项目
 git clone https://gitee.com/youlaiorg/youlai-boot.git
+
+# 2. 导入数据库脚本 sql/mysql/youlai_admin.sql
+
+# 3. 修改 application-dev.yml 配置 MySQL 和 Redis 连接信息
+#    💡 默认已配置线上只读数据源，可直接启动体验
+
+# 4. 运行 YouLaiBootApplication.java，访问 http://localhost:8000/doc.html
 ```
 
-**2. 初始化数据库**
+默认账号：`admin` / `123456`
 
-执行 [youlai_admin.sql](sql/mysql/youlai_admin.sql) 创建数据库和基础数据。
+### Docker 部署
 
-**3. 修改配置**
-
-编辑 [application-dev.yml](src/main/resources/application-dev.yml)，配置 MySQL 和 Redis：
-
-```yaml
-spring:
-  datasource:
-    url: jdbc:mysql://localhost:3306/youlai_admin # 数据库连接地址
-    username: root # 数据库用户名
-    password: 123456 # 数据库密码
-  data:
-    redis:
-      host: localhost # Redis 地址
-      port: 6379 # Redis 端口
+```bash
+cd docker && docker-compose up -d
 ```
 
-> 💡 默认连接线上环境（仅读权限），可直接启动体验。
-
-**4. 启动项目**
-
-运行 [YoulaiBootApplication.java](src/main/java/com/youlai/boot/YouLaiBootApplication.java)，访问 http://localhost:8000/doc.html 查看接口文档。
-
----
+详细指南：[部署文档](https://www.youlai.tech/docs/admin/backends/java/deploy) · [开发规范](https://www.youlai.tech/docs/admin/backends/java/dev-standards)
 
 ## 📁 目录结构
 
 ```
-youlai-boot
-├── docker/                          # Docker 部署
-├── sql/                             # 数据库脚本
-├── src/
-│   ├── auth/                        # 认证授权业务
-│   ├── codegen/                     # 代码生成器
-│   ├── common/                      # 全局通用（常量、枚举、工具类、统一响应结果）
-│   ├── framework/                   # 底层技术基座（缓存/验证码/安全/Web等）
-│   │   ├── apidoc/                  # OpenAPI/Swagger 文档
-│   │   ├── cache/                   # Redis/Caffeine 缓存
-│   │   ├── captcha/                 # 验证码
-│   │   ├── integration/             # SMS/Mail/WxMa 集成
-│   │   ├── job/                     # XxlJob 定时任务
-│   │   ├── mybatis/                 # 数据库/MP配置/拦截器
-│   │   ├── security/                # 鉴权过滤器/Token机制
-│   │   └── web/                     # 跨域/全局异常/限流/Jackson
-│   ├── message/                     # 消息中心
-│   ├── file/                        # 文件中心
-│   ├── system/                      # 核心系统模块（用户/角色/菜单/部门）
-│   └── YouLaiBootApplication.java   # 启动类
-└── pom.xml                          # Maven 配置
+youlai-boot/
+├── docker/                     # Docker 部署编排
+├── sql/                        # 数据库初始化脚本
+├── src/main/java/com/youlai/boot/
+│   ├── YouLaiBootApplication   # 启动类
+│   ├── auth/                    # 认证授权（登录/登出/令牌）
+│   ├── codegen/                 # 代码生成器
+│   ├── common/                  # 公共模块（常量/枚举/统一响应）
+│   ├── file/                    # 文件服务（MinIO/本地存储）
+│   ├── framework/               # 技术基座
+│   │   ├── apidoc/             # OpenAPI/Swagger
+│   │   ├── cache/              # Redis/Caffeine 缓存
+│   │   ├── captcha/            # 图形验证码
+│   │   ├── integration/        # 短信/邮件/微信
+│   │   ├── job/                # XXL-Job 定时任务
+│   │   ├── mybatis/            # MyBatis Plus 配置
+│   │   ├── security/           # 安全过滤器/Token机制
+│   │   └── web/                # 全局异常/跨域/限流
+│   ├── message/                 # SSE 消息推送
+│   └── system/                  # 业务模块（用户/角色/菜单/部门）
+└── pom.xml                      # Maven 依赖
 ```
 
----
+## 🌐 相关生态
 
-## 🐳 Docker 部署
+| 项目 | 技术栈 | 定位 |
+|------|--------|------|
+| [**vue3-element-admin**](https://gitee.com/youlaiorg/vue3-element-admin) | Vue 3 + Element Plus | **PC 管理前端**（主推） |
+| [**youlai-app**](https://gitee.com/youlaiorg/youlai-app) | Vue 3 + UniApp | **移动端 App** |
+| [**youlai-boot-tenant**](https://gitee.com/youlaiorg/youlai-boot-tenant) | Spring Boot 4 | **SaaS 多租户版本** |
+| [**youlai-boot-flex**](https://gitee.com/youlaiorg/youlai-boot-flex) | Spring Boot 3 + MyBatis-Flex | MyBatis-Flex 版 |
+| [**youlai-nest**](https://gitee.com/youlaiorg/youlai-nest) | NestJS + TypeORM | **Node.js 后端** |
+| [**youlai-gin**](https://gitee.com/youlaiorg/youlai-gin) | Go + Gorm | **Go 后端** |
+| [**youlai-django**](https://gitee.com/youlaiorg/youlai-django) | Django + DRF | **Python 后端** |
+| [**youlai-thinkphp**](https://gitee.com/youlaiorg/youlai-thinkphp) | ThinkPHP 8 | **PHP 后端** |
+| [**youlai-aspnet**](https://gitee.com/youlaiorg/youlai-aspnet) | ASP.NET Core | **C# 后端** |
 
-```bash
-cd docker
-docker-compose up -d
-```
+> 六种后端共享同一套 **RESTful API 规范** 和 **数据库结构**，前端可无缝切换。
 
-详细文档：[部署指南](https://www.youlai.tech/docs/admin/backend/java/deploy.html)
+## 📘 文档资源
 
----
+| 资源 | 地址 |
+|------|------|
+| **📖 完整文档站** | [docs.youlai.tech](https://www.youlai.tech/docs/admin/) |
+| **🖥️ 在线预览（前端）** | [vue.youlai.tech](https://vue.youlai.tech) |
+| **📱 在线预览（移动端）** | [app.youlai.tech](https://app.youlai.tech) |
+| **🔗 接口文档** | 启动后访问 `/doc.html` |
 
-## 📚 技术文档
+## 📊 项目统计
 
-| 文档     | 地址                                                                               |
-| -------- | ---------------------------------------------------------------------------------- |
-| 官方文档 | [youlai.tech](https://www.youlai.tech/youlai-boot/)                                |
-| 入门指南 | [CSDN 博客](https://youlai.blog.csdn.net/article/details/145177011)                |
-| 接口文档 | [Apifox](https://www.apifox.cn/apidoc/shared-195e783f-4d85-4235-a038-eec696de4ea5) |
+![Repobeats](https://repobeats.axiom.co/api/embed/544c5c0b5b3611a6c4d5ef0faa243a9066b89659.svg)
 
----
+## 🤝 参与贡献
+
+欢迎 Issue、PR 和 Star！详见 [贡献指南](https://www.youlai.tech/docs/admin/faq/help)。
+
+[![Contributors](https://contrib.rocks/image?repo=haoxianrui/youlai-boot)](https://github.com/haoxianrui/youlai-boot/graphs/contributors)
 
 ## 📄 开源协议
 
-本项目基于 [Apache 2.0](LICENSE) 协议开源，可免费用于商业项目。
+本项目基于 [Apache License 2.0](LICENSE) 开源，可免费用于商业项目。
 
 ---
-
-## ✅ 项目统计
-
-![](https://repobeats.axiom.co/api/embed/544c5c0b5b3611a6c4d5ef0faa243a9066b89659.svg)
-
----
-
-## 🤝 贡献者
-
-[![](https://contrib.rocks/image?repo=haoxianrui/youlai-boot)](https://github.com/haoxianrui/youlai-boot/graphs/contributors)
-
----
-
-## 💖 技术交流
-
-关注「有来技术」公众号，点击菜单【交流群】获取微信群二维码（为防营销广告，实属无奈，望理解）：
 
 <div align="center">
-  <img src="https://foruda.gitee.com/images/1737108820762592766/3390ed0d_716974.png" width="280">
-</div>
 
-> 二维码过期？添加微信 **`haoxianrui`**，备注「前端/后端/全栈」即可拉你入群。
+**关注「有来技术」，获取最新动态与技术分享**
+
+<br>
+
+<img src="https://foruda.gitee.com/images/1737108820762592766/3390ed0d_716974.png" width="220">
+
+<br>
+
+*微信搜索「有来技术」或扫码关注*
+
+</div>
