@@ -8,7 +8,7 @@ const ${entityName}API = {
     /** 获取${businessName}分页数据 */
     getPage(queryParams?: ${entityName}QueryParams) {
         return request<any, PageResult<${entityName}Item>>({
-            url: \`\${${entityUpperSnake}_BASE_URL}\`,
+            url: `${${entityUpperSnake}_BASE_URL}`,
             method: "get",
             params: queryParams,
         });
@@ -21,7 +21,7 @@ const ${entityName}API = {
      */
     getFormData(id: string) {
         return request<any, ${entityName}Form>({
-            url: \`\${${entityUpperSnake}_BASE_URL}/\${id}/form\`,
+            url: `${${entityUpperSnake}_BASE_URL}/${id}/form`,
             method: "get",
         });
     },
@@ -33,7 +33,7 @@ const ${entityName}API = {
      */
     create(data: ${entityName}Form) {
         return request({
-            url: \`\${${entityUpperSnake}_BASE_URL}\`,
+            url: `${${entityUpperSnake}_BASE_URL}`,
             method: "post",
             data,
         });
@@ -47,7 +47,7 @@ const ${entityName}API = {
      */
      update(id: string, data: ${entityName}Form) {
         return request({
-            url: \`\${${entityUpperSnake}_BASE_URL}/\${id}\`,
+            url: `${${entityUpperSnake}_BASE_URL}/${id}`,
             method: "put",
             data,
         });
@@ -60,7 +60,7 @@ const ${entityName}API = {
      */
      deleteByIds(ids: string) {
         return request({
-            url: \`\${${entityUpperSnake}_BASE_URL}/\${ids}\`,
+            url: `${${entityUpperSnake}_BASE_URL}/${ids}`,
             method: "delete",
         });
     }
