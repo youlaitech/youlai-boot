@@ -215,6 +215,14 @@ public class RoleServiceImpl extends ServiceImpl<RoleMapper, Role> implements Ro
         if (result) {
             // 刷新角色的权限缓存
             roleMenuService.refreshRolePermsCache(role.getCode());
+
+            // When role is disabled, invalidate sessions of all users with this role
+            if (status == 0) {
+                List<Long> userIds = userRoleService.listUserIdsByRoleId(roleId);
+                for (Long userId : userIds) {
+                    tokenManager.invalidateUserSessions(userId);
+                }
+            }
         }
         return result;
     }

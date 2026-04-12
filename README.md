@@ -162,7 +162,7 @@ youlai-boot/
 | **📖 完整文档站** | [docs.youlai.tech](https://www.youlai.tech/docs/admin/) |
 | **🖥️ 在线预览（前端）** | [vue.youlai.tech](https://vue.youlai.tech) |
 | **📱 在线预览（移动端）** | [app.youlai.tech](https://app.youlai.tech) |
-| **🔗 接口文档** | 启动后访问 `/doc.html` |
+| **🔗 接口文档** | 启动后访问 [http://localhost:8000/doc.html](http://localhost:8000/doc.html) |
 
 ## 📊 项目统计
 

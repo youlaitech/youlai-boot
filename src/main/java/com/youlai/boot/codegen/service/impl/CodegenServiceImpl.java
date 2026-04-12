@@ -323,6 +323,7 @@ public class CodegenServiceImpl implements CodegenService {
         bindMap.put("entityKebab", entityKebab);
         bindMap.put("entityUpperSnake", entityUpperSnake);
         bindMap.put("businessName", genTable.getBusinessName());
+        bindMap.put("entityComment", genTable.getBusinessName());
         bindMap.put("fieldConfigs", fieldConfigs);
 
         boolean hasLocalDateTime = false;

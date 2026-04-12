@@ -23,6 +23,7 @@ import com.youlai.boot.system.model.vo.CurrentUserVO;
 import com.youlai.boot.system.model.vo.UserPageVO;
 import com.youlai.boot.system.model.vo.UserProfileVO;
 import com.youlai.boot.system.service.UserService;
+import com.youlai.boot.framework.security.token.TokenManager;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -53,6 +54,8 @@ import java.util.List;
 @RequestMapping("/api/v1/users")
 @RequiredArgsConstructor
 public class UserController {
+
+    private final TokenManager tokenManager;
 
     private final UserService userService;
 
@@ -122,6 +125,10 @@ public class UserController {
                 .eq(SysUser::getId, userId)
                 .set(SysUser::getStatus, status)
         );
+        // 用户禁用时立即失效其会话
+        if (result && status == 0) {
+            tokenManager.invalidateUserSessions(userId);
+        }
         return Result.judge(result);
     }
 

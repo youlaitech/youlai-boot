@@ -168,18 +168,18 @@ public class RedisTokenManager implements TokenManager {
     }
 
     /**
-     * 使访问令牌失效
+     * Make access token invalid
+     * <p>
+     * Only deletes the current token, not all sessions for the user.
+     * This ensures single-device logout doesn't affect other devices when allowMultiLogin=true.
      *
-     * @param token 访问令牌
+     * @param token Access token
      */
     @Override
     public void invalidateToken(String token) {
         String cleanToken = cleanBearerPrefix(token);
-        Object value = redisTemplate.opsForValue().get(formatTokenKey(cleanToken));
-        if (value instanceof UserSession userSession) {
-            Long userId = userSession.getUserId();
-            invalidateUserSessions(userId);
-        }
+        // Only delete the current token, not all user sessions
+        redisTemplate.delete(formatTokenKey(cleanToken));
     }
 
     /**
