@@ -45,37 +45,13 @@
 | 🔌 **实时通信** | 内置 SSE 推送服务（在线用户数、字典同步、通知广播） |
 | 📱 **生态完整** | 配套移动端 [youlai-app](https://gitee.com/youlaiorg/youlai-app)（UniApp）+ 完整[技术文档](https://www.youlai.tech/docs/admin/) |
 
-## 🏗️ 技术栈
+## 📸 系统预览
 
-```
-┌─────────────────────────────────────────────┐
-│                  youlai-boot                 │
-│                                             │
-│  ┌───────────┐  ┌──────────┐  ┌───────────┐ │
-│  │  Spring   │  │  MyBatis │  │   Redis   │ │
-│  │  Security │  │   Plus   │  │  + JWT   │ │
-│  └─────┬─────┘  └────┬─────┘  └─────┬─────┘ │
-│        │              │             │        │
-│  ┌─────▼──────────────▼─────────────▼───┐  │
-│  │           Spring Boot 4               │  │
-│  │           JDK 17 (LTS)                │  │
-│  └───────────────────────────────────────┘  │
-│                                             │
-│  ┌──────────┐  ┌──────────┐  ┌──────────┐  │
-│  │ Swagger  │  │ XXL-JOB  │  │  MinIO   │  │
-│  │ (接口文档) │  │(定时任务) │  │(文件存储) │  │
-│  └──────────┘  └──────────┘  └──────────┘  │
-│                                             │
-│  MySQL 8.0 · Redis 7 · Docker Compose     │
-└─────────────────────────────────────────────┘
-```
 
-<!-- 截图占位：建议替换为系统实际运行截图（登录页 + 首页 + 权限管理） -->
 <p align="center">
   <!-- TODO: 替换为系统截图 -->
-  <img alt="系统截图" width="800" src="https://via.placeholder.com/800x450/e8f0fe/2563eb?text=System+Screenshot+Placeholder">
+  <img alt="系统截图" width="800" src="https://www.youlai.tech/storage/blog/2026/04/12/admin_preview.jpeg">
 </p>
-<p align="center"><em>↑ 系统运行效果（待补充实际截图）</em></p>
 
 ---
 
