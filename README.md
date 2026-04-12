@@ -53,7 +53,6 @@
   <img alt="系统截图" width="800" src="https://www.youlai.tech/storage/blog/2026/04/12/admin_preview.jpeg">
 </p>
 
----
 
 ## 🚀 快速开始
 
