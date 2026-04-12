@@ -22,6 +22,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.Collections;
 import java.util.List;
+import java.util.Objects;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -187,7 +188,31 @@ public class DeptServiceImpl extends ServiceImpl<DeptMapper, Dept> implements De
                 .eq(Dept::getCode, code)
         );
         Assert.isTrue(count == 0, "部门编号已存在");
+        Dept dept = this.getOne(
+            new LambdaQueryWrapper<Dept>()
+                .eq(Dept::getId, deptId)
+                .select(Dept::getParentId,Dept::getTreePath)
+        );
+        Assert.notNull(dept, "部门不存在");
 
+        Long parentId = formData.getParentId();
+        // 检查不能修改自己节点和子节点作为当前节点的父节点
+        Assert.isFalse(Objects.equals(deptId,parentId),"上级部门不能为自己");
+
+        // 检查是否修改了部门父节点
+        if (!Objects.equals(dept.getParentId(),parentId)){
+            // 获取当前节点的子节点的ID
+            List<Dept> childrenDeptList = this.list(
+                new LambdaQueryWrapper<Dept>()
+                    .apply("FIND_IN_SET({0}, tree_path)", deptId)
+                    .select(Dept::getId)
+            );
+            if(!childrenDeptList.isEmpty()) {
+                Set<Long> childrenIds = childrenDeptList.stream().map(Dept::getId).collect(Collectors.toSet());
+                Assert.isFalse(childrenIds.contains(parentId),"上级部门不能为当前子部门");
+            }
+
+        }
 
         // form->entity
         Dept entity = deptConverter.toEntity(formData);
