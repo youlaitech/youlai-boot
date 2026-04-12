@@ -48,10 +48,12 @@
 ## 📸 系统预览
 
 
-<p align="center">
-  <!-- TODO: 替换为系统截图 -->
-  <img alt="系统截图" width="800" src="https://www.youlai.tech/storage/blog/2026/04/12/admin_preview.jpeg">
-</p>
+<table align="center">
+  <tr>
+    <td><img alt="系统预览1" width="400" src="https://www.youlai.tech/storage/blog/2026/04/12/admin_preview.jpeg"></td>
+    <td><img alt="系统预览2" width="400" src="https://www.youlai.tech/storage/blog/2026/04/12/441_1x_shots_so.jpeg"></td>
+  </tr>
+</table>
 
 
 ## 🚀 快速开始
