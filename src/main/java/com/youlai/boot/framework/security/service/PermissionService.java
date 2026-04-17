@@ -14,7 +14,7 @@ import java.util.Set;
 /**
  * Spring Security 权限校验组件
  * <p>
- * 用于 SpEL 表达式权限校验，如：@PreAuthorize("@ss.hasPerm('sys:user:add')")
+ * 用于 SpEL 表达式权限校验，如：@PreAuthorize("@ss.hasPerm('sys:user:create')")
  * <p>
  * 权限数据来源：{@link RoleMenuService#getRolePermsByRoleCodes}（带 Redis 缓存）
  *
@@ -31,7 +31,7 @@ public class PermissionService {
     /**
      * 判断当前登录用户是否拥有操作权限
      * <p>
-     * 支持通配符匹配，如：权限码 "sys:user:*" 可匹配 "sys:user:add"、"sys:user:delete" 等
+     * 支持通配符匹配，如：权限码 "sys:user:*" 可匹配 "sys:user:create"、"sys:user:delete" 等
      *
      * @param requiredPerm 所需权限
      * @return 是否有权限

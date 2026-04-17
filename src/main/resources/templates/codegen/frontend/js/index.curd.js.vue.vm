@@ -84,7 +84,7 @@ const {
 
 // 搜索配置
 const searchConfig = reactive({
-  pageName: "${moduleName}:${entityKebab}",
+  permPrefix: "${moduleName}:${entityKebab}",
   formItems: [
 #foreach($fieldConfig in $fieldConfigs)
 #if($fieldConfig.isShowInQuery == 1)
@@ -135,7 +135,7 @@ const searchConfig = reactive({
 // 列表配置
 const contentConfig = reactive({
   // 权限前缀
-  pageName: "${moduleName}:${entityKebab}",
+  permPrefix: "${moduleName}:${entityKebab}",
   table: {
     border: true,
     highlightCurrentRow: true,
@@ -193,7 +193,7 @@ const contentConfig = reactive({
 // 新增配置
 const addModalConfig = reactive({
   // 权限前缀
-  pageName: "${moduleName}:${entityKebab}",
+  permPrefix: "${moduleName}:${entityKebab}",
   // 主键
   pk: "id",
   // 弹窗配置
@@ -339,7 +339,7 @@ const addModalConfig = reactive({
 
 // 编辑配置
 const editModalConfig = reactive({
-  pageName: "${moduleName}:${entityKebab}",
+  permPrefix: "${moduleName}:${entityKebab}",
   component: "drawer",
   drawer: {
     title: "编辑$!{entityComment}",
