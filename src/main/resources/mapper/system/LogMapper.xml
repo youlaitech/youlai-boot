@@ -5,8 +5,8 @@
 <!--suppress ALL -->
 <mapper namespace="com.youlai.boot.system.mapper.LogMapper">
 
-    <!-- 日志分页列表 mysql版本 -->
-    <select id="getLogPage" resultType="com.youlai.boot.system.model.vo.LogPageVO" databaseId="mysql">
+    <!-- 日志分页列表 -->
+    <select id="getLogPage" resultType="com.youlai.boot.system.model.vo.LogPageVO">
         SELECT
             t1.id,
             t1.module,
@@ -81,8 +81,8 @@
             DATE_FORMAT(create_time, '%Y-%m-%d')
     </select>
 
-    <!-- 获取访问量(PV)统计数据 mysql版本-->
-    <select id="getPvStats" resultType="com.youlai.boot.system.model.vo.VisitOverviewVO" databaseId="mysql">
+    <!-- 获取访问量(PV)统计数据 -->
+    <select id="getPvStats" resultType="com.youlai.boot.system.model.vo.VisitOverviewVO">
         SELECT
             COUNT(CASE WHEN DATE(create_time) = CURDATE() THEN 1 END) AS todayPvCount,
             COUNT(*) AS totalPvCount,
@@ -99,8 +99,8 @@
             sys_log
     </select>
 
-    <!-- 获取IP统计数据 mysql版本-->
-    <select id="getUvStats" resultType="com.youlai.boot.system.model.vo.VisitOverviewVO" databaseId="mysql">
+    <!-- 获取IP统计数据 -->
+    <select id="getUvStats" resultType="com.youlai.boot.system.model.vo.VisitOverviewVO">
             SELECT
                 COUNT(DISTINCT CASE WHEN DATE(create_time) = CURDATE() THEN ip END) AS todayUvCount,
                 COUNT(DISTINCT ip) AS totalUvCount,

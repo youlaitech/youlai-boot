@@ -5,8 +5,8 @@
 <!--suppress ALL -->
 <mapper namespace="com.youlai.boot.system.mapper.UserMapper">
 
-    <!-- 用户分页列表 mysql版本-->
-    <select id="getUserPage" resultType="com.youlai.boot.system.model.vo.UserPageVO" databaseId="mysql">
+    <!-- 用户分页列表 -->
+    <select id="getUserPage" resultType="com.youlai.boot.system.model.vo.UserPageVO">
         SELECT
             u.id,
             u.username,
@@ -203,8 +203,8 @@
         GROUP BY u.id
     </select>
 
-    <!-- 根据用户ID获取用户详情 mysql版本-->
-    <select id="getUserProfile" resultType="com.youlai.boot.system.model.vo.UserProfileVO" databaseId="mysql">
+    <!-- 根据用户ID获取用户详情 -->
+    <select id="getUserProfile" resultType="com.youlai.boot.system.model.vo.UserProfileVO">
         SELECT
             u.id,
             u.username,

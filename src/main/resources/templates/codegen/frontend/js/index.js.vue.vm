@@ -5,14 +5,14 @@
         #foreach($fieldConfig in $fieldConfigs)
           #if($fieldConfig.isShowInQuery == 1)
             <el-form-item label="$fieldConfig.fieldComment" prop="$fieldConfig.fieldName">
-                    #if($fieldConfig.formType == "INPUT")
+                    #if($fieldConfig.formType.name() == "INPUT")
                       <el-input
                           v-model="queryParams.$fieldConfig.fieldName"
                           placeholder="$fieldConfig.fieldComment"
                           clearable
                           @keyup.enter="handleQuery()"
                       />
-                    #elseif($fieldConfig.formType == "SELECT")
+                    #elseif($fieldConfig.formType.name() == "SELECT")
                         #if($fieldConfig.dictType && $fieldConfig.dictType.trim() != "")
                           <DictSelect v-model="queryParams.$fieldConfig.fieldName" code="$fieldConfig.dictType" />
                         #else
@@ -21,7 +21,7 @@
                             <el-option :key="2" :value="2" label="选项二"/>
                           </el-select>
                         #end
-                    #elseif($fieldConfig.formType == "RADIO")
+                    #elseif($fieldConfig.formType.name() == "RADIO")
                         #if($fieldConfig.dictType && $fieldConfig.dictType.trim() != "")
                           <DictSelect v-model="queryParams.$fieldConfig.fieldName" type="radio" code="$fieldConfig.dictType" />
                         #else
@@ -30,7 +30,7 @@
                             <el-radio :key="2" :value="2">选项二</el-radio>
                           </el-radio-group>
                         #end
-                    #elseif($fieldConfig.formType == "CHECK_BOX")
+                    #elseif($fieldConfig.formType.name() == "CHECK_BOX")
                         #if($fieldConfig.dictType && $fieldConfig.dictType.trim() != "")
                           <DictSelect v-model="queryParams.$fieldConfig.fieldName" type="checkbox" code="$fieldConfig.dictType" />
                         #else
@@ -39,26 +39,26 @@
                             <el-checkbox :key="2" :label="2">选项二</el-checkbox>
                           </el-checkbox-group>
                         #end
-                    #elseif($fieldConfig.formType == "INPUT_NUMBER")
+                    #elseif($fieldConfig.formType.name() == "INPUT_NUMBER")
                       <el-input-number
                           v-model="queryParams.$fieldConfig.fieldName"
                           placeholder="$fieldConfig.fieldComment"
                       />
-                    #elseif($fieldConfig.formType == "SWITCH")
+                    #elseif($fieldConfig.formType.name() == "SWITCH")
                       <el-switch
                           v-model="queryParams.$fieldConfig.fieldName"
                           :active-value="1"
                           :inactive-value="0"
                       />
-                    #elseif($fieldConfig.formType == "TEXT_AREA")
+                    #elseif($fieldConfig.formType.name() == "TEXT_AREA")
                       <el-input type="textarea"
                                 v-model="queryParams.$fieldConfig.fieldName"
                                 placeholder="$fieldConfig.fieldComment"
                       />
-                    #elseif($fieldConfig.formType == "DATE_TIME")
+                    #elseif($fieldConfig.formType.name() == "DATE_TIME")
                       <el-date-picker
                           v-model="queryParams.$fieldConfig.fieldName"
-                          #if($fieldConfig.queryType == "BETWEEN")
+                          #if($fieldConfig.queryType.name() == "BETWEEN")
                           type="daterange"
                           range-separator="~"
                           start-placeholder="开始时间"
@@ -69,11 +69,11 @@
                           #end
                           value-format="YYYY-MM-DD HH:mm:ss"
                       />
-                    #elseif($fieldConfig.formType == "DATE")
+                    #elseif($fieldConfig.formType.name() == "DATE")
                       <el-date-picker
                           class="!w-[240px]"
                           v-model="queryParams.$fieldConfig.fieldName"
-                          #if($fieldConfig.queryType == "BETWEEN")
+                          #if($fieldConfig.queryType.name() == "BETWEEN")
                           type="daterange"
                           range-separator="~"
                           start-placeholder="开始时间"
@@ -190,14 +190,14 @@
     >
       <el-form ref="dataFormRef" :model="formData" :rules="rules" label-width="100px">
           #foreach($fieldConfig in $fieldConfigs)
-              #if($fieldConfig.isShowInForm == 1 && $fieldConfig.formType != "HIDDEN")
+              #if($fieldConfig.isShowInForm == 1 && $fieldConfig.formType.name() != "HIDDEN")
                 <el-form-item label="$fieldConfig.fieldComment" prop="$fieldConfig.fieldName">
-                    #if($fieldConfig.formType == "INPUT")
+                    #if($fieldConfig.formType.name() == "INPUT")
                       <el-input
                           v-model="formData.$fieldConfig.fieldName"
                           placeholder="$fieldConfig.fieldComment"
                       />
-                    #elseif($fieldConfig.formType == "SELECT")
+                    #elseif($fieldConfig.formType.name() == "SELECT")
                         #if($fieldConfig.dictType && $fieldConfig.dictType.trim() != "")
                           <DictSelect v-model="formData.$fieldConfig.fieldName" code="$fieldConfig.dictType" />
                         #else
@@ -206,7 +206,7 @@
                             <el-option :value="1" label="选项二"/>
                           </el-select>
                         #end
-                    #elseif($fieldConfig.formType == "RADIO")
+                    #elseif($fieldConfig.formType.name() == "RADIO")
                         #if($fieldConfig.dictType && $fieldConfig.dictType.trim() != "")
                           <DictSelect v-model="formData.$fieldConfig.fieldName" type="radio" code="$fieldConfig.dictType" />
                         #else
@@ -215,7 +215,7 @@
                             <el-radio :value="1">选项二</el-radio>
                           </el-radio-group>
                         #end
-                    #elseif($fieldConfig.formType == "CHECK_BOX")
+                    #elseif($fieldConfig.formType.name() == "CHECK_BOX")
                         #if($fieldConfig.dictType && $fieldConfig.dictType.trim() != "")
                           <DictSelect v-model="formData.$fieldConfig.fieldName" type="checkbox" code="$fieldConfig.dictType" />
                         #else
@@ -224,30 +224,30 @@
                             <el-checkbox :value="1">选项二</el-checkbox>
                           </el-checkbox-group>
                         #end
-                    #elseif($fieldConfig.formType == "INPUT_NUMBER")
+                    #elseif($fieldConfig.formType.name() == "INPUT_NUMBER")
                       <el-input-number
                           v-model="formData.$fieldConfig.fieldName"
                           placeholder="$fieldConfig.fieldComment"
                       />
-                    #elseif($fieldConfig.formType == "SWITCH")
+                    #elseif($fieldConfig.formType.name() == "SWITCH")
                       <el-switch
                           v-model="formData.$fieldConfig.fieldName"
                           :active-value="1"
                           :inactive-value="0"
                       />
-                    #elseif($fieldConfig.formType == "TEXT_AREA")
+                    #elseif($fieldConfig.formType.name() == "TEXT_AREA")
                       <el-input type="textarea"
                                 v-model="formData.$fieldConfig.fieldName"
                                 placeholder="$fieldConfig.fieldComment"
                       />
-                    #elseif($fieldConfig.formType == "DATE_TIME")
+                    #elseif($fieldConfig.formType.name() == "DATE_TIME")
                       <el-date-picker
                           v-model="formData.$fieldConfig.fieldName"
                           type="datetime"
                           placeholder="$fieldConfig.fieldComment"
                           value-format="YYYY-MM-DD HH:mm:ss"
                       />
-                    #elseif($fieldConfig.formType == "DATE")
+                    #elseif($fieldConfig.formType.name() == "DATE")
                       <el-date-picker
                           class="!w-[240px]"
                           v-model="formData.$fieldConfig.fieldName"
@@ -258,7 +258,7 @@
                     #end
                 </el-form-item>
 
-              #elseif($fieldConfig.formType == "HIDDEN")
+              #elseif($fieldConfig.formType.name() == "HIDDEN")
                 <el-input type="hidden" v-model="formData.$fieldConfig.fieldName" />
               #end
           #end

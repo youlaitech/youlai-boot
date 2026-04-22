@@ -39,7 +39,7 @@
     <!-- 新增 -->
     <PageModal ref="addModalRef" :modal-config="addModalConfig" @submit-click="handleSubmitClick">
 #foreach($fieldConfig in $fieldConfigs)
-#if($fieldConfig.isShowInForm == 1 && $fieldConfig.formType != "HIDDEN" && $fieldConfig.dictType && $fieldConfig.dictType.trim() != "")
+#if($fieldConfig.isShowInForm == 1 && $fieldConfig.formType.name() != "HIDDEN" && $fieldConfig.dictType && $fieldConfig.dictType.trim() != "")
       <template #$fieldConfig.fieldName="scope">
         <Dict v-model="scope.formData[scope.prop]" code="$fieldConfig.dictType" v-bind="scope.attrs" />
       </template>
@@ -50,7 +50,7 @@
     <!-- 编辑 -->
     <PageModal ref="editModalRef" :modal-config="editModalConfig" @submit-click="handleSubmitClick">
 #foreach($fieldConfig in $fieldConfigs)
-#if($fieldConfig.isShowInForm == 1 && $fieldConfig.formType != "HIDDEN" && $fieldConfig.dictType && $fieldConfig.dictType.trim() != "")
+#if($fieldConfig.isShowInForm == 1 && $fieldConfig.formType.name() != "HIDDEN" && $fieldConfig.dictType && $fieldConfig.dictType.trim() != "")
       <template #$fieldConfig.fieldName="scope">
         <Dict v-model="scope.formData[scope.prop]" code="$fieldConfig.dictType" v-bind="scope.attrs" />
       </template>
@@ -208,7 +208,7 @@ const addModalConfig = reactive({
   // 表单项配置
   formItems: [
 #foreach($fieldConfig in $fieldConfigs)
-#if($fieldConfig.isShowInForm == 1 && $fieldConfig.formType != "HIDDEN")
+#if($fieldConfig.isShowInForm == 1 && $fieldConfig.formType.name() != "HIDDEN")
 #if($fieldConfig.dictType && $fieldConfig.dictType.trim() != "")
     {
       type: "custom",

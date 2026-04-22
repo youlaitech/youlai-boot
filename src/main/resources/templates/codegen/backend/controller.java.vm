@@ -6,7 +6,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import ${packageName}.${moduleName}.model.form.${entityName}Form;
 import ${packageName}.${moduleName}.model.query.${entityName}Query;
-import ${packageName}.${moduleName}.model.vo.${entityName}Vo;
+import ${packageName}.${moduleName}.model.vo.${entityName}VO;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import ${packageName}.common.result.PageResult;
 import ${packageName}.common.result.Result;
@@ -35,8 +35,8 @@ public class ${entityName}Controller  {
     @Operation(summary = "$!{businessName}分页列表")
     @GetMapping
     @PreAuthorize("@ss.hasPerm('${moduleName}:${entityKebab}:list')")
-    public PageResult<${entityName}Vo> get${entityName}Page(${entityName}Query queryParams ) {
-        IPage<${entityName}Vo> result = ${entityLowerCamel}Service.get${entityName}Page(queryParams);
+    public PageResult<${entityName}VO> get${entityName}Page(${entityName}Query queryParams ) {
+        IPage<${entityName}VO> result = ${entityLowerCamel}Service.get${entityName}Page(queryParams);
         return PageResult.success(result);
     }
 

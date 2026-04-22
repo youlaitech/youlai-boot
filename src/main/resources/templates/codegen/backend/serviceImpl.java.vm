@@ -10,7 +10,7 @@ import ${packageName}.${moduleName}.service.${entityName}Service;
 import ${packageName}.${moduleName}.model.entity.${entityName};
 import ${packageName}.${moduleName}.model.form.${entityName}Form;
 import ${packageName}.${moduleName}.model.query.${entityName}Query;
-import ${packageName}.${moduleName}.model.vo.${entityName}Vo;
+import ${packageName}.${moduleName}.model.vo.${entityName}VO;
 import ${packageName}.${moduleName}.converter.${entityName}Converter;
 
 import java.util.Arrays;
@@ -36,17 +36,17 @@ public class ${entityName}ServiceImpl extends ServiceImpl<${entityName}Mapper, $
     * 获取${businessName}分页列表
     *
     * @param queryParams 查询参数
-    * @return {@link IPage<${entityName}Vo>} $!{businessName}分页列表
+    * @return {@link IPage<${entityName}VO>} $!{businessName}分页列表
     */
     @Override
-    public IPage<${entityName}Vo> get${entityName}Page(${entityName}Query queryParams) {
-        Page<${entityName}Vo> pageResult = this.baseMapper.get${entityName}Page(
+    public IPage<${entityName}VO> get${entityName}Page(${entityName}Query queryParams) {
+        Page<${entityName}VO> pageResult = this.baseMapper.get${entityName}Page(
                 new Page<>(queryParams.getPageNum(), queryParams.getPageSize()),
                 queryParams
         );
         return pageResult;
     }
-    
+
     /**
      * 获取${businessName}表单数据
      *
@@ -58,7 +58,7 @@ public class ${entityName}ServiceImpl extends ServiceImpl<${entityName}Mapper, $
         ${entityName} entity = this.getById(id);
         return ${entityLowerCamel}Converter.toForm(entity);
     }
-    
+
     /**
      * 新增${businessName}
      *
@@ -70,7 +70,7 @@ public class ${entityName}ServiceImpl extends ServiceImpl<${entityName}Mapper, $
         ${entityName} entity = ${entityLowerCamel}Converter.toEntity(formData);
         return this.save(entity);
     }
-    
+
     /**
      * 更新${businessName}
      *
@@ -81,9 +81,10 @@ public class ${entityName}ServiceImpl extends ServiceImpl<${entityName}Mapper, $
     @Override
     public boolean update${entityName}(Long id,${entityName}Form formData) {
         ${entityName} entity = ${entityLowerCamel}Converter.toEntity(formData);
+        entity.setId(id);
         return this.updateById(entity);
     }
-    
+
     /**
      * 删除${businessName}
      *

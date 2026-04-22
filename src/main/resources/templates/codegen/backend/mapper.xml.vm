@@ -3,7 +3,7 @@
 <mapper namespace="${packageName}.${moduleName}.mapper.${entityName}Mapper">
 
     <!-- 获取${businessName}分页列表 -->
-    <select id="get${entityName}Page" resultType="${packageName}.${moduleName}.model.vo.${entityName}Vo">
+    <select id="get${entityName}Page" resultType="${packageName}.${moduleName}.model.vo.${entityName}VO">
         SELECT
         #if($fieldConfigs)
             #set ($fields = [])
@@ -27,7 +27,7 @@
                 #else
             <if test="queryParams.${fieldConfig.fieldName} != null">
                 #end
-                            #set ($queryType = ${fieldConfig.queryType})
+                            #set ($queryType = ${fieldConfig.queryType}.name())
                             #if($queryType == "EQ")
                 AND ${fieldConfig.columnName} = #{queryParams.${fieldConfig.fieldName}}
                             #elseif($queryType == "LIKE")
@@ -37,7 +37,7 @@
                     AND ${fieldConfig.columnName} IN  <foreach collection="queryParams.${fieldConfig.fieldName}" item="item" open="(" close=")" separator=",">#{item}</foreach>
                 </if>
                 #elseif($queryType == "BETWEEN")
-                    #if($fieldConfig.formType == "DATE" || $fieldConfig.formType == "DATE_TIME")
+                    #if($fieldConfig.formType.name() == "DATE" || $fieldConfig.formType.name() == "DATE_TIME")
                 <if test="queryParams.${fieldConfig.fieldName}[0] != null and queryParams.${fieldConfig.fieldName}[0] != ''">
                     <bind name="startDate" value="queryParams.${fieldConfig.fieldName}[0].length() == 10 ? queryParams.${fieldConfig.fieldName}[0] + ' 00:00:00' : queryParams.${fieldConfig.fieldName}[0]"/>
                     AND ${fieldConfig.columnName} &gt;= #{startDate}

@@ -4,9 +4,9 @@ import ${packageName}.common.base.BaseQuery;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Getter;
 import lombok.Setter;
+import java.util.List;
 #if(${hasLocalDateTime})
 import java.time.LocalDateTime;
-import java.util.List;
 #end
 #if(${hasBigDecimal})
 import java.math.BigDecimal;
@@ -29,8 +29,8 @@ public class ${entityName}Query extends BaseQuery {
             #if("$!fieldConfig.fieldComment" != "")
     @Schema(description = "${fieldConfig.fieldComment}")
             #end
-            #if($fieldConfig.formType == "DATE" || $fieldConfig.formType == "DATE_TIME")
-                #if($fieldConfig.queryType == "BETWEEN")
+            #if($fieldConfig.formType.name() == "DATE" || $fieldConfig.formType.name() == "DATE_TIME")
+                #if($fieldConfig.queryType.name() == "BETWEEN")
     private List<String> ${fieldConfig.fieldName};
                 #else
     private ${fieldConfig.fieldType} ${fieldConfig.fieldName};
