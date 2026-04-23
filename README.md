@@ -1,5 +1,10 @@
 <div align="center">
 
+<img alt="youlai-boot" width="80" src="./docs/images/logo/logo.png">
+
+# youlai-boot
+
+**Spring Boot 4 企业级权限管理系统后端**
 
 [![Spring Boot](https://img.shields.io/badge/Spring%20Boot-4.0.1-6DB33F?logo=spring-boot)](https://spring.io/projects/spring-boot)
 [![JDK](https://img.shields.io/badge/JDK-17%2B-007396?logo=openjdk)](https://openjdk.org/)
@@ -9,6 +14,7 @@
 [![在线预览](https://img.shields.io/badge/🖥️%20在线预览-vue.youlai.tech-10B981)](https://vue.youlai.tech)
 [![Gitee Star](https://gitee.com/youlaiorg/youlai-boot/badge/star.svg)](https://gitee.com/youlaiorg/youlai-boot/stargazers)
 [![GitHub Star](https://img.shields.io/github/stars/youlaitech/youlai-boot?style=social)](https://github.com/youlaitech/youlai-boot)
+[![GitCode Star](https://gitcode.com/youlai/youlai-boot/star/badge.svg)](https://gitcode.com/youlai/youlai-boot/stargazers)
 
 </div>
 
@@ -18,7 +24,7 @@
 
 ## 核心特性
 
-- 🔐 **安全体系** — Spring Security + JWT + Redis 多端互斥、令牌续期、验证码防刷
+- 🔐 **安全体系** — Spring Security + JWT/Redis Token 双会话模式、令牌续期、多端互斥
 - 🛡️ **细粒度权限** — RBAC 五级：数据 → 菜单 → 按钮 → 接口 → 字段
 - ⚡ **代码生成器** — 一键生成前后端 CRUD 代码
 - 📦 **模块齐全** — 用户、角色、菜单、部门、字典、文件、定时任务、消息中心、操作日志
