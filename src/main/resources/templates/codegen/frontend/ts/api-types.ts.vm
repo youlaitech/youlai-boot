@@ -26,6 +26,7 @@ export interface ${entityName}QueryParams extends BaseQueryParams {
 
 /** $!{businessName}表单对象 */
 export interface ${entityName}Form {
+  id?: number;
 #foreach($fieldConfig in $fieldConfigs)
   #if($fieldConfig.isShowInForm)
     #if("$!fieldConfig.fieldComment" != "")
