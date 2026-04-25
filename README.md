@@ -6,15 +6,20 @@
 
 **Spring Boot 4 企业级权限管理系统后端**
 
-[![Spring Boot](https://img.shields.io/badge/Spring%20Boot-4.0.1-6DB33F?logo=spring-boot)](https://spring.io/projects/spring-boot)
+[![Spring Boot](https://img.shields.io/badge/Spring%20Boot-4.0.5-6DB33F?logo=spring-boot)](https://spring.io/projects/spring-boot)
 [![JDK](https://img.shields.io/badge/JDK-17%2B-007396?logo=openjdk)](https://openjdk.org/)
 [![License](https://img.shields.io/badge/License-Apache%202.0-blue?logo=apache)](LICENSE)
-
-[![文档](https://img.shields.io/badge/📖%20文档-youlai.tech-blue)](https://www.youlai.tech/docs/admin/backend/java/)
-[![在线预览](https://img.shields.io/badge/🖥️%20在线预览-vue.youlai.tech-10B981)](https://vue.youlai.tech)
 [![Gitee Star](https://gitee.com/youlaiorg/youlai-boot/badge/star.svg)](https://gitee.com/youlaiorg/youlai-boot/stargazers)
 [![GitHub Star](https://img.shields.io/github/stars/youlaitech/youlai-boot?style=social)](https://github.com/youlaitech/youlai-boot)
 [![GitCode Star](https://gitcode.com/youlai/youlai-boot/star/badge.svg)](https://gitcode.com/youlai/youlai-boot/stargazers)
+
+</div>
+
+![](https://foruda.gitee.com/images/1708618984641188532/a7cca095_716974.png "rainbow.png")
+
+<div align="center">
+
+[🖥️ 在线预览](https://vue.youlai.tech) | [📲 移动端预览](https://app.youlai.tech) | [📖 文档](https://www.youlai.tech/docs/admin/backend/java/)
 
 </div>
 
@@ -72,13 +77,13 @@
 **环境要求**：JDK 17+ · MySQL 8.0+ · Redis 6.0+
 
 1. 克隆项目：`git clone https://gitee.com/youlaiorg/youlai-boot.git`
-2. 导入数据库：`sql/mysql/youlai_admin.sql`
+2. 导入数据库：`sql/youlai-admin.sql`
 3. 修改配置（可选，默认已配置线上只读数据源）：`src/main/resources/application-dev.yml`
 4. 启动服务，访问 http://localhost:8000/doc.html
 
 默认账号：`admin` / `123456`
 
-**Docker 部署**：`cd docker && docker-compose up -d`
+**Docker 部署**：`cd deploy/docker`，然后 `docker-compose up -d`
 
 详细指南：[部署文档](https://www.youlai.tech/docs/admin/backends/java/deploy) · [开发规范](https://www.youlai.tech/docs/admin/backends/java/dev-standards)
 
@@ -86,7 +91,7 @@
 
 | 技术 | 版本 | 说明 |
 |:-----|:-----|:-----|
-| Spring Boot | 4.0.1 | 核心框架 |
+| Spring Boot | 4.0.5 | 核心框架 |
 | Spring Security | 6.x | 认证授权 |
 | MyBatis-Plus | 3.5.15 | ORM 框架 |
 | Druid | 1.2.24 | 数据库连接池 |
@@ -101,7 +106,9 @@
 
 ```
 youlai-boot/
-├── docker/                          # Docker 部署编排
+├── deploy/
+│   └── docker/                      # Docker 部署编排
+├── docs/                            # 项目文档与图片资源
 ├── sql/                             # 数据库初始化脚本
 ├── src/main/java/com/youlai/boot/
 │   ├── YouLaiBootApplication.java   # 启动类
@@ -125,18 +132,25 @@ youlai-boot/
 
 ## 生态矩阵
 
-| 项目 | 技术栈 | 定位 |
-|:-----|:-------|:-----|
-| [**vue3-element-admin**](https://gitee.com/youlaiorg/vue3-element-admin) | Vue 3 + Element Plus | **PC 管理前端**（主推） |
-| [**youlai-app**](https://gitee.com/youlaiorg/youlai-app) | Vue 3 + UniApp | **移动端 App** |
-| [**youlai-boot-tenant**](https://gitee.com/youlaiorg/youlai-boot-tenant) | Spring Boot 4 | **SaaS 多租户版本** |
-| [**youlai-boot-flex**](https://gitee.com/youlaiorg/youlai-boot-flex) | Spring Boot 3 + MyBatis-Flex | MyBatis-Flex 版 |
-| [**youlai-nest**](https://gitee.com/youlaiorg/youlai-nest) | NestJS + TypeORM | **Node.js 后端** |
-| [**youlai-gin**](https://gitee.com/youlaiorg/youlai-gin) | Go + Gorm | **Go 后端** |
-| [**youlai-django**](https://gitee.com/youlaiorg/youlai-django) | Django + DRF | **Python 后端** |
-| [**youlai-thinkphp**](https://gitee.com/youlaiorg/youlai-thinkphp) | ThinkPHP 8 | **PHP 后端** |
-| [**youlai-aspnet**](https://gitee.com/youlaiorg/youlai-aspnet) | ASP.NET Core | **C# 后端** |
+**前端**
 
+| 项目 | 技术栈 | 说明 |
+|:-----|:-------|:-----|
+| [vue3-element-admin](https://gitee.com/youlaiorg/vue3-element-admin) | Vue 3 + Element Plus | PC 管理前端（主推） |
+| [youlai-app](https://gitee.com/youlaiorg/youlai-app) | Vue 3 + UniApp | 移动端 App |
+
+**后端**
+
+| 项目 | 技术栈 | 说明 |
+|:-----|:-------|:-----|
+| [youlai-nest](https://gitee.com/youlaiorg/youlai-nest) | NestJS + TypeORM | Node.js |
+| [youlai-gin](https://gitee.com/youlaiorg/youlai-gin) | Go + Gorm | Go |
+| [youlai-django](https://gitee.com/youlaiorg/youlai-django) | Django + DRF | Python |
+| [youlai-thinkphp](https://gitee.com/youlaiorg/youlai-thinkphp) | ThinkPHP 8 | PHP |
+| [youlai-aspnet](https://gitee.com/youlaiorg/youlai-aspnet) | ASP.NET Core | C# |
+
+> **youlai-boot** 还提供以下变种和分支版本：[多租户](https://gitee.com/youlaiorg/youlai-boot-tenant)（Spring Boot 4）· [MyBatis-Flex](https://gitee.com/youlaiorg/youlai-boot-flex)（Spring Boot 4）· [Spring Boot 3](https://gitee.com/youlaiorg/youlai-boot/tree/spring-boot-3) · [PostgreSQL](https://gitee.com/youlaiorg/youlai-boot/tree/db-pg) · [多模块](https://gitee.com/youlaiorg/youlai-boot/tree/multi-module)
+>
 > 六种后端共享同一套 **RESTful API 规范** 和 **数据库结构**，前端可无缝切换。
 
 ## 文档资源
@@ -146,7 +160,7 @@ youlai-boot/
 | 📖 完整文档站 | [www.youlai.tech/docs/admin](https://www.youlai.tech/docs/admin/) |
 | 🖥️ PC 端在线预览 | [vue.youlai.tech](https://vue.youlai.tech) |
 | 📱 移动端在线预览 | [app.youlai.tech](https://app.youlai.tech) |
-| 🔗 Apifox 接口文档 | [apifox.com](https://apifox.com/apidoc/shared-xxx) |
+| 🔗 Apifox 接口文档 | [apifox.com](https://www.apifox.cn/apidoc/shared-195e783f-4d85-4235-a038-eec696de4ea5) |
 | 🔗 本地接口文档 | [localhost:8000/doc.html](http://localhost:8000/doc.html) |
 
 ## 参与贡献
@@ -161,14 +175,23 @@ youlai-boot/
 
 ---
 
-<p align="center">
-  <img src="./docs/images/qr/wechat-offical.png" height="180" alt="有来技术公众号">
-  &nbsp;&nbsp;&nbsp;&nbsp;
-  <img src="./docs/images/qr/wechat-personal.png" height="180" alt="个人微信">
-</p>
-<p align="center">
-  <sub>公众号「有来技术」</sub>
-  &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-  <sub>添加作者微信</sub>
-</p>
+<table align="center">
+  <tr>
+    <td align="center">
+      <img src="./docs/images/qr/wechat-offical.png" height="180" alt="公众号「有来技术」"><br>
+      <sub>公众号「有来技术」</sub>
+    </td>
+    <td>&nbsp;&nbsp;&nbsp;&nbsp;</td>
+    <td align="center">
+      <img src="./docs/images/qr/wechat-mp.jpg" height="180" alt="小程序「有来技术」"><br>
+      <sub>小程序「有来技术」</sub>
+    </td>
+    <td>&nbsp;&nbsp;&nbsp;&nbsp;</td>
+    <td align="center">
+      <img src="./docs/images/qr/wechat-personal.png" height="180" alt="添加作者微信"><br>
+      <sub>添加作者微信</sub>
+    </td>
+  </tr>
+</table>
+
 <p align="center"><em>技术交流 · 问题反馈 · 商务合作</em></p>

@@ -6,10 +6,12 @@ import org.springframework.context.event.ContextClosedEvent;
 import org.springframework.context.event.EventListener;
 import org.springframework.core.Ordered;
 import org.springframework.core.annotation.Order;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -195,6 +197,28 @@ public class SseSessionRegistry {
         Set<SseEmitter> emitters = userEmittersMap.get(username);
         if (emitters != null) {
             emitters.forEach(emitter -> sendEvent(emitter, eventName, data));
+        }
+    }
+
+    /**
+     * 心跳检测：每30秒向所有连接发送ping事件，及时清理已断开的僵尸连接
+     */
+    @Scheduled(fixedRate = 30000)
+    public void heartbeat() {
+        if (emitterUserMap.isEmpty()) {
+            return;
+        }
+        List<SseEmitter> failedEmitters = new ArrayList<>();
+        for (SseEmitter emitter : emitterUserMap.keySet()) {
+            try {
+                emitter.send(SseEmitter.event().name("ping").data("heartbeat"));
+            } catch (Exception e) {
+                failedEmitters.add(emitter);
+            }
+        }
+        if (!failedEmitters.isEmpty()) {
+            log.debug("心跳检测清理{}个失效SSE连接", failedEmitters.size());
+            failedEmitters.forEach(this::removeEmitter);
         }
     }
 

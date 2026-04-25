@@ -94,6 +94,7 @@ security:
     - /v3/api-docs/**
     - /webjars/**
     - /favicon.ico
+    - /error
 
 # 文件存储配置
 oss:
