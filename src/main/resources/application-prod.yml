@@ -10,7 +10,7 @@ spring:
     password: 123456
   data:
     redis:
-      database: 11
+      database: 1
       host: www.youlai.tech
       port: 6379
       password: 123456

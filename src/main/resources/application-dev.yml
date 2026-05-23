@@ -11,7 +11,7 @@ spring:
 
   data:
     redis:
-      database: 12
+      database: 0
       host: www.youlai.tech
       port: 6379
       password: 123456
