@@ -111,6 +111,7 @@ public enum ResultCode implements IResultCode, Serializable {
     /** 二级宏观错误码：第三方服务具体错误（按号段细分，便于定位是接口不存在/数据库异常等） */
     INTERFACE_NOT_EXIST("C0113", "接口不存在"),
     DATABASE_SERVICE_ERROR("C0300", "数据库服务出错"),
+    DATABASE_EXECUTION_ERROR("C0310", "数据库执行异常"),
     DATABASE_EXECUTION_SYNTAX_ERROR("C0313", "数据库执行语法错误"),
     INTEGRITY_CONSTRAINT_VIOLATION("C0342", "违反了完整性约束"),
     DATABASE_ACCESS_DENIED("C0351", "演示环境已禁用数据库写入功能，请本地部署修改数据库链接或开启Mock模式进行体验");

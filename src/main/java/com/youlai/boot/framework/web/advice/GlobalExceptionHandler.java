@@ -190,13 +190,11 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(BadSqlGrammarException.class)
     @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
     public <T> Result<T> handleBadSqlGrammarException(BadSqlGrammarException e) {
-        log.error(e.getMessage(), e);
-        String errorMsg = e.getMessage();
-        if (StrUtil.isNotBlank(errorMsg) && errorMsg.contains("denied to user")) {
+        log.error("SQL执行异常, message={}", e.getMessage(), e);
+        if (StrUtil.isNotBlank(e.getMessage()) && e.getMessage().contains("denied to user")) {
             return Result.failed(ResultCode.DATABASE_ACCESS_DENIED);
-        } else {
-            return Result.failed(e.getMessage());
         }
+        return Result.failed(ResultCode.DATABASE_EXECUTION_ERROR);
     }
 
     /**
