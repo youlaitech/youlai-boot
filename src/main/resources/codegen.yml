@@ -53,7 +53,7 @@ codegen:
     Form:
       templatePath: codegen/backend/form.java.vm
       subpackageName: model.form
-    Vo:
+    VO:
       templatePath: codegen/backend/vo.java.vm
       subpackageName: model.vo
     Entity:
