@@ -5,9 +5,9 @@ import cn.hutool.core.util.IdUtil;
 import cn.hutool.core.util.StrUtil;
 import com.youlai.boot.common.constant.RedisConstants;
 import com.youlai.boot.common.constant.SecurityConstants;
-import com.youlai.boot.common.exception.BusinessException;
 import com.youlai.boot.common.result.ResultCode;
 import com.youlai.boot.framework.security.config.SecurityProperties;
+import com.youlai.boot.framework.security.exception.TokenInvalidException;
 import com.youlai.boot.framework.security.model.AuthenticationToken;
 import com.youlai.boot.framework.security.model.UserSession;
 import com.youlai.boot.framework.security.model.SysUserDetails;
@@ -147,7 +147,7 @@ public class RedisTokenManager implements TokenManager {
         UserSession userSession = (UserSession) redisTemplate.opsForValue()
                 .get(StrUtil.format(RedisConstants.Auth.REFRESH_TOKEN_USER, refreshToken));
         if (userSession == null) {
-            throw new BusinessException(ResultCode.REFRESH_TOKEN_INVALID);
+            throw new TokenInvalidException(ResultCode.REFRESH_TOKEN_INVALID);
         }
         Object oldAccessTokenValue = redisTemplate.opsForValue().get(StrUtil.format(RedisConstants.Auth.USER_ACCESS_TOKEN, userSession.getUserId()));
         // 删除旧的访问令牌记录

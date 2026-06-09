@@ -12,9 +12,9 @@ import cn.hutool.jwt.JWTUtil;
 import com.youlai.boot.common.constant.JwtClaimConstants;
 import com.youlai.boot.common.constant.RedisConstants;
 import com.youlai.boot.common.constant.SecurityConstants;
-import com.youlai.boot.common.exception.BusinessException;
 import com.youlai.boot.common.result.ResultCode;
 import com.youlai.boot.framework.security.config.SecurityProperties;
+import com.youlai.boot.framework.security.exception.TokenInvalidException;
 import com.youlai.boot.framework.security.model.AuthenticationToken;
 import com.youlai.boot.framework.security.model.RoleDataScope;
 import org.apache.commons.lang3.StringUtils;
@@ -300,7 +300,7 @@ public class JwtTokenManager implements TokenManager {
     public AuthenticationToken refreshToken(String refreshToken) {
         boolean isValid = validateRefreshToken(refreshToken);
         if (!isValid) {
-            throw new BusinessException(ResultCode.REFRESH_TOKEN_INVALID);
+            throw new TokenInvalidException(ResultCode.REFRESH_TOKEN_INVALID);
         }
         Authentication authentication = parseToken(refreshToken);
         int accessTokenExpiration = securityProperties.getSession().getAccessTokenTimeToLive();

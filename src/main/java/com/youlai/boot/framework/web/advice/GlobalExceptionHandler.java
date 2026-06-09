@@ -5,6 +5,7 @@ import tools.jackson.core.JacksonException;
 import com.youlai.boot.common.exception.BusinessException;
 import com.youlai.boot.common.result.Result;
 import com.youlai.boot.common.result.ResultCode;
+import com.youlai.boot.framework.security.exception.TokenInvalidException;
 import jakarta.servlet.ServletException;
 import jakarta.validation.ConstraintViolation;
 import jakarta.validation.ConstraintViolationException;
@@ -220,6 +221,17 @@ public class GlobalExceptionHandler {
     public <T> Result<T> handleSQLIntegrityConstraintViolationException(SQLIntegrityConstraintViolationException e) {
         log.error(e.getMessage(), e);
         return Result.failed(ResultCode.INTEGRITY_CONSTRAINT_VIOLATION);
+    }
+
+    /**
+     * 处理 Token 无效异常
+     * <p>
+     * 当 access_token 或 refresh_token 过期/无效时，返回 401。
+     */
+    @ExceptionHandler(TokenInvalidException.class)
+    @ResponseStatus(HttpStatus.UNAUTHORIZED)
+    public <T> Result<T> handleTokenInvalidException(TokenInvalidException e) {
+        return Result.failed(e.getResultCode());
     }
 
     /**

@@ -3,7 +3,7 @@ package com.youlai.boot.framework.security.provider;
 import cn.hutool.core.util.ObjectUtil;
 import cn.hutool.core.util.StrUtil;
 import com.youlai.boot.common.constant.RedisConstants;
-import com.youlai.boot.framework.security.exception.CaptchaValidationException;
+import com.youlai.boot.framework.security.exception.SmsCaptchaException;
 import com.youlai.boot.framework.security.model.SmsAuthenticationToken;
 import com.youlai.boot.framework.security.model.SysUserDetails;
 import com.youlai.boot.framework.security.model.UserAuthInfo;
@@ -62,11 +62,11 @@ public class SmsAuthenticationProvider implements AuthenticationProvider {
         // 参数校验
         if (StrUtil.isBlank(mobile)) {
             log.warn("短信验证码登录失败：手机号为空");
-            throw new CaptchaValidationException("手机号不能为空");
+            throw new SmsCaptchaException("手机号不能为空");
         }
         if (StrUtil.isBlank(inputVerifyCode)) {
             log.warn("短信验证码登录失败：验证码为空，手机号={}", mobile);
-            throw new CaptchaValidationException("验证码不能为空");
+            throw new SmsCaptchaException("验证码不能为空");
         }
 
         // 根据手机号获取用户信息
@@ -89,12 +89,12 @@ public class SmsAuthenticationProvider implements AuthenticationProvider {
 
         if (cachedVerifyCode == null) {
             log.warn("短信验证码登录失败：验证码已过期，手机号={}", mobile);
-            throw new CaptchaValidationException("验证码已过期，请重新获取");
+            throw new SmsCaptchaException("验证码已过期，请重新获取");
         }
 
         if (!StrUtil.equals(inputVerifyCode, cachedVerifyCode)) {
             log.warn("短信验证码登录失败：验证码错误，手机号={}", mobile);
-            throw new CaptchaValidationException("验证码错误");
+            throw new SmsCaptchaException("验证码错误");
         }
 
         // 验证成功后删除验证码，防止重复使用
