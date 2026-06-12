@@ -27,7 +27,7 @@
                 #else
             <if test="queryParams.${fieldConfig.fieldName} != null">
                 #end
-                            #set ($queryType = ${fieldConfig.queryType}.name())
+                            #set ($queryType = $fieldConfig.queryType.name())
                             #if($queryType == "EQ")
                 AND ${fieldConfig.columnName} = #{queryParams.${fieldConfig.fieldName}}
                             #elseif($queryType == "LIKE")
