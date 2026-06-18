@@ -553,15 +553,38 @@ CREATE TABLE `sys_user_notice` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='用户通知公告关联表';
 
 INSERT INTO `sys_user_notice` VALUES (1, 1, 2, 1, NULL, now(), now(), 0);
-INSERT INTO `sys_user_notice` VALUES (2, 2, 2, 1, NULL, now(), now(), 0);
-INSERT INTO `sys_user_notice` VALUES (3, 3, 2, 1, NULL, now(), now(), 0);
+INSERT INTO `sys_user_notice` VALUES (2, 2, 2, 0, NULL, now(), now(), 0);
+INSERT INTO `sys_user_notice` VALUES (3, 3, 2, 0, NULL, now(), now(), 0);
 INSERT INTO `sys_user_notice` VALUES (4, 4, 2, 1, NULL, now(), now(), 0);
-INSERT INTO `sys_user_notice` VALUES (5, 5, 2, 1, NULL, now(), now(), 0);
+INSERT INTO `sys_user_notice` VALUES (5, 5, 2, 0, NULL, now(), now(), 0);
 INSERT INTO `sys_user_notice` VALUES (6, 6, 2, 1, NULL, now(), now(), 0);
-INSERT INTO `sys_user_notice` VALUES (7, 7, 2, 1, NULL, now(), now(), 0);
+INSERT INTO `sys_user_notice` VALUES (7, 7, 2, 0, NULL, now(), now(), 0);
 INSERT INTO `sys_user_notice` VALUES (8, 8, 2, 1, NULL, now(), now(), 0);
-INSERT INTO `sys_user_notice` VALUES (9, 9, 2, 1, NULL, now(), now(), 0);
+INSERT INTO `sys_user_notice` VALUES (9, 9, 2, 0, NULL, now(), now(), 0);
 INSERT INTO `sys_user_notice` VALUES (10, 10, 2, 1, NULL, now(), now(), 0);
+
+-- root 用户 (user_id=1) 绑定全部通知，5 条未读展示红点效果
+INSERT INTO `sys_user_notice` VALUES (11, 1, 1, 0, NULL, now(), now(), 0);
+INSERT INTO `sys_user_notice` VALUES (12, 2, 1, 1, NULL, now(), now(), 0);
+INSERT INTO `sys_user_notice` VALUES (13, 3, 1, 0, NULL, now(), now(), 0);
+INSERT INTO `sys_user_notice` VALUES (14, 4, 1, 1, NULL, now(), now(), 0);
+INSERT INTO `sys_user_notice` VALUES (15, 5, 1, 0, NULL, now(), now(), 0);
+INSERT INTO `sys_user_notice` VALUES (16, 6, 1, 1, NULL, now(), now(), 0);
+INSERT INTO `sys_user_notice` VALUES (17, 7, 1, 0, NULL, now(), now(), 0);
+INSERT INTO `sys_user_notice` VALUES (18, 8, 1, 1, NULL, now(), now(), 0);
+INSERT INTO `sys_user_notice` VALUES (19, 9, 1, 0, NULL, now(), now(), 0);
+INSERT INTO `sys_user_notice` VALUES (20, 10, 1, 1, NULL, now(), now(), 0);
+
+-- test 用户 (user_id=3) 绑定除指定通知(ID=7)外的 9 条通知，4 条未读
+INSERT INTO `sys_user_notice` VALUES (21, 1, 3, 0, NULL, now(), now(), 0);
+INSERT INTO `sys_user_notice` VALUES (22, 2, 3, 1, NULL, now(), now(), 0);
+INSERT INTO `sys_user_notice` VALUES (23, 3, 3, 0, NULL, now(), now(), 0);
+INSERT INTO `sys_user_notice` VALUES (24, 4, 3, 1, NULL, now(), now(), 0);
+INSERT INTO `sys_user_notice` VALUES (25, 5, 3, 1, NULL, now(), now(), 0);
+INSERT INTO `sys_user_notice` VALUES (26, 6, 3, 0, NULL, now(), now(), 0);
+INSERT INTO `sys_user_notice` VALUES (27, 8, 3, 1, NULL, now(), now(), 0);
+INSERT INTO `sys_user_notice` VALUES (28, 9, 3, 1, NULL, now(), now(), 0);
+INSERT INTO `sys_user_notice` VALUES (29, 10, 3, 0, NULL, now(), now(), 0);
 
 -- ----------------------------
 -- Table structure for sys_user_social
