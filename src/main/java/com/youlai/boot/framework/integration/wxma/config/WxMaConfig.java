@@ -1,4 +1,4 @@
-package com.youlai.boot.framework.integration.wxma;
+package com.youlai.boot.framework.integration.wxma.config;
 
 import cn.binarywang.wx.miniapp.api.WxMaService;
 import cn.binarywang.wx.miniapp.api.impl.WxMaServiceImpl;
@@ -17,21 +17,13 @@ import org.springframework.context.annotation.Configuration;
 @EnableConfigurationProperties(WxMaProperties.class)
 public class WxMaConfig {
 
-    /**
-     * 微信小程序服务
-     *
-     * @param properties 微信小程序配置属性
-     * @return {@link WxMaService}
-     */
     @Bean
     public WxMaService wxMaService(WxMaProperties properties) {
         WxMaDefaultConfigImpl config = new WxMaDefaultConfigImpl();
         config.setAppid(properties.getAppid());
         config.setSecret(properties.getSecret());
-
         WxMaService service = new WxMaServiceImpl();
         service.setWxMaConfig(config);
         return service;
     }
-
 }

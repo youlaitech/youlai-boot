@@ -2,10 +2,10 @@ package com.youlai.boot.system.model.entity;
 
 import com.baomidou.mybatisplus.annotation.*;
 import com.baomidou.mybatisplus.extension.handlers.JacksonTypeHandler;
-import lombok.Getter;
-import lombok.Setter;
+import com.youlai.boot.common.base.BaseEntity;
+import lombok.Data;
+import lombok.EqualsAndHashCode;
 
-import java.time.LocalDateTime;
 import java.util.Map;
 
 /**
@@ -15,15 +15,9 @@ import java.util.Map;
  * @since 2023/3/6
  */
 @TableName(value = "sys_menu", autoResultMap = true)
-@Getter
-@Setter
-public class Menu {
-    /**
-     * 菜单ID
-     */
-    @TableId(type = IdType.AUTO)
-    private Long id;
-
+@Data
+@EqualsAndHashCode(callSuper = true)
+public class Menu extends BaseEntity {
     /**
      * 父菜单ID
      */
@@ -99,15 +93,5 @@ public class Menu {
      */
     @TableField(updateStrategy = FieldStrategy.ALWAYS, typeHandler = JacksonTypeHandler.class)
     private Map<String, Object> params;
-
-
-    @TableField(fill = FieldFill.INSERT)
-    private LocalDateTime createTime;
-
-    /**
-     * 更新时间
-     */
-    @TableField(fill = FieldFill.INSERT_UPDATE)
-    private LocalDateTime updateTime;
 
 }

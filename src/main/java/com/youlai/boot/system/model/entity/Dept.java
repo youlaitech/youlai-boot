@@ -4,8 +4,8 @@ import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableName;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.youlai.boot.common.base.BaseEntity;
-import lombok.Getter;
-import lombok.Setter;
+import lombok.Data;
+import lombok.EqualsAndHashCode;
 
 /**
  * 部门实体对象
@@ -14,8 +14,8 @@ import lombok.Setter;
  * @since 2024/06/23
  */
 @TableName("sys_dept")
-@Getter
-@Setter
+@Data
+@EqualsAndHashCode(callSuper = true)
 public class Dept extends BaseEntity {
 
     /**

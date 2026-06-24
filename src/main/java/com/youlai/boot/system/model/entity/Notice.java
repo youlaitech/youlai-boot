@@ -4,8 +4,8 @@ import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableName;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.youlai.boot.common.base.BaseEntity;
-import lombok.Getter;
-import lombok.Setter;
+import lombok.Data;
+import lombok.EqualsAndHashCode;
 
 import java.io.Serial;
 import java.time.LocalDateTime;
@@ -16,8 +16,8 @@ import java.time.LocalDateTime;
  * @author Kylin
  * @since 2024-08-27 10:31
  */
-@Getter
-@Setter
+@Data
+@EqualsAndHashCode(callSuper = true)
 @TableName("sys_notice")
 public class Notice extends BaseEntity {
 

@@ -1,7 +1,7 @@
 package com.youlai.boot.framework.security.handler;
 
 import com.youlai.boot.common.result.ResultCode;
-import com.youlai.boot.common.result.ResponseWriter;
+import com.youlai.boot.framework.web.util.ResponseWriter;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.InsufficientAuthenticationException;
 import org.springframework.security.core.AuthenticationException;

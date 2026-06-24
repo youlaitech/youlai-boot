@@ -1,4 +1,4 @@
-package com.youlai.boot.framework.integration.wxma;
+package com.youlai.boot.framework.integration.wxma.config;
 
 import lombok.Data;
 import org.springframework.boot.context.properties.ConfigurationProperties;
@@ -10,14 +10,7 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
 @ConfigurationProperties(prefix = "wx.miniapp")
 public class WxMaProperties {
 
-    /**
-     * 小程序 AppID
-     */
     private String appid;
 
-    /**
-     * 小程序 AppSecret
-     */
     private String secret;
-
 }

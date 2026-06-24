@@ -1,4 +1,4 @@
-package com.youlai.boot.auth.model;
+package com.youlai.boot.auth.model.vo;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.AllArgsConstructor;
@@ -8,16 +8,13 @@ import lombok.NoArgsConstructor;
 
 /**
  * 微信小程序登录响应
- *
- * @author Ray.Hao
- * @since 2.4.0
  */
 @Data
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
 @Schema(description = "微信小程序登录响应")
-public class WxMaLoginResp {
+public class WxMaLoginVO {
 
     @Schema(description = "是否新用户")
     private Boolean isNewUser;
@@ -25,7 +22,7 @@ public class WxMaLoginResp {
     @Schema(description = "是否需要绑定手机号")
     private Boolean needBindMobile;
 
-    @Schema(description = "微信openid（绑定手机号时需要）")
+    @Schema(description = "微信openid")
     private String openid;
 
     @Schema(description = "访问令牌")

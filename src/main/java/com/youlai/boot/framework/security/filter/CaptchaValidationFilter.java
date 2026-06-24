@@ -5,7 +5,7 @@ import cn.hutool.json.JSONObject;
 import cn.hutool.json.JSONUtil;
 import com.youlai.boot.common.constant.SecurityConstants;
 import com.youlai.boot.common.result.ResultCode;
-import com.youlai.boot.common.result.ResponseWriter;
+import com.youlai.boot.framework.web.util.ResponseWriter;
 import com.youlai.boot.framework.captcha.exception.CaptchaException;
 import com.youlai.boot.framework.captcha.service.CaptchaService;
 import jakarta.servlet.FilterChain;

@@ -17,34 +17,22 @@ import java.util.Map;
 @Data
 public class AliyunSmsProperties {
 
-    /**
-     * 阿里云账户的Access Key ID，用于API请求认证
-     */
+    /** Access Key ID */
     private String accessKeyId;
 
-    /**
-     *阿里云账户的Access Key Secret，用于API请求认证
-     */
+    /** Access Key Secret */
     private String accessKeySecret;
 
-    /**
-     * 阿里云短信服务API的域名 eg: dysmsapi.aliyuncs.com
-     */
+    /** API 域名，如 dysmsapi.aliyuncs.com */
     private String domain;
 
-    /**
-     * 阿里云服务的区域ID，如cn-shanghai
-     */
+    /** 区域，如 cn-shanghai */
     private String regionId;
 
-    /**
-     * 短信签名，必须是已经在阿里云短信服务中注册并通过审核的
-     */
+    /** 短信签名 */
     private String signName;
 
-    /**
-     * 短信模板集合
-     */
+    /** 短信模板集合，key 为模板用途(login/register)，value 为模板CODE */
     private Map<String, String> templates;
 
 }

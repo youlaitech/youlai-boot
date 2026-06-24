@@ -18,6 +18,7 @@
             t1.route_name,
             t1.route_path,
             t1.component,
+            t1.external_url,
             t1.icon,
             t1.sort,
             t1.visible,

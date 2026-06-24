@@ -3,7 +3,7 @@ package com.youlai.boot.framework.security.filter;
 import cn.hutool.core.util.StrUtil;
 import com.youlai.boot.common.constant.SecurityConstants;
 import com.youlai.boot.common.result.ResultCode;
-import com.youlai.boot.common.result.ResponseWriter;
+import com.youlai.boot.framework.web.util.ResponseWriter;
 import com.youlai.boot.framework.security.token.TokenManager;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;

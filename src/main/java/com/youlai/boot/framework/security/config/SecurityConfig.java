@@ -3,7 +3,6 @@ package com.youlai.boot.framework.security.config;
 import cn.binarywang.wx.miniapp.api.WxMaService;
 import com.youlai.boot.framework.captcha.service.CaptchaService;
 import cn.hutool.core.util.ArrayUtil;
-import com.youlai.boot.framework.web.filter.RateLimiterFilter;
 import com.youlai.boot.framework.security.filter.CaptchaValidationFilter;
 import com.youlai.boot.framework.security.filter.TokenAuthenticationFilter;
 import com.youlai.boot.framework.security.handler.MyAccessDeniedHandler;
@@ -12,12 +11,12 @@ import com.youlai.boot.framework.security.provider.SmsAuthenticationProvider;
 import com.youlai.boot.framework.security.provider.WxMaAuthenticationProvider;
 import com.youlai.boot.framework.security.token.TokenManager;
 import com.youlai.boot.framework.security.service.SysUserDetailsService;
-import com.youlai.boot.system.service.ConfigService;
 import com.youlai.boot.system.service.UserService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.data.redis.core.RedisTemplate;
+
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.ProviderManager;
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
@@ -52,7 +51,6 @@ public class SecurityConfig {
     private final SysUserDetailsService userDetailsService;
 
     private final CaptchaService captchaService;
-    private final ConfigService configService;
     private final SecurityProperties securityProperties;
 
     /**
@@ -86,8 +84,6 @@ public class SecurityConfig {
                 .httpBasic(AbstractHttpConfigurer::disable) // 禁用 HTTP Basic 认证，避免弹窗式登录
                 // 禁用 X-Frame-Options 响应头，允许页面被嵌套到 iframe 中
                 .headers(headers -> headers.frameOptions(HeadersConfigurer.FrameOptionsConfig::disable))
-                // 限流过滤器
-                .addFilterBefore(new RateLimiterFilter(redisTemplate, configService), UsernamePasswordAuthenticationFilter.class)
                 // 验证码校验过滤器
                 .addFilterBefore(new CaptchaValidationFilter(captchaService), UsernamePasswordAuthenticationFilter.class)
                 // 验证和解析过滤器

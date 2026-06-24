@@ -5,7 +5,7 @@ import cn.binarywang.wx.miniapp.bean.WxMaJscode2SessionResult;
 import cn.binarywang.wx.miniapp.bean.WxMaPhoneNumberInfo;
 import cn.hutool.core.util.IdUtil;
 import cn.hutool.core.util.StrUtil;
-import com.youlai.boot.auth.model.WxMaLoginResp;
+import com.youlai.boot.auth.model.vo.WxMaLoginVO;
 import com.youlai.boot.auth.service.WxMaAuthService;
 import com.youlai.boot.common.constant.RedisConstants;
 import com.youlai.boot.framework.security.exception.NeedBindMobileException;
@@ -54,14 +54,14 @@ public class WxMaAuthServiceImpl implements WxMaAuthService {
      * 静默登录
      */
     @Override
-    public WxMaLoginResp silentLogin(String code) {
+    public WxMaLoginVO silentLogin(String code) {
         WxMaAuthenticationToken token = new WxMaAuthenticationToken(code);
 
         try {
             Authentication authentication = authenticationManager.authenticate(token);
             AuthenticationToken authToken = tokenManager.generateToken(authentication);
             SecurityContextHolder.getContext().setAuthentication(authentication);
-            return WxMaLoginResp.builder()
+            return WxMaLoginVO.builder()
                     .isNewUser(false)
                     .needBindMobile(false)
                     .accessToken(authToken.getAccessToken())
@@ -70,7 +70,7 @@ public class WxMaAuthServiceImpl implements WxMaAuthService {
                     .expiresIn(authToken.getExpiresIn())
                     .build();
         } catch (NeedBindMobileException e) {
-            return WxMaLoginResp.builder()
+            return WxMaLoginVO.builder()
                     .isNewUser(true)
                     .needBindMobile(true)
                     .openid(e.getOpenid())

@@ -4,8 +4,8 @@ import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableName;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.youlai.boot.common.base.BaseEntity;
-import lombok.Getter;
-import lombok.Setter;
+import lombok.Data;
+import lombok.EqualsAndHashCode;
 
 /**
  * 角色实体
@@ -14,8 +14,8 @@ import lombok.Setter;
  * @since 2024/6/23
  */
 @TableName("sys_role")
-@Getter
-@Setter
+@Data
+@EqualsAndHashCode(callSuper = true)
 public class Role extends BaseEntity {
 
     /**

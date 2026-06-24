@@ -6,7 +6,7 @@ import cn.hutool.captcha.generator.CodeGenerator;
 import cn.hutool.core.util.IdUtil;
 import cn.hutool.core.util.StrUtil;
 import com.youlai.boot.common.constant.RedisConstants;
-import com.youlai.boot.common.enums.CaptchaTypeEnum;
+import com.youlai.boot.framework.captcha.enums.CaptchaTypeEnum;
 import com.youlai.boot.common.result.ResultCode;
 import com.youlai.boot.framework.captcha.config.CaptchaProperties;
 import com.youlai.boot.framework.captcha.exception.CaptchaException;

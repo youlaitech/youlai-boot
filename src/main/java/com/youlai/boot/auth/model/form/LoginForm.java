@@ -1,19 +1,15 @@
-package com.youlai.boot.auth.model;
+package com.youlai.boot.auth.model.form;
 
 import io.swagger.v3.oas.annotations.media.Schema;
+import jakarta.validation.constraints.NotBlank;
 import lombok.Data;
 
-import jakarta.validation.constraints.NotBlank;
-
 /**
- * 登录请求参数
- *
- * @author Ray.Hao
- * @since 3.0.0
+ * 登录表单
  */
 @Schema(description = "登录请求参数")
 @Data
-public class LoginReq {
+public class LoginForm {
 
     @Schema(description = "用户名", requiredMode = Schema.RequiredMode.REQUIRED, example = "admin")
     @NotBlank(message = "用户名不能为空")

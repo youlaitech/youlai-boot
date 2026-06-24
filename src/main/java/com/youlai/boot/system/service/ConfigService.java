@@ -58,11 +58,4 @@ public interface ConfigService extends IService<Config> {
      */
     boolean refreshCache();
 
-    /**
-     * 获取系统配置
-     * @param key 配置键
-     * @return 配置值
-     */
-    Object getSystemConfig(String key);
-
 }

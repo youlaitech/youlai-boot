@@ -1,11 +1,12 @@
 package com.youlai.boot.auth.controller;
 
-import com.youlai.boot.auth.model.LoginReq;
+import com.youlai.boot.auth.model.form.LoginForm;
 import com.youlai.boot.common.enums.ActionTypeEnum;
 import com.youlai.boot.common.enums.LogModuleEnum;
 import com.youlai.boot.common.result.Result;
 import com.youlai.boot.auth.service.AuthService;
 import com.youlai.boot.common.annotation.Log;
+import com.youlai.boot.common.annotation.RateLimit;
 import com.youlai.boot.framework.captcha.model.CaptchaInfo;
 import com.youlai.boot.framework.security.model.AuthenticationToken;
 import io.swagger.v3.oas.annotations.Operation;
@@ -41,7 +42,8 @@ public class AuthController {
     @Operation(summary = "账号密码登录")
     @PostMapping("/login")
     @Log(module = LogModuleEnum.LOGIN, value = ActionTypeEnum.LOGIN)
-    public Result<AuthenticationToken> login(@RequestBody @Valid LoginReq request) {
+    @RateLimit(limit = 5, window = 60)
+    public Result<AuthenticationToken> login(@RequestBody @Valid LoginForm request) {
         AuthenticationToken authenticationToken = authService.login(request.getUsername(), request.getPassword());
         return Result.success(authenticationToken);
     }
@@ -59,6 +61,7 @@ public class AuthController {
 
     @Operation(summary = "发送登录短信验证码")
     @PostMapping("/sms/code")
+    @RateLimit(limit = 1, window = 60)
     public Result<Void> sendSmsCode(
             @Parameter(description = "手机号", example = "18888888888") @RequestParam String mobile
     ) {

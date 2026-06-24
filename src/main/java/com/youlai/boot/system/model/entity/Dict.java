@@ -11,7 +11,7 @@ import lombok.EqualsAndHashCode;
  * @author Ray.Hao
  * @since 2022/12/17
  */
-@EqualsAndHashCode(callSuper = false)
+@EqualsAndHashCode(callSuper = true)
 @TableName("sys_dict")
 @Data
 public class Dict extends BaseEntity {

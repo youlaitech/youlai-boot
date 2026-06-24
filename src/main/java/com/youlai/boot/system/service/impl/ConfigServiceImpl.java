@@ -142,18 +142,5 @@ public class ConfigServiceImpl extends ServiceImpl<ConfigMapper, Config> impleme
         return false;
     }
 
-    /**
-     * 获取系统配置
-     *
-     * @param key 配置键
-     * @return 配置值
-     */
-    @Override
-    public Object getSystemConfig(String key) {
-        if (StringUtils.isNotBlank(key)) {
-            return redisTemplate.opsForHash().get(RedisConstants.System.CONFIG, key);
-        }
-        return null;
-    }
-
 }
+

@@ -2,15 +2,15 @@ package com.youlai.boot.system.model.entity;
 
 import com.baomidou.mybatisplus.annotation.TableName;
 import com.youlai.boot.common.base.BaseEntity;
-import lombok.Getter;
-import lombok.Setter;
+import lombok.Data;
+import lombok.EqualsAndHashCode;
 
 /**
  * 用户实体
  */
 @TableName("sys_user")
-@Getter
-@Setter
+@Data
+@EqualsAndHashCode(callSuper = true)
 public class SysUser extends BaseEntity {
 
     /**

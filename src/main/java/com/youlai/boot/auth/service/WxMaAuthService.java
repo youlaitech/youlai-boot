@@ -1,6 +1,6 @@
 package com.youlai.boot.auth.service;
 
-import com.youlai.boot.auth.model.WxMaLoginResp;
+import com.youlai.boot.auth.model.vo.WxMaLoginVO;
 import com.youlai.boot.framework.security.model.AuthenticationToken;
 
 /**
@@ -21,7 +21,7 @@ public interface WxMaAuthService {
      * @param code 微信登录凭证（wx.login 获取）
      * @return 登录结果（成功返回 token，需绑定返回 openid）
      */
-    WxMaLoginResp silentLogin(String code);
+    WxMaLoginVO silentLogin(String code);
 
     /**
      * 手机号快捷登录

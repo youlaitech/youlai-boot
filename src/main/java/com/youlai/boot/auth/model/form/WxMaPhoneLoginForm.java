@@ -1,18 +1,15 @@
-package com.youlai.boot.auth.model;
+package com.youlai.boot.auth.model.form;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.NotBlank;
 import lombok.Data;
 
 /**
- * 微信小程序手机号快捷登录请求
- *
- * @author Ray.Hao
- * @since 3.0.0
+ * 微信小程序手机号快捷登录表单
  */
 @Schema(description = "微信小程序手机号快捷登录请求")
 @Data
-public class WxMaPhoneLoginReq {
+public class WxMaPhoneLoginForm {
 
     @NotBlank(message = "微信登录凭证不能为空")
     @Schema(description = "微信登录凭证（wx.login 获取）", example = "0xxx")

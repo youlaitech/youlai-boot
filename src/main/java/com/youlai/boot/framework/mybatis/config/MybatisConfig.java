@@ -5,7 +5,7 @@ import com.baomidou.mybatisplus.core.config.GlobalConfig;
 import com.baomidou.mybatisplus.extension.plugins.MybatisPlusInterceptor;
 import com.baomidou.mybatisplus.extension.plugins.inner.DataPermissionInterceptor;
 import com.baomidou.mybatisplus.extension.plugins.inner.PaginationInnerInterceptor;
-import com.youlai.boot.framework.mybatis.handler.MyMetaObjectHandler;
+import com.youlai.boot.framework.mybatis.handler.AutoFillMetaObjectHandler;
 import com.youlai.boot.framework.mybatis.interceptor.MyDataPermissionHandler;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -43,7 +43,7 @@ public class MybatisConfig {
     @Bean
     public GlobalConfig globalConfig() {
         GlobalConfig globalConfig = new GlobalConfig();
-        globalConfig.setMetaObjectHandler(new MyMetaObjectHandler());
+        globalConfig.setMetaObjectHandler(new AutoFillMetaObjectHandler());
         return globalConfig;
     }
 

@@ -13,7 +13,7 @@ import lombok.EqualsAndHashCode;
  * @since 2024-07-29 11:17:26
  */
 @Data
-@EqualsAndHashCode(callSuper = false)
+@EqualsAndHashCode(callSuper = true)
 @Schema(description = "系统配置")
 @TableName("sys_config")
 public class Config extends BaseEntity {
