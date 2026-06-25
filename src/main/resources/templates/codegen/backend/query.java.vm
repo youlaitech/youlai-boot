@@ -4,7 +4,17 @@ import ${packageName}.common.base.BaseQuery;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Getter;
 import lombok.Setter;
+#if($fieldConfigs)
+    #set ($hasDateBetween = false)
+    #foreach($fieldConfig in ${fieldConfigs})
+        #if(($fieldConfig.formType.name() == "DATE" || $fieldConfig.formType.name() == "DATE_TIME") && $fieldConfig.queryType.name() == "BETWEEN")
+            #set ($hasDateBetween = true)
+        #end
+    #end
+    #if($hasDateBetween)
 import java.util.List;
+    #end
+#end
 #if(${hasLocalDateTime})
 import java.time.LocalDateTime;
 #end

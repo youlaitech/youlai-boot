@@ -7,30 +7,20 @@ const ${entityUpperSnake}_BASE_URL = "/api/v1/${entityKebab}";
 const ${entityName}API = {
     /** 获取${businessName}分页数据 */
     getPage(queryParams?: ${entityName}QueryParams) {
-        return request<any, PageResult<${entityName}Item>>({
+        return request<unknown, PageResult<${entityName}Item>>({
             url: `${${entityUpperSnake}_BASE_URL}`,
             method: "get",
             params: queryParams,
         });
     },
-    /**
-     * 获取${businessName}表单数据
-     *
-     * @param id ${businessName}ID
-     * @returns ${businessName}表单数据
-     */
+    /** 获取${businessName}表单数据 */
     getFormData(id: string) {
-        return request<any, ${entityName}Form>({
+        return request<unknown, ${entityName}Form>({
             url: `${${entityUpperSnake}_BASE_URL}/${id}/form`,
             method: "get",
         });
     },
-
-    /**
-     *  添加${businessName}
-     *
-     *  @param data ${businessName}表单数据
-     */
+    /** 新增${businessName} */
     create(data: ${entityName}Form) {
         return request({
             url: `${${entityUpperSnake}_BASE_URL}`,
@@ -38,13 +28,7 @@ const ${entityName}API = {
             data,
         });
     },
-
-    /**
-     * 更新${businessName}
-     *
-     * @param id ${businessName}ID
-     * @param data ${businessName}表单数据
-     */
+    /** 更新${businessName} */
      update(id: string, data: ${entityName}Form) {
         return request({
             url: `${${entityUpperSnake}_BASE_URL}/${id}`,
@@ -52,12 +36,7 @@ const ${entityName}API = {
             data,
         });
     },
-
-    /**
-     * 批量删除${businessName}，多个以英文逗号(,)分割
-     *
-     * @param ids ${businessName}ID字符串，多个以英文逗号(,)分割
-     */
+    /** 批量删除${businessName}，多个以英文逗号(,)分割 */
      deleteByIds(ids: string) {
         return request({
             url: `${${entityUpperSnake}_BASE_URL}/${ids}`,

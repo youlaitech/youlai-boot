@@ -61,11 +61,14 @@
 </template>
 
 <script setup lang="ts">
-defineOptions({ name: "$entityName" });
+defineOptions({
+  name: "$entityName",
+  inheritAttrs: false,
+});
 
 import ${entityName}API from "@/api/${moduleName}/${entityKebab}";
 import type { ${entityName}Form, ${entityName}QueryParams } from "@/api/${moduleName}/${entityKebab}";
-import type { IObject, IModalConfig, IContentConfig, ISearchConfig } from "@/components/CURD/types";
+import type { IObject, IOperateData, IModalConfig, IContentConfig, ISearchConfig } from "@/components/CURD/types";
 import usePage from "@/components/CURD/usePage";
 
 // 组合式 CRUD
@@ -185,7 +188,7 @@ const contentConfig: IContentConfig<${entityName}QueryParams> = reactive({
     {
       label: "操作",
       prop: "operation",
-      width: 220,
+      width: 180,
       templet: "tool",
       operat: ["edit", "delete"],
     },
@@ -355,7 +358,7 @@ const editModalConfig: IModalConfig<${entityName}Form> = reactive({
 });
 
 // 处理操作按钮点击
-const handleOperateClick = (data: IObject) => {
+const handleOperateClick = (data: IOperateData) => {
   if (data.name === "edit") {
     handleEditClick(data.row, async () => {
       return await ${entityName}API.getFormData(String(data.row.id));

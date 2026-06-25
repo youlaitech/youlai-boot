@@ -1,63 +1,64 @@
 <template>
   <div class="page-container">
+    <!-- 搜索 -->
     <el-card class="page-search" shadow="never">
-      <el-form ref="queryFormRef" :model="queryParams" :inline="true" label-width="auto">
+      <el-form ref="queryFormRef" :model="params" :inline="true">
         #foreach($fieldConfig in $fieldConfigs)
           #if($fieldConfig.isShowInQuery == 1)
             <el-form-item label="$fieldConfig.fieldComment" prop="$fieldConfig.fieldName">
                     #if($fieldConfig.formType.name() == "INPUT")
                       <el-input
-                          v-model="queryParams.$fieldConfig.fieldName"
+                          v-model="params.$fieldConfig.fieldName"
                           placeholder="$fieldConfig.fieldComment"
                           clearable
                           @keyup.enter="handleQuery()"
                       />
                     #elseif($fieldConfig.formType.name() == "SELECT")
                         #if($fieldConfig.dictType && $fieldConfig.dictType.trim() != "")
-                          <DictSelect v-model="queryParams.$fieldConfig.fieldName" code="$fieldConfig.dictType" />
+                          <DictSelect v-model="params.$fieldConfig.fieldName" code="$fieldConfig.dictType" />
                         #else
-                          <el-select v-model="queryParams.$fieldConfig.fieldName" placeholder="请选择$fieldConfig.fieldComment">
+                          <el-select v-model="params.$fieldConfig.fieldName" placeholder="请选择$fieldConfig.fieldComment">
                             <el-option :key="1" :value="1" label="选项一"/>
                             <el-option :key="2" :value="2" label="选项二"/>
                           </el-select>
                         #end
                     #elseif($fieldConfig.formType.name() == "RADIO")
                         #if($fieldConfig.dictType && $fieldConfig.dictType.trim() != "")
-                          <DictSelect v-model="queryParams.$fieldConfig.fieldName" type="radio" code="$fieldConfig.dictType" />
+                          <DictSelect v-model="params.$fieldConfig.fieldName" type="radio" code="$fieldConfig.dictType" />
                         #else
-                          <el-radio-group v-model="queryParams.$fieldConfig.fieldName">
+                          <el-radio-group v-model="params.$fieldConfig.fieldName">
                             <el-radio :key="1" :value="1">选项一</el-radio>
                             <el-radio :key="2" :value="2">选项二</el-radio>
                           </el-radio-group>
                         #end
                     #elseif($fieldConfig.formType.name() == "CHECK_BOX")
                         #if($fieldConfig.dictType && $fieldConfig.dictType.trim() != "")
-                          <DictSelect v-model="queryParams.$fieldConfig.fieldName" type="checkbox" code="$fieldConfig.dictType" />
+                          <DictSelect v-model="params.$fieldConfig.fieldName" type="checkbox" code="$fieldConfig.dictType" />
                         #else
-                          <el-checkbox-group v-model="queryParams.$fieldConfig.fieldName">
+                          <el-checkbox-group v-model="params.$fieldConfig.fieldName">
                             <el-checkbox :key="1" :label="1">选项一</el-checkbox>
                             <el-checkbox :key="2" :label="2">选项二</el-checkbox>
                           </el-checkbox-group>
                         #end
                     #elseif($fieldConfig.formType.name() == "INPUT_NUMBER")
                       <el-input-number
-                          v-model="queryParams.$fieldConfig.fieldName"
+                          v-model="params.$fieldConfig.fieldName"
                           placeholder="$fieldConfig.fieldComment"
                       />
                     #elseif($fieldConfig.formType.name() == "SWITCH")
                       <el-switch
-                          v-model="queryParams.$fieldConfig.fieldName"
+                          v-model="params.$fieldConfig.fieldName"
                           :active-value="1"
                           :inactive-value="0"
                       />
                     #elseif($fieldConfig.formType.name() == "TEXT_AREA")
                       <el-input type="textarea"
-                                v-model="queryParams.$fieldConfig.fieldName"
+                                v-model="params.$fieldConfig.fieldName"
                                 placeholder="$fieldConfig.fieldComment"
                       />
                     #elseif($fieldConfig.formType.name() == "DATE_TIME")
                       <el-date-picker
-                          v-model="queryParams.$fieldConfig.fieldName"
+                          v-model="params.$fieldConfig.fieldName"
                           #if($fieldConfig.queryType.name() == "BETWEEN")
                           type="daterange"
                           range-separator="~"
@@ -72,7 +73,7 @@
                     #elseif($fieldConfig.formType.name() == "DATE")
                       <el-date-picker
                           class="!w-[240px]"
-                          v-model="queryParams.$fieldConfig.fieldName"
+                          v-model="params.$fieldConfig.fieldName"
                           #if($fieldConfig.queryType.name() == "BETWEEN")
                           type="daterange"
                           range-separator="~"
@@ -89,41 +90,53 @@
           #end
         #end
         <el-form-item>
-          <el-button type="primary" icon="search" @click="handleQuery">搜索</el-button>
-          <el-button icon="refresh" @click="handleResetQuery">重置</el-button>
+          <el-button type="primary" @click="handleQuery">搜索</el-button>
+          <el-button @click="handleResetQuery">重置</el-button>
         </el-form-item>
       </el-form>
     </el-card>
 
-    <el-card class="page-content" shadow="never">
+    <!-- 表格 -->
+    <el-card ref="tableWrapperRef" class="page-content" shadow="never">
       <div class="page-toolbar">
         <div class="page-toolbar__left">
           <el-button
               v-hasPerm="['${moduleName}:${entityKebab}:create']"
-              type="success"
-              icon="plus"
+              type="primary"
               @click="handleCreateClick()"
           >新增</el-button>
           <el-button
               v-hasPerm="['${moduleName}:${entityKebab}:delete']"
               type="danger"
               :disabled="!hasSelection"
-              icon="delete"
-              @click="handleDelete()"
+              @click="handleBatchDelete()"
           >删除</el-button>
+        </div>
+        <div class="page-toolbar__right">
+          <el-tooltip content="刷新" placement="top">
+            <el-button class="page-icon-btn" @click="fetchData">
+              <el-icon><Refresh /></el-icon>
+            </el-button>
+          </el-tooltip>
+          <el-tooltip content="全屏" placement="top">
+            <el-button class="page-icon-btn" @click="toggleFullscreen">
+              <el-icon><FullScreen /></el-icon>
+            </el-button>
+          </el-tooltip>
         </div>
       </div>
 
-      <el-table
-        ref="dataTableRef"
-        v-loading="loading"
-        :data="pageData"
-        border
-        stripe
-        highlight-current-row
-        row-key="id"
-        @selection-change="handleSelectionChange"
-      >
+      <div class="page-table-wrapper">
+        <el-table
+          ref="dataTableRef"
+          v-loading="loading"
+          class="page-table"
+          :data="list"
+          height="100%"
+          border
+          highlight-current-row
+          @selection-change="handleSelectionChange"
+        >
         <el-table-column type="selection" width="55" align="center" />
         #foreach($fieldConfig in $fieldConfigs)
           #if($fieldConfig.isShowInList == 1)
@@ -144,14 +157,13 @@
             #end
           #end
         #end
-        <el-table-column fixed="right" label="操作" width="220">
+        <el-table-column fixed="right" label="操作" width="180">
           <template #default="scope">
             <el-button
                 v-hasPerm="['${moduleName}:${entityKebab}:update']"
                 type="primary"
                 size="small"
                 link
-                icon="edit"
                 @click="handleEditClick(String(scope.row.id))"
             >
               编辑
@@ -161,7 +173,6 @@
                 type="danger"
                 size="small"
                 link
-                icon="delete"
                 @click="handleDelete(String(scope.row.id))"
             >
               删除
@@ -169,23 +180,23 @@
           </template>
         </el-table-column>
       </el-table>
-
-      <div class="page-pagination">
-        <pagination
-            v-if="total > 0"
-            v-model:total="total"
-            v-model:page="queryParams.pageNum"
-            v-model:limit="queryParams.pageSize"
-            @pagination="fetchList"
-        />
       </div>
+
+      <pagination
+        v-if="total > 0"
+        v-model:total="total"
+        v-model:page="params.pageNum"
+        v-model:limit="params.pageSize"
+        class="page-pagination"
+        @pagination="fetchData"
+      />
     </el-card>
 
-    <!-- $!{businessName}表单弹窗 -->
+    <!-- 表单弹窗 -->
     <el-dialog
         v-model="dialog.visible"
         :title="dialog.title"
-        width="500px"
+        width="600px"
         @close="closeDialog"
     >
       <el-form ref="dataFormRef" :model="formData" :rules="rules" label-width="100px">
@@ -265,8 +276,8 @@
       </el-form>
       <template #footer>
         <div class="dialog-footer">
-          <el-button type="primary" @click="handleSubmit()">确定</el-button>
-          <el-button @click="closeDialog()">取消</el-button>
+          <el-button type="primary" @click="handleSubmit">确定</el-button>
+          <el-button @click="closeDialog">取消</el-button>
         </div>
       </template>
     </el-dialog>
@@ -274,9 +285,15 @@
 </template>
 
 <script setup lang="ts">
-  import { onMounted, reactive, ref } from "vue";
-  import { ElMessage, ElMessageBox, type FormInstance, type FormRules } from "element-plus";
-  import { useTableSelection } from "@/composables";
+  import { useFullscreen } from "@vueuse/core";
+  import {
+    ElMessage,
+    ElMessageBox,
+    type FormInstance,
+    type FormRules,
+  } from "element-plus";
+  import { FullScreen, Refresh } from "@element-plus/icons-vue";
+  import { usePageTable, useTableSelection } from "@/composables";
   import ${entityName}API from "@/api/${moduleName}/${entityKebab}";
   import type { ${entityName}Item, ${entityName}Form, ${entityName}QueryParams } from "@/api/${moduleName}/${entityKebab}";
 
@@ -287,17 +304,26 @@
 
   const queryFormRef = ref<FormInstance>();
   const dataFormRef = ref<FormInstance>();
+  const tableWrapperRef = ref<HTMLElement | null>(null);
+  const { toggle: toggleFullscreen } = useFullscreen(tableWrapperRef);
 
-  const loading = ref(false);
-  const total = ref(0);
-
-  const queryParams = reactive<${entityName}QueryParams>({
-    pageNum: 1,
-    pageSize: 10,
-  } as ${entityName}QueryParams);
+  const initialFormData = reactive({} as ${entityName}Form);
+  Object.assign(initialFormData, {} as ${entityName}Form);
 
   // $!{businessName}表格数据
-  const pageData = ref<${entityName}Item[]>([]);
+  const { loading, list, total, params, fetchData, handleQuery, handleResetQuery } = usePageTable<
+    ${entityName}Item,
+    ${entityName}QueryParams
+  >({
+    initialParams: {
+      pageNum: 1,
+      pageSize: 10,
+    } as ${entityName}QueryParams,
+    request: ${entityName}API.getPage,
+    onBeforeReset: () => queryFormRef.value?.resetFields(),
+  });
+
+  const { selectedIds, hasSelection, handleSelectionChange } = useTableSelection<${entityName}Item>();
 
   // 弹窗
   const dialog = reactive({
@@ -319,112 +345,114 @@
       #end
   };
 
-  const { selectedIds, hasSelection, handleSelectionChange } = useTableSelection<${entityName}Item>();
-
-  async function fetchList(): Promise<void> {
-    loading.value = true;
-    try {
-      const data = await ${entityName}API.getPage(queryParams);
-      pageData.value = data.list;
-      total.value = data.total ?? 0;
-    } finally {
-      loading.value = false;
-    }
-  }
-
-  /** 查询$!{businessName} */
-  function handleQuery(): void {
-    queryParams.pageNum = 1;
-    fetchList();
-  }
-
-  /** 重置$!{businessName}查询 */
-  function handleResetQuery() {
-    queryFormRef.value?.resetFields();
-    handleQuery();
-  }
-
+  /**
+   * 打开表单弹窗
+   */
   function openDialog(): void {
     dialog.visible = true;
   }
 
+  /**
+   * 关闭弹窗并重置表单
+   */
   function closeDialog(): void {
     dialog.visible = false;
     resetForm();
   }
 
+  /**
+   * 重置表单
+   */
   function resetForm(): void {
     dataFormRef.value?.resetFields();
     dataFormRef.value?.clearValidate();
-    formData.id = undefined;
+    Object.keys(formData).forEach((key) => {
+      delete (formData as Record<string, unknown>)[key];
+    });
+    Object.assign(formData, initialFormData);
   }
 
+  /**
+   * 打开新增弹窗
+   */
   async function handleCreateClick(): Promise<void> {
     dialog.title = "新增$!{businessName}";
     openDialog();
   }
 
+  /**
+   * 打开编辑弹窗并回填数据
+   */
   async function handleEditClick(id: string): Promise<void> {
     dialog.title = "修改$!{businessName}";
-          ${entityName}API.getFormData(id).then((data) => {
-      Object.assign(formData, data);
-      openDialog();
-    });
+    const data = await ${entityName}API.getFormData(id);
+    Object.assign(formData, data);
+    openDialog();
   }
 
-  /** 提交$!{businessName}表单 */
-  function handleSubmit() {
-    dataFormRef.value?.validate((valid: any) => {
-      if (valid) {
-        loading.value = true;
-        const id = formData.id;
-        if (id) {
-                ${entityName}API.update(id, formData)
-              .then(() => {
-                ElMessage.success("修改成功");
-                closeDialog();
-                handleResetQuery();
-              })
-              .finally(() => (loading.value = false));
-        } else {
-                ${entityName}API.create(formData)
-              .then(() => {
-                ElMessage.success("新增成功");
-                closeDialog();
-                handleResetQuery();
-              })
-              .finally(() => (loading.value = false));
-        }
+  /**
+   * 提交$!{businessName}表单
+   */
+  async function handleSubmit(): Promise<void> {
+    const valid = await dataFormRef.value?.validate().then(
+      () => true,
+      () => false
+    );
+    if (!valid) return;
+
+    loading.value = true;
+    try {
+      const id = formData.id;
+      if (id) {
+        await ${entityName}API.update(id, formData);
+        ElMessage.success("修改成功");
+      } else {
+        await ${entityName}API.create(formData);
+        ElMessage.success("新增成功");
       }
-    });
+      closeDialog();
+      handleResetQuery();
+    } finally {
+      loading.value = false;
+    }
   }
 
-  /** 删除$!{businessName} */
-  function handleDelete(id?: string) {
-    const ids = [id || selectedIds.value].join(",");
+  /**
+   * 批量删除$!{businessName}
+   */
+  function handleBatchDelete(): void {
+    handleDelete();
+  }
+
+  /**
+   * 删除$!{businessName}
+   */
+  async function handleDelete(id?: string): Promise<void> {
+    const ids = id || selectedIds.value.join(",");
     if (!ids) {
       ElMessage.warning("请勾选删除项");
       return;
     }
 
-    ElMessageBox.confirm("确认删除已选中的数据项?", "警告", {
-      confirmButtonText: "确定",
-      cancelButtonText: "取消",
-      type: "warning",
-    }).then(
-        () => {
-          loading.value = true;
-                ${entityName}API.deleteByIds(ids)
-              .then(() => {
-                ElMessage.success("删除成功");
-                handleResetQuery();
-              })
-              .finally(() => (loading.value = false));
-        },
-        () => {
-          ElMessage.info("已取消删除");
-        }
-    );
+    try {
+      await ElMessageBox.confirm("确认删除已选中的数据项?", "警告", {
+        confirmButtonText: "确定",
+        cancelButtonText: "取消",
+        type: "warning",
+      });
+    } catch {
+      ElMessage.info("已取消删除");
+      return;
+    }
+
+    loading.value = true;
+    try {
+      await ${entityName}API.deleteByIds(ids);
+      ElMessage.success("删除成功");
+      handleResetQuery();
+    } finally {
+      loading.value = false;
+    }
   }
 
   onMounted(() => {
