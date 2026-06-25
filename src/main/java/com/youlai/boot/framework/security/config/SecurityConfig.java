@@ -1,8 +1,8 @@
 package com.youlai.boot.framework.security.config;
 
 import cn.binarywang.wx.miniapp.api.WxMaService;
-import com.youlai.boot.framework.captcha.service.CaptchaService;
 import cn.hutool.core.util.ArrayUtil;
+import com.youlai.boot.framework.captcha.service.CaptchaService;
 import com.youlai.boot.framework.security.filter.CaptchaValidationFilter;
 import com.youlai.boot.framework.security.filter.TokenAuthenticationFilter;
 import com.youlai.boot.framework.security.handler.MyAccessDeniedHandler;

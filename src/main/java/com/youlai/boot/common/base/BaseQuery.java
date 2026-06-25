@@ -7,6 +7,12 @@ import lombok.Data;
 import java.io.Serial;
 import java.io.Serializable;
 
+/**
+ * 查询参数基类
+ *
+ * @author Ray.Hao
+ * @since 0.0.1
+ */
 @Data
 @Schema
 public class BaseQuery implements Serializable {

@@ -24,7 +24,7 @@ public class SysUser extends BaseEntity {
     private String nickname;
 
     /**
-     * 性别((1-男 2-女 0-保密)
+     * 性别(1-男 2-女 0-保密)
      */
     private Integer gender;
 
@@ -49,7 +49,7 @@ public class SysUser extends BaseEntity {
     private String mobile;
 
     /**
-     * 状态((1-正常 0-禁用)
+     * 状态(1-正常 0-禁用)
      */
     private Integer status;
 

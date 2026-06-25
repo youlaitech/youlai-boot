@@ -7,13 +7,13 @@ import org.slf4j.helpers.MessageFormatter;
 /**
  * 自定义业务异常
  *
- * @author Ray
- * @since 2022/7/31
+ * @author Ray.Hao
+ * @since 0.0.1
  */
 @Getter
 public class BusinessException extends RuntimeException {
 
-    public IResultCode resultCode;
+    private IResultCode resultCode;
 
     public BusinessException(IResultCode errorCode) {
         super(errorCode.getMsg());
@@ -21,7 +21,7 @@ public class BusinessException extends RuntimeException {
     }
 
 
-    public BusinessException(IResultCode errorCode,String message) {
+    public BusinessException(IResultCode errorCode, String message) {
         super(message);
         this.resultCode = errorCode;
     }

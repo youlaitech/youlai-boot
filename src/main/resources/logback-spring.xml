@@ -38,7 +38,7 @@
             <maxFileSize>10MB</maxFileSize>
             <!-- 最大保留30天的日志 -->
             <maxHistory>30</maxHistory>
-            <!-- 总日志文件大小不超过3GB -->
+            <!-- 总日志文件大小不超过1GB -->
             <totalSizeCap>1GB</totalSizeCap>
         </rollingPolicy>
         <!-- 临界值过滤器，输出大于INFO级别日志 -->

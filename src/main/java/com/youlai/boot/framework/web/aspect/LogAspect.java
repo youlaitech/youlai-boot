@@ -28,6 +28,9 @@ import java.util.concurrent.Executor;
 /**
  * 操作日志切面
  * <p>@Log 标注的方法执行后异步写入 sys_log 表</p>
+ *
+ * @author Ray.Hao
+ * @since 0.0.1
  */
 @Aspect
 @Component
@@ -125,9 +128,17 @@ public class LogAspect {
         return new IpRegion(StrUtil.blankToDefault(parts[2], null), StrUtil.blankToDefault(parts[3], null));
     }
 
-    private String getOs(UserAgent ua) { return Optional.ofNullable(ua).map(UserAgent::getOs).map(os -> os.getName()).orElse(null); }
-    private String getDevice(UserAgent ua) { return Optional.ofNullable(ua).map(UserAgent::getPlatform).map(p -> p.getName()).orElse(null); }
-    private String getBrowser(UserAgent ua) { return Optional.ofNullable(ua).map(UserAgent::getBrowser).map(b -> b.getName()).orElse(null); }
+    private String getOs(UserAgent ua) {
+        return Optional.ofNullable(ua).map(UserAgent::getOs).map(os -> os.getName()).orElse(null);
+    }
+
+    private String getDevice(UserAgent ua) {
+        return Optional.ofNullable(ua).map(UserAgent::getPlatform).map(p -> p.getName()).orElse(null);
+    }
+
+    private String getBrowser(UserAgent ua) {
+        return Optional.ofNullable(ua).map(UserAgent::getBrowser).map(b -> b.getName()).orElse(null);
+    }
 
     private record IpRegion(String province, String city) {
         static final IpRegion EMPTY = new IpRegion(null, null);
