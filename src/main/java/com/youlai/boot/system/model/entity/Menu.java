@@ -49,6 +49,11 @@ public class Menu extends BaseEntity {
     private String component;
 
     /**
+     * 外链地址
+     */
+    private String externalUrl;
+
+    /**
      * 权限标识
      */
     private String perm;

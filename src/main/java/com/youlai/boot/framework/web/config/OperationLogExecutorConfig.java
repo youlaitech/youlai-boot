@@ -9,11 +9,9 @@ import java.util.concurrent.ThreadPoolExecutor;
 
 /**
  * 操作日志线程池
- * <p>core=1 确保日志按序写入，max=2 峰值扩容，queue=1000 缓冲突发流量，
- * CallerRunsPolicy 保证满载时由调用线程兜底执行不丢数据。</p>
  *
  * @author Ray.Hao
- * @since 0.0.1
+ * @since 3.0.0
  */
 @Configuration
 public class OperationLogExecutorConfig {

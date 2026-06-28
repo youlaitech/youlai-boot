@@ -1,6 +1,9 @@
 package com.youlai.boot.common.base;
 
-import com.baomidou.mybatisplus.annotation.*;
+import com.baomidou.mybatisplus.annotation.FieldFill;
+import com.baomidou.mybatisplus.annotation.IdType;
+import com.baomidou.mybatisplus.annotation.TableField;
+import com.baomidou.mybatisplus.annotation.TableId;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import lombok.Data;
@@ -14,8 +17,8 @@ import java.time.LocalDateTime;
  *
  * <p>实体类的基类，包含了实体类的公共属性，如创建时间、更新时间、逻辑删除标识等</p>
  *
- * @author Ray
- * @since 2024/6/23
+ * @author Ray.Hao
+ * @since 4.3.1
  */
 @Data
 public class BaseEntity implements Serializable {

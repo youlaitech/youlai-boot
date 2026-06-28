@@ -2,11 +2,11 @@ package com.youlai.boot.system.controller;
 
 import cn.idev.excel.EasyExcel;
 import cn.idev.excel.ExcelWriter;
-import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
 import com.youlai.boot.common.annotation.Log;
 import com.youlai.boot.common.annotation.RepeatSubmit;
 import com.youlai.boot.common.enums.ActionTypeEnum;
 import com.youlai.boot.common.enums.LogModuleEnum;
+import com.youlai.boot.common.enums.StatusEnum;
 import com.youlai.boot.framework.security.util.SecurityUtils;
 import com.youlai.boot.common.model.Option;
 import com.youlai.boot.common.result.ExcelResult;
@@ -14,9 +14,14 @@ import com.youlai.boot.common.result.PageResult;
 import com.youlai.boot.common.result.Result;
 import com.youlai.boot.common.util.ExcelUtils;
 import com.youlai.boot.system.listener.UserImportListener;
-import com.youlai.boot.system.model.form.*;
+import com.youlai.boot.system.model.form.EmailUpdateForm;
+import com.youlai.boot.system.model.form.MobileUpdateForm;
+import com.youlai.boot.system.model.form.PasswordUpdateForm;
+import com.youlai.boot.system.model.form.PasswordVerifyForm;
+import com.youlai.boot.system.model.form.UserForm;
+import com.youlai.boot.system.model.form.UserImportForm;
+import com.youlai.boot.system.model.form.UserProfileForm;
 import com.youlai.boot.system.model.vo.UserExportVO;
-import com.youlai.boot.system.model.entity.SysUser;
 import com.youlai.boot.system.model.query.UserQuery;
 import com.youlai.boot.system.model.vo.CurrentUserVO;
 import com.youlai.boot.system.model.vo.UserPageVO;
@@ -32,7 +37,16 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.annotation.Validated;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PatchMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.File;
@@ -46,7 +60,7 @@ import java.util.List;
  * 用户控制层
  *
  * @author Ray.Hao
- * @since 2022/10/16
+ * @since 4.3.1
  */
 @Tag(name = "02.用户接口")
 @RestController
@@ -120,12 +134,9 @@ public class UserController {
             @Parameter(description = "用户ID") @PathVariable Long userId,
             @Parameter(description = "用户状态(1:启用;0:禁用)") @RequestParam Integer status
     ) {
-        boolean result = userService.update(new LambdaUpdateWrapper<SysUser>()
-                .eq(SysUser::getId, userId)
-                .set(SysUser::getStatus, status)
-        );
+        boolean result = userService.updateUserStatus(userId, status);
         // 用户禁用时立即失效其会话
-        if (result && status == 0) {
+        if (result && StatusEnum.DISABLE.getValue().equals(status)) {
             tokenManager.invalidateUserSessions(userId);
         }
         return Result.judge(result);

@@ -1,17 +1,18 @@
 package com.youlai.boot.framework.mybatis.handler;
 
 import com.baomidou.mybatisplus.core.handlers.MetaObjectHandler;
-import lombok.RequiredArgsConstructor;
 import org.apache.ibatis.reflection.MetaObject;
 import org.springframework.stereotype.Component;
 
 import java.time.LocalDateTime;
 
 /**
- * mybatis-plus 字段自动填充
+ * MyBatis-Plus 字段自动填充
+ *
+ * @author Ray.Hao
+ * @since 3.0.0
  */
 @Component
-@RequiredArgsConstructor
 public class AutoFillMetaObjectHandler implements MetaObjectHandler {
 
     @Override

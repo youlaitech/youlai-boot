@@ -1,7 +1,6 @@
 package com.youlai.boot.framework.web.advice;
 
 import cn.hutool.core.util.StrUtil;
-import tools.jackson.core.JacksonException;
 import com.youlai.boot.common.exception.BusinessException;
 import com.youlai.boot.common.result.Result;
 import com.youlai.boot.common.result.ResultCode;
@@ -25,6 +24,7 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
 import org.springframework.web.servlet.NoHandlerFoundException;
+import tools.jackson.core.JacksonException;
 
 import java.sql.SQLIntegrityConstraintViolationException;
 import java.sql.SQLSyntaxErrorException;
@@ -34,18 +34,14 @@ import java.util.stream.Collectors;
 
 /**
  * 全局系统异常处理器
- * <p>
- * 调整异常处理的HTTP状态码，丰富异常处理类型
+ *
+ * @author Ray.Hao
+ * @since 4.3.1
  */
 @RestControllerAdvice
 @Slf4j
 public class GlobalExceptionHandler {
 
-    /**
-     * 处理绑定异常
-     * <p>
-     * 当请求参数绑定到对象时发生错误，会抛出 BindException 异常。
-     */
     @ExceptionHandler(BindException.class)
     @ResponseStatus(HttpStatus.OK)
     public <T> Result<T> processException(BindException e) {
@@ -54,12 +50,6 @@ public class GlobalExceptionHandler {
         return Result.failed(ResultCode.USER_REQUEST_PARAMETER_ERROR, msg);
     }
 
-    /**
-     * 处理 @RequestParam 参数校验异常
-     * <p>
-     * 当请求参数在校验过程中发生违反约束条件的异常时（如 @RequestParam 验证不通过），
-     * 会捕获到 ConstraintViolationException 异常。
-     */
     @ExceptionHandler(ConstraintViolationException.class)
     @ResponseStatus(HttpStatus.OK)
     public <T> Result<T> processException(ConstraintViolationException e) {
@@ -68,12 +58,6 @@ public class GlobalExceptionHandler {
         return Result.failed(ResultCode.INVALID_USER_INPUT, msg);
     }
 
-    /**
-     * 处理方法参数校验异常
-     * <p>
-     * 当使用 @Valid 或 @Validated 注解对方法参数进行验证时，如果验证失败，
-     * 会抛出 MethodArgumentNotValidException 异常。
-     */
     @ExceptionHandler(MethodArgumentNotValidException.class)
     @ResponseStatus(HttpStatus.OK)
     public <T> Result<T> processException(MethodArgumentNotValidException e) {
@@ -82,11 +66,6 @@ public class GlobalExceptionHandler {
         return Result.failed(ResultCode.INVALID_USER_INPUT, msg);
     }
 
-    /**
-     * 处理接口不存在的异常
-     * <p>
-     * 当客户端请求一个不存在的路径时，会抛出 NoHandlerFoundException 异常。
-     */
     @ExceptionHandler(NoHandlerFoundException.class)
     @ResponseStatus(HttpStatus.NOT_FOUND)
     public <T> Result<T> processException(NoHandlerFoundException e) {
@@ -94,11 +73,6 @@ public class GlobalExceptionHandler {
         return Result.failed(ResultCode.INTERFACE_NOT_EXIST);
     }
 
-    /**
-     * 处理缺少请求参数的异常
-     * <p>
-     * 当请求缺少必需的参数时，会抛出 MissingServletRequestParameterException 异常。
-     */
     @ExceptionHandler(MissingServletRequestParameterException.class)
     @ResponseStatus(HttpStatus.OK)
     public <T> Result<T> processException(MissingServletRequestParameterException e) {
@@ -106,11 +80,6 @@ public class GlobalExceptionHandler {
         return Result.failed(ResultCode.REQUEST_REQUIRED_PARAMETER_IS_EMPTY);
     }
 
-    /**
-     * 处理方法参数类型不匹配的异常
-     * <p>
-     * 当请求参数类型不匹配时，会抛出 MethodArgumentTypeMismatchException 异常。
-     */
     @ExceptionHandler(MethodArgumentTypeMismatchException.class)
     @ResponseStatus(HttpStatus.OK)
     public <T> Result<T> processException(MethodArgumentTypeMismatchException e) {
@@ -118,11 +87,6 @@ public class GlobalExceptionHandler {
         return Result.failed(ResultCode.PARAMETER_FORMAT_MISMATCH, "类型错误");
     }
 
-    /**
-     * 处理 Servlet 异常
-     * <p>
-     * 当 Servlet 处理请求时发生异常时，会抛出 ServletException 异常。
-     */
     @ExceptionHandler(ServletException.class)
     @ResponseStatus(HttpStatus.OK)
     public <T> Result<T> processException(ServletException e) {
@@ -130,11 +94,6 @@ public class GlobalExceptionHandler {
         return Result.failed(e.getMessage());
     }
 
-    /**
-     * 处理非法参数异常
-     * <p>
-     * 当方法接收到非法参数时，会抛出 IllegalArgumentException 异常。
-     */
     @ExceptionHandler(IllegalArgumentException.class)
     @ResponseStatus(HttpStatus.OK)
     public <T> Result<T> handleIllegalArgumentException(IllegalArgumentException e) {
@@ -142,11 +101,6 @@ public class GlobalExceptionHandler {
         return Result.failed(e.getMessage());
     }
 
-    /**
-     * 处理 JSON 处理异常
-     * <p>
-     * 当处理 JSON 数据时发生错误，会抛出 JacksonException 异常。
-     */
     @ExceptionHandler(JacksonException.class)
     @ResponseStatus(HttpStatus.OK)
     public <T> Result<T> handleJacksonException(JacksonException e) {
@@ -154,11 +108,6 @@ public class GlobalExceptionHandler {
         return Result.failed(e.getMessage());
     }
 
-    /**
-     * 处理请求体不可读的异常
-     * <p>
-     * 当请求体不可读时，会抛出 HttpMessageNotReadableException 异常。
-     */
     @ExceptionHandler(HttpMessageNotReadableException.class)
     @ResponseStatus(HttpStatus.OK)
     public <T> Result<T> processException(HttpMessageNotReadableException e) {
@@ -171,11 +120,6 @@ public class GlobalExceptionHandler {
         return Result.failed(errorMessage);
     }
 
-    /**
-     * 处理类型不匹配异常
-     * <p>
-     * 当方法参数类型不匹配时，会抛出 TypeMismatchException 异常。
-     */
     @ExceptionHandler(TypeMismatchException.class)
     @ResponseStatus(HttpStatus.OK)
     public <T> Result<T> processException(TypeMismatchException e) {
@@ -183,11 +127,6 @@ public class GlobalExceptionHandler {
         return Result.failed(e.getMessage());
     }
 
-    /**
-     * 处理 SQL 语法错误异常
-     * <p>
-     * 当 SQL 语法错误时，会抛出 BadSqlGrammarException 异常。
-     */
     @ExceptionHandler(BadSqlGrammarException.class)
     @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
     public <T> Result<T> handleBadSqlGrammarException(BadSqlGrammarException e) {
@@ -198,11 +137,6 @@ public class GlobalExceptionHandler {
         return Result.failed(ResultCode.DATABASE_EXECUTION_ERROR);
     }
 
-    /**
-     * 处理 SQL 语法错误异常
-     * <p>
-     * 当 SQL 语法错误时，会抛出 SQLSyntaxErrorException 异常。
-     */
     @ExceptionHandler(SQLSyntaxErrorException.class)
     @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
     public <T> Result<T> processSQLSyntaxErrorException(SQLSyntaxErrorException e) {
@@ -210,12 +144,6 @@ public class GlobalExceptionHandler {
         return Result.failed(ResultCode.DATABASE_EXECUTION_SYNTAX_ERROR);
     }
 
-
-    /**
-     * 处理 SQL 违反了完整性约束
-     * <p>
-     * 当 SQL 违反了完整性约束时，会抛出 SQLIntegrityConstraintViolationException 异常。
-     */
     @ExceptionHandler(SQLIntegrityConstraintViolationException.class)
     @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
     public <T> Result<T> handleSQLIntegrityConstraintViolationException(SQLIntegrityConstraintViolationException e) {
@@ -223,22 +151,12 @@ public class GlobalExceptionHandler {
         return Result.failed(ResultCode.INTEGRITY_CONSTRAINT_VIOLATION);
     }
 
-    /**
-     * 处理 Token 无效异常
-     * <p>
-     * 当 access_token 或 refresh_token 过期/无效时，返回 401。
-     */
     @ExceptionHandler(TokenInvalidException.class)
     @ResponseStatus(HttpStatus.UNAUTHORIZED)
     public <T> Result<T> handleTokenInvalidException(TokenInvalidException e) {
         return Result.failed(e.getResultCode());
     }
 
-    /**
-     * 处理业务异常
-     * <p>
-     * 当业务逻辑发生错误时，会抛出 BusinessException 异常。
-     */
     @ExceptionHandler(BusinessException.class)
     @ResponseStatus(HttpStatus.OK)
     public <T> Result<T> handleBizException(BusinessException e) {
@@ -249,15 +167,9 @@ public class GlobalExceptionHandler {
         return Result.failed(e.getMessage());
     }
 
-    /**
-     * 处理所有未捕获的异常
-     * <p>
-     * 当发生未捕获的异常时，会抛出 Exception 异常。
-     */
     @ExceptionHandler(Exception.class)
     @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
     public <T> Result<T> handleException(Exception e) throws Exception {
-        // 将 Spring Security 异常继续抛出，以便交给自定义处理器处理
         if (e instanceof AccessDeniedException
                 || e instanceof AuthenticationException) {
             throw e;
@@ -266,12 +178,6 @@ public class GlobalExceptionHandler {
         return Result.failed(e.getLocalizedMessage());
     }
 
-    /**
-     * 传参类型错误时，用于消息转换
-     *
-     * @param throwable 异常
-     * @return 错误信息
-     */
     private String convertMessage(Throwable throwable) {
         String error = throwable.toString();
         String regulation = "\\[\"(.*?)\"]+";

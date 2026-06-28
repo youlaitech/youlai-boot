@@ -31,6 +31,9 @@ public class MenuVO {
     @Schema(description = "组件路径")
     private String component;
 
+    @Schema(description = "外链地址")
+    private String externalUrl;
+
     @Schema(description = "菜单排序(数字越小排名越靠前)")
     private Integer sort;
 

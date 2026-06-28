@@ -48,7 +48,7 @@ import java.io.Serializable;
  * </pre>
  *
  * @author Ray.Hao
- * @since 2020/6/23
+ * @since 4.3.1
  **/
 public enum ResultCode implements IResultCode, Serializable {
 

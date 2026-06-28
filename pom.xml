@@ -6,7 +6,7 @@
 
     <groupId>com.youlai</groupId>
     <artifactId>youlai-boot</artifactId>
-    <version>4.3.1</version>
+    <version>4.3.2</version>
     <description>基于 Java 17 + SpringBoot 4 + Spring Security 构建的权限管理系统。</description>
 
     <parent>
@@ -26,9 +26,9 @@
         <druid.version>1.2.24</druid.version>
         <!-- Spring Boot 4.x 必须使用更新的版本 -->
         <mybatis-plus.version>3.5.15</mybatis-plus.version>
-        <dynamic-datasource.version>4.3.1</dynamic-datasource.version>
 
         <knife4j.version>4.5.0</knife4j.version>
+        <springdoc.version>2.8.9</springdoc.version>
 
         <mapstruct.version>1.6.3</mapstruct.version>
         <lombok-mapstruct-binding.version>0.2.0</lombok-mapstruct-binding.version>
@@ -54,8 +54,8 @@
         <ip2region.version>2.7.0</ip2region.version>
 
         <!-- 阿里云短信 -->
-        <aliyun.java.sdk.core.version>4.7.6</aliyun.java.sdk.core.version>
-        <aliyun.java.sdk.dysmsapi.version>2.2.1</aliyun.java.sdk.dysmsapi.version>
+        <aliyun-sdk-core.version>4.7.6</aliyun-sdk-core.version>
+        <aliyun-sdk-dysmsapi.version>2.2.1</aliyun-sdk-dysmsapi.version>
 
         <caffeine.version>2.9.3</caffeine.version>
 
@@ -63,7 +63,6 @@
         <transmittable-thread-local.version>2.14.5</transmittable-thread-local.version>
 
         <weixin-java-miniapp.version>4.8.1.B</weixin-java-miniapp.version>
-
 
     </properties>
 
@@ -81,7 +80,7 @@
             <version>${hutool.version}</version>
         </dependency>
 
-        <!-- TransmittableThreadLocal: 支持异步场景的租户上下文传递 -->
+        <!-- TransmittableThreadLocal -->
         <dependency>
             <groupId>com.alibaba</groupId>
             <artifactId>transmittable-thread-local</artifactId>
@@ -178,7 +177,7 @@
         <dependency>
             <groupId>org.springdoc</groupId>
             <artifactId>springdoc-openapi-starter-webmvc-ui</artifactId>
-            <version>2.8.9</version>
+            <version>${springdoc.version}</version>
         </dependency>
 
         <!-- MapStruct 对象映射 -->
@@ -201,7 +200,7 @@
             <version>${xxl-job.version}</version>
         </dependency>
 
-        <!-- Excel 工具（EasyExcel-PLus ）  -->
+        <!-- Excel 工具（EasyExcel-Plus） -->
         <dependency>
             <groupId>cn.idev.excel</groupId>
             <artifactId>fastexcel</artifactId>
@@ -253,13 +252,13 @@
         <dependency>
             <groupId>com.aliyun</groupId>
             <artifactId>aliyun-java-sdk-core</artifactId>
-            <version>${aliyun.java.sdk.core.version}</version>
+            <version>${aliyun-sdk-core.version}</version>
         </dependency>
 
         <dependency>
             <groupId>com.aliyun</groupId>
             <artifactId>aliyun-java-sdk-dysmsapi</artifactId>
-            <version>${aliyun.java.sdk.dysmsapi.version}</version>
+            <version>${aliyun-sdk-dysmsapi.version}</version>
         </dependency>
 
         <!-- 本地缓存 -->
@@ -275,13 +274,6 @@
             <artifactId>weixin-java-miniapp</artifactId>
             <version>${weixin-java-miniapp.version}</version>
         </dependency>
-
-        <!-- 动态多数据源 -->
-        <!--<dependency>
-            <groupId>com.baomidou</groupId>
-            <artifactId>dynamic-datasource-spring-boot3-starter</artifactId>
-            <version>${dynamic-datasource.version}</version>
-        </dependency>-->
 
     </dependencies>
 

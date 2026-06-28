@@ -6,6 +6,9 @@ import java.util.concurrent.TimeUnit;
 /**
  * 接口限流
  * <p>标注在 Controller 方法上，基于 Redis 计数窗口实现</p>
+ *
+ * @author Ray.Hao
+ * @since 4.3.1
  */
 @Target(ElementType.METHOD)
 @Retention(RetentionPolicy.RUNTIME)

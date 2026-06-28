@@ -8,7 +8,7 @@ import org.springframework.scheduling.annotation.EnableScheduling;
  * 应用启动类
  *
  * @author Ray.Hao
- * @since 0.0.1
+ * @since 3.0.0
  */
 @EnableScheduling
 @SpringBootApplication

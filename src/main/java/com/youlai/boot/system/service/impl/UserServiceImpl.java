@@ -664,6 +664,14 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, SysUser> implements
         );
     }
 
+    @Override
+    public boolean updateUserStatus(Long userId, Integer status) {
+        return this.update(new LambdaUpdateWrapper<SysUser>()
+                .eq(SysUser::getId, userId)
+                .set(SysUser::getStatus, status)
+        );
+    }
+
     /**
      * 获取用户选项列表
      *

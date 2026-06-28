@@ -13,10 +13,9 @@ import com.youlai.boot.framework.security.token.TokenManager;
 import com.youlai.boot.framework.security.service.SysUserDetailsService;
 import com.youlai.boot.system.service.UserService;
 import lombok.RequiredArgsConstructor;
-import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.ProviderManager;
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
@@ -35,7 +34,7 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
  * Spring Security 配置类
  *
  * @author Ray.Hao
- * @since 2023/2/17
+ * @since 4.3.1
  */
 @Configuration
 @EnableWebSecurity
@@ -147,7 +146,7 @@ public class SecurityConfig {
         return new ProviderManager(
                 daoAuthenticationProvider,
                 smsAuthenticationProvider,
-            wxMaAuthenticationProvider
+                wxMaAuthenticationProvider
         );
     }
 

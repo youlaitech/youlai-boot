@@ -26,6 +26,9 @@ import java.util.concurrent.TimeUnit;
 /**
  * 接口限流切面
  * <p>对 @RateLimit 标注的方法做 Redis 计数，超阈值则拒绝</p>
+ *
+ * @author Ray.Hao
+ * @since 4.3.1
  */
 @Aspect
 @Component

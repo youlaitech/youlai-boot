@@ -4,7 +4,7 @@ package com.youlai.boot.common.constant;
  * Redis 常量
  *
  * @author Theo
- * @since 2024-7-29 11:46:08
+ * @since 4.3.1
  */
 public interface RedisConstants {
 
@@ -32,7 +32,7 @@ public interface RedisConstants {
         String REFRESH_TOKEN_USER = "auth:token:refresh:{}";
         // 用户与访问令牌的映射（userId -> accessToken）
         String USER_ACCESS_TOKEN = "auth:user:access:{}";
-        // 用户与刷新令牌的映射（userId -> refreshToken
+        // 用户与刷新令牌的映射（userId -> refreshToken））
         String USER_REFRESH_TOKEN = "auth:user:refresh:{}";
         // 已撤销 Token 的 JTI（单端退出/会话注销）：如果 jti 在撤销列表中，则 Token 立即无效
         String BLACKLIST_TOKEN = "auth:token:blacklist:{}";

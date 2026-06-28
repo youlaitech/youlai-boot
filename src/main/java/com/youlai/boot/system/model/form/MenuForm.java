@@ -38,6 +38,9 @@ public class MenuForm {
     @Schema(description = "组件路径(vue页面完整路径，省略.vue后缀)")
     private String component;
 
+    @Schema(description = "外链地址")
+    private String externalUrl;
+
     @Schema(description = "权限标识")
     private String perm;
 

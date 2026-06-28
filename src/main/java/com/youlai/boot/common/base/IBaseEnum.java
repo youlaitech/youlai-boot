@@ -1,6 +1,5 @@
 package com.youlai.boot.common.base;
 
-
 import cn.hutool.core.util.ObjectUtil;
 
 import java.util.EnumSet;
@@ -9,8 +8,8 @@ import java.util.Objects;
 /**
  * 枚举通用接口
  *
- * @author haoxr
- * @since 2022/3/27 12:06
+ * @author Ray.Hao
+ * @since 4.3.1
  */
 public interface IBaseEnum<T> {
 
@@ -37,12 +36,12 @@ public interface IBaseEnum<T> {
     }
 
     /**
-     * 根据文本标签获取值
+     * 根据值获取标签
      *
-     * @param value
-     * @param clazz
-     * @param <E>
-     * @return
+     * @param value 枚举值
+     * @param clazz 枚举类型
+     * @param <E>   枚举
+     * @return 标签文本
      */
     static <E extends Enum<E> & IBaseEnum> String getLabelByValue(Object value, Class<E> clazz) {
         Objects.requireNonNull(value);
@@ -59,14 +58,13 @@ public interface IBaseEnum<T> {
         return label;
     }
 
-
     /**
-     * 根据文本标签获取值
+     * 根据标签获取值
      *
-     * @param label
-     * @param clazz
-     * @param <E>
-     * @return
+     * @param label 标签文本
+     * @param clazz 枚举类型
+     * @param <E>   枚举
+     * @return 枚举值
      */
     static <E extends Enum<E> & IBaseEnum> Object getValueByLabel(String label, Class<E> clazz) {
         Objects.requireNonNull(label);
@@ -83,6 +81,5 @@ public interface IBaseEnum<T> {
         }
         return value;
     }
-
 
 }

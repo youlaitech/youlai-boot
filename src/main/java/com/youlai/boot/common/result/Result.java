@@ -9,7 +9,7 @@ import java.io.Serializable;
  * 统一响应结构体
  *
  * @author Ray.Hao
- * @since 2022/1/30
+ * @since 4.3.1
  **/
 @Data
 public class Result<T> implements Serializable {
@@ -62,10 +62,6 @@ public class Result<T> implements Serializable {
 
     public static <T> Result<T> failed(IResultCode resultCode, String msg, T data) {
         return result(resultCode.getCode(), StrUtil.isNotBlank(msg) ? msg : resultCode.getMsg(), data);
-    }
-
-    private static <T> Result<T> result(IResultCode resultCode, T data) {
-        return result(resultCode.getCode(), resultCode.getMsg(), data);
     }
 
     private static <T> Result<T> result(String code, String msg, T data) {

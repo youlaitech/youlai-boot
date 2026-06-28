@@ -11,7 +11,8 @@ import com.youlai.boot.framework.security.model.SysUserDetails;
 import com.youlai.boot.framework.security.util.SecurityUtils;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
-import net.sf.jsqlparser.expression.*;
+import net.sf.jsqlparser.expression.Expression;
+import net.sf.jsqlparser.expression.LongValue;
 import net.sf.jsqlparser.expression.operators.conditional.AndExpression;
 import net.sf.jsqlparser.expression.operators.conditional.OrExpression;
 import net.sf.jsqlparser.expression.operators.relational.EqualsTo;
@@ -30,8 +31,8 @@ import java.util.List;
  * <p>
  * 使用 JSQLParser 构建 SQL 条件，避免字符串拼接，提高代码安全性和可读性。
  *
- * @author zc
- * @since 2021-12-10 13:28
+ * @author Ray.Hao
+ * @since 2021/12/10
  */
 @Slf4j
 public class MyDataPermissionHandler implements DataPermissionHandler {

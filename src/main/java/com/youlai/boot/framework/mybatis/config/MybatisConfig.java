@@ -12,10 +12,10 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.transaction.annotation.EnableTransactionManagement;
 
 /**
- * mybatis-plus 配置类
+ * MyBatis-Plus 配置类
  *
  * @author Ray.Hao
- * @since 2022/7/2
+ * @since 4.3.1
  */
 @Configuration
 @EnableTransactionManagement
@@ -38,7 +38,7 @@ public class MybatisConfig {
     }
 
     /**
-     * 自动填充数据库创建人、创建时间、更新人、更新时间
+     * 自动填充创建时间和更新时间
      */
     @Bean
     public GlobalConfig globalConfig() {

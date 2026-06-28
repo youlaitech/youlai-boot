@@ -55,6 +55,15 @@ public interface UserService extends IService<SysUser> {
      */
     boolean updateUser(Long userId, UserForm userForm);
 
+    /**
+     * 修改用户状态
+     *
+     * @param userId 用户ID
+     * @param status 状态值
+     * @return {@link Boolean} 是否修改成功
+     */
+    boolean updateUserStatus(Long userId, Integer status);
+
 
     /**
      * 删除用户
