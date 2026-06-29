@@ -29,7 +29,7 @@ public class Menu extends BaseEntity {
     private String name;
 
     /**
-     * 菜单类型(C-目录 M-菜单 B-按钮)
+     * 菜单类型(C-目录 M-菜单 E-外链 B-按钮)
      */
     private String type;
 

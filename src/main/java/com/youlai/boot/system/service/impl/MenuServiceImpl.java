@@ -227,35 +227,49 @@ public class MenuServiceImpl extends ServiceImpl<MenuMapper, Menu> implements Me
     private RouteVO toRouteVo(Menu menu) {
         RouteVO routeVo = new RouteVO();
         String routePath = menu.getRoutePath();
-        boolean externalLink = StrUtil.startWithAny(routePath, "http://", "https://");
+        String externalUrl = menu.getExternalUrl();
 
-        // 获取路由名称
+        // 外链(type=E)：component 为空是新标签页，component=iframe 是系统内嵌
+        boolean isExternal = MenuTypeEnum.EXTERNAL.getValue().equals(menu.getType());
+        boolean isEmbedded = isExternal && "iframe".equals(menu.getComponent());
+
+        // 新标签页：path 用外链地址；内嵌：path 用内部路由路径
+        String path = isExternal && !isEmbedded && StrUtil.isNotBlank(externalUrl)
+                ? externalUrl
+                : routePath;
+        routeVo.setPath(path);
+
+        // 路由名称：外链不设 name（前端 filterRoutes 会过滤出路由注册表）
         String routeName = menu.getRouteName();
-        if (StrUtil.isBlank(routeName)) {
-            // 外链不做驼峰转换，使用唯一占位，避免 http:// 被解析异常
-            routeName = externalLink
-                    ? "ext-" + menu.getId()
-                    : StringUtils.capitalize(StrUtil.toCamelCase(routePath, '-'));
+        if (StrUtil.isBlank(routeName) && !isExternal) {
+            routeName = StringUtils.capitalize(StrUtil.toCamelCase(path, '-'));
         }
-        // 根据name路由跳转 this.$router.push({name:xxx})
         routeVo.setName(routeName);
 
-        // 根据path路由跳转 this.$router.push({path:xxx})
-        routeVo.setPath(routePath);
         routeVo.setRedirect(menu.getRedirect());
-        // 外链无组件
-        routeVo.setComponent(externalLink ? null : menu.getComponent());
+
+        if (isEmbedded) {
+            routeVo.setComponent("iframe");
+        } else if (isExternal) {
+            routeVo.setComponent(null);
+        } else {
+            routeVo.setComponent(menu.getComponent());
+        }
 
         RouteVO.Meta meta = new RouteVO.Meta();
         meta.setTitle(menu.getName());
         meta.setIcon(menu.getIcon());
         meta.setHidden(StatusEnum.DISABLE.getValue().equals(menu.getVisible()));
-        // 【菜单】是否开启页面缓存
-        if (MenuTypeEnum.MENU.getValue().equals(menu.getType())
+        // 【菜单/内嵌外链】是否开启页面缓存
+        if ((MenuTypeEnum.MENU.getValue().equals(menu.getType()) || isEmbedded)
                 && ObjectUtil.equals(menu.getKeepAlive(), 1)) {
             meta.setKeepAlive(true);
         }
         meta.setAlwaysShow(ObjectUtil.equals(menu.getAlwaysShow(), 1));
+
+        if (isEmbedded && StrUtil.isNotBlank(externalUrl)) {
+            meta.setExternalUrl(externalUrl);
+        }
 
         Map<String, Object> paramsMap = menu.getParams();
         if (paramsMap != null && !paramsMap.isEmpty()) {
@@ -275,8 +289,8 @@ public class MenuServiceImpl extends ServiceImpl<MenuMapper, Menu> implements Me
     public boolean saveMenu(MenuForm menuForm) {
 
         String menuType = menuForm.getType();
-        boolean isExternalLink = MenuTypeEnum.MENU.getValue().equals(menuType)
-                && StrUtil.startWithAny(menuForm.getRoutePath(), "http://", "https://");
+        boolean isExternal = MenuTypeEnum.EXTERNAL.getValue().equals(menuType);
+        boolean isEmbedded = isExternal && "iframe".equals(menuForm.getComponent());
 
         if (MenuTypeEnum.CATALOG.getValue().equals(menuType)) {  // 如果是目录
             String path = menuForm.getRoutePath();
@@ -284,8 +298,8 @@ public class MenuServiceImpl extends ServiceImpl<MenuMapper, Menu> implements Me
                 menuForm.setRoutePath("/" + path); // 一级目录需以 / 开头
             }
             menuForm.setComponent("Layout");
-        } else if (isExternalLink) {
-            // 外链菜单组件设置为 null，通过 routePath 判断外链
+        } else if (isExternal && !isEmbedded) {
+            // 外链新标签页：component 留空
             menuForm.setComponent(null);
         }
         if (Objects.equals(menuForm.getParentId(), menuForm.getId())) {
@@ -302,8 +316,9 @@ public class MenuServiceImpl extends ServiceImpl<MenuMapper, Menu> implements Me
         } else {
             entity.setParams(null);
         }
-        // 新增类型为菜单时候 路由名称唯一
-        if (MenuTypeEnum.MENU.getValue().equals(menuType) && !isExternalLink) {
+        // 菜单(M)和内嵌外链(E+iframe)需要路由名称唯一
+        boolean needsRouteName = MenuTypeEnum.MENU.getValue().equals(menuType) || isEmbedded;
+        if (needsRouteName) {
             Assert.isFalse(this.exists(new LambdaQueryWrapper<Menu>()
                     .eq(Menu::getRouteName, entity.getRouteName())
                     .ne(menuForm.getId() != null, Menu::getId, menuForm.getId())

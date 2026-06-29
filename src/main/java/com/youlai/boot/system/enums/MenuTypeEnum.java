@@ -9,6 +9,7 @@ import lombok.Getter;
  *
  * C：目录
  * M：菜单
+ * E：外链
  * B：按钮
  */
 @Getter
@@ -16,6 +17,7 @@ public enum MenuTypeEnum implements IBaseEnum<String> {
 
     CATALOG("C", "目录"),
     MENU("M", "菜单"),
+    EXTERNAL("E", "外链"),
     BUTTON("B", "按钮");
 
     /**

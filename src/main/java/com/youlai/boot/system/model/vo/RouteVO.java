@@ -54,6 +54,10 @@ public class RouteVO {
         @JsonInclude(JsonInclude.Include.NON_NULL)
         private Boolean alwaysShow;
 
+        @Schema(description = "外链地址(内嵌模式用)", example = "https://www.youlai.tech")
+        @JsonInclude(JsonInclude.Include.NON_NULL)
+        private String externalUrl;
+
         @Schema(description = "路由参数")
         private Map<String,String> params;
     }
