@@ -19,6 +19,8 @@ import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.stereotype.Service;
 
+import tools.jackson.databind.json.JsonMapper;
+
 import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
@@ -46,10 +48,14 @@ public class RedisTokenManager implements TokenManager {
 
     private final SecurityProperties securityProperties;
     private final RedisTemplate<String, Object> redisTemplate;
+    private final JsonMapper jsonMapper;
 
-    public RedisTokenManager(SecurityProperties securityProperties, RedisTemplate<String, Object> redisTemplate) {
+    public RedisTokenManager(SecurityProperties securityProperties,
+                             RedisTemplate<String, Object> redisTemplate,
+                             JsonMapper jsonMapper) {
         this.securityProperties = securityProperties;
         this.redisTemplate = redisTemplate;
+        this.jsonMapper = jsonMapper;
     }
 
     /**
@@ -96,8 +102,9 @@ public class RedisTokenManager implements TokenManager {
      */
     @Override
     public Authentication parseToken(String token) {
-        UserSession userSession = (UserSession) redisTemplate.opsForValue().get(formatTokenKey(token));
-        if (userSession == null) return null;
+        Object raw = redisTemplate.opsForValue().get(formatTokenKey(token));
+        if (raw == null) return null;
+        UserSession userSession = jsonMapper.convertValue(raw, UserSession.class);
 
         // 构建用户权限集合
         Set<SimpleGrantedAuthority> authorities = null;
@@ -144,11 +151,12 @@ public class RedisTokenManager implements TokenManager {
      */
     @Override
     public AuthenticationToken refreshToken(String refreshToken) {
-        UserSession userSession = (UserSession) redisTemplate.opsForValue()
+        Object raw = redisTemplate.opsForValue()
                 .get(StrUtil.format(RedisConstants.Auth.REFRESH_TOKEN_USER, refreshToken));
-        if (userSession == null) {
+        if (raw == null) {
             throw new TokenInvalidException(ResultCode.REFRESH_TOKEN_INVALID);
         }
+        UserSession userSession = jsonMapper.convertValue(raw, UserSession.class);
         Object oldAccessTokenValue = redisTemplate.opsForValue().get(StrUtil.format(RedisConstants.Auth.USER_ACCESS_TOKEN, userSession.getUserId()));
         // 删除旧的访问令牌记录
         Optional.of(oldAccessTokenValue)
