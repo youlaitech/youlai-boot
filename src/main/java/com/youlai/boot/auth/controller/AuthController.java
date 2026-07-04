@@ -48,7 +48,7 @@ public class AuthController {
     @Operation(summary = "账号密码登录")
     @PostMapping("/login")
     @Log(module = LogModuleEnum.LOGIN, value = ActionTypeEnum.LOGIN)
-    @RateLimit(limit = 5, window = 60)
+    @RateLimit
     public Result<AuthenticationToken> login(@RequestBody @Valid LoginForm request) {
         AuthenticationToken authenticationToken = authService.login(request.getUsername(), request.getPassword());
         return Result.success(authenticationToken);

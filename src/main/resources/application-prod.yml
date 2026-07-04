@@ -71,6 +71,10 @@ mybatis-plus:
 rate-limit:
   default-limit: 10
   default-window: 1
+  ip:
+    enabled: true
+    limit: 1000           # IP 全局：1000 req / 60s
+    window-seconds: 60
 
 # 安全配置
 security:
