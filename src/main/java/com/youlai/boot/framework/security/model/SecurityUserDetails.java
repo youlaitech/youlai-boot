@@ -13,17 +13,18 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 /**
- * Spring Security 用户认证对象
+ * Spring Security 用户认证对象。
  * <p>
- * 封装了用户的基本信息和权限信息，供 Spring Security 进行用户认证与授权。
- * 实现了 {@link UserDetails} 接口，提供用户的核心信息。
+ * 实现 {@link UserDetails}，封装用户标识、角色、数据权限等认证信息。
+ * {@link #roles} 字段存储角色编码（不带 ROLE_ 前缀），
+ * {@link #getAuthorities()} 运行时补前缀并转为 {@link SimpleGrantedAuthority}。
  *
  * @author Ray.Hao
  * @version 3.0.0
  */
 @Data
 @NoArgsConstructor
-public class SysUserDetails implements UserDetails {
+public class SecurityUserDetails implements UserDetails {
 
     /**
      * 用户ID
@@ -52,42 +53,35 @@ public class SysUserDetails implements UserDetails {
 
     /**
      * 数据权限列表
-     * <p>
-     * 存储用户所有角色的数据权限范围，用于实现多角色权限合并（并集策略）
      */
     private List<RoleDataScope> dataScopes;
 
     /**
-     * 用户角色权限集合
+     * 角色编码集合（不带 ROLE_ 前缀）
      */
-    private Collection<SimpleGrantedAuthority> authorities;
+    private Set<String> roles;
 
     /**
-     * 构造函数：根据用户认证信息初始化用户详情对象
-     *
-     * @param user 用户认证信息对象 {@link UserAuthInfo}
+     * 构造函数：根据 {@link SecurityUser} 初始化。
      */
-    public SysUserDetails(UserAuthInfo user) {
+    public SecurityUserDetails(SecurityUser user) {
         this.userId = user.getUserId();
         this.username = user.getUsername();
         this.password = user.getPassword();
         this.enabled = ObjectUtil.equal(user.getStatus(), 1);
         this.deptId = user.getDeptId();
         this.dataScopes = user.getDataScopes();
-
-        // 初始化角色权限集合
-        this.authorities = CollectionUtil.isNotEmpty(user.getRoles())
-                ? user.getRoles().stream()
-                // 角色名加上前缀 "ROLE_"，用于区分角色 (ROLE_ADMIN) 和权限 (user:add)
-                .map(role -> new SimpleGrantedAuthority(SecurityConstants.ROLE_PREFIX + role))
-                .collect(Collectors.toSet())
-                : Collections.emptySet();
+        this.roles = user.getRoles();
     }
-
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
-        return this.authorities;
+        if (CollectionUtil.isEmpty(roles)) {
+            return Collections.emptySet();
+        }
+        return roles.stream()
+                .map(role -> new SimpleGrantedAuthority(SecurityConstants.ROLE_PREFIX + role))
+                .collect(Collectors.toSet());
     }
 
     @Override
@@ -107,8 +101,6 @@ public class SysUserDetails implements UserDetails {
 
     /**
      * 判断是否包含"全部数据"权限
-     *
-     * @return 是否有全部数据权限
      */
     public boolean hasAllDataScope() {
         if (CollectionUtil.isEmpty(dataScopes)) {
@@ -119,9 +111,7 @@ public class SysUserDetails implements UserDetails {
     }
 
     /**
-     * 获取数据权限列表
-     *
-     * @return 数据权限列表，永不为null
+     * 获取数据权限列表，永不为 null
      */
     public List<RoleDataScope> getDataScopes() {
         return dataScopes != null ? dataScopes : Collections.emptyList();

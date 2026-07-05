@@ -2,7 +2,7 @@ package com.youlai.boot.system.model.entity;
 
 import com.baomidou.mybatisplus.annotation.TableName;
 import com.youlai.boot.common.base.BaseEntity;
-import com.youlai.boot.system.enums.SocialPlatformEnum;
+import com.youlai.boot.common.enums.SocialPlatformEnum;
 import lombok.Getter;
 import lombok.Setter;
 

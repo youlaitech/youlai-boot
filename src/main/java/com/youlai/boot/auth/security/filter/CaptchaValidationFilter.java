@@ -1,4 +1,4 @@
-package com.youlai.boot.framework.security.filter;
+package com.youlai.boot.auth.security.filter;
 
 import cn.hutool.core.util.StrUtil;
 import cn.hutool.json.JSONObject;
@@ -29,7 +29,9 @@ import java.io.InputStreamReader;
 import java.nio.charset.StandardCharsets;
 
 /**
- * 图形验证码校验过滤器
+ * 图形验证码校验过滤器。
+ * <p>
+ * 归使用方，因为验证码规则（哪些接口需要验证码、验证码类型）因项目而异。
  */
 public class CaptchaValidationFilter extends OncePerRequestFilter {
 
@@ -49,20 +51,17 @@ public class CaptchaValidationFilter extends OncePerRequestFilter {
     public void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain chain)
             throws ServletException, IOException {
 
-        // 非登录接口直接放行
         if (!LOGIN_PATH_REQUEST_MATCHER.matches(request)) {
             chain.doFilter(request, response);
             return;
         }
 
-        // 仅支持 JSON 登录
         String contentType = request.getContentType();
         if (contentType == null || !contentType.contains(MediaType.APPLICATION_JSON_VALUE)) {
             ResponseWriter.writeError(response, ResultCode.USER_VERIFICATION_CODE_ERROR);
             return;
         }
 
-        // 包装请求，确保下游还能读取 body
         ContentCachingRequestWrapper requestWrapper = new ContentCachingRequestWrapper(request, -1);
 
         byte[] bodyBytes = StreamUtils.copyToByteArray(requestWrapper.getInputStream());
@@ -85,9 +84,6 @@ public class CaptchaValidationFilter extends OncePerRequestFilter {
         }
     }
 
-    /**
-     * Simple wrapper to allow repeated reads of the request body after we've parsed it here.
-     */
     private static class RepeatableReadRequestWrapper extends HttpServletRequestWrapper {
 
         private final byte[] cachedBody;
@@ -139,5 +135,3 @@ public class CaptchaValidationFilter extends OncePerRequestFilter {
         }
     }
 }
-
-

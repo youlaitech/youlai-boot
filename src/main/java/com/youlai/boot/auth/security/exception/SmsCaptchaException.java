@@ -1,4 +1,4 @@
-package com.youlai.boot.framework.security.exception;
+package com.youlai.boot.auth.security.exception;
 
 import org.springframework.security.core.AuthenticationException;
 
@@ -9,6 +9,7 @@ import org.springframework.security.core.AuthenticationException;
  * @since 2025/3/1
  */
 public class SmsCaptchaException extends AuthenticationException {
+
     public SmsCaptchaException(String msg) {
         super(msg);
     }

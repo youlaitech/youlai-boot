@@ -6,16 +6,16 @@ import java.util.List;
 import java.util.Set;
 
 /**
- * 用户认证信息
+ * 安全模块用户数据 POJO。
  * <p>
- * 用于登录认证过程中的用户信息承载，包含用户名、密码、状态、角色等与认证/授权相关的数据。
- * </p>
+ * 作为端口接口的返回类型，承载用户认证所需的全部数据。
+ * 纯 JDK 类型，无 system 模块依赖，可直接序列化。
  *
  * @author Ray.Hao
  * @since 2025/12/16
  */
 @Data
-public class UserAuthInfo {
+public class SecurityUser {
 
     /**
      * 用户ID
@@ -48,7 +48,7 @@ public class UserAuthInfo {
     private Integer status;
 
     /**
-     * 角色集合
+     * 角色编码集合
      */
     private Set<String> roles;
 

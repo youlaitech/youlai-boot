@@ -6,7 +6,7 @@ import com.youlai.boot.system.model.entity.SysUser;
 import com.youlai.boot.system.model.query.UserQuery;
 import com.youlai.boot.system.model.form.UserForm;
 import com.youlai.boot.common.annotation.DataPermission;
-import com.youlai.boot.framework.security.model.UserAuthInfo;
+import com.youlai.boot.framework.security.model.SecurityUser;
 import com.youlai.boot.system.model.vo.UserExportVO;
 import com.youlai.boot.system.model.vo.UserPageVO;
 import com.youlai.boot.system.model.vo.UserProfileVO;
@@ -48,9 +48,9 @@ public interface UserMapper extends BaseMapper<SysUser> {
      * @param username 用户名
      * @return 认证信息
      */
-    UserAuthInfo getAuthInfoByUsername(String username);
+    SecurityUser getAuthInfoByUsername(String username);
 
-    default UserAuthInfo getAuthCredentialsByUsername(String username) {
+    default SecurityUser getAuthCredentialsByUsername(String username) {
         return getAuthInfoByUsername(username);
     }
 
@@ -60,9 +60,9 @@ public interface UserMapper extends BaseMapper<SysUser> {
      * @param mobile 手机号
      * @return 认证信息
      */
-    UserAuthInfo getAuthInfoByMobile(String mobile);
+    SecurityUser getAuthInfoByMobile(String mobile);
 
-    default UserAuthInfo getAuthCredentialsByMobile(String mobile) {
+    default SecurityUser getAuthCredentialsByMobile(String mobile) {
         return getAuthInfoByMobile(mobile);
     }
 

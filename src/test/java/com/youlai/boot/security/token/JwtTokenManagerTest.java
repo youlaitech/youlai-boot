@@ -3,7 +3,7 @@ package com.youlai.boot.security.token;
 import com.youlai.boot.framework.security.config.SecurityProperties;
 import com.youlai.boot.framework.security.model.AuthenticationToken;
 import com.youlai.boot.framework.security.model.RoleDataScope;
-import com.youlai.boot.framework.security.model.SysUserDetails;
+import com.youlai.boot.framework.security.model.SecurityUserDetails;
 import com.youlai.boot.framework.security.token.JwtTokenManager;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -16,7 +16,6 @@ import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.core.ValueOperations;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
-import org.springframework.security.core.authority.SimpleGrantedAuthority;
 
 import java.util.Collection;
 import java.util.List;
@@ -92,7 +91,7 @@ class JwtTokenManagerTest {
             assertThat(parsed).isNotNull();
             assertThat(parsed.getName()).isEqualTo("testuser");
 
-            SysUserDetails userDetails = (SysUserDetails) parsed.getPrincipal();
+            SecurityUserDetails userDetails = (SecurityUserDetails) parsed.getPrincipal();
             assertThat(userDetails.getUserId()).isEqualTo(1L);
             assertThat(userDetails.getDeptId()).isEqualTo(100L);
         }
@@ -120,7 +119,7 @@ class JwtTokenManagerTest {
             AuthenticationToken token = tokenManager.generateToken(authentication);
             Authentication parsed = tokenManager.parseToken(token.getAccessToken());
 
-            SysUserDetails userDetails = (SysUserDetails) parsed.getPrincipal();
+            SecurityUserDetails userDetails = (SecurityUserDetails) parsed.getPrincipal();
             List<RoleDataScope> dataScopes = userDetails.getDataScopes();
 
             assertThat(dataScopes).hasSize(2);
@@ -270,9 +269,9 @@ class JwtTokenManagerTest {
             Authentication parsed = tokenManager.parseToken(token.getAccessToken());
 
             assertThat(parsed).isInstanceOf(UsernamePasswordAuthenticationToken.class);
-            assertThat(parsed.getPrincipal()).isInstanceOf(SysUserDetails.class);
+            assertThat(parsed.getPrincipal()).isInstanceOf(SecurityUserDetails.class);
 
-            SysUserDetails userDetails = (SysUserDetails) parsed.getPrincipal();
+            SecurityUserDetails userDetails = (SecurityUserDetails) parsed.getPrincipal();
             assertThat(userDetails.getUserId()).isEqualTo(1L);
             assertThat(userDetails.getDeptId()).isEqualTo(100L);
             assertThat(userDetails.getUsername()).isEqualTo("testuser");
@@ -285,7 +284,7 @@ class JwtTokenManagerTest {
             AuthenticationToken token = tokenManager.generateToken(authentication);
 
             Authentication parsed = tokenManager.parseToken(token.getAccessToken());
-            SysUserDetails userDetails = (SysUserDetails) parsed.getPrincipal();
+            SecurityUserDetails userDetails = (SecurityUserDetails) parsed.getPrincipal();
 
             List<RoleDataScope> dataScopes = userDetails.getDataScopes();
             assertThat(dataScopes).hasSize(1);
@@ -313,7 +312,7 @@ class JwtTokenManagerTest {
     }
 
     private Authentication createTestAuthentication() {
-        SysUserDetails userDetails = new SysUserDetails();
+        SecurityUserDetails userDetails = new SecurityUserDetails();
         userDetails.setUserId(1L);
         userDetails.setUsername("testuser");
         userDetails.setDeptId(100L);
@@ -322,10 +321,7 @@ class JwtTokenManagerTest {
                 new RoleDataScope("ADMIN", 1, null),  // 全部数据权限
                 new RoleDataScope("USER", 4, null)    // 本人数据权限
         ));
-        userDetails.setAuthorities(Set.of(
-                new SimpleGrantedAuthority("ROLE_ADMIN"),
-                new SimpleGrantedAuthority("ROLE_USER")
-        ));
+        userDetails.setRoles(Set.of("ADMIN", "USER"));
 
         return new UsernamePasswordAuthenticationToken(
                 userDetails,
@@ -335,7 +331,7 @@ class JwtTokenManagerTest {
     }
 
     private Authentication createTestAuthenticationWithCustomScope() {
-        SysUserDetails userDetails = new SysUserDetails();
+        SecurityUserDetails userDetails = new SecurityUserDetails();
         userDetails.setUserId(2L);
         userDetails.setUsername("customuser");
         userDetails.setDeptId(200L);
@@ -343,9 +339,7 @@ class JwtTokenManagerTest {
         userDetails.setDataScopes(List.of(
                 new RoleDataScope("CUSTOM_ROLE", 5, List.of(10L, 20L, 30L))  // 自定义部门权限
         ));
-        userDetails.setAuthorities(Set.of(
-                new SimpleGrantedAuthority("ROLE_CUSTOM")
-        ));
+        userDetails.setRoles(Set.of("CUSTOM"));
 
         return new UsernamePasswordAuthenticationToken(
                 userDetails,

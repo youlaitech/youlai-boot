@@ -3,7 +3,7 @@ package com.youlai.boot.system.service;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.service.IService;
 import com.youlai.boot.common.model.Option;
-import com.youlai.boot.framework.security.model.UserAuthInfo;
+import com.youlai.boot.framework.security.model.SecurityUser;
 import com.youlai.boot.system.model.vo.CurrentUserVO;
 import com.youlai.boot.system.model.vo.UserExportVO;
 import com.youlai.boot.system.model.entity.SysUser;
@@ -78,11 +78,11 @@ public interface UserService extends IService<SysUser> {
      * 根据用户名获取认证信息
      *
      * @param username 用户名
-     * @return {@link UserAuthInfo}
+     * @return {@link SecurityUser}
      */
-    UserAuthInfo getAuthInfoByUsername(String username);
+    SecurityUser getAuthInfoByUsername(String username);
 
-    default UserAuthInfo getAuthCredentialsByUsername(String username) {
+    default SecurityUser getAuthCredentialsByUsername(String username) {
         return getAuthInfoByUsername(username);
     }
 
@@ -194,11 +194,11 @@ public interface UserService extends IService<SysUser> {
      * 根据手机号获取用户认证信息
      *
      * @param mobile 手机号
-     * @return {@link UserAuthInfo}
+     * @return {@link SecurityUser}
      */
-    UserAuthInfo getAuthInfoByMobile(String mobile);
+    SecurityUser getAuthInfoByMobile(String mobile);
 
-    default UserAuthInfo getAuthCredentialsByMobile(String mobile) {
+    default SecurityUser getAuthCredentialsByMobile(String mobile) {
         return getAuthInfoByMobile(mobile);
     }
 

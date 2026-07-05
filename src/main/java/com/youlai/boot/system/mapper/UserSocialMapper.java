@@ -1,7 +1,7 @@
 package com.youlai.boot.system.mapper;
 
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
-import com.youlai.boot.framework.security.model.UserAuthInfo;
+import com.youlai.boot.framework.security.model.SecurityUser;
 import com.youlai.boot.system.model.entity.UserSocial;
 import org.apache.ibatis.annotations.Mapper;
 
@@ -17,6 +17,6 @@ public interface UserSocialMapper extends BaseMapper<UserSocial> {
      * @param userId 用户ID
      * @return 认证信息
      */
-    UserAuthInfo getAuthInfoByUserId(Long userId);
+    SecurityUser getAuthInfoByUserId(Long userId);
 
 }

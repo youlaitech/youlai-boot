@@ -33,9 +33,9 @@ public interface JwtClaimConstants {
     String DATA_SCOPES = "dataScopes";
 
     /**
-     * 权限(角色Code)集合
+     * 角色编码集合（不带 ROLE_ 前缀）
      */
-    String AUTHORITIES = "authorities";
+    String ROLES = "roles";
 
     /**
      * Token 版本号

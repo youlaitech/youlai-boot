@@ -1,14 +1,16 @@
-package com.youlai.boot.framework.security.provider;
+package com.youlai.boot.auth.security.provider;
 
 import cn.binarywang.wx.miniapp.api.WxMaService;
 import cn.binarywang.wx.miniapp.bean.WxMaJscode2SessionResult;
 import cn.hutool.core.util.ObjectUtil;
-import com.youlai.boot.framework.security.exception.NeedBindMobileException;
-import com.youlai.boot.framework.security.model.SysUserDetails;
-import com.youlai.boot.framework.security.model.UserAuthInfo;
-import com.youlai.boot.framework.security.model.WxMaAuthenticationToken;
-import com.youlai.boot.framework.security.service.SysUserDetailsService;
+import com.youlai.boot.common.enums.SocialPlatformEnum;
+import com.youlai.boot.framework.security.model.SecurityUser;
+import com.youlai.boot.framework.security.model.SecurityUserDetails;
+import com.youlai.boot.framework.security.port.UserAuthenticationPort;
+import com.youlai.boot.auth.security.exception.MobileNotBoundException;
+import com.youlai.boot.auth.security.model.WxMaAuthenticationToken;
 import com.youlai.boot.system.model.entity.UserSocial;
+import com.youlai.boot.system.service.UserSocialService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import me.chanjar.weixin.common.error.WxErrorException;
@@ -26,7 +28,8 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 public class WxMaAuthenticationProvider implements AuthenticationProvider {
 
     private final WxMaService wxMaService;
-    private final SysUserDetailsService sysUserDetailsService;
+    private final UserAuthenticationPort userAuthPort;
+    private final UserSocialService userSocialService;
 
     @Override
     public Authentication authenticate(Authentication authentication) throws AuthenticationException {
@@ -38,44 +41,35 @@ public class WxMaAuthenticationProvider implements AuthenticationProvider {
         }
 
         try {
-            // 1. 用 code 换取 openid
             WxMaJscode2SessionResult session = wxMaService.jsCode2SessionInfo(code);
             String openid = session.getOpenid();
             String sessionKey = session.getSessionKey();
 
             log.info("微信小程序登录：openid={}", openid);
 
-            // 2. 根据 openid 查询绑定信息
-            UserSocial userSocial = sysUserDetailsService.getWechatMiniBindInfo(openid);
+            UserSocial userSocial = userSocialService.getByPlatformAndOpenid(SocialPlatformEnum.WECHAT_MINI, openid);
 
             if (userSocial == null) {
-                // 未绑定，抛出异常提示需要绑定手机号
                 log.info("微信小程序登录：用户未绑定手机号，openid={}", openid);
-                throw new NeedBindMobileException(openid, sessionKey);
+                throw new MobileNotBoundException(openid, sessionKey);
             }
 
-            // 3. 获取用户认证信息
-            UserAuthInfo userAuthInfo = sysUserDetailsService.getAuthInfoByWechatOpenid(openid);
+            SecurityUser securityUser = userAuthPort.getAuthInfoByOpenid(SocialPlatformEnum.WECHAT_MINI, openid);
 
-            if (userAuthInfo == null) {
+            if (securityUser == null) {
                 log.warn("微信小程序登录失败：用户不存在，openid={}", openid);
                 throw new UsernameNotFoundException("用户不存在");
             }
 
-            // 4. 检查用户状态
-            if (ObjectUtil.notEqual(userAuthInfo.getStatus(), 1)) {
-                log.warn("微信小程序登录失败：用户已禁用，username={}", userAuthInfo.getUsername());
+            if (ObjectUtil.notEqual(securityUser.getStatus(), 1)) {
+                log.warn("微信小程序登录失败：用户已禁用，username={}", securityUser.getUsername());
                 throw new DisabledException("用户已被禁用");
             }
 
-            // 5. 更新 session_key
-            sysUserDetailsService.updateWechatSessionKey(userSocial.getId(), sessionKey);
+            userSocialService.updateSessionKey(userSocial.getId(), sessionKey);
 
-            // 6. 构建已认证 Token
-            SysUserDetails userDetails = new SysUserDetails(userAuthInfo);
-
-            log.info("微信小程序登录成功：username={}, openid={}", userAuthInfo.getUsername(), openid);
-
+            SecurityUserDetails userDetails = new SecurityUserDetails(securityUser);
+            log.info("微信小程序登录成功：username={}, openid={}", securityUser.getUsername(), openid);
             return WxMaAuthenticationToken.authenticated(userDetails, userDetails.getAuthorities());
 
         } catch (WxErrorException e) {
@@ -88,5 +82,4 @@ public class WxMaAuthenticationProvider implements AuthenticationProvider {
     public boolean supports(Class<?> authentication) {
         return WxMaAuthenticationToken.class.isAssignableFrom(authentication);
     }
-
 }

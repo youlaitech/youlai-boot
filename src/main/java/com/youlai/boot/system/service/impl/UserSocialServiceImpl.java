@@ -3,8 +3,8 @@ package com.youlai.boot.system.service.impl;
 import cn.hutool.core.util.StrUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
-import com.youlai.boot.framework.security.model.UserAuthInfo;
-import com.youlai.boot.system.enums.SocialPlatformEnum;
+import com.youlai.boot.framework.security.model.SecurityUser;
+import com.youlai.boot.common.enums.SocialPlatformEnum;
 import com.youlai.boot.system.mapper.UserSocialMapper;
 import com.youlai.boot.system.model.entity.UserSocial;
 import com.youlai.boot.system.service.UserSocialService;
@@ -86,7 +86,7 @@ public class UserSocialServiceImpl extends ServiceImpl<UserSocialMapper, UserSoc
     }
 
     @Override
-    public UserAuthInfo getAuthInfoByOpenid(SocialPlatformEnum platform, String openid) {
+    public SecurityUser getAuthInfoByOpenid(SocialPlatformEnum platform, String openid) {
         UserSocial userSocial = getByPlatformAndOpenid(platform, openid);
         if (userSocial == null) {
             return null;

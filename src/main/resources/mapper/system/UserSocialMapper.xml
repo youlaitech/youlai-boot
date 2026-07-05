@@ -5,7 +5,7 @@
 <mapper namespace="com.youlai.boot.system.mapper.UserSocialMapper">
 
     <!-- 用户认证信息映射 -->
-    <resultMap id="AuthCredentialsMap" type="com.youlai.boot.framework.security.model.UserAuthInfo">
+    <resultMap id="AuthCredentialsMap" type="com.youlai.boot.framework.security.model.SecurityUser">
         <id property="userId" column="userId" jdbcType="BIGINT"/>
         <result property="username" column="username" jdbcType="VARCHAR"/>
         <result property="nickname" column="nickname" jdbcType="VARCHAR"/>

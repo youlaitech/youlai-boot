@@ -8,12 +8,12 @@ import cn.hutool.core.util.StrUtil;
 import com.youlai.boot.auth.model.vo.WxMaLoginVO;
 import com.youlai.boot.auth.service.WxMaAuthService;
 import com.youlai.boot.common.constant.RedisConstants;
-import com.youlai.boot.framework.security.exception.NeedBindMobileException;
 import com.youlai.boot.framework.security.model.AuthenticationToken;
-import com.youlai.boot.framework.security.model.SysUserDetails;
-import com.youlai.boot.framework.security.model.WxMaAuthenticationToken;
+import com.youlai.boot.framework.security.model.SecurityUserDetails;
 import com.youlai.boot.framework.security.token.TokenManager;
-import com.youlai.boot.system.enums.SocialPlatformEnum;
+import com.youlai.boot.auth.security.exception.MobileNotBoundException;
+import com.youlai.boot.auth.security.model.WxMaAuthenticationToken;
+import com.youlai.boot.common.enums.SocialPlatformEnum;
 import com.youlai.boot.system.model.entity.SysUser;
 import com.youlai.boot.system.service.UserSocialService;
 import com.youlai.boot.system.service.UserService;
@@ -69,7 +69,7 @@ public class WxMaAuthServiceImpl implements WxMaAuthService {
                     .tokenType(authToken.getTokenType())
                     .expiresIn(authToken.getExpiresIn())
                     .build();
-        } catch (NeedBindMobileException e) {
+        } catch (MobileNotBoundException e) {
             return WxMaLoginVO.builder()
                     .isNewUser(true)
                     .needBindMobile(true)
@@ -234,7 +234,7 @@ public class WxMaAuthServiceImpl implements WxMaAuthService {
      * 生成认证令牌
      */
     private AuthenticationToken generateAuthToken(String mobile) {
-        SysUserDetails userDetails = new SysUserDetails(userService.getAuthInfoByMobile(mobile));
+        SecurityUserDetails userDetails = new SecurityUserDetails(userService.getAuthInfoByMobile(mobile));
         Authentication authentication = new UsernamePasswordAuthenticationToken(
                 userDetails, null, userDetails.getAuthorities()
         );

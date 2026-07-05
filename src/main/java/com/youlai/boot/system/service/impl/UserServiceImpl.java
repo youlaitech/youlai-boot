@@ -16,7 +16,7 @@ import com.youlai.boot.framework.integration.mail.service.MailService;
 import com.youlai.boot.framework.integration.sms.enums.SmsTypeEnum;
 import com.youlai.boot.framework.integration.sms.service.SmsService;
 import com.youlai.boot.framework.security.model.RoleDataScope;
-import com.youlai.boot.framework.security.model.UserAuthInfo;
+import com.youlai.boot.framework.security.model.SecurityUser;
 import com.youlai.boot.framework.security.token.TokenManager;
 import com.youlai.boot.framework.security.util.SecurityUtils;
 import com.youlai.boot.system.converter.UserConverter;
@@ -206,39 +206,34 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, SysUser> implements
      * 根据用户名获取认证凭证信息
      *
      * @param username 用户名
-     * @return 用户认证凭证信息 {@link UserAuthInfo}
+     * @return 用户认证凭证信息 {@link SecurityUser}
      */
     @Override
-    public UserAuthInfo getAuthInfoByUsername(String username) {
-        UserAuthInfo userAuthInfo = this.baseMapper.getAuthInfoByUsername(username);
-        if (userAuthInfo != null) {
-            Set<String> roles = userAuthInfo.getRoles();
-            // 获取数据权限列表（用于并集策略）
+    public SecurityUser getAuthInfoByUsername(String username) {
+        SecurityUser securityUser = this.baseMapper.getAuthInfoByUsername(username);
+        if (securityUser != null) {
+            Set<String> roles = securityUser.getRoles();
             List<RoleDataScope> dataScopes = roleService.getRoleDataScopes(roles);
-            userAuthInfo.setDataScopes(dataScopes);
+            securityUser.setDataScopes(dataScopes);
         }
-        return userAuthInfo;
+        return securityUser;
     }
 
     /**
      * 根据手机号获取用户认证信息
-     *
-     * @param mobile 手机号
-     * @return 用户认证信息
      */
     @Override
-    public UserAuthInfo getAuthInfoByMobile(String mobile) {
+    public SecurityUser getAuthInfoByMobile(String mobile) {
         if (StrUtil.isBlank(mobile)) {
             return null;
         }
-        UserAuthInfo userAuthInfo = this.baseMapper.getAuthInfoByMobile(mobile);
-        if (userAuthInfo != null) {
-            Set<String> roles = userAuthInfo.getRoles();
-            // 获取数据权限列表（用于并集策略）
+        SecurityUser securityUser = this.baseMapper.getAuthInfoByMobile(mobile);
+        if (securityUser != null) {
+            Set<String> roles = securityUser.getRoles();
             List<RoleDataScope> dataScopes = roleService.getRoleDataScopes(roles);
-            userAuthInfo.setDataScopes(dataScopes);
+            securityUser.setDataScopes(dataScopes);
         }
-        return userAuthInfo;
+        return securityUser;
     }
 
     /**
