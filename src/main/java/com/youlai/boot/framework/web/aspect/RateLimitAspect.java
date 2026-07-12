@@ -5,10 +5,10 @@ import cn.hutool.crypto.digest.DigestUtil;
 import com.youlai.boot.common.annotation.RateLimit;
 import com.youlai.boot.common.constant.RedisConstants;
 import com.youlai.boot.common.constant.SecurityConstants;
-import com.youlai.boot.common.exception.BusinessException;
 import com.youlai.boot.common.result.ResultCode;
 import com.youlai.boot.common.util.IPUtils;
 import com.youlai.boot.framework.web.config.RateLimitProperties;
+import com.youlai.boot.framework.web.exception.RateLimitException;
 import com.youlai.boot.framework.web.ratelimit.SlidingWindowScript;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
@@ -55,7 +55,7 @@ public class RateLimitAspect {
 
         String key = buildKey(request, rateLimit);
         int limit = rateLimit.limit() > 0 ? rateLimit.limit() : rateLimitProperties.getDefaultLimit();
-        int window = rateLimit.window() > 0 ? rateLimit.window() : rateLimitProperties.getDefaultWindow();
+        int window = rateLimit.window() > 0 ? rateLimit.window() : rateLimitProperties.getDefaultWindowSeconds();
         long windowMs = rateLimit.timeUnit().toMillis(window);
 
         Long count = SlidingWindowScript.execute(redisTemplate, key, windowMs);
@@ -65,7 +65,7 @@ public class RateLimitAspect {
 
         if (current > limit) {
             log.warn("接口限流触发  key={}  count={}  limit={}", key, current, limit);
-            throw new BusinessException(ResultCode.REQUEST_CONCURRENCY_LIMIT_EXCEEDED);
+            throw new RateLimitException(ResultCode.REQUEST_CONCURRENCY_LIMIT_EXCEEDED);
         }
 
         return jp.proceed();
@@ -73,7 +73,7 @@ public class RateLimitAspect {
 
     private String buildKey(HttpServletRequest request, RateLimit rateLimit) {
         String user = resolveUser(request);
-        return StrUtil.format(RedisConstants.RateLimiter.API,
+        return StrUtil.format(RedisConstants.RateLimit.API,
                 rateLimit.prefix(), user, request.getRequestURI());
     }
 

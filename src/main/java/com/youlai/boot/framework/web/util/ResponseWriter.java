@@ -57,6 +57,7 @@ public final class ResponseWriter {
         return switch (resultCode) {
             case ACCESS_UNAUTHORIZED, ACCESS_TOKEN_INVALID, REFRESH_TOKEN_INVALID -> HttpStatus.UNAUTHORIZED.value();
             case ACCESS_PERMISSION_EXCEPTION -> HttpStatus.FORBIDDEN.value();
+            case REQUEST_CONCURRENCY_LIMIT_EXCEEDED -> HttpStatus.TOO_MANY_REQUESTS.value();
             default -> HttpStatus.BAD_REQUEST.value();
         };
     }

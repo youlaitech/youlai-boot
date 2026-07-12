@@ -30,7 +30,7 @@ import java.io.IOException;
  *
  * <h3>限流维度</h3>
  * <pre>{@code
- *   Key: rate_limiter:ip:{clientIp}
+ *   Key: rate_limit:ip:{clientIp}
  *   默认: 1000 req / 60s（可通过 rate-limit.ip.* 配置）
  * }</pre>
  *
@@ -67,7 +67,7 @@ public class IpRateLimitFilter extends OncePerRequestFilter {
         }
 
         String ip = IPUtils.getIpAddr(request);
-        String key = StrUtil.format(RedisConstants.RateLimiter.IP, ip);
+        String key = StrUtil.format(RedisConstants.RateLimit.IP, ip);
         long windowMs = ipConfig.getWindowSeconds() * 1000L;
 
         // 执行滑动窗口计数（Lua 原子操作）

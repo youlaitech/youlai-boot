@@ -49,7 +49,7 @@ public final class SlidingWindowScript {
      * 执行滑动窗口计数
      *
      * @param redisTemplate Redis 模板
-     * @param key           限流 Key（如 {@code rate_limiter:ip:192.168.1.1}）
+     * @param key           限流 Key（如 {@code rate_limit:ip:192.168.1.1}）
      * @param windowMs      窗口大小（毫秒）
      * @return 当前窗口内请求数（包含本次）
      */

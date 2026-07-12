@@ -5,6 +5,7 @@ import com.youlai.boot.common.exception.BusinessException;
 import com.youlai.boot.common.result.Result;
 import com.youlai.boot.common.result.ResultCode;
 import com.youlai.boot.framework.security.exception.TokenInvalidException;
+import com.youlai.boot.framework.web.exception.RateLimitException;
 import jakarta.servlet.ServletException;
 import jakarta.validation.ConstraintViolation;
 import jakarta.validation.ConstraintViolationException;
@@ -155,6 +156,12 @@ public class GlobalExceptionHandler {
     @ResponseStatus(HttpStatus.UNAUTHORIZED)
     public <T> Result<T> handleTokenInvalidException(TokenInvalidException e) {
         return Result.failed(e.getResultCode());
+    }
+
+    @ExceptionHandler(RateLimitException.class)
+    @ResponseStatus(HttpStatus.TOO_MANY_REQUESTS)
+    public <T> Result<T> handleRateLimitException(RateLimitException e) {
+        return Result.failed(e.getResultCode(), e.getMessage());
     }
 
     @ExceptionHandler(BusinessException.class)

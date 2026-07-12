@@ -2,6 +2,7 @@ package com.youlai.boot.framework.web.aspect;
 
 import cn.hutool.core.util.StrUtil;
 import cn.hutool.crypto.digest.DigestUtil;
+import cn.hutool.json.JSONUtil;
 import com.youlai.boot.common.constant.RedisConstants;
 import com.youlai.boot.common.constant.SecurityConstants;
 import com.youlai.boot.common.result.ResultCode;
@@ -42,7 +43,7 @@ public class RepeatSubmitAspect {
 
     @Around(value = "repeatSubmitPointCut(repeatSubmit)", argNames = "pjp,repeatSubmit")
     public Object handleRepeatSubmit(ProceedingJoinPoint pjp, RepeatSubmit repeatSubmit) throws Throwable {
-        String lockKey = buildLockKey();
+        String lockKey = buildLockKey(pjp);
 
         int expire = repeatSubmit.expire();
         RLock lock = redissonClient.getLock(lockKey);
@@ -56,12 +57,17 @@ public class RepeatSubmitAspect {
 
     /**
      * 生成防重复提交锁的 key
+     * <p>
+     * key 由「用户标识 + 接口(method:URI) + 请求体哈希」组成：只有同一用户在同一接口提交
+     * 完全相同的请求体才视为重复提交；若仅按 method:URI 生成，同一接口的不同提交
+     * （如新增菜单与新增目录）会在窗口内被误判为重复。
      */
-    private String buildLockKey() {
+    private String buildLockKey(ProceedingJoinPoint pjp) {
         HttpServletRequest request = ((ServletRequestAttributes) RequestContextHolder.getRequestAttributes()).getRequest();
         String userIdentifier = getUserIdentifier(request);
         String requestIdentifier = StrUtil.join(":", request.getMethod(), request.getRequestURI());
-        return StrUtil.format(RedisConstants.Lock.RESUBMIT, userIdentifier, requestIdentifier);
+        String bodyHash = DigestUtil.sha256Hex(JSONUtil.toJsonStr(pjp.getArgs()));
+        return StrUtil.format(RedisConstants.Lock.RESUBMIT, userIdentifier, requestIdentifier + ":" + bodyHash);
     }
 
     /**

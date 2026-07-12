@@ -19,14 +19,14 @@ import org.springframework.stereotype.Component;
 public class RateLimitProperties {
 
     /**
-     * @RateLimit 注解未显式指定 limit 时的默认阈值
+     * @RateLimit 注解未显式指定 limit 时的默认阈值（窗口内最大请求数）
      */
     private int defaultLimit = 5;
 
     /**
      * @RateLimit 注解未显式指定 window 时的默认窗口大小（秒）
      */
-    private int defaultWindow = 1;
+    private int defaultWindowSeconds = 60;
 
     /**
      * IP 全局限流配置
