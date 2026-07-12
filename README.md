@@ -77,9 +77,7 @@
 
 默认账号：`admin` / `123456`
 
-**Docker 部署**：`cd deploy/docker`，然后 `docker-compose up -d`
-
-详细指南：[部署文档](https://www.youlai.tech/docs/server/spring-boot/deploy) · [开发规范](https://www.youlai.tech/docs/server/spring-boot/dev-standards)
+详细指南：https://www.youlai.tech/docs/server/spring-boot/quick-start.html
 
 ## 技术栈
 
@@ -104,7 +102,7 @@ youlai-boot/
 │   └── docker/                      # Docker 部署编排
 ├── docs/                            # 项目文档与图片资源
 ├── sql/                             # 数据库初始化脚本
-├── src/main/java/com/youlai/boot/
+├── src/                             # 源码目录
 │   ├── YouLaiBootApplication.java   # 启动类
 │   ├── auth/                        # 认证授权（登录/登出/令牌）
 │   ├── codegen/                     # 代码生成器
@@ -140,6 +138,7 @@ youlai-boot/
 | [youlai-nest](https://gitee.com/youlaiorg/youlai-nest) | NestJS + TypeORM | Node.js |
 | [youlai-gin](https://gitee.com/youlaiorg/youlai-gin) | Go + Gorm | Go |
 | [youlai-django](https://gitee.com/youlaiorg/youlai-django) | Django + DRF | Python |
+| [youlai-fastapi](https://gitee.com/youlaiorg/youlai-fastapi) | FastAPI + SQLAlchemy | Python |
 | [youlai-thinkphp](https://gitee.com/youlaiorg/youlai-thinkphp) | ThinkPHP 8 | PHP |
 | [youlai-aspnet](https://gitee.com/youlaiorg/youlai-aspnet) | ASP.NET Core | C# |
 | [youlai-rust](https://gitee.com/youlaiorg/youlai-rust) | Axum + SeaORM | Rust |
@@ -157,12 +156,6 @@ youlai-boot/
 | 📱 移动端在线预览 | [app.youlai.tech](https://app.youlai.tech) |
 | 🔗 Apifox 接口文档 | [apifox.com](https://www.apifox.cn/apidoc/shared-195e783f-4d85-4235-a038-eec696de4ea5) |
 | 🔗 本地接口文档 | [localhost:8000/doc.html](http://localhost:8000/doc.html) |
-
-## 参与贡献
-
-欢迎提交 Issue 和 Pull Request！详见 [贡献指南](https://www.youlai.tech/faq/help)。
-
-[![Contributors](https://contrib.rocks/image?repo=haoxianrui/youlai-boot)](https://github.com/haoxianrui/youlai-boot/graphs/contributors)
 
 ## 开源协议
 

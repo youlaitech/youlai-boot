@@ -77,9 +77,7 @@
 
 Default credentials: `admin` / `123456`
 
-**Docker**: `cd deploy/docker`, then `docker-compose up -d`
-
-Detailed guide: [Deployment Docs](https://www.youlai.tech/docs/server/spring-boot/deploy) · [Dev Standards](https://www.youlai.tech/docs/server/spring-boot/dev-standards)
+Detailed guide: https://www.youlai.tech/docs/server/spring-boot/quick-start.html
 
 ## Tech Stack
 
@@ -104,7 +102,7 @@ youlai-boot/
 │   └── docker/                      # Docker orchestration
 ├── docs/                            # Docs and image assets
 ├── sql/                             # Database init scripts
-├── src/main/java/com/youlai/boot/
+├── src/                             # Source code
 │   ├── YouLaiBootApplication.java   # Bootstrap class
 │   ├── auth/                        # Auth (login/logout/token)
 │   ├── codegen/                     # Code generator
@@ -140,6 +138,7 @@ youlai-boot/
 | [youlai-nest](https://gitee.com/youlaiorg/youlai-nest) | NestJS + TypeORM | Node.js |
 | [youlai-gin](https://gitee.com/youlaiorg/youlai-gin) | Go + Gorm | Go |
 | [youlai-django](https://gitee.com/youlaiorg/youlai-django) | Django + DRF | Python |
+| [youlai-fastapi](https://gitee.com/youlaiorg/youlai-fastapi) | FastAPI + SQLAlchemy | Python |
 | [youlai-thinkphp](https://gitee.com/youlaiorg/youlai-thinkphp) | ThinkPHP 8 | PHP |
 | [youlai-aspnet](https://gitee.com/youlaiorg/youlai-aspnet) | ASP.NET Core | C# |
 | [youlai-rust](https://gitee.com/youlaiorg/youlai-rust) | Axum + SeaORM | Rust |
@@ -157,12 +156,6 @@ youlai-boot/
 | 📱 Mobile live preview | [app.youlai.tech](https://app.youlai.tech) |
 | 🔗 Apifox API docs | [apifox.com](https://www.apifox.cn/apidoc/shared-195e783f-4d85-4235-a038-eec696de4ea5) |
 | 🔗 Local API docs | [localhost:8000/doc.html](http://localhost:8000/doc.html) |
-
-## Contributing
-
-Issues and Pull Requests are welcome! See the [Contribution Guide](https://www.youlai.tech/faq/help).
-
-[![Contributors](https://contrib.rocks/image?repo=haoxianrui/youlai-boot)](https://github.com/haoxianrui/youlai-boot/graphs/contributors)
 
 ## License
 
