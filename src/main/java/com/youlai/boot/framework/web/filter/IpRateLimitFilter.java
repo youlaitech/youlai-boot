@@ -70,8 +70,14 @@ public class IpRateLimitFilter extends OncePerRequestFilter {
         String key = StrUtil.format(RedisConstants.RateLimit.IP, ip);
         long windowMs = ipConfig.getWindow().toMillis();
 
-        // 执行滑动窗口计数（Lua 原子操作）
-        Long count = SlidingWindowScript.execute(redisTemplate, key, windowMs);
+        // 执行滑动窗口计数（Lua 原子操作）；Redis 异常时 Fail-Open 放行
+        Long count;
+        try {
+            count = SlidingWindowScript.execute(redisTemplate, key, windowMs);
+        } catch (Exception e) {
+            log.warn("IP 限流 Redis 异常，Fail-Open 放行  ip={}", ip, e);
+            count = null;
+        }
 
         int limit = ipConfig.getLimit();
         int current = count != null ? count.intValue() : 0;
