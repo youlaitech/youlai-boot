@@ -70,11 +70,11 @@ mybatis-plus:
 # 接口限流
 rate-limit:
   default-limit: 10
-  default-window-seconds: 60
+  default-window: 60s
   ip:
     enabled: true
     limit: 1000           # IP 全局：1000 req / 60s
-    window-seconds: 60
+    window: 60s
 
 # 安全配置
 security:

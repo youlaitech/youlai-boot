@@ -71,9 +71,11 @@ mybatis-plus:
 # 接口限流
 rate-limit:
   default-limit: 60
-  default-window-seconds: 60
+  default-window: 60s
   ip:
-    enabled: false    # 开发环境关闭 IP 全局限流
+    enabled: true     # 开发环境开启 IP 全局限流（供限流测试）
+    limit: 1000
+    window: 60s
 
 # 安全配置
 security:
