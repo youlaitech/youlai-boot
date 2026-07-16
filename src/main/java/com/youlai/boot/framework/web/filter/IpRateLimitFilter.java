@@ -68,7 +68,7 @@ public class IpRateLimitFilter extends OncePerRequestFilter {
 
         String ip = IPUtils.getIpAddr(request);
         String key = StrUtil.format(RedisConstants.RateLimit.IP, ip);
-        long windowMs = ipConfig.getWindowSeconds() * 1000L;
+        long windowMs = ipConfig.getWindow().toMillis();
 
         // 执行滑动窗口计数（Lua 原子操作）
         Long count = SlidingWindowScript.execute(redisTemplate, key, windowMs);
@@ -80,7 +80,7 @@ public class IpRateLimitFilter extends OncePerRequestFilter {
 
         if (current > limit) {
             log.warn("IP 限流触发  ip={}  count={}  limit={}", ip, current, limit);
-            response.setHeader("Retry-After", String.valueOf(ipConfig.getWindowSeconds()));
+            response.setHeader("Retry-After", String.valueOf(ipConfig.getWindow().getSeconds()));
             ResponseWriter.writeError(response, ResultCode.REQUEST_CONCURRENCY_LIMIT_EXCEEDED);
             return;
         }

@@ -4,11 +4,11 @@ import lombok.Data;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.stereotype.Component;
 
+import java.time.Duration;
+
 /**
  * 限流配置
- * <p>
- * 对应 application.yml 中的 {@code rate-limit} 配置节点。
- * </p>
+ * <p>对应 application.yml 中的 {@code rate-limit} 配置节点。</p>
  *
  * @author Ray.Hao
  * @since 4.3.1
@@ -24,9 +24,9 @@ public class RateLimitProperties {
     private int defaultLimit = 5;
 
     /**
-     * @RateLimit 注解未显式指定 window 时的默认窗口大小（秒）
+     * @RateLimit 注解未显式指定 window 时的默认窗口大小，支持 60s / 1m / 500ms 等 Duration 写法
      */
-    private int defaultWindowSeconds = 60;
+    private Duration defaultWindow = Duration.ofSeconds(60);
 
     /**
      * IP 全局限流配置
@@ -48,9 +48,9 @@ public class RateLimitProperties {
         private int limit = 1000;
 
         /**
-         * 窗口大小（秒，默认 60）
+         * 滑动窗口大小，支持 60s / 1m / 500ms 等 Duration 写法（默认 60s）
          */
-        private int windowSeconds = 60;
+        private Duration window = Duration.ofSeconds(60);
 
     }
 

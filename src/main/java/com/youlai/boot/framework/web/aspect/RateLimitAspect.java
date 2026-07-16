@@ -55,8 +55,9 @@ public class RateLimitAspect {
 
         String key = buildKey(request, rateLimit);
         int limit = rateLimit.limit() > 0 ? rateLimit.limit() : rateLimitProperties.getDefaultLimit();
-        int window = rateLimit.window() > 0 ? rateLimit.window() : rateLimitProperties.getDefaultWindowSeconds();
-        long windowMs = rateLimit.timeUnit().toMillis(window);
+        long windowMs = rateLimit.window() > 0
+                ? rateLimit.window() * 1000L
+                : rateLimitProperties.getDefaultWindow().toMillis();
 
         Long count = SlidingWindowScript.execute(redisTemplate, key, windowMs);
 
@@ -73,8 +74,7 @@ public class RateLimitAspect {
 
     private String buildKey(HttpServletRequest request, RateLimit rateLimit) {
         String user = resolveUser(request);
-        return StrUtil.format(RedisConstants.RateLimit.API,
-                rateLimit.prefix(), user, request.getRequestURI());
+        return StrUtil.format(RedisConstants.RateLimit.API, user, request.getRequestURI());
     }
 
     private String resolveUser(HttpServletRequest request) {
