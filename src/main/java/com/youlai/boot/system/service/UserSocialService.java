@@ -60,6 +60,14 @@ public interface UserSocialService extends IService<UserSocial> {
     SecurityUser getAuthInfoByOpenid(SocialPlatformEnum platform, String openid);
 
     /**
+     * 根据用户ID获取用户认证信息
+     *
+     * @param userId 用户ID
+     * @return 用户认证信息
+     */
+    SecurityUser getAuthInfoByUserId(Long userId);
+
+    /**
      * 更新session_key
      *
      * @param id         绑定记录ID

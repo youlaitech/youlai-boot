@@ -1,0 +1,20 @@
+package com.youlai.boot.auth.qrcode.model.vo;
+
+import io.swagger.v3.oas.annotations.media.Schema;
+import lombok.Builder;
+import lombok.Data;
+
+/**
+ * generate 接口响应。
+ */
+@Data
+@Builder
+@Schema(description = "扫码票据生成结果")
+public class QrCodeGenerateVO {
+
+    @Schema(description = "票据")
+    private String ticket;
+
+    @Schema(description = "有效期（秒）")
+    private Integer expireSeconds;
+}

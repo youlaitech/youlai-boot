@@ -80,6 +80,12 @@ public enum ResultCode implements IResultCode, Serializable {
     USER_VERIFICATION_CODE_ATTEMPT_LIMIT_EXCEEDED("A0241", "用户验证码尝试次数超限"),
     USER_VERIFICATION_CODE_EXPIRED("A0242", "用户验证码过期"),
 
+    /** A025x：扫码登录异常 */
+    QR_CODE_NOT_FOUND("A0250", "扫码登录票据不存在或已过期"),
+    QR_CODE_STATUS_ILLEGAL("A0251", "当前扫码状态不允许该操作"),
+    QR_CODE_USER_MISMATCH("A0252", "操作用户与扫码用户不一致"),
+    QR_CODE_ALREADY_USED("A0253", "扫码登录票据已被使用"),
+
     /** A03xx：访问权限异常 */
     ACCESS_PERMISSION_EXCEPTION("A0300", "访问权限异常"),
     ACCESS_UNAUTHORIZED("A0301", "访问未授权"),

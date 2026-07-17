@@ -48,6 +48,11 @@ public class SecurityUser {
     private Integer status;
 
     /**
+     * 头像 URL
+     */
+    private String avatar;
+
+    /**
      * 角色编码集合
      */
     private Set<String> roles;

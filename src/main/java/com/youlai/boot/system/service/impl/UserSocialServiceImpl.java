@@ -95,6 +95,11 @@ public class UserSocialServiceImpl extends ServiceImpl<UserSocialMapper, UserSoc
     }
 
     @Override
+    public SecurityUser getAuthInfoByUserId(Long userId) {
+        return baseMapper.getAuthInfoByUserId(userId);
+    }
+
+    @Override
     public void updateSessionKey(Long id, String sessionKey) {
         UserSocial userSocial = getById(id);
         if (userSocial != null) {

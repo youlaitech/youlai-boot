@@ -43,6 +43,8 @@ public interface RedisConstants {
         String REVOKED_JTI = BLACKLIST_TOKEN;
         // 用户 Token 版本号（用于按用户失效历史 JWT）：token.tokenVersion != redis.tokenVersion => token 无效
         String USER_TOKEN_VERSION = "auth:user:token_version:{}";
+        // 扫码登录票据上下文（ticket -> QrCodeLoginContext）
+        String QR_CODE_LOGIN = "auth:qr_code:{}";
     }
 
     /**

@@ -12,6 +12,7 @@
         <result property="deptId" column="dept_id" jdbcType="BIGINT"/>
         <result property="password" column="password" jdbcType="VARCHAR"/>
         <result property="status" column="status" jdbcType="BOOLEAN"/>
+        <result property="avatar" column="avatar" jdbcType="VARCHAR"/>
         <collection property="roles" ofType="string" javaType="java.util.Set">
             <result column="code"/>
         </collection>
@@ -26,6 +27,7 @@
             u.dept_id,
             u.password,
             u.status,
+            u.avatar AS avatar,
             r.code
         FROM
             sys_user u
