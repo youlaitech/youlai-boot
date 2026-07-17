@@ -22,13 +22,13 @@ import java.time.LocalDateTime;
 @Data
 @Slf4j
 @Component
-@ConditionalOnProperty(value = "oss.type", havingValue = "local")
-@ConfigurationProperties(prefix = "oss.local")
+@ConditionalOnProperty(value = "file-storage.type", havingValue = "local")
+@ConfigurationProperties(prefix = "file-storage.local")
 @RequiredArgsConstructor
 public class LocalFileServiceImpl implements FileService {
 
-    @Value("${oss.local.storage-path}")
-    private String storagePath;
+    @Value("${file-storage.local.path}")
+    private String path;
 
     @Override
     public FileInfo uploadFile(MultipartFile file) {
@@ -36,7 +36,7 @@ public class LocalFileServiceImpl implements FileService {
         String suffix = FileUtil.getSuffix(originalFilename);
         String fileName = IdUtil.simpleUUID()+ "." + suffix;;
         String folder = DateUtil.format(LocalDateTime.now(), DatePattern.PURE_DATE_PATTERN);
-        String filePrefix = storagePath.endsWith(File.separator) ? storagePath : storagePath + File.separator;
+        String filePrefix = path.endsWith(File.separator) ? path : path + File.separator;
         try (InputStream inputStream = file.getInputStream()) {
             FileUtil.writeFromStream(inputStream, filePrefix + folder + File.separator + fileName);
         } catch (Exception e) {
@@ -55,9 +55,9 @@ public class LocalFileServiceImpl implements FileService {
         if (filePath == null || filePath.isEmpty()) {
             return false;
         }
-        if (FileUtil.isDirectory(storagePath + filePath)) {
+        if (FileUtil.isDirectory(path + filePath)) {
             return false;
         }
-        return FileUtil.del(storagePath + filePath);
+        return FileUtil.del(path + filePath);
     }
 }

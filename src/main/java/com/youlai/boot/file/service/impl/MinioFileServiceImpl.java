@@ -25,8 +25,8 @@ import java.io.InputStream;
 import java.time.LocalDateTime;
 
 @Component
-@ConditionalOnProperty(value = "oss.type", havingValue = "minio")
-@ConfigurationProperties(prefix = "oss.minio")
+@ConditionalOnProperty(value = "file-storage.type", havingValue = "minio")
+@ConfigurationProperties(prefix = "file-storage.minio")
 @RequiredArgsConstructor
 @Data
 @Slf4j
@@ -35,8 +35,8 @@ public class MinioFileServiceImpl implements FileService {
     private String endpoint;
     private String accessKey;
     private String secretKey;
-    private String bucketName;
-    private String customDomain;
+    private String bucket;
+    private String domain;
 
     private MinioClient minioClient;
 
@@ -50,7 +50,7 @@ public class MinioFileServiceImpl implements FileService {
 
     @Override
     public FileInfo uploadFile(MultipartFile file) {
-        createBucketIfAbsent(bucketName);
+        createBucketIfAbsent(bucket);
         String originalFilename = file.getOriginalFilename();
         String suffix = FileUtil.getSuffix(originalFilename);
         String dateFolder = DateUtil.format(LocalDateTime.now(), "yyyyMMdd");
@@ -58,7 +58,7 @@ public class MinioFileServiceImpl implements FileService {
 
         try (InputStream inputStream = file.getInputStream()) {
             PutObjectArgs putObjectArgs = PutObjectArgs.builder()
-                    .bucket(bucketName)
+                    .bucket(bucket)
                     .object(dateFolder + "/"+ fileName)
                     .contentType(file.getContentType())
                     .stream(inputStream, inputStream.available(), -1)
@@ -66,16 +66,16 @@ public class MinioFileServiceImpl implements FileService {
             minioClient.putObject(putObjectArgs);
 
             String fileUrl;
-            if (StrUtil.isBlank(customDomain)) {
+            if (StrUtil.isBlank(domain)) {
                 GetPresignedObjectUrlArgs getPresignedObjectUrlArgs = GetPresignedObjectUrlArgs.builder()
-                        .bucket(bucketName)
+                        .bucket(bucket)
                         .object(dateFolder + "/"+ fileName)
                         .method(Method.GET)
                         .build();
                 fileUrl = minioClient.getPresignedObjectUrl(getPresignedObjectUrlArgs);
                 fileUrl = fileUrl.substring(0, fileUrl.indexOf("?"));
             } else {
-                fileUrl = customDomain + "/"+ bucketName + "/"+ dateFolder + "/"+ fileName;
+                fileUrl = domain + "/"+ bucket + "/"+ dateFolder + "/"+ fileName;
             }
 
             FileInfo fileInfo = new FileInfo();
@@ -93,13 +93,13 @@ public class MinioFileServiceImpl implements FileService {
         Assert.notBlank(filePath, "删除文件路径不能为空");
         try {
             String fileName;
-            if (StrUtil.isNotBlank(customDomain)) {
-                fileName = filePath.substring(customDomain.length() + 1 + bucketName.length() + 1);
+            if (StrUtil.isNotBlank(domain)) {
+                fileName = filePath.substring(domain.length() + 1 + bucket.length() + 1);
             } else {
-                fileName = filePath.substring(endpoint.length() + 1 + bucketName.length() + 1);
+                fileName = filePath.substring(endpoint.length() + 1 + bucket.length() + 1);
             }
             minioClient.removeObject(RemoveObjectArgs.builder()
-                    .bucket(bucketName).object(fileName).build());
+                    .bucket(bucket).object(fileName).build());
             return true;
         } catch (Exception e) {
             log.error("删除文件失败", e);
@@ -107,23 +107,23 @@ public class MinioFileServiceImpl implements FileService {
         }
     }
 
-    private static String publicBucketPolicy(String bucketName) {
+    private static String publicBucketPolicy(String bucket) {
         return "{\"Version\":\"2012-10-17\","
                 + "\"Statement\":[{\"Effect\":\"Allow\","
                 + "\"Principal\":{\"AWS\":[\"*\"]},"
                 + "\"Action\":[\"s3:ListBucketMultipartUploads\",\"s3:GetBucketLocation\",\"s3:ListBucket\"],"
-                + "\"Resource\":[\"arn:aws:s3:::" + bucketName + "\"]},"
+                + "\"Resource\":[\"arn:aws:s3:::" + bucket + "\"]},"
                 + "{\"Effect\":\"Allow\"," + "\"Principal\":{\"AWS\":[\"*\"]},"
                 + "\"Action\":[\"s3:ListMultipartUploadParts\",\"s3:PutObject\",\"s3:AbortMultipartUpload\",\"s3:DeleteObject\",\"s3:GetObject\"],"
-                + "\"Resource\":[\"arn:aws:s3:::" + bucketName + "/*\"]}]}";
+                + "\"Resource\":[\"arn:aws:s3:::" + bucket + "/*\"]}]}";
     }
 
     @SneakyThrows
-    private void createBucketIfAbsent(String bucketName) {
-        if (!minioClient.bucketExists(BucketExistsArgs.builder().bucket(bucketName).build())) {
-            minioClient.makeBucket(MakeBucketArgs.builder().bucket(bucketName).build());
+    private void createBucketIfAbsent(String bucket) {
+        if (!minioClient.bucketExists(BucketExistsArgs.builder().bucket(bucket).build())) {
+            minioClient.makeBucket(MakeBucketArgs.builder().bucket(bucket).build());
             minioClient.setBucketPolicy(SetBucketPolicyArgs.builder()
-                    .bucket(bucketName).config(publicBucketPolicy(bucketName)).build());
+                    .bucket(bucket).config(publicBucketPolicy(bucket)).build());
         }
     }
 }

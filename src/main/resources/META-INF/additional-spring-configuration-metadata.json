@@ -1,54 +1,69 @@
 {
   "properties": [
     {
-      "name": "oss.type",
+      "name": "file-storage.type",
       "type": "java.lang.String",
-      "description": "OSS 类型 (目前支持aliyun、minio)"
+      "description": "文件存储类型：minio | aliyun | local"
     },
     {
-      "name": "oss.minio.endpoint",
+      "name": "file-storage.upload.max-file-size",
+      "type": "java.lang.String",
+      "description": "单文件大小上限（如 50MB），同时作为 spring.servlet.multipart 的上限"
+    },
+    {
+      "name": "file-storage.upload.allowed-extensions",
+      "type": "java.util.List<java.lang.String>",
+      "description": "允许的文件扩展名白名单（置空表示不限制）"
+    },
+    {
+      "name": "file-storage.minio.endpoint",
       "type": "java.lang.String",
       "description": "MinIO 服务 Endpoint"
     },
     {
-      "name": "oss.minio.access-key",
+      "name": "file-storage.minio.access-key",
       "type": "java.lang.String",
       "description": "MinIO 访问凭据"
     },
     {
-      "name": "oss.minio.secret-key",
+      "name": "file-storage.minio.secret-key",
       "type": "java.lang.String",
       "description": "MinIO 凭据密钥"
     },
     {
-      "name": "oss.minio.bucket-name",
+      "name": "file-storage.minio.bucket",
       "type": "java.lang.String",
       "description": "MinIO 存储桶名称"
     },
     {
-      "name": "oss.minio.custom-domain",
+      "name": "file-storage.minio.domain",
       "type": "java.lang.String",
-      "description": "MinIO 自定义域名"
+      "description": "MinIO 自定义域名（文件 URL 域名）"
     },
     {
-      "name": "oss.aliyun.endpoint",
+      "name": "file-storage.aliyun.endpoint",
       "type": "java.lang.String",
       "description": "阿里云 OSS 服务 Endpoint"
     },
     {
-      "name": "oss.aliyun.access-key-id",
+      "name": "file-storage.aliyun.access-key-id",
       "type": "java.lang.String",
       "description": "阿里云 OSS 访问凭据 ID"
     },
     {
-      "name": "oss.aliyun.access-key-secret",
+      "name": "file-storage.aliyun.access-key-secret",
       "type": "java.lang.String",
       "description": "阿里云 OSS 凭据密钥"
     },
     {
-      "name": "oss.aliyun.bucket-name",
+      "name": "file-storage.aliyun.bucket",
       "type": "java.lang.String",
       "description": "阿里云 OSS 存储桶名称"
+    },
+    {
+      "name": "file-storage.local.path",
+      "type": "java.lang.String",
+      "description": "本地存储根目录（相对路径基于工作目录）"
     },
     {
       "name": "xxl.job.enabled",

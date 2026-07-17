@@ -23,8 +23,8 @@ import java.io.InputStream;
 import java.time.LocalDateTime;
 
 @Component
-@ConditionalOnProperty(value = "oss.type", havingValue = "aliyun")
-@ConfigurationProperties(prefix = "oss.aliyun")
+@ConditionalOnProperty(value = "file-storage.type", havingValue = "aliyun")
+@ConfigurationProperties(prefix = "file-storage.aliyun")
 @RequiredArgsConstructor
 @Data
 public class AliyunFileServiceImpl implements FileService {
@@ -32,7 +32,7 @@ public class AliyunFileServiceImpl implements FileService {
     private String endpoint;
     private String accessKeyId;
     private String accessKeySecret;
-    private String bucketName;
+    private String bucket;
 
     private OSS aliyunOssClient;
 
@@ -51,12 +51,12 @@ public class AliyunFileServiceImpl implements FileService {
         try (InputStream inputStream = file.getInputStream()) {
             ObjectMetadata metadata = new ObjectMetadata();
             metadata.setContentType(file.getContentType());
-            PutObjectRequest putObjectRequest = new PutObjectRequest(bucketName, fileName, inputStream, metadata);
+            PutObjectRequest putObjectRequest = new PutObjectRequest(bucket, fileName, inputStream, metadata);
             aliyunOssClient.putObject(putObjectRequest);
         } catch (Exception e) {
             throw new RuntimeException("文件上传失败");
         }
-        String fileUrl = "https://" + bucketName + "." + endpoint + "/" + fileName;
+        String fileUrl = "https://" + bucket + "." + endpoint + "/" + fileName;
         FileInfo fileInfo = new FileInfo();
         fileInfo.setName(originalFilename);
         fileInfo.setUrl(fileUrl);
@@ -66,9 +66,9 @@ public class AliyunFileServiceImpl implements FileService {
     @Override
     public boolean deleteFile(String filePath) {
         Assert.notBlank(filePath, "删除文件路径不能为空");
-        String fileHost = "https://" + bucketName + "." + endpoint;
+        String fileHost = "https://" + bucket + "." + endpoint;
         String fileName = filePath.substring(fileHost.length() + 1);
-        aliyunOssClient.deleteObject(bucketName, fileName);
+        aliyunOssClient.deleteObject(bucket, fileName);
         return true;
     }
 }

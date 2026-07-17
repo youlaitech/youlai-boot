@@ -1,8 +1,13 @@
 package com.youlai.boot.file.controller;
 
+import cn.hutool.core.io.FileUtil;
+import cn.hutool.core.util.StrUtil;
+import com.youlai.boot.common.exception.BusinessException;
 import com.youlai.boot.common.result.Result;
-import com.youlai.boot.file.service.FileService;
+import com.youlai.boot.common.result.ResultCode;
+import com.youlai.boot.file.config.FileStorageProperties;
 import com.youlai.boot.file.model.FileInfo;
+import com.youlai.boot.file.service.FileService;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.enums.ParameterIn;
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -12,6 +17,8 @@ import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
+
+import java.util.Set;
 
 /**
  * 文件控制层
@@ -26,6 +33,7 @@ import org.springframework.web.multipart.MultipartFile;
 public class FileController {
 
     private final FileService fileService;
+    private final FileStorageProperties fileStorageProperties;
 
     @PostMapping
     @Operation(summary = "文件上传")
@@ -39,6 +47,7 @@ public class FileController {
             )
             @RequestPart(value = "file") MultipartFile file
     ) {
+        validateFileExtension(file);
         FileInfo fileInfo = fileService.uploadFile(file);
         return Result.success(fileInfo);
     }
@@ -51,5 +60,20 @@ public class FileController {
     ) {
         boolean result = fileService.deleteFile(filePath);
         return Result.judge(result);
+    }
+
+    /**
+     * 文件扩展名白名单校验：{@code allowed-extensions} 为空时不限制。
+     */
+    private void validateFileExtension(MultipartFile file) {
+        Set<String> allowedExtensions = fileStorageProperties.getAllowedExtensions();
+        if (allowedExtensions.isEmpty()) {
+            return;
+        }
+        String suffix = FileUtil.getSuffix(file.getOriginalFilename());
+        if (StrUtil.isBlank(suffix) || !allowedExtensions.contains(suffix.toLowerCase())) {
+            throw new BusinessException(ResultCode.UPLOAD_FILE_EXCEPTION,
+                    "不支持的文件类型: " + (StrUtil.isBlank(suffix) ? "" : "." + suffix));
+        }
     }
 }

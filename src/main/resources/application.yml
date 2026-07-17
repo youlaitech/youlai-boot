@@ -7,8 +7,9 @@ spring:
     import: classpath:codegen.yml
   servlet:
     multipart:
-      max-file-size: 50MB
-      max-request-size: 50MB
+      # 单文件大小上限，取自 file-storage.upload.max-file-size（单一来源）
+      max-file-size: ${file-storage.upload.max-file-size:50MB}
+      max-request-size: ${file-storage.upload.max-file-size:50MB}
 # 在 banner.txt 中显示项目版本，使用 @project.version@ 从 pom.xml 获取
 project:
   version: @project.version@
