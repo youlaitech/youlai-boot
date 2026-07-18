@@ -24,7 +24,7 @@
 
 </div>
 
-## 简介
+## 项目简介
 
 **youlai-boot** 是一套基于 Spring Boot 4 的企业级权限管理系统后端，配套前端 [vue3-element-admin](https://gitee.com/youlaiorg/vue3-element-admin) 和移动端 [youlai-app](https://gitee.com/youlaiorg/youlai-app)，并提供 **7 种语言实现**（Java / Node.js / Go / Python / PHP / C# / Rust），共享同一套 API 规范与数据库结构。适用于企业中后台管理系统的学习参考与二次开发。
 
@@ -80,21 +80,6 @@
 
 详细指南：https://www.youlai.tech/docs/server/spring-boot/quick-start.html
 
-## 技术栈
-
-| 技术 | 版本 | 说明 |
-|:-----|:-----|:-----|
-| Spring Boot | 4.0.5 | 核心框架 |
-| Spring Security | 6.x | 认证授权 |
-| MyBatis-Plus | 3.5.15 | ORM 框架 |
-| Druid | 1.2.24 | 数据库连接池 |
-| Redis + Redisson | 6.0+ / 4.1.0 | 缓存 · 会话 · 分布式锁 |
-| Caffeine | 2.9.3 | 本地缓存 |
-| XXL-Job | 3.2.0 | 分布式定时任务 |
-| Knife4j | 4.5.0 | API 文档 |
-| MapStruct | 1.6.3 | 对象映射 |
-| MinIO | 8.5.10 | 对象存储 |
-
 ## 目录结构
 
 ```
@@ -148,26 +133,15 @@ youlai-boot/
 >
 > 七种后端共享同一套 **RESTful API 规范** 和 **数据库结构**，前端可无缝切换。
 
-## 文档资源
+## 交流合作
 
-| 资源 | 地址 |
-|:-----|:-----|
-| 📖 完整文档站 | [www.youlai.tech](https://www.youlai.tech/) |
-| 🖥️ PC 端在线预览 | [vue.youlai.tech](https://vue.youlai.tech) |
-| 📱 移动端在线预览 | [app.youlai.tech](https://app.youlai.tech) |
-| 🔗 Apifox 接口文档 | [apifox.com](https://www.apifox.cn/apidoc/shared-195e783f-4d85-4235-a038-eec696de4ea5) |
-| 🔗 本地接口文档 | [localhost:8000/doc.html](http://localhost:8000/doc.html) |
-
-## 开源协议
-
-本项目基于 [Apache License 2.0](LICENSE) 开源，可免费用于商业项目。
-
----
+欢迎在 [Issue](https://gitee.com/youlaiorg/youlai-boot/issues) 提交问题或反馈，也欢迎提交 Pull Request，支持与合作见[支持指南](https://www.youlai.tech/faq/help)。
+本项目基于 [Apache License 2.0](LICENSE) 开源，可免费用于商业项目。如需商务合作、二次开发、项目定制或部署支持，可联系作者微信（见下方二维码）。
 
 <table align="center">
   <tr>
     <td align="center">
-      <img src="./docs/images/qrcode/wechat-official.png" height="180" alt="公众号「有来技术」"><br>
+      <img src="./docs/images/qrcode/wechat-official.jpg" height="180" alt="公众号「有来技术」"><br>
       <sub>公众号「有来技术」</sub>
     </td>
     <td>&nbsp;&nbsp;&nbsp;&nbsp;</td>
