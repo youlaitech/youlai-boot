@@ -167,7 +167,7 @@ Released under the [Apache License 2.0](LICENSE); free for commercial use.
 <table align="center">
   <tr>
     <td align="center">
-      <img src="./docs/images/qrcode/wechat-official.png" height="180" alt="Official WeChat Account"><br>
+      <img src="./docs/images/qrcode/wechat-official.jpg" height="180" alt="Official WeChat Account"><br>
       <sub>Official WeChat Account</sub>
     </td>
     <td>&nbsp;&nbsp;&nbsp;&nbsp;</td>
