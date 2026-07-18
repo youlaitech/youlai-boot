@@ -1,7 +1,6 @@
 package com.youlai.boot.system.model.entity;
 
-import com.baomidou.mybatisplus.annotation.TableField;
-import com.baomidou.mybatisplus.annotation.TableName;
+import com.baomidou.mybatisplus.annotation.*;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.youlai.boot.common.base.BaseEntity;
 import lombok.Data;
@@ -55,6 +54,7 @@ public class Notice extends BaseEntity {
     /**
      * 目标用户ID集合
      */
+    @TableField(updateStrategy = FieldStrategy.ALWAYS)
     private String targetUserIds;
 
     /**

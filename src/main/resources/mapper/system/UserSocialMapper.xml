@@ -27,7 +27,7 @@
             u.dept_id,
             u.password,
             u.status,
-            u.avatar AS avatar,
+            u.avatar,
             r.code
         FROM
             sys_user u

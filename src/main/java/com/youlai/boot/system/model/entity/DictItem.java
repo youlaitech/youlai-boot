@@ -1,6 +1,6 @@
 package com.youlai.boot.system.model.entity;
 
-import com.baomidou.mybatisplus.annotation.TableName;
+import com.baomidou.mybatisplus.annotation.*;
 import com.youlai.boot.common.base.BaseEntity;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -44,11 +44,13 @@ public class DictItem extends BaseEntity {
     /**
      * 备注
      */
+    @TableField(updateStrategy = FieldStrategy.ALWAYS)
     private String remark;
 
     /**
      * 标签类型
      */
+    @TableField(updateStrategy = FieldStrategy.ALWAYS)
     private String tagType;
 
     /**

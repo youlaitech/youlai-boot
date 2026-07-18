@@ -1,6 +1,6 @@
 package com.youlai.boot.system.model.entity;
 
-import com.baomidou.mybatisplus.annotation.TableName;
+import com.baomidou.mybatisplus.annotation.*;
 import com.youlai.boot.common.base.BaseEntity;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -41,11 +41,13 @@ public class SysUser extends BaseEntity {
     /**
      * 用户头像
      */
+    @TableField(updateStrategy = FieldStrategy.ALWAYS)
     private String avatar;
 
     /**
      * 联系方式
      */
+    @TableField(updateStrategy = FieldStrategy.ALWAYS)
     private String mobile;
 
     /**
@@ -56,6 +58,7 @@ public class SysUser extends BaseEntity {
     /**
      * 用户邮箱
      */
+    @TableField(updateStrategy = FieldStrategy.ALWAYS)
     private String email;
 
     /**

@@ -36,6 +36,7 @@ public class Config extends BaseEntity {
     /**
      * 描述、备注
      */
+    @TableField(updateStrategy = FieldStrategy.ALWAYS)
     private String remark;
 
     /**
