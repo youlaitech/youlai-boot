@@ -71,14 +71,35 @@
 
 **环境要求**：JDK 17+ · MySQL 8.0+ · Redis 6.0+
 
-1. 克隆项目：`git clone https://gitee.com/youlaiorg/youlai-boot.git`
-2. 导入数据库：`sql/youlai-admin.sql`
-3. 修改配置（可选，默认已配置线上只读数据源）：`src/main/resources/application-dev.yml`
-4. 启动服务，访问 http://localhost:8000/doc.html
+1. 克隆项目：
+   ```bash
+   git clone https://gitee.com/youlaiorg/youlai-boot.git
+   ```
 
-默认账号：`admin` / `123456`
+2. 导入数据库：
+   ```bash
+   sql/youlai-admin.sql
+   ```
+
+3. 修改配置（可选，默认已配置线上只读数据源）：
+   ```bash
+   src/main/resources/application-dev.yml
+   ```
+
+4. 启动服务：
+   ```bash
+   mvn spring-boot:run
+   ```
+   启动后访问 http://localhost:8000/doc.html，能打开接口文档即说明后端已正常运行。
 
 详细指南：https://www.youlai.tech/docs/server/spring-boot/quick-start.html
+
+## 前端对接
+
+启动配套前端 [vue3-element-admin](https://gitee.com/youlaiorg/vue3-element-admin)，访问 http://localhost:3000 即可登录：
+
+- 账号：`admin`
+- 密码：`123456`
 
 ## 目录结构
 
