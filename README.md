@@ -136,7 +136,9 @@ youlai-boot/
 
 ## 交流合作
 
-欢迎在 [Issue](https://gitee.com/youlaiorg/youlai-boot/issues) 提交问题或反馈，提交 Pull Request 前请阅读[支持指南](https://www.youlai.tech/faq/help)。技术交流 · 商务合作请扫描下方二维码。
+欢迎在 [Issue](https://gitee.com/youlaiorg/youlai-boot/issues) 提交问题或反馈，也欢迎提交 Pull Request。
+
+本项目基于 [Apache License 2.0](LICENSE) 开源，可免费用于商业项目。如需商务合作、二次开发、项目定制或部署支持，可联系作者微信（见下方二维码）。
 
 <table align="center">
   <tr>
