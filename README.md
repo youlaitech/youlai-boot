@@ -134,11 +134,11 @@ youlai-boot/
 >
 > 八种后端共享同一套 **RESTful API 规范** 和 **数据库结构**，前端可无缝切换。
 
-## 交流合作
+## 技术合作
 
-欢迎在 [Issue](https://gitee.com/youlaiorg/youlai-boot/issues) 提交问题或反馈，也欢迎提交 Pull Request。
+本项目采用 [Apache License 2.0](LICENSE) 开源，可免费用于商业项目。欢迎在 [Issue](https://gitee.com/youlaiorg/youlai-boot/issues) 提交问题或反馈，也欢迎提交 [Pull Request](https://gitee.com/youlaiorg/youlai-boot/pulls) 共建项目。
 
-本项目基于 [Apache License 2.0](LICENSE) 开源，可免费用于商业项目。如需商务合作、二次开发、项目定制或部署支持，可联系作者微信（见下方二维码）。
+如需技术支持、商务合作、二次开发、项目定制或私有化部署，可联系作者微信（见下方二维码）。
 
 <table align="center">
   <tr>
