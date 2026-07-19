@@ -2,7 +2,7 @@
 
 # <img alt="youlai-boot" width="28" valign="middle" src="./docs/images/logo/logo.png"> youlai-boot
 
-**Spring Boot 4 企业级权限管理系统后端**
+**Spring Boot 企业级权限管理系统后端**
 
 [![Spring Boot](https://img.shields.io/badge/Spring%20Boot-4.0.5-6DB33F?logo=spring-boot)](https://spring.io/projects/spring-boot)
 [![JDK](https://img.shields.io/badge/JDK-17%2B-007396?logo=openjdk)](https://openjdk.org/)
@@ -26,7 +26,7 @@
 
 ## 项目简介
 
-**youlai-boot** 是一套基于 Spring Boot 4 的企业级权限管理系统后端，配套前端 [vue3-element-admin](https://gitee.com/youlaiorg/vue3-element-admin) 和移动端 [youlai-app](https://gitee.com/youlaiorg/youlai-app)，并提供 **7 种语言实现**（Java / Node.js / Go / Python / PHP / C# / Rust），共享同一套 API 规范与数据库结构。适用于企业中后台管理系统的学习参考与二次开发。
+**youlai-boot** 是一套基于 Spring Boot 的企业级权限管理系统后端，配套前端 [vue3-element-admin](https://gitee.com/youlaiorg/vue3-element-admin) 和移动端 [youlai-app](https://gitee.com/youlaiorg/youlai-app)，并提供 **7 种语言实现**（Java / Node.js / Go / Python / PHP / C# / Rust），共享同一套 API 规范与数据库结构。适用于企业中后台管理系统的学习参考与二次开发。
 
 ## 核心特性
 
@@ -121,23 +121,22 @@ youlai-boot/
 
 | 项目 | 技术栈 | 说明 |
 |:-----|:-------|:-----|
-| [youlai-boot](https://gitee.com/youlaiorg/youlai-boot) | Spring Boot 4 + MyBatis-Plus | Java（主推） |
+| [youlai-boot](https://gitee.com/youlaiorg/youlai-boot) | Spring Boot + MyBatis-Plus | Java（主推） |
 | [youlai-nest](https://gitee.com/youlaiorg/youlai-nest) | NestJS + TypeORM | Node.js |
 | [youlai-gin](https://gitee.com/youlaiorg/youlai-gin) | Go + Gorm | Go |
 | [youlai-django](https://gitee.com/youlaiorg/youlai-django) | Django + DRF | Python |
 | [youlai-fastapi](https://gitee.com/youlaiorg/youlai-fastapi) | FastAPI + SQLAlchemy | Python |
-| [youlai-think](https://gitee.com/youlaiorg/youlai-think) | ThinkPHP 8 | PHP |
-| [youlai-aspnet](https://gitee.com/youlaiorg/youlai-aspnet) | ASP.NET Core | C# |
+| [youlai-think](https://gitee.com/youlaiorg/youlai-think) | ThinkPHP + ThinkORM | PHP |
+| [youlai-aspnet](https://gitee.com/youlaiorg/youlai-aspnet) | ASP.NET Core + EF Core | C# |
 | [youlai-axum](https://gitee.com/youlaiorg/youlai-axum) | Axum + SeaORM | Rust |
 
-> **youlai-boot** 还提供以下变种和分支版本：[多租户](https://gitee.com/youlaiorg/youlai-boot-tenant)（Spring Boot 4）· [MyBatis-Flex](https://gitee.com/youlaiorg/youlai-boot-flex)（Spring Boot 4）· [Spring Boot 3](https://gitee.com/youlaiorg/youlai-boot/tree/spring-boot-3) · [PostgreSQL](https://gitee.com/youlaiorg/youlai-boot/tree/db-pg) · [多模块](https://gitee.com/youlaiorg/youlai-boot/tree/multi-module)
+> **youlai-boot** 还提供以下变种和分支版本：[多租户](https://gitee.com/youlaiorg/youlai-boot-tenant)· [MyBatis-Flex](https://gitee.com/youlaiorg/youlai-boot-flex)· [Spring Boot 3](https://gitee.com/youlaiorg/youlai-boot/tree/spring-boot-3) · [PostgreSQL](https://gitee.com/youlaiorg/youlai-boot/tree/db-pg) · [多模块](https://gitee.com/youlaiorg/youlai-boot/tree/multi-module)
 >
 > 八种后端共享同一套 **RESTful API 规范** 和 **数据库结构**，前端可无缝切换。
 
 ## 交流合作
 
-欢迎在 [Issue](https://gitee.com/youlaiorg/youlai-boot/issues) 提交问题或反馈，也欢迎提交 Pull Request，支持与合作见[支持指南](https://www.youlai.tech/faq/help)。
-本项目基于 [Apache License 2.0](LICENSE) 开源，可免费用于商业项目。如需商务合作、二次开发、项目定制或部署支持，可联系作者微信（见下方二维码）。
+欢迎在 [Issue](https://gitee.com/youlaiorg/youlai-boot/issues) 提交问题或反馈，提交 Pull Request 前请阅读[支持指南](https://www.youlai.tech/faq/help)。技术交流 · 商务合作请扫描下方二维码。
 
 <table align="center">
   <tr>
