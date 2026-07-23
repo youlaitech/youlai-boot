@@ -1,6 +1,6 @@
 <div align="center">
 
-# <img alt="youlai-boot" height="32" valign="middle" src="./docs/images/logo/logo.png"> youlai-boot <a href="https://atomgit.com/youlai/youlai-boot"><img src="https://atomgit.com/youlai/youlai-boot/star/new_badge.svg" height="22" valign="middle" alt="AtomGit G-Star"></a>
+# <img alt="youlai-boot" height="32" valign="middle" src="./docs/images/logo/logo.png"> youlai-boot
 
 **Spring Boot 企业级权限管理系统后端**
 
