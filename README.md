@@ -1,6 +1,6 @@
 <div align="center">
 
-# <img alt="youlai-boot" width="28" valign="middle" src="./docs/images/logo/logo.png"> youlai-boot
+# <img alt="youlai-boot" height="32" valign="middle" src="./docs/images/logo/logo.png"> youlai-boot <a href="https://atomgit.com/youlai/youlai-boot"><img src="https://atomgit.com/youlai/youlai-boot/star/new_badge.svg" height="22" valign="middle" alt="AtomGit G-Star"></a>
 
 **Spring Boot 企业级权限管理系统后端**
 
@@ -10,11 +10,10 @@
 [![Gitee Star](https://gitee.com/youlaiorg/youlai-boot/badge/star.svg)](https://gitee.com/youlaiorg/youlai-boot/stargazers)
 [![GitHub Star](https://img.shields.io/github/stars/youlaitech/youlai-boot?style=social)](https://github.com/youlaitech/youlai-boot)
 [![GitCode Star](https://gitcode.com/youlai/youlai-boot/star/badge.svg)](https://gitcode.com/youlai/youlai-boot/stargazers)
-<a href="https://atomgit.com/youlai/youlai-boot"><img src="https://atomgit.com/youlai/youlai-boot/star/new_badge.svg" height="20" alt="AtomGit G-Star"></a>
 
 </div>
 
-![](https://foruda.gitee.com/images/1708618984641188532/a7cca095_716974.png "rainbow.png")
+<p align="center"><img src="https://foruda.gitee.com/images/1708618984641188532/a7cca095_716974.png" alt="rainbow"></p>
 
 <div align="center">
 
