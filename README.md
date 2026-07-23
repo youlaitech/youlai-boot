@@ -10,7 +10,7 @@
 [![Gitee Star](https://gitee.com/youlaiorg/youlai-boot/badge/star.svg)](https://gitee.com/youlaiorg/youlai-boot/stargazers)
 [![GitHub Star](https://img.shields.io/github/stars/youlaitech/youlai-boot?style=social)](https://github.com/youlaitech/youlai-boot)
 [![GitCode Star](https://gitcode.com/youlai/youlai-boot/star/badge.svg)](https://gitcode.com/youlai/youlai-boot/stargazers)
-[![AtomGit G-Star](https://atomgit.com/youlai/youlai-boot/star/new_badge.svg)](https://atomgit.com/youlai/youlai-boot)
+<a href="https://atomgit.com/youlai/youlai-boot"><img src="https://atomgit.com/youlai/youlai-boot/star/new_badge.svg" height="20" alt="AtomGit G-Star"></a>
 
 </div>
 
