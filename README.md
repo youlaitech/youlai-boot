@@ -13,7 +13,7 @@
 
 </div>
 
-<p align="center"><img src="https://foruda.gitee.com/images/1708618984641188532/a7cca095_716974.png" alt="rainbow"></p>
+<p align="center"><img src="./docs/images/rainbow.png" alt="rainbow"></p>
 
 <div align="center">
 

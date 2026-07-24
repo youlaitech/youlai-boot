@@ -28,7 +28,7 @@
 
 
 
-![](https://foruda.gitee.com/images/1708618984641188532/a7cca095_716974.png "rainbow.png")
+![](./docs/images/rainbow.png "rainbow.png")
 
 
 
