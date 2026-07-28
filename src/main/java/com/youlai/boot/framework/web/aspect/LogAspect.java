@@ -3,7 +3,7 @@ package com.youlai.boot.framework.web.aspect;
 import cn.hutool.core.util.StrUtil;
 import cn.hutool.http.useragent.UserAgent;
 import cn.hutool.http.useragent.UserAgentUtil;
-import com.youlai.boot.common.annotation.Log;
+import com.youlai.boot.framework.annotation.Log;
 import com.youlai.boot.common.enums.ActionTypeEnum;
 import com.youlai.boot.common.enums.LogModuleEnum;
 import com.youlai.boot.common.util.IPUtils;

@@ -6,7 +6,7 @@
 
     <groupId>com.youlai</groupId>
     <artifactId>youlai-boot</artifactId>
-    <version>4.4.0</version>
+    <version>4.5.0</version>
     <description>基于 Java 17 + SpringBoot 4 + Spring Security 构建的权限管理系统。</description>
 
     <parent>
@@ -39,7 +39,7 @@
 
         <!-- 对象存储 -->
         <minio.version>8.5.10</minio.version>
-        <okhttp3.version>4.8.1</okhttp3.version>
+        <okhttp3.version>4.12.0</okhttp3.version>
 
         <aliyun-sdk-oss.version>3.16.3</aliyun-sdk-oss.version>
 
@@ -47,7 +47,7 @@
         <redisson.version>4.1.0</redisson.version>
 
         <!-- 自动代码生成 -->
-        <mybatis-plus-generator.version>3.5.6</mybatis-plus-generator.version>
+        <mybatis-plus-generator.version>3.5.15</mybatis-plus-generator.version>
         <velocity.version>2.3</velocity.version>
 
         <!-- IP 地区转换 -->
@@ -57,7 +57,7 @@
         <aliyun-sdk-core.version>4.7.6</aliyun-sdk-core.version>
         <aliyun-sdk-dysmsapi.version>2.2.1</aliyun-sdk-dysmsapi.version>
 
-        <caffeine.version>2.9.3</caffeine.version>
+        <caffeine.version>3.2.0</caffeine.version>
 
         <!-- 阿里 TransmittableThreadLocal (支持异步场景的ThreadLocal传递) -->
         <transmittable-thread-local.version>2.14.5</transmittable-thread-local.version>

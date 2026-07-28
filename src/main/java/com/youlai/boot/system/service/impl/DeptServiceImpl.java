@@ -84,7 +84,7 @@ public class DeptServiceImpl extends ServiceImpl<DeptMapper, Dept> implements De
      * @param deptList 部门列表
      * @return 部门树形列表
      */
-    public List<DeptVO> recurDeptList(Long parentId, List<Dept> deptList) {
+    private List<DeptVO> recurDeptList(Long parentId, List<Dept> deptList) {
         return deptList.stream()
                 .filter(dept -> dept.getParentId().equals(parentId))
                 .map(dept -> {
@@ -150,7 +150,6 @@ public class DeptServiceImpl extends ServiceImpl<DeptMapper, Dept> implements De
         String treePath = generateDeptTreePath(formData.getParentId());
         entity.setTreePath(treePath);
 
-        entity.setCreateBy(SecurityUtils.getUserId());
         // 保存部门并返回部门ID
         boolean result = this.save(entity);
         Assert.isTrue(result, "部门保存失败");
@@ -236,7 +235,7 @@ public class DeptServiceImpl extends ServiceImpl<DeptMapper, Dept> implements De
      * @param deptList 部门列表
      * @return 部门表格层级列表
      */
-    public static List<Option<Long>> recurDeptTreeOptions(long parentId, List<Dept> deptList) {
+    private static List<Option<Long>> recurDeptTreeOptions(long parentId, List<Dept> deptList) {
         return CollectionUtil.emptyIfNull(deptList).stream()
                 .filter(dept -> dept.getParentId().equals(parentId))
                 .map(dept -> {

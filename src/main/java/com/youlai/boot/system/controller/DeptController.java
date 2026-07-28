@@ -2,13 +2,13 @@ package com.youlai.boot.system.controller;
 
 import com.youlai.boot.common.enums.ActionTypeEnum;
 import com.youlai.boot.common.enums.LogModuleEnum;
-import com.youlai.boot.common.annotation.RepeatSubmit;
+import com.youlai.boot.framework.annotation.RepeatSubmit;
 import com.youlai.boot.common.model.Option;
 import com.youlai.boot.common.result.Result;
 import com.youlai.boot.system.model.form.DeptForm;
 import com.youlai.boot.system.model.query.DeptQuery;
 import com.youlai.boot.system.model.vo.DeptVO;
-import com.youlai.boot.common.annotation.Log;
+import com.youlai.boot.framework.annotation.Log;
 import com.youlai.boot.system.service.DeptService;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;

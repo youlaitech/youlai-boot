@@ -1,7 +1,7 @@
 package com.youlai.boot.system.controller;
 
-import com.youlai.boot.common.annotation.Log;
-import com.youlai.boot.common.annotation.RepeatSubmit;
+import com.youlai.boot.framework.annotation.Log;
+import com.youlai.boot.framework.annotation.RepeatSubmit;
 import com.youlai.boot.common.enums.ActionTypeEnum;
 import com.youlai.boot.common.enums.LogModuleEnum;
 import com.youlai.boot.common.model.Option;
@@ -62,12 +62,12 @@ public class MenuController {
     }
 
     @Operation(summary = "菜单表单数据")
-    @GetMapping("/{id}/form")
+    @GetMapping("/{menuId}/form")
     @PreAuthorize("@ss.hasPerm('sys:menu:update')")
     public Result<MenuForm> getMenuForm(
-            @Parameter(description = "菜单ID") @PathVariable Long id
+            @Parameter(description = "菜单ID") @PathVariable Long menuId
     ) {
-        MenuForm menu = menuService.getMenuForm(id);
+        MenuForm menu = menuService.getMenuForm(menuId);
         return Result.success(menu);
     }
 
@@ -82,10 +82,11 @@ public class MenuController {
     }
 
     @Operation(summary = "修改菜单")
-    @PutMapping(value = "/{id}")
+    @PutMapping(value = "/{menuId}")
     @PreAuthorize("@ss.hasPerm('sys:menu:update')")
     @Log(module = LogModuleEnum.MENU, value = ActionTypeEnum.UPDATE)
     public Result<?> updateMenu(
+            @Parameter(description = "菜单ID") @PathVariable Long menuId,
             @RequestBody MenuForm menuForm
     ) {
         boolean result = menuService.saveMenu(menuForm);
@@ -93,13 +94,13 @@ public class MenuController {
     }
 
     @Operation(summary = "删除菜单")
-    @DeleteMapping("/{id}")
+    @DeleteMapping("/{menuId}")
     @PreAuthorize("@ss.hasPerm('sys:menu:delete')")
     @Log(module = LogModuleEnum.MENU, value = ActionTypeEnum.DELETE)
     public Result<?> deleteMenu(
-            @Parameter(description = "菜单ID，多个以英文(,)分割") @PathVariable("id") Long id
+            @Parameter(description = "菜单ID，多个以英文(,)分割") @PathVariable Long menuId
     ) {
-        boolean result = menuService.deleteMenu(id);
+        boolean result = menuService.deleteMenu(menuId);
         return Result.judge(result);
     }
 

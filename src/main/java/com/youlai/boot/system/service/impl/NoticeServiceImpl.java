@@ -95,7 +95,6 @@ public class NoticeServiceImpl extends ServiceImpl<NoticeMapper, Notice> impleme
             }
         }
         Notice entity = noticeConverter.toEntity(formData);
-        entity.setCreateBy(SecurityUtils.getUserId());
         return this.save(entity);
     }
 
@@ -250,7 +249,6 @@ public class NoticeServiceImpl extends ServiceImpl<NoticeMapper, Notice> impleme
 
         notice.setPublishStatus(NoticePublishStatusEnum.REVOKED.getValue());
         notice.setRevokeTime(LocalDateTime.now());
-        notice.setUpdateBy(SecurityUtils.getUserId());
 
         boolean revokeResult = this.updateById(notice);
 

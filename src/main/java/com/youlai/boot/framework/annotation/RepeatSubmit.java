@@ -1,4 +1,4 @@
-package com.youlai.boot.common.annotation;
+package com.youlai.boot.framework.annotation;
 
 
 import java.lang.annotation.*;

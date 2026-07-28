@@ -133,7 +133,6 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, SysUser> implements
         // 设置默认加密密码
         String defaultEncryptPwd = passwordEncoder.encode(SystemConstants.DEFAULT_PASSWORD);
         entity.setPassword(defaultEncryptPwd);
-        entity.setCreateBy(SecurityUtils.getUserId());
 
         // 新增用户
         boolean result = this.save(entity);
@@ -171,7 +170,6 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, SysUser> implements
 
         // form -> entity
         SysUser entity = userConverter.toEntity(userForm);
-        entity.setUpdateBy(SecurityUtils.getUserId());
 
         // 修改用户
         boolean result = this.updateById(entity);

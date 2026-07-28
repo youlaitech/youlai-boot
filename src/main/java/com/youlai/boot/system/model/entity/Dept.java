@@ -1,9 +1,9 @@
 package com.youlai.boot.system.model.entity;
 
+import com.baomidou.mybatisplus.annotation.FieldFill;
 import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableName;
-import com.fasterxml.jackson.annotation.JsonInclude;
-import com.youlai.boot.common.base.BaseEntity;
+import com.youlai.boot.framework.base.BaseEntity;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
@@ -51,11 +51,13 @@ public class Dept extends BaseEntity {
     /**
      * 创建人 ID
      */
+    @TableField(fill = FieldFill.INSERT)
     private Long createBy;
 
     /**
      * 更新人 ID
      */
+    @TableField(fill = FieldFill.INSERT_UPDATE)
     private Long updateBy;
 
     /**

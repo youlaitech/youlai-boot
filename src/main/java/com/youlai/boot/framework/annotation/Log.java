@@ -1,4 +1,4 @@
-package com.youlai.boot.common.annotation;
+package com.youlai.boot.framework.annotation;
 
 import com.youlai.boot.common.enums.ActionTypeEnum;
 import com.youlai.boot.common.enums.LogModuleEnum;

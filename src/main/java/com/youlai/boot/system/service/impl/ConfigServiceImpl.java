@@ -12,7 +12,6 @@ import com.youlai.boot.system.model.form.ConfigForm;
 import com.youlai.boot.system.model.query.ConfigQuery;
 import com.youlai.boot.system.model.vo.ConfigVO;
 import com.youlai.boot.system.service.ConfigService;
-import com.youlai.boot.framework.security.util.SecurityUtils;
 import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
 import org.apache.commons.lang3.StringUtils;
@@ -78,7 +77,6 @@ public class ConfigServiceImpl extends ServiceImpl<ConfigMapper, Config> impleme
                 super.count(new LambdaQueryWrapper<Config>().eq(Config::getConfigKey, configForm.getConfigKey())) == 0,
                 "配置键已存在");
         Config config = configConverter.toEntity(configForm);
-        config.setCreateBy(SecurityUtils.getUserId());
         return this.save(config);
     }
 
@@ -107,7 +105,6 @@ public class ConfigServiceImpl extends ServiceImpl<ConfigMapper, Config> impleme
                 super.count(new LambdaQueryWrapper<Config>().eq(Config::getConfigKey, configForm.getConfigKey()).ne(Config::getId, id)) == 0,
                 "配置键已存在");
         Config config = configConverter.toEntity(configForm);
-        config.setUpdateBy(SecurityUtils.getUserId());
         return this.updateById(config);
     }
 

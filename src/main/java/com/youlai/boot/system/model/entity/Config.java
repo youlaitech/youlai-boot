@@ -1,7 +1,7 @@
 package com.youlai.boot.system.model.entity;
 
 import com.baomidou.mybatisplus.annotation.*;
-import com.youlai.boot.common.base.BaseEntity;
+import com.youlai.boot.framework.base.BaseEntity;
 import lombok.Data;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.EqualsAndHashCode;
@@ -42,11 +42,13 @@ public class Config extends BaseEntity {
     /**
      * 创建人ID
      */
+    @TableField(fill = FieldFill.INSERT)
     private Long createBy;
 
     /**
      * 更新人ID
      */
+    @TableField(fill = FieldFill.INSERT_UPDATE)
     private Long updateBy;
 
     /**

@@ -1,6 +1,5 @@
 package com.youlai.boot.system.model.vo;
 
-import com.fasterxml.jackson.annotation.JsonFormat;
 import com.youlai.boot.common.enums.ActionTypeEnum;
 import com.youlai.boot.common.enums.LogModuleEnum;
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -70,7 +69,6 @@ public class LogPageVO implements Serializable {
     @Schema(description = "错误信息")
     private String errorMsg;
 
-    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     private LocalDateTime createTime;
 
 }

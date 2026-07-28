@@ -1,4 +1,4 @@
-package com.youlai.boot.common.annotation;
+package com.youlai.boot.framework.annotation;
 
 import java.lang.annotation.*;
 
@@ -25,4 +25,3 @@ public @interface DataPermission {
     String userIdColumnName() default "create_by";
 
 }
-

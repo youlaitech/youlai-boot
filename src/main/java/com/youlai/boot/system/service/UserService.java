@@ -82,11 +82,6 @@ public interface UserService extends IService<SysUser> {
      */
     SecurityUser getAuthInfoByUsername(String username);
 
-    default SecurityUser getAuthCredentialsByUsername(String username) {
-        return getAuthInfoByUsername(username);
-    }
-
-
     /**
      * 获取导出用户列表
      *
@@ -197,9 +192,5 @@ public interface UserService extends IService<SysUser> {
      * @return {@link SecurityUser}
      */
     SecurityUser getAuthInfoByMobile(String mobile);
-
-    default SecurityUser getAuthCredentialsByMobile(String mobile) {
-        return getAuthInfoByMobile(mobile);
-    }
 
 }

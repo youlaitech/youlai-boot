@@ -5,7 +5,7 @@ import com.youlai.boot.common.enums.ActionTypeEnum;
 import com.youlai.boot.common.enums.LogModuleEnum;
 import com.youlai.boot.common.result.PageResult;
 import com.youlai.boot.common.result.Result;
-import com.youlai.boot.common.annotation.Log;
+import com.youlai.boot.framework.annotation.Log;
 import com.youlai.boot.system.model.form.ConfigForm;
 import com.youlai.boot.system.model.query.ConfigQuery;
 import com.youlai.boot.system.model.vo.ConfigVO;
@@ -53,11 +53,11 @@ public class ConfigController {
     }
 
     @Operation(summary = "获取系统配置表单数据")
-    @GetMapping("/{id}/form")
+    @GetMapping("/{configId}/form")
     public Result<ConfigForm> getConfigForm(
-            @Parameter(description = "系统配置ID") @PathVariable Long id
+            @Parameter(description = "系统配置ID") @PathVariable Long configId
     ) {
-        ConfigForm formData = configService.getConfigFormData(id);
+        ConfigForm formData = configService.getConfigFormData(configId);
         return Result.success(formData);
     }
 
@@ -70,19 +70,19 @@ public class ConfigController {
     }
 
     @Operation(summary = "修改系统配置")
-    @PutMapping(value = "/{id}")
+    @PutMapping(value = "/{configId}")
     @PreAuthorize("@ss.hasPerm('sys:config:update')")
     @Log(module = LogModuleEnum.CONFIG, value = ActionTypeEnum.UPDATE)
-    public Result<?> update(@Valid @PathVariable Long id, @RequestBody ConfigForm configForm) {
-        return Result.judge(configService.edit(id, configForm));
+    public Result<?> update(@Valid @PathVariable Long configId, @RequestBody ConfigForm configForm) {
+        return Result.judge(configService.edit(configId, configForm));
     }
 
     @Operation(summary = "删除系统配置")
-    @DeleteMapping("/{id}")
+    @DeleteMapping("/{configId}")
     @PreAuthorize("@ss.hasPerm('sys:config:delete')")
     @Log(module = LogModuleEnum.CONFIG, value = ActionTypeEnum.DELETE)
-    public Result<?> delete(@PathVariable Long id) {
-        return Result.judge(configService.delete(id));
+    public Result<?> delete(@PathVariable Long configId) {
+        return Result.judge(configService.delete(configId));
     }
 
 }

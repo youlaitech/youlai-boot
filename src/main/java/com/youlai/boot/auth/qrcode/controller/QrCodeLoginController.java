@@ -5,7 +5,7 @@ import com.youlai.boot.auth.qrcode.model.form.QrCodeTicketForm;
 import com.youlai.boot.auth.qrcode.model.vo.QrCodeGenerateVO;
 import com.youlai.boot.auth.qrcode.model.vo.QrCodeStatusVO;
 import com.youlai.boot.auth.qrcode.service.QrCodeLoginService;
-import com.youlai.boot.common.annotation.RateLimit;
+import com.youlai.boot.framework.annotation.RateLimit;
 import com.youlai.boot.common.result.Result;
 import com.youlai.boot.framework.security.model.AuthenticationToken;
 import com.youlai.boot.framework.security.util.SecurityUtils;

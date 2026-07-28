@@ -5,7 +5,7 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.youlai.boot.system.model.entity.SysUser;
 import com.youlai.boot.system.model.query.UserQuery;
 import com.youlai.boot.system.model.form.UserForm;
-import com.youlai.boot.common.annotation.DataPermission;
+import com.youlai.boot.framework.annotation.DataPermission;
 import com.youlai.boot.framework.security.model.SecurityUser;
 import com.youlai.boot.system.model.vo.UserExportVO;
 import com.youlai.boot.system.model.vo.UserPageVO;
@@ -50,10 +50,6 @@ public interface UserMapper extends BaseMapper<SysUser> {
      */
     SecurityUser getAuthInfoByUsername(String username);
 
-    default SecurityUser getAuthCredentialsByUsername(String username) {
-        return getAuthInfoByUsername(username);
-    }
-
     /**
      * 根据手机号获取用户认证信息
      *
@@ -61,10 +57,6 @@ public interface UserMapper extends BaseMapper<SysUser> {
      * @return 认证信息
      */
     SecurityUser getAuthInfoByMobile(String mobile);
-
-    default SecurityUser getAuthCredentialsByMobile(String mobile) {
-        return getAuthInfoByMobile(mobile);
-    }
 
     /**
      * 获取导出用户列表

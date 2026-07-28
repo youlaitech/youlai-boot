@@ -3,14 +3,14 @@ package com.youlai.boot.system.controller;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.youlai.boot.common.enums.ActionTypeEnum;
 import com.youlai.boot.common.enums.LogModuleEnum;
-import com.youlai.boot.common.annotation.RepeatSubmit;
+import com.youlai.boot.framework.annotation.RepeatSubmit;
 import com.youlai.boot.common.model.Option;
 import com.youlai.boot.common.result.PageResult;
 import com.youlai.boot.common.result.Result;
 import com.youlai.boot.system.model.form.RoleForm;
 import com.youlai.boot.system.model.query.RoleQuery;
 import com.youlai.boot.system.model.vo.RolePageVO;
-import com.youlai.boot.common.annotation.Log;
+import com.youlai.boot.framework.annotation.Log;
 import com.youlai.boot.system.service.RoleService;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -75,10 +75,12 @@ public class RoleController {
     }
 
     @Operation(summary = "修改角色")
-    @PutMapping(value = "/{id}")
+    @PutMapping(value = "/{roleId}")
     @PreAuthorize("@ss.hasPerm('sys:role:update')")
     @Log(module = LogModuleEnum.ROLE, value = ActionTypeEnum.UPDATE)
-    public Result<?> updateRole(@Valid @RequestBody RoleForm roleForm) {
+    public Result<?> updateRole(
+            @Parameter(description = "角色ID") @PathVariable Long roleId,
+            @Valid @RequestBody RoleForm roleForm) {
         boolean result = roleService.saveRole(roleForm);
         return Result.judge(result);
     }

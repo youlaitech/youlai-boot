@@ -7,7 +7,7 @@ import com.youlai.boot.common.constant.RedisConstants;
 import com.youlai.boot.common.constant.SecurityConstants;
 import com.youlai.boot.common.result.ResultCode;
 import com.youlai.boot.common.exception.BusinessException;
-import com.youlai.boot.common.annotation.RepeatSubmit;
+import com.youlai.boot.framework.annotation.RepeatSubmit;
 import com.youlai.boot.common.util.IPUtils;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;

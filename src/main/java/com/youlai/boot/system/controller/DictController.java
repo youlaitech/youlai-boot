@@ -12,9 +12,9 @@ import com.youlai.boot.system.model.query.DictQuery;
 import com.youlai.boot.system.model.vo.DictItemOptionVO;
 import com.youlai.boot.system.model.vo.DictItemPageVO;
 import com.youlai.boot.system.model.vo.DictPageVO;
-import com.youlai.boot.common.annotation.RepeatSubmit;
+import com.youlai.boot.framework.annotation.RepeatSubmit;
 import com.youlai.boot.system.model.form.DictForm;
-import com.youlai.boot.common.annotation.Log;
+import com.youlai.boot.framework.annotation.Log;
 import com.youlai.boot.system.service.DictItemService;
 import com.youlai.boot.system.service.DictService;
 import com.youlai.boot.message.service.SseService;
@@ -67,11 +67,11 @@ public class DictController {
     }
 
     @Operation(summary = "获取字典表单数据")
-    @GetMapping("/{id}/form")
+    @GetMapping("/{dictId}/form")
     public Result<DictForm> getDictForm(
-            @Parameter(description = "字典ID") @PathVariable Long id
+            @Parameter(description = "字典ID") @PathVariable Long dictId
     ) {
-        DictForm formData = dictService.getDictForm(id);
+        DictForm formData = dictService.getDictForm(dictId);
         return Result.success(formData);
     }
 
@@ -90,14 +90,14 @@ public class DictController {
     }
 
     @Operation(summary = "修改字典")
-    @PutMapping("/{id}")
+    @PutMapping("/{dictId}")
     @PreAuthorize("@ss.hasPerm('sys:dict:update')")
     @Log(module = LogModuleEnum.DICT, value = ActionTypeEnum.UPDATE)
     public Result<?> updateDict(
-            @PathVariable Long id,
+            @PathVariable Long dictId,
             @RequestBody DictForm dictForm
     ) {
-        boolean status = dictService.updateDict(id, dictForm);
+        boolean status = dictService.updateDict(dictId, dictForm);
         // 发送字典更新通知
         if (status && dictForm.getDictCode() != null) {
           sseService.sendDictChange(dictForm.getDictCode());

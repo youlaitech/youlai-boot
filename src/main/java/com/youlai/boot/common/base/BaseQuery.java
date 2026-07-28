@@ -1,6 +1,6 @@
 package com.youlai.boot.common.base;
 
-import com.youlai.boot.common.annotation.ValidField;
+import com.youlai.boot.framework.annotation.ValidField;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 

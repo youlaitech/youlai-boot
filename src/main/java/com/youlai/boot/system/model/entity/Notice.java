@@ -1,8 +1,7 @@
 package com.youlai.boot.system.model.entity;
 
 import com.baomidou.mybatisplus.annotation.*;
-import com.fasterxml.jackson.annotation.JsonInclude;
-import com.youlai.boot.common.base.BaseEntity;
+import com.youlai.boot.framework.base.BaseEntity;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
@@ -75,11 +74,13 @@ public class Notice extends BaseEntity {
     /**
      * 创建人ID
      */
+    @TableField(fill = FieldFill.INSERT)
     private Long createBy;
 
     /**
      * 更新人ID
      */
+    @TableField(fill = FieldFill.INSERT_UPDATE)
     private Long updateBy;
 
     /**

@@ -2,7 +2,7 @@ package com.youlai.boot.framework.web.aspect;
 
 import cn.hutool.core.util.StrUtil;
 import cn.hutool.crypto.digest.DigestUtil;
-import com.youlai.boot.common.annotation.RateLimit;
+import com.youlai.boot.framework.annotation.RateLimit;
 import com.youlai.boot.common.constant.RedisConstants;
 import com.youlai.boot.common.constant.SecurityConstants;
 import com.youlai.boot.common.result.ResultCode;

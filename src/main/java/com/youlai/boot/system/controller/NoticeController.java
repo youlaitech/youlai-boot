@@ -1,7 +1,7 @@
 package com.youlai.boot.system.controller;
 
 import com.baomidou.mybatisplus.core.metadata.IPage;
-import com.youlai.boot.common.annotation.Log;
+import com.youlai.boot.framework.annotation.Log;
 import com.youlai.boot.common.enums.ActionTypeEnum;
 import com.youlai.boot.common.enums.LogModuleEnum;
 import com.youlai.boot.common.result.PageResult;
@@ -57,55 +57,55 @@ public class NoticeController {
     }
 
     @Operation(summary = "获取通知公告表单数据")
-    @GetMapping("/{id}/form")
+    @GetMapping("/{noticeId}/form")
     @PreAuthorize("@ss.hasPerm('sys:notice:update')")
     public Result<NoticeForm> getNoticeForm(
-            @Parameter(description = "通知公告ID") @PathVariable Long id
+            @Parameter(description = "通知公告ID") @PathVariable Long noticeId
     ) {
-        NoticeForm formData = noticeService.getNoticeFormData(id);
+        NoticeForm formData = noticeService.getNoticeFormData(noticeId);
         return Result.success(formData);
     }
 
     @Operation(summary = "阅读获取通知公告详情")
-    @GetMapping("/{id}/detail")
+    @GetMapping("/{noticeId}/detail")
     public Result<NoticeDetailVO> getNoticeDetail(
-            @Parameter(description = "通知公告ID") @PathVariable Long id
+            @Parameter(description = "通知公告ID") @PathVariable Long noticeId
     ) {
-        NoticeDetailVO detailVo = noticeService.getNoticeDetail(id);
+        NoticeDetailVO detailVo = noticeService.getNoticeDetail(noticeId);
         return Result.success(detailVo);
     }
 
     @Operation(summary = "修改通知公告")
-    @PutMapping(value = "/{id}")
+    @PutMapping(value = "/{noticeId}")
     @PreAuthorize("@ss.hasPerm('sys:notice:update')")
     @Log(module = LogModuleEnum.NOTICE, value = ActionTypeEnum.UPDATE)
     public Result<Void> updateNotice(
-            @Parameter(description = "通知公告ID") @PathVariable Long id,
+            @Parameter(description = "通知公告ID") @PathVariable Long noticeId,
             @RequestBody @Validated NoticeForm formData
     ) {
-        boolean result = noticeService.updateNotice(id, formData);
+        boolean result = noticeService.updateNotice(noticeId, formData);
         return Result.judge(result);
     }
 
     @Operation(summary = "发布通知公告")
-    @PutMapping("/{id}/publish")
+    @PutMapping("/{noticeId}/publish")
     @PreAuthorize("@ss.hasPerm('sys:notice:publish')")
     @Log(module = LogModuleEnum.NOTICE, value = ActionTypeEnum.UPDATE)
     public Result<Void> publishNotice(
-            @Parameter(description = "通知公告ID") @PathVariable Long id
+            @Parameter(description = "通知公告ID") @PathVariable Long noticeId
     ) {
-        boolean result = noticeService.publishNotice(id);
+        boolean result = noticeService.publishNotice(noticeId);
         return Result.judge(result);
     }
 
     @Operation(summary = "撤回通知公告")
-    @PutMapping("/{id}/revoke")
+    @PutMapping("/{noticeId}/revoke")
     @PreAuthorize("@ss.hasPerm('sys:notice:revoke')")
     @Log(module = LogModuleEnum.NOTICE, value = ActionTypeEnum.UPDATE)
     public Result<Void> revokeNotice(
-            @Parameter(description = "通知公告ID") @PathVariable Long id
+            @Parameter(description = "通知公告ID") @PathVariable Long noticeId
     ) {
-        boolean result = noticeService.revokeNotice(id);
+        boolean result = noticeService.revokeNotice(noticeId);
         return Result.judge(result);
     }
 
