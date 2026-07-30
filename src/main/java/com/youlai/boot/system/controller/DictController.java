@@ -12,12 +12,14 @@ import com.youlai.boot.system.model.query.DictQuery;
 import com.youlai.boot.system.model.vo.DictItemOptionVO;
 import com.youlai.boot.system.model.vo.DictItemPageVO;
 import com.youlai.boot.system.model.vo.DictPageVO;
-import com.youlai.boot.framework.annotation.RepeatSubmit;
+import com.youlai.boot.common.annotation.RepeatSubmit;
 import com.youlai.boot.system.model.form.DictForm;
-import com.youlai.boot.framework.annotation.Log;
+import com.youlai.boot.common.annotation.Log;
 import com.youlai.boot.system.service.DictItemService;
 import com.youlai.boot.system.service.DictService;
-import com.youlai.boot.message.service.SseService;
+import com.youlai.boot.support.sse.SseService;
+import com.youlai.boot.support.sse.constant.SseTopics;
+import com.youlai.boot.system.model.dto.DictChangeEvent;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import io.swagger.v3.oas.annotations.Operation;
@@ -44,6 +46,15 @@ public class DictController {
     private final DictService dictService;
     private final DictItemService dictItemService;
     private final SseService sseService;
+
+    /**
+     * 广播字典变更事件到所有 SSE 在线连接
+     *
+     * @param dictCode 字典编码
+     */
+    private void sendDictChange(String dictCode) {
+        sseService.broadcast(SseTopics.DICT, new DictChangeEvent(dictCode));
+    }
 
     //---------------------------------------------------
     // 字典相关接口
@@ -84,7 +95,7 @@ public class DictController {
         boolean result = dictService.saveDict(formData);
         // 发送字典更新通知
         if (result) {
-            sseService.sendDictChange(formData.getDictCode());
+            sendDictChange(formData.getDictCode());
         }
         return Result.judge(result);
     }
@@ -100,7 +111,7 @@ public class DictController {
         boolean status = dictService.updateDict(dictId, dictForm);
         // 发送字典更新通知
         if (status && dictForm.getDictCode() != null) {
-          sseService.sendDictChange(dictForm.getDictCode());
+          sendDictChange(dictForm.getDictCode());
         }
         return Result.judge(status);
     }
@@ -119,7 +130,7 @@ public class DictController {
 
         // 发送字典删除通知
         for (String dictCode : dictCodes) {
-          sseService.sendDictChange(dictCode);
+          sendDictChange(dictCode);
         }
 
         return Result.success();
@@ -163,7 +174,7 @@ public class DictController {
 
         // 发送字典更新通知
         if (result) {
-          sseService.sendDictChange(dictCode);
+          sendDictChange(dictCode);
         }
 
         return Result.judge(result);
@@ -195,7 +206,7 @@ public class DictController {
 
         // 发送字典更新通知
         if (status) {
-            sseService.sendDictChange(dictCode);
+            sendDictChange(dictCode);
         }
 
         return Result.judge(status);
@@ -212,7 +223,7 @@ public class DictController {
         dictItemService.deleteDictItemByIds(itemIds);
 
         // 发送字典更新通知
-        sseService.sendDictChange(dictCode);
+        sendDictChange(dictCode);
 
         return Result.success();
     }

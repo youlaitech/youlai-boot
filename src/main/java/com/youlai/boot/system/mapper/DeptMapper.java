@@ -3,7 +3,7 @@ package com.youlai.boot.system.mapper;
 import com.baomidou.mybatisplus.core.conditions.Wrapper;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import com.baomidou.mybatisplus.core.toolkit.Constants;
-import com.youlai.boot.framework.annotation.DataPermission;
+import com.youlai.boot.common.annotation.DataPermission;
 import com.youlai.boot.system.model.entity.Dept;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;

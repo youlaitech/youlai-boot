@@ -12,9 +12,9 @@ import com.youlai.boot.common.constant.RedisConstants;
 import com.youlai.boot.common.constant.SystemConstants;
 import com.youlai.boot.common.exception.BusinessException;
 import com.youlai.boot.common.model.Option;
-import com.youlai.boot.framework.integration.mail.service.MailService;
-import com.youlai.boot.framework.integration.sms.enums.SmsTypeEnum;
-import com.youlai.boot.framework.integration.sms.service.SmsService;
+import com.youlai.boot.support.sms.SmsTypeEnum;
+import com.youlai.boot.support.mail.EmailService;
+import com.youlai.boot.support.sms.SmsService;
 import com.youlai.boot.framework.security.model.RoleDataScope;
 import com.youlai.boot.framework.security.model.SecurityUser;
 import com.youlai.boot.framework.security.token.TokenManager;
@@ -66,8 +66,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, SysUser> implements
     private final RoleMenuService roleMenuService;
 
     private final SmsService smsService;
-
-    private final MailService mailService;
+    private final EmailService emailService;
 
     private final StringRedisTemplate redisTemplate;
 
@@ -328,6 +327,11 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, SysUser> implements
         // 用户权限集合
         if (CollectionUtil.isNotEmpty(roles)) {
             Set<String> perms = roleMenuService.getRolePermsByRoleCodes(roles);
+            // 缓存未命中时触发全量刷新（防止 DB 数据已更新但缓存未同步）
+            if (CollectionUtil.isEmpty(perms)) {
+                roleMenuService.refreshRolePermsCache();
+                perms = roleMenuService.getRolePermsByRoleCodes(roles);
+            }
             userInfoVo.setPerms(perms);
         }
         return userInfoVo;
@@ -454,7 +458,13 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, SysUser> implements
 
         Map<String, String> templateParams = new HashMap<>();
         templateParams.put("code", code);
-        boolean result = smsService.sendSms(mobile, SmsTypeEnum.CHANGE_MOBILE, templateParams);
+        boolean result = true;
+        try {
+            smsService.send(mobile, SmsTypeEnum.CHANGE_MOBILE, templateParams);
+        } catch (Exception e) {
+            result = false;
+            log.error("发送短信验证码失败", e);
+        }
         if (result) {
             // 缓存验证码，5分钟有效，用于更换手机号校验
             String redisCacheKey = StrUtil.format(RedisConstants.Captcha.MOBILE_CODE, mobile);
@@ -537,7 +547,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, SysUser> implements
         // TODO 为了方便测试，验证码固定为 123456，实际开发中在配置了邮箱服务后，可以使用上面的随机验证码
         String code = "123456";
 
-        mailService.sendMail(email, "邮箱验证码", "您的验证码为：" + code + "，请在5分钟内使用");
+        emailService.send(email, "邮箱验证码", "您的验证码为：" + code + "，请在5分钟内使用");
         // 缓存验证码，5分钟有效，用于更换邮箱校验
         String redisCacheKey = StrUtil.format(RedisConstants.Captcha.EMAIL_CODE, email);
         redisTemplate.opsForValue().set(redisCacheKey, code, 5, TimeUnit.MINUTES);

@@ -4,7 +4,7 @@ import cn.hutool.core.collection.CollectionUtil;
 import cn.hutool.core.util.StrUtil;
 import com.baomidou.mybatisplus.core.toolkit.StringPool;
 import com.baomidou.mybatisplus.extension.plugins.handler.DataPermissionHandler;
-import com.youlai.boot.framework.annotation.DataPermission;
+import com.youlai.boot.common.annotation.DataPermission;
 import com.youlai.boot.common.enums.DataScopeEnum;
 import com.youlai.boot.framework.security.model.RoleDataScope;
 import com.youlai.boot.framework.security.model.SecurityUserDetails;

@@ -2,7 +2,7 @@ package com.youlai.boot.system.model.entity;
 
 import com.baomidou.mybatisplus.annotation.*;
 import com.baomidou.mybatisplus.extension.handlers.JacksonTypeHandler;
-import com.youlai.boot.framework.base.BaseEntity;
+import com.youlai.boot.common.base.BaseEntity;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 

@@ -107,28 +107,25 @@
 
 ```
 youlai-boot/
-├── deploy/
-│   └── docker/                      # Docker 部署编排
-├── docs/                            # 项目文档与图片资源
-├── sql/                             # 数据库初始化脚本
-├── src/                             # 源码目录
-│   ├── YouLaiBootApplication.java   # 启动类
-│   ├── auth/                        # 认证授权（登录/登出/令牌）
-│   ├── codegen/                     # 代码生成器
-│   ├── common/                      # 公共模块（常量/枚举/统一响应）
-│   ├── file/                        # 文件服务（MinIO/本地/OSS）
-│   ├── framework/                   # 技术框架层
-│   │   ├── apidoc/                  # OpenAPI / Knife4j
-│   │   ├── cache/                   # Redis / Caffeine 缓存
-│   │   ├── captcha/                 # 图形验证码
-│   │   ├── integration/             # 短信 / 邮件 / 微信
-│   │   ├── job/                     # XXL-Job 定时任务
-│   │   ├── mybatis/                 # MyBatis-Plus 配置
-│   │   ├── security/                # Security / JWT / Token
-│   │   └── web/                     # 全局异常 / 跨域 / 限流
-│   ├── message/                     # SSE 消息推送
-│   └── system/                      # 系统业务（用户/角色/菜单/部门）
-└── pom.xml                          # Maven 依赖管理
+├── docker/                    # Docker 部署编排
+├── docs/                      # 项目文档与图片资源
+├── sql/                       # 数据库初始化脚本
+├── src/                       # 源码目录
+│   ├── auth/                  # 认证模块（登录/登出/令牌/验证码）
+│   ├── codegen/               # 代码生成器
+│   ├── common/                # 公共模块（常量/枚举/异常/统一响应/工具类）
+│   ├── config/                # 配置类（Security/Redis/Captcha/OSS/邮件等）
+│   ├── framework/             # 基础设施层
+│   │   ├── mybatis/           # MyBatis-Plus 配置
+│   │   ├── security/          # Spring Security（过滤器/Token/工具类）
+│   │   └── web/               # Web 层（全局异常/跨域/限流）
+│   ├── support/               # 能力服务
+│   │   ├── file/              # 文件存储（MinIO/阿里云OSS/本地）
+│   │   ├── mail/              # 邮件服务
+│   │   ├── sms/               # 短信服务
+│   │   └── sse/               # SSE 消息推送
+│   └── system/                # 系统业务（用户/角色/菜单/部门/字典等）
+└── pom.xml                    # Maven 依赖管理
 ```
 
 ## 生态矩阵

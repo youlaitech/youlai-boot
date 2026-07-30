@@ -41,7 +41,7 @@ public class SysLog implements Serializable {
     private String title;
 
     /**
-     * 自定义日志内容
+     * 自定义日志内容，最长 500 字符
      */
     private String content;
 
@@ -102,7 +102,7 @@ public class SysLog implements Serializable {
     private Integer status;
 
     /**
-     * 错误信息
+     * 错误信息，切面内截断至 1000 字符
      */
     @TableField(value = "error_msg")
     private String errorMsg;

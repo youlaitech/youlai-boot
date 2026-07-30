@@ -1,13 +1,13 @@
 package com.youlai.boot.auth.controller;
 
-import com.youlai.boot.auth.model.form.LoginForm;
+import com.youlai.boot.auth.model.req.LoginReq;
 import com.youlai.boot.common.enums.ActionTypeEnum;
 import com.youlai.boot.common.enums.LogModuleEnum;
 import com.youlai.boot.common.result.Result;
 import com.youlai.boot.auth.service.AuthService;
-import com.youlai.boot.framework.annotation.Log;
-import com.youlai.boot.framework.annotation.RateLimit;
-import com.youlai.boot.framework.captcha.model.CaptchaInfo;
+import com.youlai.boot.common.annotation.Log;
+import com.youlai.boot.common.annotation.RateLimit;
+import com.youlai.boot.auth.model.resp.CaptchaInfo;
 import com.youlai.boot.framework.security.model.AuthenticationToken;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -49,30 +49,9 @@ public class AuthController {
     @PostMapping("/login")
     @Log(module = LogModuleEnum.LOGIN, value = ActionTypeEnum.LOGIN)
     @RateLimit
-    public Result<AuthenticationToken> login(@RequestBody @Valid LoginForm request) {
+    public Result<AuthenticationToken> login(@RequestBody @Valid LoginReq request) {
         AuthenticationToken authenticationToken = authService.login(request.getUsername(), request.getPassword());
         return Result.success(authenticationToken);
-    }
-
-    @Operation(summary = "短信验证码登录")
-    @PostMapping("/login/sms")
-    @Log(module = LogModuleEnum.LOGIN, value = ActionTypeEnum.LOGIN)
-    public Result<AuthenticationToken> loginBySms(
-            @Parameter(description = "手机号", example = "18888888888") @RequestParam String mobile,
-            @Parameter(description = "验证码", example = "123456") @RequestParam String code
-    ) {
-        AuthenticationToken loginResult = authService.loginBySms(mobile, code);
-        return Result.success(loginResult);
-    }
-
-    @Operation(summary = "发送登录短信验证码")
-    @PostMapping("/sms/code")
-    @RateLimit(limit = 1, window = 60)
-    public Result<Void> sendSmsCode(
-            @Parameter(description = "手机号", example = "18888888888") @RequestParam String mobile
-    ) {
-        authService.sendSmsCode(mobile);
-        return Result.success();
     }
 
     @Operation(summary = "退出登录")

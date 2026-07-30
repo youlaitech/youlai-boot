@@ -192,59 +192,54 @@ Detailed guide: https://www.youlai.tech/docs/server/spring-boot/quick-start.html
 
 
 
+
 ## Directory Structure
 
 
 
-```
+``` 
 
 youlai-boot/
 
-├── deploy/
+├── docker/                    # Docker orchestration
 
-│   └── docker/                      # Docker orchestration
+├── docs/                      # Docs and image assets
 
-├── docs/                            # Docs and image assets
+├── sql/                       # Database init scripts
 
-├── sql/                             # Database init scripts
+├── src/                       # Source code
 
-├── src/                             # Source code
+│   ├── auth/                  # Auth module (login/logout/token/captcha)
 
-│   ├── YouLaiBootApplication.java   # Bootstrap class
+│   ├── codegen/               # Code generator
 
-│   ├── auth/                        # Auth (login/logout/token)
+│   ├── common/                # Common module (constants/enums/exceptions/response/utils)
 
-│   ├── codegen/                     # Code generator
+│   ├── config/                # Configuration (Security/Redis/Captcha/OSS/Email etc.)
 
-│   ├── common/                      # Common module (constants/enums/response)
+│   ├── framework/             # Infrastructure layer
 
-│   ├── file/                        # File service (MinIO/local/OSS)
+│   │   ├── mybatis/           # MyBatis-Plus config
 
-│   ├── framework/                   # Technical framework layer
+│   │   ├── security/          # Spring Security (filters/token/utils)
 
-│   │   ├── apidoc/                  # OpenAPI / Knife4j
+│   │   └── web/               # Web layer (global exception/CORS/rate limit)
 
-│   │   ├── cache/                   # Redis / Caffeine cache
+│   ├── support/               # Capability services
 
-│   │   ├── captcha/                 # Graphic captcha
+│   │   ├── file/              # File storage (MinIO/Alibaba Cloud OSS/local)
 
-│   │   ├── integration/             # SMS / Email / WeChat
+│   │   ├── mail/              # Email service
 
-│   │   ├── job/                     # XXL-Job scheduled tasks
+│   │   ├── sms/               # SMS service
 
-│   │   ├── mybatis/                 # MyBatis-Plus config
+│   │   └── sse/               # SSE push
 
-│   │   ├── security/                # Security / JWT / Token
+│   └── system/                # Business (user/role/menu/dept/dict etc.)
 
-│   │   └── web/                     # Global exception / CORS / rate limit
+└── pom.xml                    # Maven dependency management
 
-│   ├── message/                     # SSE push
-
-│   └── system/                      # Business (user/role/menu/dept)
-
-└── pom.xml                          # Maven dependency management
-
-```
+``` 
 
 
 

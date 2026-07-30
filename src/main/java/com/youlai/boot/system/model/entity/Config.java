@@ -1,7 +1,7 @@
 package com.youlai.boot.system.model.entity;
 
 import com.baomidou.mybatisplus.annotation.*;
-import com.youlai.boot.framework.base.BaseEntity;
+import com.youlai.boot.common.base.BaseEntity;
 import lombok.Data;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.EqualsAndHashCode;

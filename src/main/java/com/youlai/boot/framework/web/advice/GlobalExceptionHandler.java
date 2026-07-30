@@ -4,15 +4,17 @@ import cn.hutool.core.util.StrUtil;
 import com.youlai.boot.common.exception.BusinessException;
 import com.youlai.boot.common.result.Result;
 import com.youlai.boot.common.result.ResultCode;
-import com.youlai.boot.framework.security.exception.TokenInvalidException;
-import com.youlai.boot.framework.web.exception.RateLimitException;
+import com.youlai.boot.common.exception.TokenInvalidException;
+import com.youlai.boot.common.exception.RateLimitException;
 import jakarta.servlet.ServletException;
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.ConstraintViolation;
 import jakarta.validation.ConstraintViolationException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.TypeMismatchException;
 import org.springframework.context.support.DefaultMessageSourceResolvable;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.jdbc.BadSqlGrammarException;
 import org.springframework.security.access.AccessDeniedException;
@@ -176,9 +178,13 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(Exception.class)
     @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
-    public <T> Result<T> handleException(Exception e) throws Exception {
+    public <T> Result<T> handleException(Exception e, HttpServletRequest request) throws Exception {
         if (e instanceof AccessDeniedException
                 || e instanceof AuthenticationException) {
+            throw e;
+        }
+        String accept = request.getHeader("Accept");
+        if (accept != null && accept.contains(MediaType.TEXT_EVENT_STREAM_VALUE)) {
             throw e;
         }
         log.error("unknown exception", e);

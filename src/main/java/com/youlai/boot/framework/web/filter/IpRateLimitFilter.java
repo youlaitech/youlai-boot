@@ -4,7 +4,7 @@ import cn.hutool.core.util.StrUtil;
 import com.youlai.boot.common.constant.RedisConstants;
 import com.youlai.boot.common.result.ResultCode;
 import com.youlai.boot.common.util.IPUtils;
-import com.youlai.boot.framework.web.config.RateLimitProperties;
+import com.youlai.boot.config.property.RateLimitProperties;
 import com.youlai.boot.framework.web.ratelimit.SlidingWindowScript;
 import com.youlai.boot.framework.web.util.ResponseWriter;
 import jakarta.servlet.FilterChain;

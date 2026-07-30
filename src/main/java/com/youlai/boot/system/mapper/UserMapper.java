@@ -5,7 +5,7 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.youlai.boot.system.model.entity.SysUser;
 import com.youlai.boot.system.model.query.UserQuery;
 import com.youlai.boot.system.model.form.UserForm;
-import com.youlai.boot.framework.annotation.DataPermission;
+import com.youlai.boot.common.annotation.DataPermission;
 import com.youlai.boot.framework.security.model.SecurityUser;
 import com.youlai.boot.system.model.vo.UserExportVO;
 import com.youlai.boot.system.model.vo.UserPageVO;

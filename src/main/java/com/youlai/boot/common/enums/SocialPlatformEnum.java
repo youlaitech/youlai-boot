@@ -5,7 +5,12 @@ import com.youlai.boot.common.base.IBaseEnum;
 import lombok.Getter;
 
 /**
- * 第三方登录平台类型枚举
+ * 第三方登录平台类型枚举。
+ * <p>
+ * value 作为 MyBatis-Plus 枚举值持久化到数据库。
+ *
+ * @author Ray.Hao
+ * @since 2.17.0
  */
 @Getter
 public enum SocialPlatformEnum implements IBaseEnum<String> {

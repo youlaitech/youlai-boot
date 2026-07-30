@@ -2,7 +2,7 @@ package com.youlai.boot.codegen.model.entity;
 
 import com.baomidou.mybatisplus.annotation.*;
 
-import com.youlai.boot.framework.base.BaseEntity;
+import com.youlai.boot.common.base.BaseEntity;
 import lombok.Getter;
 import lombok.Setter;
 

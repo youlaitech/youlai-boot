@@ -1,7 +1,7 @@
 package com.youlai.boot.system.controller;
 
-import com.youlai.boot.framework.annotation.Log;
-import com.youlai.boot.framework.annotation.RepeatSubmit;
+import com.youlai.boot.common.annotation.Log;
+import com.youlai.boot.common.annotation.RepeatSubmit;
 import com.youlai.boot.common.enums.ActionTypeEnum;
 import com.youlai.boot.common.enums.LogModuleEnum;
 import com.youlai.boot.common.model.Option;

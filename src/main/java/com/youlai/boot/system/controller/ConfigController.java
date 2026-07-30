@@ -5,7 +5,7 @@ import com.youlai.boot.common.enums.ActionTypeEnum;
 import com.youlai.boot.common.enums.LogModuleEnum;
 import com.youlai.boot.common.result.PageResult;
 import com.youlai.boot.common.result.Result;
-import com.youlai.boot.framework.annotation.Log;
+import com.youlai.boot.common.annotation.Log;
 import com.youlai.boot.system.model.form.ConfigForm;
 import com.youlai.boot.system.model.query.ConfigQuery;
 import com.youlai.boot.system.model.vo.ConfigVO;

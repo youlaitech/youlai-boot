@@ -1,11 +1,11 @@
 package com.youlai.boot.auth.controller;
 
-import com.youlai.boot.auth.model.form.WxMaBindMobileForm;
-import com.youlai.boot.auth.model.form.WxMaPhoneLoginForm;
-import com.youlai.boot.auth.model.vo.WxMaLoginVO;
+import com.youlai.boot.auth.model.req.WxMaBindMobileReq;
+import com.youlai.boot.auth.model.req.WxMaPhoneLoginReq;
+import com.youlai.boot.auth.model.resp.WxMaLoginResp;
 import com.youlai.boot.auth.service.WxMaAuthService;
-import com.youlai.boot.framework.annotation.Log;
-import com.youlai.boot.framework.annotation.RateLimit;
+import com.youlai.boot.common.annotation.Log;
+import com.youlai.boot.common.annotation.RateLimit;
 import com.youlai.boot.common.enums.ActionTypeEnum;
 import com.youlai.boot.common.enums.LogModuleEnum;
 import com.youlai.boot.common.result.Result;
@@ -29,9 +29,9 @@ import jakarta.validation.Valid;
  * @author Ray.Hao
  * @since 2.4.0
  */
-@Tag(name = "13.微信小程序认证")
+@Tag(name = "01.认证中心")
 @RestController
-@RequestMapping("/api/v1/wxma/auth")
+@RequestMapping("/api/v1/auth/wxma")
 @RequiredArgsConstructor
 @Slf4j
 public class WxMaAuthController {
@@ -47,15 +47,15 @@ public class WxMaAuthController {
      *   <li>未绑定手机号的用户：返回 openid，需调用绑定手机号接口</li>
      * </ul>
      */
-    @Operation(summary = "静默登录", description = "通过微信 code 登录，已绑定用户直接返回 token，未绑定用户返回 openid 需绑定手机号")
+    @Operation(summary = "[小程序]静默登录", description = "通过微信 code 登录，已绑定用户直接返回 token，未绑定用户返回 openid 需绑定手机号")
     @PostMapping("/silent-login")
     @Log(module = LogModuleEnum.LOGIN, value = ActionTypeEnum.LOGIN)
     @RateLimit
-    public Result<WxMaLoginVO> silentLogin(
+    public Result<WxMaLoginResp> silentLogin(
             @Parameter(description = "微信登录凭证（wx.login 获取）", required = true, example = "0xxx")
             @RequestParam String code
     ) {
-        WxMaLoginVO result = wxMaAuthService.silentLogin(code);
+        WxMaLoginResp result = wxMaAuthService.silentLogin(code);
         return Result.success(result);
     }
 
@@ -66,11 +66,11 @@ public class WxMaAuthController {
      * <p>
      * 一步完成登录，无需绑定流程，自动创建新用户
      */
-    @Operation(summary = "手机号快捷登录", description = "同时使用微信 code 和手机号授权 code 登录，适用于企业认证小程序")
+    @Operation(summary = "[小程序]手机号快捷登录", description = "同时使用微信 code 和手机号授权 code 登录，适用于企业认证小程序")
     @PostMapping("/phone-login")
     @Log(module = LogModuleEnum.LOGIN, value = ActionTypeEnum.LOGIN)
     @RateLimit
-    public Result<AuthenticationToken> phoneLogin(@Valid @RequestBody WxMaPhoneLoginForm req) {
+    public Result<AuthenticationToken> phoneLogin(@Valid @RequestBody WxMaPhoneLoginReq req) {
         AuthenticationToken result = wxMaAuthService.phoneLogin(req.getLoginCode(), req.getPhoneCode());
         return Result.success(result);
     }
@@ -82,11 +82,11 @@ public class WxMaAuthController {
      * <p>
      * 绑定成功后自动完成登录
      */
-    @Operation(summary = "绑定手机号", description = "为静默登录用户绑定手机号，绑定成功后自动登录")
+    @Operation(summary = "[小程序]绑定手机号", description = "为静默登录用户绑定手机号，绑定成功后自动登录")
     @PostMapping("/bind-mobile")
     @Log(module = LogModuleEnum.LOGIN, value = ActionTypeEnum.LOGIN)
     @RateLimit
-    public Result<AuthenticationToken> bindMobile(@Valid @RequestBody WxMaBindMobileForm req) {
+    public Result<AuthenticationToken> bindMobile(@Valid @RequestBody WxMaBindMobileReq req) {
         AuthenticationToken result = wxMaAuthService.bindMobile(req.getOpenid(), req.getMobile(), req.getSmsCode());
         return Result.success(result);
     }

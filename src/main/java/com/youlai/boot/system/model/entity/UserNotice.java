@@ -3,7 +3,7 @@ package com.youlai.boot.system.model.entity;
 import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableLogic;
 import com.baomidou.mybatisplus.annotation.TableName;
-import com.youlai.boot.framework.base.BaseEntity;
+import com.youlai.boot.common.base.BaseEntity;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
