@@ -1,4 +1,4 @@
-package com.youlai.boot.system.job;
+package com.youlai.boot.system.schedule;
 
 import com.youlai.boot.support.sse.SseService;
 import lombok.RequiredArgsConstructor;

@@ -13,7 +13,7 @@ import com.youlai.boot.common.result.ExcelResult;
 import com.youlai.boot.common.result.PageResult;
 import com.youlai.boot.common.result.Result;
 import com.youlai.boot.common.util.ExcelUtils;
-import com.youlai.boot.system.listener.UserImportListener;
+import com.youlai.boot.system.service.UserImportReader;
 import com.youlai.boot.system.model.form.EmailUpdateForm;
 import com.youlai.boot.system.model.form.MobileUpdateForm;
 import com.youlai.boot.system.model.form.PasswordUpdateForm;
@@ -184,9 +184,9 @@ public class UserController {
     @PreAuthorize("@ss.hasPerm('sys:user:import')")
     @Log(module = LogModuleEnum.USER, value = ActionTypeEnum.IMPORT)
     public Result<ExcelResult> importUsers(MultipartFile file) throws IOException {
-        UserImportListener listener = new UserImportListener();
-        ExcelUtils.importExcel(file.getInputStream(), UserImportForm.class, listener);
-        return Result.success(listener.getExcelResult());
+        UserImportReader reader = new UserImportReader();
+        ExcelUtils.importExcel(file.getInputStream(), UserImportForm.class, reader);
+        return Result.success(reader.getExcelResult());
     }
 
     @Operation(summary = "导出用户")

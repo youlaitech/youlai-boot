@@ -1,4 +1,4 @@
-package com.youlai.boot.system.security.port;
+package com.youlai.boot.system.security.adapter;
 
 import com.youlai.boot.framework.security.port.PermissionPort;
 import com.youlai.boot.system.service.RoleMenuService;

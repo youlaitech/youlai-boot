@@ -1,4 +1,4 @@
-package com.youlai.boot.system.listener;
+package com.youlai.boot.system.service;
 
 import cn.hutool.core.collection.CollectionUtil;
 import cn.hutool.core.convert.Convert;
@@ -17,7 +17,6 @@ import com.youlai.boot.system.enums.DictCodeEnum;
 import com.youlai.boot.system.model.entity.SysUser;
 import com.youlai.boot.system.model.entity.*;
 import com.youlai.boot.system.model.form.UserImportForm;
-import com.youlai.boot.system.service.*;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -28,15 +27,15 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 /**
- * 用户导入监听器
+ * 用户导入读取器。
  * <p>
- * <a href="https://easyexcel.opensource.alibaba.com/docs/current/quickstart/read#%E6%9C%80%E7%AE%80%E5%8D%95%E7%9A%84%E8%AF%BB%E7%9A%84%E7%9B%91%E5%90%AC%E5%99%A8">最简单的读的监听器</a>
+ * 基于 EasyExcel 的 {@link AnalysisEventListener}，逐行读取 Excel 并完成校验、持久化。
  *
  * @author Ray
  * @since 2022/4/10
  */
 @Slf4j
-public class UserImportListener extends AnalysisEventListener<UserImportForm> {
+public class UserImportReader extends AnalysisEventListener<UserImportForm> {
 
     /**
      * Excel 导入结果
@@ -62,7 +61,7 @@ public class UserImportListener extends AnalysisEventListener<UserImportForm> {
      * 构造方法
      * <p>在构造方法中给需要查询的内容查询好，尽量避免每条数据查询一次</p>
      */
-    public UserImportListener() {
+    public UserImportReader() {
         this.userService = SpringUtil.getBean(UserService.class);
         this.passwordEncoder = SpringUtil.getBean(PasswordEncoder.class);
         this.userRoleService = SpringUtil.getBean(UserRoleService.class);
