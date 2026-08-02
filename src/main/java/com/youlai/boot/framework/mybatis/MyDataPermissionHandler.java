@@ -1,4 +1,4 @@
-package com.youlai.boot.framework.mybatis.interceptor;
+package com.youlai.boot.framework.mybatis;
 
 import cn.hutool.core.collection.CollectionUtil;
 import cn.hutool.core.util.StrUtil;
@@ -23,7 +23,7 @@ import java.lang.reflect.Method;
 import java.util.List;
 
 /**
- * 数据权限控制器
+ * 数据权限处理器
  * <p>
  * 支持多角色数据权限合并（并集策略）：
  * - 如果任一角色是 ALL，则跳过数据权限过滤

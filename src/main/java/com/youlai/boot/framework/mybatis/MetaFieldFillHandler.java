@@ -1,4 +1,4 @@
-package com.youlai.boot.framework.mybatis.handler;
+package com.youlai.boot.framework.mybatis;
 
 import com.baomidou.mybatisplus.core.handlers.MetaObjectHandler;
 import com.youlai.boot.framework.security.util.SecurityUtils;
@@ -17,7 +17,7 @@ import java.time.LocalDateTime;
  * @since 3.0.0
  */
 @Component
-public class AutoFillMetaObjectHandler implements MetaObjectHandler {
+public class MetaFieldFillHandler implements MetaObjectHandler {
 
     @Override
     public void insertFill(MetaObject metaObject) {

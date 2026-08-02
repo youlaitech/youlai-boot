@@ -106,6 +106,13 @@
             <scope>test</scope>
         </dependency>
 
+        <!-- Spring Boot 4: @AutoConfigureMockMvc 移到了 webmvc-test 模块 -->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-webmvc-test</artifactId>
+            <scope>test</scope>
+        </dependency>
+
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-security</artifactId>
