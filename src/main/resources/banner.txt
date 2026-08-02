@@ -7,7 +7,6 @@ ${AnsiColor.BRIGHT_BLUE}
     |_|\___/ \__,_| |______\__,_|_|
 
 ${AnsiColor.BRIGHT_GREEN}
-YouLai Boot Version: ${project.version}
 Spring Boot Version: ${spring-boot.version}${spring-boot.formatted-version}
 有来官网： https://www.youlai.tech/
 版权所属： 有来开源组织
