@@ -1,4 +1,4 @@
-package com.youlai.boot.common.aspect;
+package com.youlai.boot.framework.web.log;
 
 import cn.hutool.core.util.StrUtil;
 import cn.hutool.http.useragent.UserAgent;
@@ -8,8 +8,6 @@ import com.youlai.boot.common.enums.ActionTypeEnum;
 import com.youlai.boot.common.enums.LogModuleEnum;
 import com.youlai.boot.common.util.IPUtils;
 import com.youlai.boot.framework.security.util.SecurityUtils;
-import com.youlai.boot.system.model.entity.SysLog;
-import com.youlai.boot.system.service.LogService;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.extern.slf4j.Slf4j;
 import org.aspectj.lang.ProceedingJoinPoint;
@@ -27,7 +25,7 @@ import java.util.concurrent.Executor;
 
 /**
  * 操作日志切面
- * <p>@Log 标注的方法执行后异步写入 sys_log 表</p>
+ * <p>@Log 标注的方法执行后异步采集操作日志，通过 {@link OperationLogPort} 落库</p>
  *
  * @author Ray.Hao
  * @since 0.0.1
@@ -35,18 +33,18 @@ import java.util.concurrent.Executor;
 @Aspect
 @Component
 @Slf4j
-public class LogAspect {
+public class OperationLogAspect {
 
     private static final int MAX_ERROR_MSG_LENGTH = 1000;
 
-    private final LogService logService;
+    private final OperationLogPort operationLogPort;
     private final Executor operationLogExecutor;
 
-    public LogAspect(
-            LogService logService,
+    public OperationLogAspect(
+            OperationLogPort operationLogPort,
             @Qualifier("operationLogExecutor") Executor operationLogExecutor
     ) {
-        this.logService = logService;
+        this.operationLogPort = operationLogPort;
         this.operationLogExecutor = operationLogExecutor;
     }
 
@@ -69,13 +67,13 @@ public class LogAspect {
         } finally {
             long elapsed = System.currentTimeMillis() - start;
             try {
-                SysLog entity = buildEntity(logAnnotation, elapsed, failure, userId, username);
-                if (entity != null) {
+                OperationLog operationLog = buildOperationLog(logAnnotation, elapsed, failure, userId, username);
+                if (operationLog != null) {
                     operationLogExecutor.execute(() -> {
                         try {
-                            logService.save(entity);
+                            operationLogPort.record(operationLog);
                         } catch (Exception e) {
-                            log.error("保存操作日志失败 title={} uri={}", entity.getTitle(), entity.getRequestUri(), e);
+                            log.error("保存操作日志失败 title={} uri={}", operationLog.title(), operationLog.requestUri(), e);
                         }
                     });
                 }
@@ -85,7 +83,7 @@ public class LogAspect {
         }
     }
 
-    private SysLog buildEntity(Log ann, long elapsed, Throwable failure, Long userId, String username) {
+    private OperationLog buildOperationLog(Log ann, long elapsed, Throwable failure, Long userId, String username) {
         ServletRequestAttributes attrs = (ServletRequestAttributes) RequestContextHolder.getRequestAttributes();
         if (attrs == null) return null;
 
@@ -96,29 +94,28 @@ public class LogAspect {
         LogModuleEnum module = ann.module();
         ActionTypeEnum action = ann.value();
 
-        SysLog entity = new SysLog();
-        entity.setModule(module);
-        entity.setActionType(action);
-        entity.setTitle(StrUtil.blankToDefault(ann.title(), module.getLabel() + "-" + action.getLabel()));
-        entity.setContent(ann.content());
-        entity.setOperatorId(userId);
-        entity.setOperatorName(username);
-        entity.setRequestUri(req.getRequestURI());
-        entity.setRequestMethod(req.getMethod());
-        entity.setIp(ip);
-        entity.setDevice(getDevice(ua));
-        entity.setOs(getOs(ua));
-        entity.setBrowser(getBrowser(ua));
-        entity.setStatus(failure == null ? 1 : 0);
-        entity.setErrorMsg(failure == null ? null : truncate(failure.getMessage(), MAX_ERROR_MSG_LENGTH));
-        entity.setExecutionTime((int) Math.min(elapsed, Integer.MAX_VALUE));
-        entity.setCreateTime(LocalDateTime.now());
-
         IpRegion region = parseRegion(ip);
-        entity.setProvince(region.province);
-        entity.setCity(region.city);
 
-        return entity;
+        return new OperationLog(
+                module,
+                action,
+                StrUtil.blankToDefault(ann.title(), module.getLabel() + "-" + action.getLabel()),
+                ann.content(),
+                userId,
+                username,
+                req.getRequestURI(),
+                req.getMethod(),
+                ip,
+                region.province(),
+                region.city(),
+                getDevice(ua),
+                getOs(ua),
+                getBrowser(ua),
+                failure == null ? 1 : 0,
+                failure == null ? null : truncate(failure.getMessage(), MAX_ERROR_MSG_LENGTH),
+                (int) Math.min(elapsed, Integer.MAX_VALUE),
+                LocalDateTime.now()
+        );
     }
 
     private IpRegion parseRegion(String ip) {

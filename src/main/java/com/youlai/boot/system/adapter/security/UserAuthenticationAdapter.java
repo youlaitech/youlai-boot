@@ -1,4 +1,4 @@
-package com.youlai.boot.system.security.adapter;
+package com.youlai.boot.system.adapter.security;
 
 import com.youlai.boot.common.enums.SocialPlatformEnum;
 import com.youlai.boot.framework.security.model.SecurityUser;
