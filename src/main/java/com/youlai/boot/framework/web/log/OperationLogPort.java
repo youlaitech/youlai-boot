@@ -2,12 +2,10 @@ package com.youlai.boot.framework.web.log;
 
 /**
  * 操作日志落库端口
- * <p>由各业务模块实现，framework 层通过此接口写入操作日志，不依赖具体落库实现。
- * 如 system 模块的 {@code OperationLogAdapter} 落库 sys_log 表。</p>
+ * <p>由 {@link com.youlai.boot.system.adapter.log.OperationLogAdapter} 实现</p>
  *
- * @see com.youlai.boot.system.adapter.log.OperationLogAdapter
  * @author Ray.Hao
- * @since 0.0.1
+ * @since 4.7.0
  */
 public interface OperationLogPort {
 

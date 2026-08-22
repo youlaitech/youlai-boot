@@ -4,6 +4,7 @@ import cn.hutool.core.date.DatePattern;
 import cn.hutool.core.date.DateUtil;
 import cn.hutool.core.io.FileUtil;
 import cn.hutool.core.util.IdUtil;
+import com.youlai.boot.common.exception.BusinessException;
 import com.youlai.boot.support.file.model.FileInfo;
 import com.youlai.boot.support.file.service.FileService;
 import lombok.Data;
@@ -52,7 +53,7 @@ public class LocalFileServiceImpl implements FileService {
             FileUtil.writeFromStream(inputStream, filePrefix + folder + File.separator + fileName);
         } catch (Exception e) {
             log.error("文件上传失败", e);
-            throw new RuntimeException("文件上传失败");
+            throw new BusinessException("文件上传失败");
         }
         String fileUrl = File.separator + folder + File.separator + fileName;
         FileInfo fileInfo = new FileInfo();

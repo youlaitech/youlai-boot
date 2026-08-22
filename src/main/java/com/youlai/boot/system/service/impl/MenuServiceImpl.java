@@ -8,6 +8,7 @@ import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.youlai.boot.codegen.model.entity.GenTable;
+import com.youlai.boot.common.exception.BusinessException;
 import com.youlai.boot.framework.security.util.SecurityUtils;
 import com.youlai.boot.system.converter.MenuConverter;
 import com.youlai.boot.system.mapper.MenuMapper;
@@ -303,7 +304,7 @@ public class MenuServiceImpl extends ServiceImpl<MenuMapper, Menu> implements Me
             menuForm.setComponent(null);
         }
         if (Objects.equals(menuForm.getParentId(), menuForm.getId())) {
-            throw new RuntimeException("父级菜单不能为当前菜单");
+            throw new BusinessException("父级菜单不能为当前菜单");
         }
         Menu entity = menuConverter.toEntity(menuForm);
         String treePath = generateMenuTreePath(menuForm.getParentId());

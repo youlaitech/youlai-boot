@@ -1,6 +1,7 @@
 package com.youlai.boot.codegen.controller;
 
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import com.youlai.boot.common.exception.BusinessException;
 import com.youlai.boot.common.result.PageResult;
 import com.youlai.boot.common.result.Result;
 import com.youlai.boot.codegen.config.CodegenProperties;
@@ -106,7 +107,7 @@ public class CodegenController {
             outputStream.flush();
         } catch (IOException e) {
             log.error("Error while writing the zip file1 to response", e);
-            throw new RuntimeException("Failed to write the zip file1 to response", e);
+            throw new BusinessException("代码生成压缩包响应写入失败", e);
         }
     }
 }

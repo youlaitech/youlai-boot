@@ -278,7 +278,7 @@ public class RoleServiceImpl extends ServiceImpl<RoleMapper, Role> implements Ro
     public void assignMenusToRole(Long roleId, List<Long> menuIds) {
         Role role = this.getById(roleId);
         if (role == null) {
-            throw new RuntimeException("角色不存在");
+            throw new BusinessException("角色不存在");
         }
         // 删除角色菜单
         roleMenuService.remove(

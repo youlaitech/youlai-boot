@@ -7,6 +7,7 @@ import com.youlai.boot.common.annotation.RepeatSubmit;
 import com.youlai.boot.common.enums.ActionTypeEnum;
 import com.youlai.boot.common.enums.LogModuleEnum;
 import com.youlai.boot.common.enums.StatusEnum;
+import com.youlai.boot.common.exception.BusinessException;
 import com.youlai.boot.framework.security.util.SecurityUtils;
 import com.youlai.boot.common.model.Option;
 import com.youlai.boot.common.result.ExcelResult;
@@ -57,7 +58,7 @@ import java.nio.charset.StandardCharsets;
 import java.util.List;
 
 /**
- * 用户控制层
+ * 用户管理控制器.
  *
  * @author Ray.Hao
  * @since 4.3.1
@@ -175,7 +176,7 @@ public class UserController {
              ExcelWriter excelWriter = EasyExcel.write(outputStream).withTemplate(inputStream).build()) {
             excelWriter.finish();
         } catch (IOException e) {
-            throw new RuntimeException("用户导入模板下载失败", e);
+            throw new BusinessException("用户导入模板下载失败", e);
         }
     }
 

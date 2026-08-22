@@ -389,7 +389,7 @@ public class CodegenServiceImpl implements CodegenService {
 
         } catch (IOException e) {
             log.error("Error while generating zip for code download", e);
-            throw new RuntimeException("Failed to generate code zip file1", e);
+            throw new BusinessException("代码生成压缩包失败", e);
         }
     }
 

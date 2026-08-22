@@ -8,12 +8,14 @@ import com.aliyun.oss.OSS;
 import com.aliyun.oss.OSSClientBuilder;
 import com.aliyun.oss.model.ObjectMetadata;
 import com.aliyun.oss.model.PutObjectRequest;
+import com.youlai.boot.common.exception.BusinessException;
 import com.youlai.boot.support.file.model.FileInfo;
 import com.youlai.boot.support.file.service.FileService;
 import jakarta.annotation.PostConstruct;
 import lombok.Data;
 import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.stereotype.Component;
@@ -29,6 +31,7 @@ import java.time.LocalDateTime;
  * 上传文件按日期分目录存储，URL 格式：{@code https://bucket.endpoint/yyyyMMdd/uuid.suffix}。
  */
 @Component
+@Slf4j
 @ConditionalOnProperty(value = "file-storage.type", havingValue = "aliyun")
 @ConfigurationProperties(prefix = "file-storage.aliyun")
 @RequiredArgsConstructor
@@ -67,7 +70,8 @@ public class AliyunFileServiceImpl implements FileService {
             PutObjectRequest putObjectRequest = new PutObjectRequest(bucket, fileName, inputStream, metadata);
             aliyunOssClient.putObject(putObjectRequest);
         } catch (Exception e) {
-            throw new RuntimeException("文件上传失败");
+            log.error("文件上传失败", e);
+            throw new BusinessException("文件上传失败", e);
         }
         String fileUrl = "https://" + bucket + "." + endpoint + "/" + fileName;
         FileInfo fileInfo = new FileInfo();

@@ -3,18 +3,16 @@ package com.youlai.boot.system.adapter.log;
 import com.youlai.boot.framework.web.log.OperationLog;
 import com.youlai.boot.framework.web.log.OperationLogPort;
 import com.youlai.boot.system.converter.LogConverter;
-import com.youlai.boot.system.model.entity.SysLog;
 import com.youlai.boot.system.service.LogService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
 /**
  * 操作日志适配器
- * <p>实现 framework 层的 {@link OperationLogPort}，将切面采集的操作日志落库 sys_log 表</p>
+ * <p>实现 {@link OperationLogPort}，落库 sys_log</p>
  *
  * @author Ray.Hao
- * @since 0.0.1
- * @see OperationLogPort
+ * @since 4.7.0
  */
 @Component
 @RequiredArgsConstructor
@@ -25,9 +23,6 @@ public class OperationLogAdapter implements OperationLogPort {
 
     /**
      * 记录操作日志
-     * <p>通过 {@link LogConverter} 将操作日志载荷转换为 {@link SysLog} 后落库</p>
-     *
-     * @param operationLog 操作日志载荷
      */
     @Override
     public void record(OperationLog operationLog) {

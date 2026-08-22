@@ -25,10 +25,9 @@ import java.util.concurrent.Executor;
 
 /**
  * 操作日志切面
- * <p>@Log 标注的方法执行后异步采集操作日志，通过 {@link OperationLogPort} 落库</p>
  *
  * @author Ray.Hao
- * @since 0.0.1
+ * @since 4.7.0
  */
 @Aspect
 @Component

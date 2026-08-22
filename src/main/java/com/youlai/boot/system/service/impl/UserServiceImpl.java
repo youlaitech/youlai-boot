@@ -22,7 +22,12 @@ import com.youlai.boot.framework.security.util.SecurityUtils;
 import com.youlai.boot.system.converter.UserConverter;
 import com.youlai.boot.system.enums.DictCodeEnum;
 import com.youlai.boot.system.mapper.UserMapper;
-import com.youlai.boot.system.model.form.*;
+import com.youlai.boot.system.model.form.EmailUpdateForm;
+import com.youlai.boot.system.model.form.MobileUpdateForm;
+import com.youlai.boot.system.model.form.PasswordUpdateForm;
+import com.youlai.boot.system.model.form.PasswordVerifyForm;
+import com.youlai.boot.system.model.form.UserForm;
+import com.youlai.boot.system.model.form.UserProfileForm;
 import com.youlai.boot.system.model.vo.CurrentUserVO;
 import com.youlai.boot.system.model.vo.UserExportVO;
 import com.youlai.boot.system.model.entity.Dept;
@@ -40,15 +45,21 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.*;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.LinkedHashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
+import java.util.Set;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
 /**
- * 用户业务实现类
+ * 用户业务实现类.
  *
  * @author Ray.Hao
- * @since 2022/1/14
+ * @since 0.0.1
  */
 @Service
 @RequiredArgsConstructor
@@ -78,10 +89,10 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, SysUser> implements
 
 
     /**
-     * 获取用户分页列表
+     * 获取用户分页列表.
      *
-     * @param queryParams 查询参数
-     * @return {@link IPage<UserPageVO>} 用户分页列表
+     * @param queryParams 分页查询条件（含关键字、状态、部门过滤）
+     * @return 用户分页数据（含角色、部门名称）
      */
     @Override
     public IPage<UserPageVO> getUserPage(UserQuery queryParams) {
@@ -99,10 +110,10 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, SysUser> implements
     }
 
     /**
-     * 获取用户表单数据
+     * 获取用户表单回显数据.
      *
-     * @param userId 用户ID
-     * @return {@link UserForm} 用户表单数据
+     * @param userId 用户 ID
+     * @return 用户表单（含已分配角色 ID 列表），用于编辑页回显
      */
     @Override
     public UserForm getUserFormData(Long userId) {
@@ -110,10 +121,12 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, SysUser> implements
     }
 
     /**
-     * 新增用户
+     * 新增用户.
+     * <p>校验用户名唯一性，设置默认加密密码，保存用户角色关联（事务一致）。
      *
-     * @param userForm 用户表单对象
-     * @return true|false
+     * @param userForm 用户表单（username 必填且唯一，roleIds 为角色 ID 列表）
+     * @return 新增成功返回 true
+     * @throws BusinessException 如果用户名已存在
      */
     @Override
     @Transactional(rollbackFor = Exception.class)
@@ -144,11 +157,13 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, SysUser> implements
     }
 
     /**
-     * 更新用户
+     * 更新用户.
+     * <p>校验用户名唯一性（排除自身），同步更新角色关联（事务一致）。
      *
-     * @param userId   用户ID
-     * @param userForm 用户表单对象
-     * @return true|false
+     * @param userId   用户 ID
+     * @param userForm 用户表单（username 必填且唯一，roleIds 为角色 ID 列表）
+     * @return 更新成功返回 true
+     * @throws BusinessException 如果用户不存在或用户名已被占用
      */
     @Override
     @Transactional(rollbackFor = Exception.class)
@@ -181,10 +196,11 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, SysUser> implements
     }
 
     /**
-     * 删除用户
+     * 批量删除用户.
      *
-     * @param idsStr 用户ID，多个以英文逗号(,)分割
-     * @return true|false
+     * @param idsStr 用户 ID，多个以英文逗号分割
+     * @return 删除成功返回 true
+     * @throws BusinessException 如果 idsStr 为空
      */
     @Override
     @Transactional(rollbackFor = Exception.class)
@@ -200,10 +216,11 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, SysUser> implements
     }
 
     /**
-     * 根据用户名获取认证凭证信息
+     * 根据用户名获取认证凭证信息.
+     * <p>含角色集合和数据权限范围。
      *
-     * @param username 用户名
-     * @return 用户认证凭证信息 {@link SecurityUser}
+     * @param username 用户名（唯一）
+     * @return 认证凭证，用户不存在时返回 null
      */
     @Override
     public SecurityUser getAuthInfoByUsername(String username) {
@@ -217,7 +234,11 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, SysUser> implements
     }
 
     /**
-     * 根据手机号获取用户认证信息
+     * 根据手机号获取认证凭证信息.
+     * <p>含角色集合和数据权限范围。
+     *
+     * @param mobile 手机号
+     * @return 认证凭证，手机号为空或用户不存在时返回 null
      */
     @Override
     public SecurityUser getAuthInfoByMobile(String mobile) {
@@ -234,10 +255,11 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, SysUser> implements
     }
 
     /**
-     * 获取导出用户列表
+     * 获取导出用户列表.
+     * <p>含性别字典翻译，用于 Excel 导出。
      *
-     * @param queryParams 查询参数
-     * @return {@link List<UserExportVO>} 导出用户列表
+     * @param queryParams 查询条件（含关键字、状态、部门过滤）
+     * @return 导出用户列表（gender 字段已翻译为中文）
      */
     @Override
     public List<UserExportVO> listExportUsers(UserQuery queryParams) {
@@ -273,9 +295,10 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, SysUser> implements
     }
 
     /**
-     * 获取登录用户信息
+     * 获取当前登录用户信息.
+     * <p>含基础信息、部门名称、角色集合、权限集合（缓存未命中时触发全量刷新）。
      *
-     * @return {@link CurrentUserVO}   用户信息
+     * @return 当前用户信息（含角色、权限）
      */
     @Override
     public CurrentUserVO getCurrentUserInfo() {
@@ -338,10 +361,10 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, SysUser> implements
     }
 
     /**
-     * 获取个人中心用户信息
+     * 获取个人中心用户信息.
      *
-     * @param userId 用户ID
-     * @return {@link UserProfileVO} 个人中心用户信息
+     * @param userId 用户 ID
+     * @return 个人中心信息（含角色、部门名称）
      */
     @Override
     public UserProfileVO getUserProfile(Long userId) {
@@ -349,10 +372,12 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, SysUser> implements
     }
 
     /**
-     * 修改个人中心用户信息
+     * 修改个人中心用户信息.
+     * <p>仅支持修改昵称、头像、性别，至少修改一个字段。
      *
-     * @param formData 表单数据
-     * @return true|false
+     * @param formData 个人中心表单（nickname/avatar/gender 至少一个非空）
+     * @return 修改成功返回 true
+     * @throws BusinessException 如果所有字段均为空
      */
     @Override
     public boolean updateUserProfile(UserProfileForm formData) {
@@ -371,11 +396,13 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, SysUser> implements
     }
 
     /**
-     * 修改指定用户密码
+     * 修改当前用户密码.
+     * <p>校验原密码，确认新旧不同，密码变更后使所有会话失效。
      *
-     * @param userId 用户ID
-     * @param data   密码修改表单数据
-     * @return true|false
+     * @param userId 用户 ID
+     * @param data   密码表单（含原密码、新密码、确认密码）
+     * @return 修改成功返回 true
+     * @throws BusinessException 如果用户不存在、原密码错误、新旧密码相同或确认密码不一致
      */
     @Override
     public boolean changeUserPassword(Long userId, PasswordUpdateForm data) {
@@ -415,11 +442,12 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, SysUser> implements
     }
 
     /**
-     * 重置指定用户密码
+     * 重置用户密码.
+     * <p>管理员操作，重置后使该用户所有会话失效。
      *
-     * @param userId   用户ID
-     * @param password 密码重置表单数据
-     * @return true|false
+     * @param userId   用户 ID
+     * @param password 新密码（明文，内部加密存储）
+     * @return 重置成功返回 true
      */
     @Override
     public boolean resetUserPassword(Long userId, String password) {
@@ -435,10 +463,12 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, SysUser> implements
     }
 
     /**
-     * 发送短信验证码(绑定或更换手机号)
+     * 发送短信验证码（绑定或更换手机号）.
+     * <p>校验手机号未被其他账号绑定，验证码缓存 5 分钟。
      *
      * @param mobile 手机号
-     * @return true|false
+     * @return 发送成功返回 true，失败返回 false 并记录日志
+     * @throws BusinessException 如果手机号已被其他账号绑定
      */
     @Override
     public boolean sendMobileCode(String mobile) {
@@ -474,10 +504,12 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, SysUser> implements
     }
 
     /**
-     * 绑定或更换手机号
+     * 绑定或更换手机号.
+     * <p>校验密码、验证码、手机号唯一性，成功后删除验证码缓存。
      *
-     * @param form 表单数据
-     * @return true|false
+     * @param form 手机号绑定表单（含密码、手机号、验证码）
+     * @return 绑定成功返回 true
+     * @throws BusinessException 如果用户不存在、密码错误、验证码过期/错误或手机号已被绑定
      */
     @Override
     public boolean bindOrChangeMobile(MobileUpdateForm form) {
@@ -527,9 +559,11 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, SysUser> implements
     }
 
     /**
-     * 发送邮箱验证码（绑定或更换邮箱）
+     * 发送邮箱验证码（绑定或更换邮箱）.
+     * <p>校验邮箱未被其他账号绑定，验证码缓存 5 分钟。
      *
-     * @param email 邮箱
+     * @param email 邮箱地址
+     * @throws BusinessException 如果邮箱已被其他账号绑定
      */
     @Override
     public void sendEmailCode(String email) {
@@ -554,10 +588,12 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, SysUser> implements
     }
 
     /**
-     * 修改当前用户邮箱
+     * 绑定或更换邮箱.
+     * <p>校验密码、验证码、邮箱唯一性，成功后删除验证码缓存。
      *
-     * @param form 表单数据
-     * @return true|false
+     * @param form 邮箱绑定表单（含密码、邮箱、验证码）
+     * @return 绑定成功返回 true
+     * @throws BusinessException 如果用户不存在、密码错误、验证码过期/错误或邮箱已被绑定
      */
     @Override
     public boolean bindOrChangeEmail(EmailUpdateForm form) {
@@ -608,10 +644,12 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, SysUser> implements
     }
 
     /**
-     * 解绑手机号
+     * 解绑手机号.
+     * <p>校验密码后将手机号置空。
      *
-     * @param form 表单数据
-     * @return true|false
+     * @param form 密码验证表单（含密码）
+     * @return 解绑成功返回 true
+     * @throws BusinessException 如果用户不存在、未绑定手机号或密码错误
      */
     @Override
     public boolean unbindMobile(PasswordVerifyForm form) {
@@ -638,10 +676,12 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, SysUser> implements
     }
 
     /**
-     * 解绑邮箱
+     * 解绑邮箱.
+     * <p>校验密码后将邮箱置空。
      *
-     * @param form 表单数据
-     * @return true|false
+     * @param form 密码验证表单（含密码）
+     * @return 解绑成功返回 true
+     * @throws BusinessException 如果用户不存在、未绑定邮箱或密码错误
      */
     @Override
     public boolean unbindEmail(PasswordVerifyForm form) {
@@ -667,6 +707,13 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, SysUser> implements
         );
     }
 
+    /**
+     * 修改用户状态.
+     *
+     * @param userId 用户 ID
+     * @param status 状态（1:启用 0:禁用）
+     * @return 修改成功返回 true
+     */
     @Override
     public boolean updateUserStatus(Long userId, Integer status) {
         return this.update(new LambdaUpdateWrapper<SysUser>()
@@ -676,9 +723,9 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, SysUser> implements
     }
 
     /**
-     * 获取用户选项列表
+     * 获取用户下拉选项列表.
      *
-     * @return {@link List<Option<String>>} 用户选项列表
+     * @return 启用状态的用户选项（value 为用户 ID，label 为昵称）
      */
     @Override
     public List<Option<String>> listUserOptions() {
