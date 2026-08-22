@@ -107,7 +107,6 @@
 
 ```
 youlai-boot/
-├── docker/                    # Docker 部署编排
 ├── docs/                      # 项目文档与图片资源
 ├── sql/                       # 数据库初始化脚本
 ├── src/                       # 源码目录
@@ -125,6 +124,7 @@ youlai-boot/
 │   │   ├── sms/               # 短信服务
 │   │   └── sse/               # SSE 消息推送
 │   └── system/                # 系统业务（用户/角色/菜单/部门/字典等）
+├── docker-compose.yml         # 中间件一键编排（MySQL/Redis/MinIO/Xxl-Job）
 └── pom.xml                    # Maven 依赖管理
 ```
 

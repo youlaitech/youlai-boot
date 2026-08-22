@@ -201,8 +201,6 @@ Detailed guide: https://www.youlai.tech/docs/server/spring-boot/quick-start.html
 
 youlai-boot/
 
-├── docker/                    # Docker orchestration
-
 ├── docs/                      # Docs and image assets
 
 ├── sql/                       # Database init scripts
@@ -236,6 +234,8 @@ youlai-boot/
 │   │   └── sse/               # SSE push
 
 │   └── system/                # Business (user/role/menu/dept/dict etc.)
+
+├── docker-compose.yml         # One-click middleware orchestration (MySQL/Redis/MinIO/Xxl-Job)
 
 └── pom.xml                    # Maven dependency management
 

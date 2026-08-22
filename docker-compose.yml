@@ -1,0 +1,75 @@
+# Docker Compose 一键安装中间件 MySQL、Redis、MinIO、Xxl-Job
+#
+# 安装：docker compose up -d
+# 卸载：docker compose down（加 -v 同时删除数据卷）
+#
+# 说明：
+# - name 固定项目名，容器统一管理和卸载，避免与其他项目冲突
+# - MySQL 首次启动时自动执行 ./sql 下初始化脚本（仅首次，数据卷已存在时跳过）
+# - 中间件配置全部内联于 command 参数，无需外部配置文件
+# - 数据持久化使用命名卷（docker volume 统一管理），不污染项目目录
+
+name: youlai-boot
+
+services:
+  mysql:
+    image: mysql:8.0.29
+    container_name: mysql
+    restart: unless-stopped
+    # 等价于原 my.cnf 的 utf8mb4 字符集设置（MySQL 8 其余项与默认值一致）
+    command: --character-set-server=utf8mb4 --collation-server=utf8mb4_0900_ai_ci
+    environment:
+      - TZ=Asia/Shanghai
+      - LANG=en_US.UTF-8
+      - MYSQL_ROOT_PASSWORD=123456
+    volumes:
+      - youlai-mysql-data:/var/lib/mysql
+      - ./sql:/docker-entrypoint-initdb.d
+    ports:
+      - 3306:3306
+
+  redis:
+    image: redis:7.2.3
+    container_name: redis
+    restart: unless-stopped
+    # --protected-mode no 允许远程连接（原 redis.conf 唯一非默认项）
+    command: redis-server --requirepass 123456 --appendonly no --protected-mode no
+    environment:
+      - TZ=Asia/Shanghai
+    volumes:
+      - youlai-redis-data:/data
+    ports:
+      - 6379:6379
+
+  minio:
+    image: minio/minio:RELEASE.2024-07-16T23-46-41Z
+    container_name: minio
+    restart: unless-stopped
+    command: server /data --console-address ":9001"
+    environment:
+      - TZ=Asia/Shanghai
+      - LANG=en_US.UTF-8
+      - MINIO_ROOT_USER=minioadmin
+      - MINIO_ROOT_PASSWORD=minioadmin
+    volumes:
+      - youlai-minio-data:/data
+    ports:
+      - 9000:9000
+      - 9001:9001
+
+  xxl-job-admin:
+    image: xuxueli/xxl-job-admin:2.4.0
+    container_name: xxl-job-admin
+    restart: unless-stopped
+    environment:
+      PARAMS: '--spring.datasource.url=jdbc:mysql://mysql:3306/xxl_job?useUnicode=true&characterEncoding=UTF-8&autoReconnect=true&serverTimezone=Asia/Shanghai --spring.datasource.username=root --spring.datasource.password=123456 --spring.datasource.driver-class-name=com.mysql.cj.jdbc.Driver'
+    volumes:
+      - youlai-xxljob-logs:/data/applogs
+    ports:
+      - 8080:8080
+
+volumes:
+  youlai-mysql-data:
+  youlai-redis-data:
+  youlai-minio-data:
+  youlai-xxljob-logs:
