@@ -6,7 +6,7 @@
 
     <groupId>com.youlai</groupId>
     <artifactId>youlai-boot</artifactId>
-    <version>4.7.0</version>
+    <version>4.8.0</version>
     <description>基于 Java 17 + SpringBoot 4 + Spring Security 构建的权限管理系统。</description>
 
     <parent>
@@ -39,6 +39,7 @@
 
         <!-- 对象存储 -->
         <okhttp3.version>4.12.0</okhttp3.version>
+        <aws-sdk-s3.version>2.54.2</aws-sdk-s3.version>
 
         <aliyun-sdk-oss.version>3.16.3</aliyun-sdk-oss.version>
 
@@ -217,7 +218,7 @@
         <dependency>
             <groupId>software.amazon.awssdk</groupId>
             <artifactId>s3</artifactId>
-            <version>2.54.2</version>
+            <version>${aws-sdk-s3.version}</version>
         </dependency>
 
         <!-- 阿里云 OSS 对象存储 -->

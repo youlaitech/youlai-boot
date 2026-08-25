@@ -1,4 +1,4 @@
-# Docker Compose 一键安装中间件 MySQL、Redis、MinIO、Xxl-Job
+# Docker Compose 一键安装中间件 MySQL、Redis、RustFS、Xxl-Job
 #
 # 安装：docker compose up -d
 # 卸载：docker compose down（加 -v 同时删除数据卷）
@@ -8,6 +8,7 @@
 # - MySQL 首次启动时自动执行 ./sql 下初始化脚本（仅首次，数据卷已存在时跳过）
 # - 中间件配置全部内联于 command 参数，无需外部配置文件
 # - 数据持久化使用命名卷（docker volume 统一管理），不污染项目目录
+# - RustFS 兼容 MinIO 磁盘格式与 S3 协议（MinIO 社区版已于 2026 年停止维护）
 
 name: youlai-boot
 
@@ -41,18 +42,17 @@ services:
     ports:
       - 6379:6379
 
-  minio:
-    image: minio/minio:RELEASE.2024-07-16T23-46-41Z
-    container_name: minio
+  rustfs:
+    image: rustfs/rustfs:latest
+    container_name: rustfs
     restart: unless-stopped
-    command: server /data --console-address ":9001"
     environment:
       - TZ=Asia/Shanghai
       - LANG=en_US.UTF-8
-      - MINIO_ROOT_USER=minioadmin
-      - MINIO_ROOT_PASSWORD=minioadmin
+      - RUSTFS_ACCESS_KEY=rustfs-admin
+      - RUSTFS_SECRET_KEY=rustfs-admin
     volumes:
-      - youlai-minio-data:/data
+      - youlai-rustfs-data:/data
     ports:
       - 9000:9000
       - 9001:9001
@@ -71,5 +71,5 @@ services:
 volumes:
   youlai-mysql-data:
   youlai-redis-data:
-  youlai-minio-data:
+  youlai-rustfs-data:
   youlai-xxljob-logs:

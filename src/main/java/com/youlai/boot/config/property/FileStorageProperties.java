@@ -10,28 +10,44 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 /**
- * 文件存储顶层配置：存储类型与上传限制。
+ * 文件存储配置。
  * <p>
- * rustfs / aliyun / local 子树由各自 {@code FileService} 实现类绑定，
- * 此处仅承载 {@code type} 与 {@code upload}。
+ * 绑定前缀 {@code file-storage}，承载存储类型与上传限制；
+ * rustfs / aliyun / local 子配置由各自的 {@code FileService} 实现类绑定。
+ *
+ * @author youlai.tech
  */
 @Data
 @Component
 @ConfigurationProperties(prefix = "file-storage")
 public class FileStorageProperties {
 
-    /** 存储类型：rustfs | aliyun | local */
+    /**
+     * 存储类型，决定激活哪个 FileService 实现。
+     * <p>
+     * 可选值：rustfs、aliyun、local。
+     */
     private String type;
 
+    /** 上传限制 */
     private Upload upload = new Upload();
 
+    /**
+     * 上传限制，绑定前缀 {@code file-storage.upload}。
+     */
     @Data
     public static class Upload {
 
-        /** 单文件大小上限，如 50MB；同时作为 spring.servlet.multipart 的上限 */
+        /**
+         * 单文件大小上限，如 50MB。
+         * <p>
+         * 同时作为 spring.servlet.multipart 的上限，单一来源。
+         */
         private String maxFileSize;
 
-        /** 允许的文件扩展名白名单（置空表示不限制） */
+        /**
+         * 允许的文件扩展名白名单，置空表示不限制。
+         */
         private List<String> allowedExtensions;
     }
 
