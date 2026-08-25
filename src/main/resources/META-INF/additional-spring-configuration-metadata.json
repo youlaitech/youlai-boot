@@ -3,7 +3,7 @@
     {
       "name": "file-storage.type",
       "type": "java.lang.String",
-      "description": "文件存储类型：minio | aliyun | local"
+      "description": "文件存储类型：rustfs | aliyun | local"
     },
     {
       "name": "file-storage.upload.max-file-size",
@@ -16,29 +16,29 @@
       "description": "允许的文件扩展名白名单（置空表示不限制）"
     },
     {
-      "name": "file-storage.minio.endpoint",
+      "name": "file-storage.rustfs.endpoint",
       "type": "java.lang.String",
-      "description": "MinIO 服务 Endpoint"
+      "description": "RustFS(S3) 服务 Endpoint"
     },
     {
-      "name": "file-storage.minio.access-key",
+      "name": "file-storage.rustfs.access-key",
       "type": "java.lang.String",
-      "description": "MinIO 访问凭据"
+      "description": "RustFS 访问凭据"
     },
     {
-      "name": "file-storage.minio.secret-key",
+      "name": "file-storage.rustfs.secret-key",
       "type": "java.lang.String",
-      "description": "MinIO 凭据密钥"
+      "description": "RustFS 凭据密钥"
     },
     {
-      "name": "file-storage.minio.bucket",
+      "name": "file-storage.rustfs.bucket",
       "type": "java.lang.String",
-      "description": "MinIO 存储桶名称"
+      "description": "RustFS 存储桶名称"
     },
     {
-      "name": "file-storage.minio.domain",
+      "name": "file-storage.rustfs.domain",
       "type": "java.lang.String",
-      "description": "MinIO 自定义域名（文件 URL 域名）"
+      "description": "RustFS 自定义域名（文件 URL 域名）"
     },
     {
       "name": "file-storage.aliyun.endpoint",

@@ -12,7 +12,7 @@ import java.util.stream.Collectors;
 /**
  * 文件存储顶层配置：存储类型与上传限制。
  * <p>
- * minio / aliyun / local 子树由各自 {@code FileService} 实现类绑定，
+ * rustfs / aliyun / local 子树由各自 {@code FileService} 实现类绑定，
  * 此处仅承载 {@code type} 与 {@code upload}。
  */
 @Data
@@ -20,7 +20,7 @@ import java.util.stream.Collectors;
 @ConfigurationProperties(prefix = "file-storage")
 public class FileStorageProperties {
 
-    /** 存储类型：minio | aliyun | local */
+    /** 存储类型：rustfs | aliyun | local */
     private String type;
 
     private Upload upload = new Upload();

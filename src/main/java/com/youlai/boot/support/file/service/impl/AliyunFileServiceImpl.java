@@ -4,6 +4,7 @@ import cn.hutool.core.date.DateUtil;
 import cn.hutool.core.io.FileUtil;
 import cn.hutool.core.lang.Assert;
 import cn.hutool.core.util.IdUtil;
+import cn.hutool.core.util.StrUtil;
 import com.aliyun.oss.OSS;
 import com.aliyun.oss.OSSClientBuilder;
 import com.aliyun.oss.model.ObjectMetadata;
@@ -28,7 +29,8 @@ import java.time.LocalDateTime;
  * 阿里云 OSS 文件存储服务。
  * <p>
  * 当 {@code file-storage.type=aliyun} 时生效。
- * 上传文件按日期分目录存储，URL 格式：{@code https://bucket.endpoint/yyyyMMdd/uuid.suffix}。
+ * 上传文件按日期分目录存储，URL 格式：{@code 协议://bucket.endpoint/yyyyMMdd/uuid.suffix}，
+ * 协议取自 endpoint 配置（未指定时默认 https）。
  */
 @Component
 @Slf4j
@@ -38,7 +40,7 @@ import java.time.LocalDateTime;
 @Data
 public class AliyunFileServiceImpl implements FileService {
 
-    /** OSS 地域节点，如 {@code oss-cn-hangzhou.aliyuncs.com} */
+    /** OSS 地域节点，如 {@code oss-cn-hangzhou.aliyuncs.com}，兼容带 {@code http(s)://} 前缀写法 */
     private String endpoint;
     /** AccessKey ID */
     private String accessKeyId;
@@ -51,11 +53,11 @@ public class AliyunFileServiceImpl implements FileService {
 
     @PostConstruct
     public void init() {
-        aliyunOssClient = new OSSClientBuilder().build(endpoint, accessKeyId, accessKeySecret);
+        aliyunOssClient = new OSSClientBuilder().build(endpointWithProtocol(), accessKeyId, accessKeySecret);
     }
 
     /**
-     * 上传文件到阿里云 OSS，按日期分目录，返回 {@code https://bucket.endpoint/path} 格式的 URL。
+     * 上传文件到阿里云 OSS，按日期分目录，返回 {@code 协议://bucket.endpoint/path} 格式的 URL。
      */
     @Override
     @SneakyThrows
@@ -73,7 +75,7 @@ public class AliyunFileServiceImpl implements FileService {
             log.error("文件上传失败", e);
             throw new BusinessException("文件上传失败", e);
         }
-        String fileUrl = "https://" + bucket + "." + endpoint + "/" + fileName;
+        String fileUrl = getFileHost() + "/" + fileName;
         FileInfo fileInfo = new FileInfo();
         fileInfo.setName(originalFilename);
         fileInfo.setUrl(fileUrl);
@@ -89,9 +91,33 @@ public class AliyunFileServiceImpl implements FileService {
     @Override
     public boolean deleteFile(String filePath) {
         Assert.notBlank(filePath, "删除文件路径不能为空");
-        String fileHost = "https://" + bucket + "." + endpoint;
-        String fileName = filePath.substring(fileHost.length() + 1);
+        String fileName = filePath.substring(getFileHost().length() + 1);
         aliyunOssClient.deleteObject(bucket, fileName);
         return true;
+    }
+
+    /**
+     * 补全 endpoint 协议前缀：已带 {@code http://} 或 {@code https://} 的仅去除尾部 {@code /}，
+     * 纯域名写法默认补 {@code https://}，避免 OSS 客户端对无协议 endpoint 默认走 http 明文传输。
+     */
+    private String endpointWithProtocol() {
+        String trimmed = StrUtil.trim(endpoint);
+        if (!StrUtil.startWithIgnoreCase(trimmed, "http://") && !StrUtil.startWithIgnoreCase(trimmed, "https://")) {
+            trimmed = "https://" + trimmed;
+        }
+        return StrUtil.removeSuffix(trimmed, "/");
+    }
+
+    /**
+     * 获取文件访问主机地址（含协议），如 {@code https://bucket.oss-cn-hangzhou.aliyuncs.com}。
+     * <p>
+     * 协议以 endpoint 配置为准，未指定时默认 https；上传拼接 URL 与删除解析 URL 共用，保证两处口径一致。
+     */
+    private String getFileHost() {
+        String endpointWithProtocol = endpointWithProtocol();
+        int schemeEnd = endpointWithProtocol.indexOf("://");
+        String protocol = endpointWithProtocol.substring(0, schemeEnd);
+        String host = endpointWithProtocol.substring(schemeEnd + "://".length());
+        return protocol + "://" + bucket + "." + host;
     }
 }

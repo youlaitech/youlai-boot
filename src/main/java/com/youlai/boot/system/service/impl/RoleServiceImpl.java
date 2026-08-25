@@ -55,7 +55,7 @@ public class RoleServiceImpl extends ServiceImpl<RoleMapper, Role> implements Ro
      * 角色分页列表
      *
      * @param queryParams 角色查询参数
-     * @return {@link Page< RolePageVO >} – 角色分页列表
+     * @return {@link Page<RolePageVO>} – 角色分页列表
      */
     @Override
     public Page<RolePageVO> getRolePage(RoleQuery queryParams) {

@@ -107,8 +107,8 @@ security:
 
 # 文件存储
 file-storage:
-  # 存储类型：minio | aliyun | local
-  type: minio
+  # 存储类型：rustfs | aliyun | local
+  type: rustfs
   # 上传限制
   upload:
     # 单文件大小上限（同时作为 spring.servlet.multipart 的上限，单一来源）
@@ -119,11 +119,11 @@ file-storage:
       - jpeg
       - png
       - gif
-  # MinIO 对象存储
-  minio:
+  # RustFS(S3) 对象存储
+  rustfs:
     endpoint: http://localhost:9000
-    access-key: minioadmin
-    secret-key: minioadmin
+    access-key: rustfs-admin
+    secret-key: rustfs-admin
     bucket: public
     # 自定义域名：配置后文件 URL 走域名，留空则用 endpoint（IP）格式
     domain:
