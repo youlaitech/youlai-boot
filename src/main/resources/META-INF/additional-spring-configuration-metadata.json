@@ -1,67 +1,67 @@
 {
   "properties": [
     {
-      "name": "file-storage.type",
+      "name": "storage.type",
       "type": "java.lang.String",
-      "description": "文件存储类型：rustfs | aliyun | local"
+      "description": "文件存储类型：s3 | aliyun | local"
     },
     {
-      "name": "file-storage.upload.max-file-size",
+      "name": "storage.upload.max-file-size",
       "type": "java.lang.String",
       "description": "单文件大小上限（如 50MB），同时作为 spring.servlet.multipart 的上限"
     },
     {
-      "name": "file-storage.upload.allowed-extensions",
+      "name": "storage.upload.allowed-extensions",
       "type": "java.util.List<java.lang.String>",
       "description": "允许的文件扩展名白名单（置空表示不限制）"
     },
     {
-      "name": "file-storage.rustfs.endpoint",
+      "name": "storage.s3.endpoint",
       "type": "java.lang.String",
-      "description": "RustFS(S3) 服务 Endpoint"
+      "description": "S3 服务 Endpoint（S3 协议兼容存储，默认部署 RustFS）"
     },
     {
-      "name": "file-storage.rustfs.access-key",
+      "name": "storage.s3.access-key",
       "type": "java.lang.String",
-      "description": "RustFS 访问凭据"
+      "description": "S3 访问凭据"
     },
     {
-      "name": "file-storage.rustfs.secret-key",
+      "name": "storage.s3.secret-key",
       "type": "java.lang.String",
-      "description": "RustFS 凭据密钥"
+      "description": "S3 凭据密钥"
     },
     {
-      "name": "file-storage.rustfs.bucket",
+      "name": "storage.s3.bucket",
       "type": "java.lang.String",
-      "description": "RustFS 存储桶名称"
+      "description": "S3 存储桶名称"
     },
     {
-      "name": "file-storage.rustfs.domain",
+      "name": "storage.s3.domain",
       "type": "java.lang.String",
-      "description": "RustFS 自定义域名（文件 URL 域名）"
+      "description": "S3 自定义域名（文件 URL 域名）"
     },
     {
-      "name": "file-storage.aliyun.endpoint",
+      "name": "storage.aliyun.endpoint",
       "type": "java.lang.String",
       "description": "阿里云 OSS 服务 Endpoint"
     },
     {
-      "name": "file-storage.aliyun.access-key-id",
+      "name": "storage.aliyun.access-key-id",
       "type": "java.lang.String",
       "description": "阿里云 OSS 访问凭据 ID"
     },
     {
-      "name": "file-storage.aliyun.access-key-secret",
+      "name": "storage.aliyun.access-key-secret",
       "type": "java.lang.String",
       "description": "阿里云 OSS 凭据密钥"
     },
     {
-      "name": "file-storage.aliyun.bucket",
+      "name": "storage.aliyun.bucket",
       "type": "java.lang.String",
       "description": "阿里云 OSS 存储桶名称"
     },
     {
-      "name": "file-storage.local.path",
+      "name": "storage.local.path",
       "type": "java.lang.String",
       "description": "本地存储根目录（相对路径基于工作目录）"
     },

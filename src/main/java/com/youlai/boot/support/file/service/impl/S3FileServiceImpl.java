@@ -39,25 +39,24 @@ import java.time.Duration;
 import java.time.LocalDateTime;
 
 /**
- * RustFS 文件存储服务（S3 协议）。
- * <p>
- * 当 {@code file-storage.type=rustfs} 时生效。通过 AWS SDK 的 S3Client
- * 连接 RustFS（S3 兼容对象存储），IP 端点必须走 path-style 寻址。
- * 上传文件按日期分目录存储，路径格式：{@code yyyyMMdd/uuid.suffix}。
+ * S3 协议文件存储实现类（当前部署为 RustFS）
+ *
+ * <p>当 {@code storage.type=s3} 时生效。</p>
  * <ul>
- *   <li>配置了 {@code file-storage.rustfs.domain} 时直接用域名拼接 URL</li>
+ *   <li>配置了 {@code storage.s3.domain} 时直接用域名拼接 URL</li>
  *   <li>未配置则用预签名 GET URL（去掉 query 参数后的纯路径）</li>
  * </ul>
  *
- * @author youlai.tech
+ * @author Ray.Hao
+ * @since 4.8.0
  */
 @Component
-@ConditionalOnProperty(value = "file-storage.type", havingValue = "rustfs")
-@ConfigurationProperties(prefix = "file-storage.rustfs")
+@ConditionalOnProperty(value = "storage.type", havingValue = "s3")
+@ConfigurationProperties(prefix = "storage.s3")
 @RequiredArgsConstructor
 @Data
 @Slf4j
-public class RustFSFileServiceImpl implements FileService {
+public class S3FileServiceImpl implements FileService {
 
     /** S3 对象存储服务端点，如 {@code http://localhost:9000} */
     private String endpoint;
@@ -97,7 +96,7 @@ public class RustFSFileServiceImpl implements FileService {
     }
 
     /**
-     * 上传文件到 RustFS，按日期分目录，自动创建存储桶，返回文件访问 URL。
+     * 上传文件到 S3（RustFS），按日期分目录，自动创建存储桶，返回文件访问 URL。
      */
     @Override
     @SneakyThrows

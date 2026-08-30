@@ -10,7 +10,6 @@ import com.youlai.boot.support.file.service.FileService;
 import lombok.Data;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.stereotype.Component;
@@ -23,20 +22,19 @@ import java.time.LocalDateTime;
 /**
  * 本地文件存储服务。
  * <p>
- * 当 {@code file-storage.type=local} 时生效。
- * 文件写入本地磁盘 {@code file-storage.local.path} 下按日期分目录存储。
+ * 当 {@code storage.type=local} 时生效。
+ * 文件写入本地磁盘 {@code storage.local.path} 下按日期分目录存储。
  * URL 为相对于存储根目录的路径，如 {@code /yyyyMMdd/uuid.suffix}。
  */
 @Data
 @Slf4j
 @Component
-@ConditionalOnProperty(value = "file-storage.type", havingValue = "local")
-@ConfigurationProperties(prefix = "file-storage.local")
+@ConditionalOnProperty(value = "storage.type", havingValue = "local")
+@ConfigurationProperties(prefix = "storage.local")
 @RequiredArgsConstructor
 public class LocalFileServiceImpl implements FileService {
 
-    /** 本地存储根目录，来自 {@code file-storage.local.path} */
-    @Value("${file-storage.local.path}")
+    /** 本地存储根目录，来自 {@code storage.local.path} */
     private String path;
 
     /**

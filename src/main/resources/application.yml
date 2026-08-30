@@ -8,6 +8,6 @@ spring:
     import: classpath:codegen.yml
   servlet:
     multipart:
-      # 单文件大小上限，取自 file-storage.upload.max-file-size（单一来源）
-      max-file-size: ${file-storage.upload.max-file-size:50MB}
-      max-request-size: ${file-storage.upload.max-file-size:50MB}
+      # 单文件大小上限，取自 storage.upload.max-file-size（单一来源）
+      max-file-size: ${storage.upload.max-file-size:50MB}
+      max-request-size: ${storage.upload.max-file-size:50MB}

@@ -146,7 +146,14 @@
 
 1. Clone: `git clone https://gitee.com/youlaiorg/youlai-boot.git`
 
-2. Import database: `sql/youlai-admin.sql`
+2. Import database:
+   ```bash
+   # Base schema (required)
+   sql/youlai-admin.sql
+
+   # Optional extensions: safe to skip, run after the base schema
+   sql/extensions/form.sql    # Dynamic Form
+   ```
 
 3. Adjust config (optional, a read-only online data source is configured by default): `src/main/resources/application-dev.yml`
 

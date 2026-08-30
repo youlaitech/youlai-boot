@@ -33,7 +33,7 @@
 - 🔐 **安全体系** — Spring Security + JWT/Redis Token 双会话模式、令牌续期、多端互斥
 - 🛡️ **细粒度权限** — RBAC 五级：数据 → 菜单 → 按钮 → 接口 → 字段
 - ⚡ **代码生成器** — 一键生成前后端 CRUD 代码
-- 📦 **模块齐全** — 用户、角色、菜单、部门、字典、文件、定时任务、消息中心、操作日志
+- 📦 **模块齐全** — 用户、角色、菜单、部门、字典、文件(OSS/RustFS/本地)、定时任务、消息中心、操作日志
 - 🌐 **多租户 SaaS** — 数据隔离 + 租户配置，独立 [youlai-boot-tenant](https://gitee.com/youlaiorg/youlai-boot-tenant) 版本
 - 🔌 **实时通信** — SSE 推送：在线用户数、字典同步、通知广播
 
@@ -78,7 +78,11 @@
 
 2. 导入数据库：
    ```bash
+   # 基础库（必装）
    sql/youlai-admin.sql
+
+   # 可选扩展：不装不影响基础功能，需在基础库之后执行
+   sql/extensions/form.sql    # 动态表单
    ```
 
 3. 修改配置（可选，默认已配置线上只读数据源）：
@@ -119,12 +123,12 @@ youlai-boot/
 │   │   ├── security/          # Spring Security（过滤器/Token/工具类）
 │   │   └── web/               # Web 层（全局异常/跨域/限流）
 │   ├── support/               # 能力服务
-│   │   ├── file/              # 文件存储（MinIO/阿里云OSS/本地）
+│   │   ├── file/              # 文件存储（RustFS/阿里云OSS/本地）
 │   │   ├── mail/              # 邮件服务
 │   │   ├── sms/               # 短信服务
 │   │   └── sse/               # SSE 消息推送
 │   └── system/                # 系统业务（用户/角色/菜单/部门/字典等）
-├── docker-compose.yml         # 中间件一键编排（MySQL/Redis/MinIO/Xxl-Job）
+├── docker-compose.yml         # 中间件一键编排（MySQL/Redis/RustFS/Xxl-Job）
 └── pom.xml                    # Maven 依赖管理
 ```
 

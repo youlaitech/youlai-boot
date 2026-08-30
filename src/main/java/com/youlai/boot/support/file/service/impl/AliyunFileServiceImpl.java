@@ -28,14 +28,14 @@ import java.time.LocalDateTime;
 /**
  * 阿里云 OSS 文件存储服务。
  * <p>
- * 当 {@code file-storage.type=aliyun} 时生效。
+ * 当 {@code storage.type=aliyun} 时生效。
  * 上传文件按日期分目录存储，URL 格式：{@code 协议://bucket.endpoint/yyyyMMdd/uuid.suffix}，
  * 协议取自 endpoint 配置（未指定时默认 https）。
  */
 @Component
 @Slf4j
-@ConditionalOnProperty(value = "file-storage.type", havingValue = "aliyun")
-@ConfigurationProperties(prefix = "file-storage.aliyun")
+@ConditionalOnProperty(value = "storage.type", havingValue = "aliyun")
+@ConfigurationProperties(prefix = "storage.aliyun")
 @RequiredArgsConstructor
 @Data
 public class AliyunFileServiceImpl implements FileService {

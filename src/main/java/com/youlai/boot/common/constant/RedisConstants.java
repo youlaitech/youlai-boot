@@ -66,4 +66,14 @@ public interface RedisConstants {
         String ROLE_PERMS = "system:role:perms"; // 系统角色和权限映射
     }
 
+    /**
+     * 表单模块
+     */
+    interface Form {
+        /** 已发布表单渲染规则（formKey -> FormRenderVO，发布/停用/改规则/删除时主动失效） */
+        String RENDER_RULE = "form:render:{}";
+        /** 公开表单匿名提交计数（formKey:ip 维度滑动窗口，防刷限流） */
+        String PUBLIC_SUBMIT_COUNT = "form:public:submit:{}:{}";
+    }
+
 }

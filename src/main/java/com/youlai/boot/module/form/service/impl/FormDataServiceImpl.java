@@ -1,0 +1,215 @@
+package com.youlai.boot.module.form.service.impl;
+
+import cn.hutool.core.util.StrUtil;
+import cn.hutool.json.JSONUtil;
+import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import com.youlai.boot.common.constant.RedisConstants;
+import com.youlai.boot.common.exception.BusinessException;
+import com.youlai.boot.module.form.enums.FormStatusEnum;
+import com.youlai.boot.module.form.mapper.FormDataMapper;
+import com.youlai.boot.module.form.mapper.FormSnapshotMapper;
+import com.youlai.boot.module.form.model.entity.FormData;
+import com.youlai.boot.module.form.model.entity.FormDefinition;
+import com.youlai.boot.module.form.model.entity.FormSnapshot;
+import com.youlai.boot.module.form.model.query.FormDataQuery;
+import com.youlai.boot.module.form.model.vo.FormDataVO;
+import com.youlai.boot.module.form.service.FormDataService;
+import com.youlai.boot.module.form.service.FormDefinitionService;
+import com.youlai.boot.module.form.util.FormRuleValidator;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.stereotype.Service;
+
+import java.time.Duration;
+import java.util.List;
+import java.util.Map;
+
+/**
+ * 表单数据业务实现类
+ *
+ * @author Ray.Hao
+ * @since 4.8.0
+ */
+@Service
+@RequiredArgsConstructor
+@Slf4j
+public class FormDataServiceImpl extends ServiceImpl<FormDataMapper, FormData> implements FormDataService {
+
+    private final FormDefinitionService formDefinitionService;
+    private final FormSnapshotMapper formSnapshotMapper;
+    private final RedisTemplate<String, Object> redisTemplate;
+
+    /**
+     * 公开表单单 IP 提交上限（次/分钟）：匿名接口防刷阈值
+     */
+    private static final int PUBLIC_SUBMIT_LIMIT = 10;
+
+    /**
+     * 公开表单限流窗口：1 分钟
+     */
+    private static final Duration PUBLIC_SUBMIT_WINDOW = Duration.ofMinutes(1);
+
+    /**
+     * 提交表单数据
+     *
+     * <p>仅已发布表单可提交；提交时快照表单版本，供数据追溯到产出规则</p>
+     *
+     * @param formKey 表单唯一标识
+     * @param data    表单数据（field -> value 映射）
+     */
+    @Override
+    public boolean saveFormData(String formKey, Map<String, Object> data) {
+        FormDefinition form = formDefinitionService.getByFormKey(formKey);
+        if (!FormStatusEnum.PUBLISHED.getValue().equals(form.getStatus())) {
+            throw new BusinessException("表单未发布或已停用");
+        }
+        return this.persistFormData(form, data);
+    }
+
+    /**
+     * 匿名提交公开表单数据
+     *
+     * @param formKey 表单唯一标识
+     * @param data    表单数据（field -> value 映射）
+     * @param ip      提交方 IP（限流维度）
+     */
+    @Override
+    public boolean savePublicFormData(String formKey, Map<String, Object> data, String ip) {
+        FormDefinition form = formDefinitionService.getByFormKey(formKey);
+        // 公开访问总闸：未开启公开或未发布的表单拿 key 也提交不了
+        if (!FormStatusEnum.PUBLISHED.getValue().equals(form.getStatus())
+                || !Integer.valueOf(1).equals(form.getIsPublic())) {
+            throw new BusinessException("表单不存在或未开放公开访问");
+        }
+        checkPublicSubmitLimit(formKey, ip);
+        log.info("公开表单匿名提交  formKey={}  ip={}", formKey, ip);
+        return this.persistFormData(form, data);
+    }
+
+    /**
+     * 数据落库（登录/匿名提交共用）
+     *
+     * <p>后端基础校验（必填/类型）+ 字段白名单过滤：前端校验可被绕过，
+     * 恶意构造的未声明字段不会入库；匿名提交 create_by 由字段填充器留空</p>
+     *
+     * @param form 表单定义
+     * @param data 提交数据
+     */
+    private boolean persistFormData(FormDefinition form, Map<String, Object> data) {
+        Map<String, Object> filteredData = FormRuleValidator.validateAndFilter(form.getFormJson(), data);
+
+        FormData entity = new FormData();
+        entity.setFormId(form.getId());
+        entity.setFormVersion(form.getVersion());
+        entity.setDataJson(JSONUtil.toJsonStr(filteredData));
+        return this.save(entity);
+    }
+
+    /**
+     * 公开表单按 formKey + IP 限流（固定窗口计数）
+     *
+     * <p>Redis 异常时 Fail-Open 放行，与 IpRateLimitFilter 策略一致：
+     * 限流是防刷兜底而非业务正确性保障，不能因 Redis 抖动拒绝正常提交</p>
+     *
+     * @param formKey 表单唯一标识
+     * @param ip      提交方 IP
+     */
+    private void checkPublicSubmitLimit(String formKey, String ip) {
+        String key = StrUtil.format(RedisConstants.Form.PUBLIC_SUBMIT_COUNT, formKey, ip);
+        try {
+            Long count = redisTemplate.opsForValue().increment(key);
+            if (count != null) {
+                // 首次计数时设置过期，窗口结束后自动清零
+                if (count == 1) {
+                    redisTemplate.expire(key, PUBLIC_SUBMIT_WINDOW);
+                }
+                if (count > PUBLIC_SUBMIT_LIMIT) {
+                    throw new BusinessException("提交过于频繁，请稍后再试");
+                }
+            }
+        } catch (BusinessException e) {
+            throw e;
+        } catch (Exception e) {
+            log.warn("公开表单限流 Redis 异常，Fail-Open 放行  formKey={}  ip={}", formKey, ip, e);
+        }
+    }
+
+    /**
+     * 表单数据分页列表
+     *
+     * @param formKey     表单唯一标识
+     * @param queryParams 查询参数
+     */
+    @Override
+    public Page<FormDataVO> getFormDataPage(String formKey, FormDataQuery queryParams) {
+        FormDefinition form = formDefinitionService.getByFormKey(formKey);
+        int pageNum = queryParams.getPageNum();
+        int pageSize = queryParams.getPageSize();
+        return this.baseMapper.getFormDataPage(new Page<>(pageNum, pageSize), form.getId(), queryParams);
+    }
+
+    /**
+     * 获取表单数据详情（只读回显）
+     *
+     * <p>版本快照严格回显：优先按提交时版本加载规则快照，
+     * 防止表单定义变更（字段删除/改名）导致历史数据回显漂移</p>
+     *
+     * @param dataId 数据ID
+     */
+    @Override
+    public FormDataVO getFormDataDetail(Long dataId) {
+        FormData entity = this.getById(dataId);
+        if (entity == null) {
+            throw new BusinessException("表单数据不存在");
+        }
+        FormDataVO vo = new FormDataVO();
+        vo.setId(entity.getId());
+        vo.setFormVersion(entity.getFormVersion());
+        vo.setDataJson(entity.getDataJson());
+        vo.setCreateBy(entity.getCreateBy());
+        vo.setCreateTime(entity.getCreateTime());
+        this.fillRuleSnapshot(vo, entity.getFormId(), entity.getFormVersion());
+        return vo;
+    }
+
+    /**
+     * 填充回显规则：命中版本快照用快照规则，否则回退当前定义
+     *
+     * <p>回退分支兼容快照表启用前提交的历史数据</p>
+     *
+     * @param vo      数据详情 VO
+     * @param formId  表单定义ID
+     * @param version 提交时版本
+     */
+    private void fillRuleSnapshot(FormDataVO vo, Long formId, Integer version) {
+        FormSnapshot snapshot = formSnapshotMapper.selectOne(new LambdaQueryWrapper<FormSnapshot>()
+                .eq(FormSnapshot::getFormId, formId)
+                .eq(FormSnapshot::getVersion, version)
+                .last("LIMIT 1")
+        );
+        if (snapshot != null) {
+            vo.setFormJson(snapshot.getFormJson());
+            vo.setOptionsJson(snapshot.getOptionsJson());
+            return;
+        }
+        FormDefinition form = formDefinitionService.getById(formId);
+        if (form != null) {
+            vo.setFormJson(form.getFormJson());
+            vo.setOptionsJson(form.getOptionsJson());
+        }
+    }
+
+    /**
+     * 批量删除表单数据
+     *
+     * @param ids 数据ID列表
+     */
+    @Override
+    public void removeFormData(List<Long> ids) {
+        this.removeByIds(ids);
+    }
+
+}

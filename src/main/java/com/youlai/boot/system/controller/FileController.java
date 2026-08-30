@@ -5,7 +5,7 @@ import cn.hutool.core.util.StrUtil;
 import com.youlai.boot.common.exception.BusinessException;
 import com.youlai.boot.common.result.Result;
 import com.youlai.boot.common.result.ResultCode;
-import com.youlai.boot.config.property.FileStorageProperties;
+import com.youlai.boot.config.property.StorageProperties;
 import com.youlai.boot.support.file.model.FileInfo;
 import com.youlai.boot.support.file.service.FileService;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -33,7 +33,7 @@ import java.util.Set;
 public class FileController {
 
     private final FileService fileService;
-    private final FileStorageProperties fileStorageProperties;
+    private final StorageProperties storageProperties;
 
     @PostMapping
     @Operation(summary = "文件上传")
@@ -66,7 +66,7 @@ public class FileController {
      * 文件扩展名白名单校验：{@code allowed-extensions} 为空时不限制。
      */
     private void validateFileExtension(MultipartFile file) {
-        Set<String> allowedExtensions = fileStorageProperties.getAllowedExtensions();
+        Set<String> allowedExtensions = storageProperties.getAllowedExtensions();
         if (allowedExtensions.isEmpty()) {
             return;
         }

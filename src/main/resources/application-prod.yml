@@ -95,6 +95,7 @@ security:
     - /api/v1/auth/wxma/** # 微信小程序认证接口(静默登录/手机号快捷登录/绑定手机号)
     - /api/v1/logs/** # 日志接口(访问日志列表)
     - /api/v1/auth/qr-code/** # 扫码登录接口(生成票据/查询状态/换取令牌)
+    - /api/v1/forms/public/** # 公开表单接口(匿名渲染/提交，Service 校验 is_public 总闸 + IP 限流)
   # 非安全端点路径，完全绕过 Spring Security 的过滤器
   unsecured-urls:
     - ${springdoc.swagger-ui.path}
@@ -106,9 +107,9 @@ security:
     - /error
 
 # 文件存储
-file-storage:
-  # 存储类型：rustfs | aliyun | local
-  type: rustfs
+storage:
+  # 存储类型：s3 | aliyun | local
+  type: s3
   # 上传限制
   upload:
     # 单文件大小上限（同时作为 spring.servlet.multipart 的上限，单一来源）
@@ -119,8 +120,8 @@ file-storage:
       - jpeg
       - png
       - gif
-  # RustFS(S3) 对象存储
-  rustfs:
+  # S3 对象存储（S3 协议兼容服务，默认部署 RustFS）
+  s3:
     endpoint: http://localhost:9000
     access-key: rustfs-admin
     secret-key: rustfs-admin

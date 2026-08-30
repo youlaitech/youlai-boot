@@ -12,6 +12,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 
+import java.time.Duration;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -25,6 +26,13 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 @Slf4j
 public class RoleMenuServiceImpl extends ServiceImpl<RoleMenuMapper, RoleMenu> implements RoleMenuService {
+
+    /**
+     * 权限缓存TTL：与 Caffeine 菜单缓存 expireAfterWrite=600s 对齐。
+     * Hash 写入默认永不过期，直接改库（SQL 脚本/手工修数）不触发任何刷新点时会永久陈旧；
+     * 加 TTL 后过期整 Key 消失，Read-Through 按角色逐个回源重建，实现最终一致自愈
+     */
+    private static final Duration ROLE_PERMS_TTL = Duration.ofSeconds(600);
 
     private final RedisTemplate<String, Object> redisTemplate;
 
@@ -48,6 +56,7 @@ public class RoleMenuServiceImpl extends ServiceImpl<RoleMenuMapper, RoleMenu> i
                     redisTemplate.opsForHash().put(cacheKey, roleCode, perms);
                 }
             });
+            refreshCacheTtl(cacheKey);
         }
 
         log.info("权限缓存刷新完成");
@@ -71,6 +80,7 @@ public class RoleMenuServiceImpl extends ServiceImpl<RoleMenuMapper, RoleMenu> i
                 Set<String> perms = rolePerms.getPerms();
                 if (CollectionUtil.isNotEmpty(perms)) {
                     redisTemplate.opsForHash().put(cacheKey, roleCode, perms);
+                    refreshCacheTtl(cacheKey);
                 }
             }
         }
@@ -97,6 +107,7 @@ public class RoleMenuServiceImpl extends ServiceImpl<RoleMenuMapper, RoleMenu> i
                 Set<String> perms = rolePerms.getPerms();
                 if (CollectionUtil.isNotEmpty(perms)) {
                     redisTemplate.opsForHash().put(cacheKey, newRoleCode, perms);
+                    refreshCacheTtl(cacheKey);
                 }
             }
         }
@@ -163,9 +174,19 @@ public class RoleMenuServiceImpl extends ServiceImpl<RoleMenuMapper, RoleMenu> i
                 redisTemplate.opsForHash().put(cacheKey, roleCode, dbPerms);
                 perms.addAll(dbPerms);
             }
+            refreshCacheTtl(cacheKey);
         }
 
         return perms;
+    }
+
+    /**
+     * 刷新权限缓存TTL（写后滑动续期：有写入的周期内缓存常驻，静置超过 TTL 整 Key 过期触发回源重建）
+     *
+     * @param cacheKey 缓存Key
+     */
+    private void refreshCacheTtl(String cacheKey) {
+        redisTemplate.expire(cacheKey, ROLE_PERMS_TTL);
     }
 
     /**

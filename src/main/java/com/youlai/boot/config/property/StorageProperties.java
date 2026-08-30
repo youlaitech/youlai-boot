@@ -10,49 +10,57 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 /**
- * 文件存储配置。
- * <p>
- * 绑定前缀 {@code file-storage}，承载存储类型与上传限制；
- * rustfs / aliyun / local 子配置由各自的 {@code FileService} 实现类绑定。
+ * 文件存储配置属性类
  *
- * @author youlai.tech
+ * <p>映射 application.yml 中 storage 前缀的配置；s3 / aliyun / local
+ * 子配置由各自的 {@code FileService} 实现类绑定</p>
+ *
+ * @author Ray.Hao
+ * @since 4.8.0
  */
 @Data
 @Component
-@ConfigurationProperties(prefix = "file-storage")
-public class FileStorageProperties {
+@ConfigurationProperties(prefix = "storage")
+public class StorageProperties {
 
     /**
-     * 存储类型，决定激活哪个 FileService 实现。
-     * <p>
-     * 可选值：rustfs、aliyun、local。
+     * 存储类型，决定激活哪个 FileService 实现类
+     * <ul>
+     *   <li>s3 - S3 协议兼容对象存储（当前部署 RustFS）</li>
+     *   <li>aliyun - 阿里云 OSS</li>
+     *   <li>local - 本地磁盘存储</li>
+     * </ul>
      */
     private String type;
 
-    /** 上传限制 */
+    /**
+     * 上传限制
+     */
     private Upload upload = new Upload();
 
     /**
-     * 上传限制，绑定前缀 {@code file-storage.upload}。
+     * 上传限制配置嵌套类
      */
     @Data
     public static class Upload {
 
         /**
-         * 单文件大小上限，如 50MB。
-         * <p>
-         * 同时作为 spring.servlet.multipart 的上限，单一来源。
+         * 单文件大小上限，如 50MB
+         * <p>同时作为 spring.servlet.multipart 的上限，保持单一来源</p>
          */
         private String maxFileSize;
 
         /**
-         * 允许的文件扩展名白名单，置空表示不限制。
+         * 允许上传的文件扩展名白名单
+         * <p>置空表示不限制</p>
          */
         private List<String> allowedExtensions;
     }
 
     /**
-     * 允许扩展名集合（小写、不含点）；空集合表示不限制。
+     * 获取规范化后的扩展名白名单
+     *
+     * @return 小写、不含点的扩展名集合；空集合表示不限制
      */
     public Set<String> getAllowedExtensions() {
         if (upload == null || upload.allowedExtensions == null) {
