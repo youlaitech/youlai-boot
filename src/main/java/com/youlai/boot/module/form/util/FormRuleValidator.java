@@ -13,12 +13,8 @@ import java.util.Map;
 /**
  * 表单规则校验器（后端基础校验 + 字段白名单）
  *
- * <p>前端校验可被绕过，后端基于 form-create rule 的 validate 规则做兜底校验：
- * 必填（required）与基础类型（number/array），并按 rule 声明的 field 做白名单过滤，
- * 恶意构造的未声明字段不会入库</p>
- *
- * <p>仅做基础校验（与 rule validate 语义对齐），pattern/min/max 等复杂规则
- * 由前端 form-create 完整执行，后端不重复实现整套校验引擎</p>
+ * <p>按 form-create rule 的 validate 声明校验必填（required）与基础类型（number/array），
+ * 并按 rule 声明的 field 过滤数据</p>
  *
  * @author Ray.Hao
  * @since 4.8.0

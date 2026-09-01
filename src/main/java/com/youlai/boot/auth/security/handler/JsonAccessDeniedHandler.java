@@ -9,9 +9,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 
 /**
- * 无权限访问处理器。
- * <p>
- * 归使用方，因为 JSON 响应格式因项目而异。
+ * 无权限访问处理器
  *
  * @author Ray.Hao
  * @since 2.0.0

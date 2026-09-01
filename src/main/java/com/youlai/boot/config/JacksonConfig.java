@@ -27,9 +27,6 @@ public class JacksonConfig {
 
     /**
      * 全局 JsonMapper
-     *
-     * <p>由 Spring Boot 自动装配到 Jackson 相关的 HttpMessageConverter 中，作为全局 JSON 序列化/反序列化
-     * 行为的唯一入口。</p>
      */
     @Bean
     public JsonMapper objectMapper() {

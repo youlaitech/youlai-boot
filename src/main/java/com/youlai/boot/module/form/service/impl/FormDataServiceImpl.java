@@ -92,9 +92,6 @@ public class FormDataServiceImpl extends ServiceImpl<FormDataMapper, FormData> i
     /**
      * 数据落库（登录/匿名提交共用）
      *
-     * <p>后端基础校验（必填/类型）+ 字段白名单过滤：前端校验可被绕过，
-     * 恶意构造的未声明字段不会入库；匿名提交 create_by 由字段填充器留空</p>
-     *
      * @param form 表单定义
      * @param data 提交数据
      */
@@ -110,9 +107,6 @@ public class FormDataServiceImpl extends ServiceImpl<FormDataMapper, FormData> i
 
     /**
      * 公开表单按 formKey + IP 限流（固定窗口计数）
-     *
-     * <p>Redis 异常时 Fail-Open 放行，与 IpRateLimitFilter 策略一致：
-     * 限流是防刷兜底而非业务正确性保障，不能因 Redis 抖动拒绝正常提交</p>
      *
      * @param formKey 表单唯一标识
      * @param ip      提交方 IP
@@ -153,9 +147,6 @@ public class FormDataServiceImpl extends ServiceImpl<FormDataMapper, FormData> i
 
     /**
      * 获取表单数据详情（只读回显）
-     *
-     * <p>版本快照严格回显：优先按提交时版本加载规则快照，
-     * 防止表单定义变更（字段删除/改名）导致历史数据回显漂移</p>
      *
      * @param dataId 数据ID
      */

@@ -109,8 +109,7 @@ public class FormDefinitionServiceImpl extends ServiceImpl<FormDefinitionMapper,
     /**
      * 修改表单定义
      *
-     * <p>formKey 创建后不可修改；草稿态可修改元数据与规则，
-     * 非草稿态仅可修改规则（元数据只读，防止已发布表单的语义漂移）</p>
+     * <p>formKey 创建后不可修改；草稿态可修改元数据与规则，非草稿态仅可修改规则</p>
      *
      * @param id       表单ID
      * @param formData 表单定义表单数据
@@ -262,8 +261,8 @@ public class FormDefinitionServiceImpl extends ServiceImpl<FormDefinitionMapper,
     /**
      * 按 formKey 获取公开表单的渲染规则（匿名接口）
      *
-     * <p>不复用 {@link #getFormRender(String)} 的 Redis 缓存：缓存 VO 不含 isPublic，
-     * 开关切换需额外失效逻辑；公开页非高频路径（IP 全局限流兜底），直查更简单可靠</p>
+     * <p>仅返回已发布且 isPublic=1 的表单；直查库，不读 {@link #getFormRender(String)} 的
+     * Redis 缓存——缓存 VO 不含 isPublic，命中会绕过公开开关校验</p>
      *
      * @param formKey 表单唯一标识
      */
@@ -310,9 +309,6 @@ public class FormDefinitionServiceImpl extends ServiceImpl<FormDefinitionMapper,
 
     /**
      * 生成表单访问菜单并授权可见角色
-     *
-     * <p>菜单 component 指向通用承载页 dynamic-form/render，路由参数携带 formKey，
-     * 承载页从 route.meta.params 读取后按 formKey 加载渲染规则</p>
      *
      * @param formId   表单ID
      * @param menuForm 菜单发布参数
@@ -380,14 +376,8 @@ public class FormDefinitionServiceImpl extends ServiceImpl<FormDefinitionMapper,
     /**
      * 确保默认挂载目录"表单中心"存在，不存在则创建
      *
-     * <p>挂载位置："动态表单"目录下（顶级入口聚合，员工侧边栏为 动态表单 > 表单中心 > 各表单；
-     * 管理菜单不授权给填写角色即不渲染，无需顶级分离）；
-     * "动态表单"目录缺失时（未执行 form.sql 的环境）退化为顶级创建兜底</p>
-     *
-     * <p>懒创建而非 SQL 预置：预置空目录在侧边栏是点不开的孤菜单（无子路由不注册）；
-     * 首个表单发布时才建目录，目录一出现就有子菜单</p>
-     *
-     * <p>踩坑：saveMenu 内部 saveOrUpdate 不回写表单对象主键，需按路由名称反查实体</p>
+     * <p>挂到顶级"动态表单"目录下，该目录缺失时退化为顶级创建；
+     * 无子菜单的目录在侧边栏不渲染</p>
      *
      * @return 默认目录实体
      */

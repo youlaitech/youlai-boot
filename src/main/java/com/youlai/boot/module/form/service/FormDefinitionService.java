@@ -89,9 +89,6 @@ public interface FormDefinitionService extends IService<FormDefinition> {
     /**
      * 按 formKey 获取公开表单的渲染规则（匿名接口）
      *
-     * <p>公开访问总闸：仅 is_public=1 且已发布的表单可获取，
-     * 否则视为不存在（分享链接立即失效，无需召回）</p>
-     *
      * @param formKey 表单唯一标识
      * @return 表单渲染数据
      */
@@ -107,9 +104,6 @@ public interface FormDefinitionService extends IService<FormDefinition> {
 
     /**
      * 生成表单访问菜单并授权可见角色（幂等：已生成时更新原菜单）
-     *
-     * <p>菜单 component 指向通用承载页 dynamic-form/render，路由参数携带 formKey；
-     * 角色授权沿 tree_path 补齐祖先目录，防止侧边栏构树出现孤儿节点</p>
      *
      * @param formId   表单ID
      * @param menuForm 菜单发布参数

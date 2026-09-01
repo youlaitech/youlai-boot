@@ -29,9 +29,7 @@ import java.io.InputStreamReader;
 import java.nio.charset.StandardCharsets;
 
 /**
- * 图形验证码校验过滤器。
- * <p>
- * 归使用方，因为验证码规则（哪些接口需要验证码、验证码类型）因项目而异。
+ * 图形验证码校验过滤器
  */
 public class CaptchaValidationFilter extends OncePerRequestFilter {
 

@@ -111,7 +111,7 @@ public class AliyunFileServiceImpl implements FileService {
     /**
      * 获取文件访问主机地址（含协议），如 {@code https://bucket.oss-cn-hangzhou.aliyuncs.com}。
      * <p>
-     * 协议以 endpoint 配置为准，未指定时默认 https；上传拼接 URL 与删除解析 URL 共用，保证两处口径一致。
+     * 协议以 endpoint 配置为准，未指定时默认 https。
      */
     private String getFileHost() {
         String endpointWithProtocol = endpointWithProtocol();

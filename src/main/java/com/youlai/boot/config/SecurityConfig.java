@@ -36,10 +36,7 @@ import org.springframework.security.web.access.intercept.AuthorizationFilter;
 import jakarta.servlet.DispatcherType;
 
 /**
- * Spring Security 配置类。
- * <p>
- * 归使用方（auth 模块），安全规则（放行路径、CORS、Provider 装配、响应格式）
- * 因项目而异，不应由框架层强制装配。
+ * Spring Security 配置类
  *
  * @author Ray.Hao
  * @since 4.3.1
