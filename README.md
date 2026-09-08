@@ -220,8 +220,6 @@ youlai-boot/
 
    Flowable 引擎开关（process / idm / eventregistry）在同一 `application-{profile}.yml` 中以占位符跟随 `workflow.enabled`，无需单独维护。
 
-   演示流程的启动自动部署由同文件 `workflow.demo.enabled` 控制（dev/youlai 默认 `true`、prod 默认 `false`，仅在模块开启后生效）。
-
 **多租户**
 
 需要租户隔离与租户配置，使用独立仓库 [youlai-boot-tenant](https://gitee.com/youlaiorg/youlai-boot-tenant)。
