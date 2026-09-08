@@ -5,8 +5,8 @@ import cn.hutool.json.JSONUtil;
 import com.youlai.boot.common.exception.BusinessException;
 import com.youlai.boot.module.form.service.FormDataService;
 import com.youlai.boot.module.workflow.service.WorkflowDemoService;
-import com.youlai.boot.module.workflow.service.WorkflowDemoService;
 import com.youlai.boot.module.workflow.util.BpmnModelHelper;
+import com.youlai.boot.module.workflow.config.ConditionalOnWorkflowEnabled;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.flowable.engine.RepositoryService;
@@ -29,12 +29,12 @@ import java.util.Set;
  * <p>初始化按 key 幂等双写：部署流程定义（可发起）+ 创建模型草稿（流程模型页可见），两者各自查重互不依赖。
  * 引擎表（ACT_*）不走 SQL 预置：流程定义跨三表且主键由引擎生成，直接写库绕过解析校验，重置同理依赖引擎级联删除</p>
  *
- * <p>重置为工作流数据全量恢复出厂：清空所有流程定义、模型、实例、历史（含用户自建）及关联表单提交数据后重建演示流程，
- * 供演示环境定期复原，等价于业务脚本"DROP 重建"的数据效果而不动引擎表结构</p>
+ * <p>重置供演示环境定期复原，数据效果等价业务脚本"DROP 重建"，不动引擎表结构</p>
  *
  * @author Ray.Hao
  * @since 4.9.0
  */
+@ConditionalOnWorkflowEnabled
 @Service
 @RequiredArgsConstructor
 @Slf4j
@@ -141,7 +141,7 @@ public class WorkflowDemoServiceImpl implements WorkflowDemoService {
     }
 
     /**
-     * 幂等创建模型草稿（流程模型页数据源），editorSource 与部署 XML 同源，metaInfo 与服务层约定一致
+     * 幂等创建模型草稿（流程模型页数据源），editorSource 与部署 XML 同源
      */
     private void createModelIfAbsent(DemoProcess process, String bpmnXml) {
         long count = repositoryService.createModelQuery()
@@ -160,8 +160,6 @@ public class WorkflowDemoServiceImpl implements WorkflowDemoService {
 
     /**
      * 清理演示表单提交数据（流程 businessKey 指向 form_data，随流程一并复位）
-     *
-     * <p>formKey 到删除条件的解析封装在 form 模块（removeByFormKey 窄接口），本模块不感知表单实体</p>
      */
     private void deleteFormData(String formKey) {
         formDataService.removeByFormKey(formKey);

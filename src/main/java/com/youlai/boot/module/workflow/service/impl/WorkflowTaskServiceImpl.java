@@ -18,6 +18,7 @@ import com.youlai.boot.module.workflow.service.WorkflowDefinitionService;
 import com.youlai.boot.module.workflow.service.WorkflowTaskService;
 import com.youlai.boot.module.workflow.util.ApprovalHistoryHelper;
 import com.youlai.boot.module.workflow.util.BpmnModelHelper;
+import com.youlai.boot.module.workflow.config.ConditionalOnWorkflowEnabled;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.flowable.common.engine.impl.identity.Authentication;
@@ -52,6 +53,7 @@ import java.util.stream.Collectors;
  * @since 4.9.0
  */
 @Slf4j
+@ConditionalOnWorkflowEnabled
 @Service
 @RequiredArgsConstructor
 public class WorkflowTaskServiceImpl implements WorkflowTaskService {
@@ -94,7 +96,6 @@ public class WorkflowTaskServiceImpl implements WorkflowTaskService {
             taskVO.setName(task.getName());
             taskVO.setProcessInstanceId(task.getProcessInstanceId());
             ProcessInstance instance = instances.get(task.getProcessInstanceId());
-            // 实例名优先（发起时可自定义标题区分批次），旧实例 NAME_ 为空则回退流程定义名
             taskVO.setProcessName(resolveProcessName(
                     instance == null ? null : instance.getName(),
                     processNames.get(task.getProcessDefinitionId())));
@@ -177,7 +178,6 @@ public class WorkflowTaskServiceImpl implements WorkflowTaskService {
         detailVO.setTaskName(task.getName());
         detailVO.setTaskDefinitionKey(task.getTaskDefinitionKey());
         detailVO.setProcessInstanceId(task.getProcessInstanceId());
-        // 实例名优先（与列表口径一致），旧实例 NAME_ 为空则回退流程定义名
         detailVO.setProcessName(resolveProcessName(instance.getName(), instance.getProcessDefinitionName()));
         detailVO.setTaskFormKey(bpmnModelHelper.getUserTaskFormKey(
                 task.getProcessDefinitionId(), task.getTaskDefinitionKey()));
@@ -227,7 +227,6 @@ public class WorkflowTaskServiceImpl implements WorkflowTaskService {
     public void completeTask(String taskId, CompleteTaskForm formData) {
         Task task = getCurrentUserTask(taskId);
         this.addComment(task, formData.getComment());
-        // 或签（候选组）任务办理即认领，历史表写入办理人，已办列表可追溯
         this.claimIfCandidate(task);
         taskService.complete(taskId, formData.getVariables() == null ? Map.of() : formData.getVariables());
     }

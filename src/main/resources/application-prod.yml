@@ -236,11 +236,20 @@ wx:
     secret: Your_AppSecret
 
 # 工作流（默认关闭，开启见 README「可选扩展」）
-flowable:
-  # 工作流总开关，未配置视为关闭
+workflow:
+  # 工作流模块开关，未配置视为关闭
   enabled: false
-  # 引擎表初始化策略，false 要求 ACT_* 表已存在
-  database-schema-update: false
   demo:
     # 演示流程自动部署开关
     enabled: false
+
+flowable:
+  # 引擎开关跟随 workflow.enabled
+  process:
+    enabled: ${workflow.enabled:false}
+  idm:
+    enabled: ${workflow.enabled:false}
+  eventregistry:
+    enabled: ${workflow.enabled:false}
+  # 引擎表初始化策略，false 要求 ACT_* 表已存在
+  database-schema-update: false

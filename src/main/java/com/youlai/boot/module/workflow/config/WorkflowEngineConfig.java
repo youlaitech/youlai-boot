@@ -16,6 +16,7 @@ import java.util.List;
  * @author Ray.Hao
  * @since 4.9.0
  */
+@ConditionalOnWorkflowEnabled
 @Configuration(proxyBeanMethods = false)
 public class WorkflowEngineConfig {
 

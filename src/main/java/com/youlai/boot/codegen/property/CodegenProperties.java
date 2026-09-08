@@ -4,6 +4,7 @@ import cn.hutool.core.io.file.FileNameUtil;
 import cn.hutool.core.map.MapUtil;
 import lombok.Data;
 import org.springframework.boot.context.properties.ConfigurationProperties;
+import org.springframework.stereotype.Component;
 
 import java.util.List;
 import java.util.Map;
@@ -14,6 +15,7 @@ import java.util.Map;
  * @author Ray
  * @since 2.11.0
  */
+@Component
 @ConfigurationProperties(prefix = "codegen")
 @Data
 public class CodegenProperties {

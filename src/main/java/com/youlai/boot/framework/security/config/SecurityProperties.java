@@ -8,6 +8,7 @@ import jakarta.validation.constraints.Pattern;
 import lombok.Data;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.validation.annotation.Validated;
+import org.springframework.stereotype.Component;
 
 /**
  * 安全模块配置属性类
@@ -19,6 +20,7 @@ import org.springframework.validation.annotation.Validated;
  */
 @Data
 @Validated
+@Component
 @ConfigurationProperties(prefix = "security")
 public class SecurityProperties {
 

@@ -16,6 +16,7 @@ import com.youlai.boot.module.workflow.service.WorkflowModelService;
 import com.youlai.boot.module.workflow.util.BpmnModelHelper;
 import com.youlai.boot.system.model.entity.Role;
 import com.youlai.boot.system.service.RoleService;
+import com.youlai.boot.module.workflow.config.ConditionalOnWorkflowEnabled;
 import lombok.RequiredArgsConstructor;
 import org.flowable.engine.RepositoryService;
 import org.flowable.engine.repository.Deployment;
@@ -39,6 +40,7 @@ import java.util.stream.Collectors;
  * @author Ray.Hao
  * @since 4.9.0
  */
+@ConditionalOnWorkflowEnabled
 @Service
 @RequiredArgsConstructor
 public class WorkflowModelServiceImpl implements WorkflowModelService {

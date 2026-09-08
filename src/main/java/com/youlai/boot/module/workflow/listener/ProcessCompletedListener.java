@@ -2,6 +2,7 @@ package com.youlai.boot.module.workflow.listener;
 
 import com.youlai.boot.module.workflow.handler.ProcessCompletedContext;
 import com.youlai.boot.module.workflow.handler.ProcessCompletedHandler;
+import com.youlai.boot.module.workflow.config.ConditionalOnWorkflowEnabled;
 import lombok.extern.slf4j.Slf4j;
 import org.flowable.common.engine.api.delegate.event.FlowableEngineEvent;
 import org.flowable.common.engine.api.delegate.event.FlowableEngineEventType;
@@ -27,6 +28,7 @@ import java.util.stream.Collectors;
  * @since 4.9.0
  */
 @Slf4j
+@ConditionalOnWorkflowEnabled
 @Component
 public class ProcessCompletedListener implements FlowableEventListener {
 

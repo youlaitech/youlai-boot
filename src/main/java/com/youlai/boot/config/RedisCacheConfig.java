@@ -22,7 +22,7 @@ import org.springframework.data.redis.serializer.RedisSerializer;
 @EnableCaching
 @EnableConfigurationProperties(CacheProperties.class)
 @Configuration
-@ConditionalOnProperty(name = "spring.cache.enabled") // xxl.job.enabled = true 才会自动装配
+@ConditionalOnProperty(name = "spring.cache.enabled") // 未配置视为关闭
 public class RedisCacheConfig {
 
     /**

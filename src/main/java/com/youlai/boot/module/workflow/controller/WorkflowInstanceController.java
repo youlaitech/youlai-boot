@@ -13,6 +13,7 @@ import com.youlai.boot.module.workflow.model.vo.InstanceDetailVO;
 import com.youlai.boot.module.workflow.model.vo.InstancePageVO;
 import com.youlai.boot.module.workflow.model.vo.ProcessDiagramVO;
 import com.youlai.boot.module.workflow.service.WorkflowInstanceService;
+import com.youlai.boot.module.workflow.config.ConditionalOnWorkflowEnabled;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -28,6 +29,7 @@ import org.springframework.web.bind.annotation.*;
  * @since 4.9.0
  */
 @Tag(name = "13.工作流实例接口")
+@ConditionalOnWorkflowEnabled
 @RestController
 @RequestMapping("/api/v1/workflow/instances")
 @RequiredArgsConstructor

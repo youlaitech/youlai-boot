@@ -15,6 +15,7 @@ import com.youlai.boot.module.workflow.model.vo.RejectTargetVO;
 import com.youlai.boot.module.workflow.model.vo.TaskDetailVO;
 import com.youlai.boot.module.workflow.model.vo.TodoTaskVO;
 import com.youlai.boot.module.workflow.service.WorkflowTaskService;
+import com.youlai.boot.module.workflow.config.ConditionalOnWorkflowEnabled;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -33,6 +34,7 @@ import java.util.List;
  * @since 4.9.0
  */
 @Tag(name = "13.工作流任务接口")
+@ConditionalOnWorkflowEnabled
 @RestController
 @RequestMapping("/api/v1/workflow/tasks")
 @RequiredArgsConstructor

@@ -14,6 +14,7 @@ import com.youlai.boot.module.workflow.model.vo.ModelVO;
 import com.youlai.boot.module.workflow.model.vo.ModelXmlVO;
 import com.youlai.boot.module.workflow.service.WorkflowDemoService;
 import com.youlai.boot.module.workflow.service.WorkflowModelService;
+import com.youlai.boot.module.workflow.config.ConditionalOnWorkflowEnabled;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -31,6 +32,7 @@ import java.util.Arrays;
  * @since 4.9.0
  */
 @Tag(name = "13.工作流模型接口")
+@ConditionalOnWorkflowEnabled
 @RestController
 @RequestMapping("/api/v1/workflow/models")
 @RequiredArgsConstructor

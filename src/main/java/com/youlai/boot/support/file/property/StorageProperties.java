@@ -2,6 +2,7 @@ package com.youlai.boot.support.file.property;
 
 import lombok.Data;
 import org.springframework.boot.context.properties.ConfigurationProperties;
+import org.springframework.stereotype.Component;
 
 import java.util.Collections;
 import java.util.List;
@@ -18,6 +19,7 @@ import java.util.stream.Collectors;
  * @since 4.8.0
  */
 @Data
+@Component
 @ConfigurationProperties(prefix = "storage")
 public class StorageProperties {
 

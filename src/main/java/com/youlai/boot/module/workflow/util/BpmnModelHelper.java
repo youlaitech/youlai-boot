@@ -3,6 +3,7 @@ package com.youlai.boot.module.workflow.util;
 import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.util.StrUtil;
 import com.youlai.boot.common.exception.BusinessException;
+import com.youlai.boot.module.workflow.config.ConditionalOnWorkflowEnabled;
 import lombok.RequiredArgsConstructor;
 import org.flowable.bpmn.converter.BpmnXMLConverter;
 import org.flowable.bpmn.model.BpmnModel;
@@ -22,11 +23,12 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 /**
- * BPMN 模型读取辅助类（formKey 与 XML 解析统一收口，避免散落各 Service）
+ * BPMN 模型读取辅助（formKey 与 XML 解析）
  *
  * @author Ray.Hao
  * @since 4.9.0
  */
+@ConditionalOnWorkflowEnabled
 @Component
 @RequiredArgsConstructor
 public class BpmnModelHelper {
@@ -34,7 +36,7 @@ public class BpmnModelHelper {
     private final RepositoryService repositoryService;
 
     /**
-     * 用户任务节点的 BPMN 原始信息（办理人配置由上层翻译为角色/用户展示）
+     * 用户任务节点的 BPMN 原始信息（办理人为未翻译的原始配置）
      *
      * @param nodeId          节点ID
      * @param nodeName        节点名称

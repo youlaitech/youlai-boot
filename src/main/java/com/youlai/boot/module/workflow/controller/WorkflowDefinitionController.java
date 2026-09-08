@@ -6,6 +6,7 @@ import com.youlai.boot.module.workflow.model.vo.ModelXmlVO;
 import com.youlai.boot.module.workflow.model.vo.ProcessStageVO;
 import com.youlai.boot.module.workflow.model.vo.StartableProcessVO;
 import com.youlai.boot.module.workflow.service.WorkflowDefinitionService;
+import com.youlai.boot.module.workflow.config.ConditionalOnWorkflowEnabled;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -19,12 +20,13 @@ import java.util.List;
 /**
  * 流程定义控制层（发布产物：发布后供发起、审批与流程图查看）
  *
- * <p>定义的发布入口在模型接口（deploy），删除随模型级联，本层不再提供独立分页与删除</p>
+ * <p>定义的发布在模型接口（deploy），删除随模型级联</p>
  *
  * @author Ray.Hao
  * @since 4.9.0
  */
 @Tag(name = "13.工作流定义接口")
+@ConditionalOnWorkflowEnabled
 @RestController
 @RequestMapping("/api/v1/workflow/definitions")
 @RequiredArgsConstructor

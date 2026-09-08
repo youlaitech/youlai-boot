@@ -295,7 +295,7 @@
             <version>${weixin-java-miniapp.version}</version>
         </dependency>
 
-        <!-- 工作流引擎（可选扩展 module/workflow，只引 process 引擎，不含 CMMN/DMN） -->
+        <!-- 工作流引擎（可选扩展，只引 process 引擎，不含 CMMN/DMN） -->
         <dependency>
             <groupId>org.flowable</groupId>
             <artifactId>flowable-spring-boot-starter-process</artifactId>

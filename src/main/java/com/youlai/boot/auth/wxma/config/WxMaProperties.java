@@ -2,6 +2,7 @@ package com.youlai.boot.auth.wxma.config;
 
 import lombok.Data;
 import org.springframework.boot.context.properties.ConfigurationProperties;
+import org.springframework.stereotype.Component;
 
 /**
  * 微信小程序配置属性
@@ -9,6 +10,7 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
  * @author Ray.Hao
  */
 @Data
+@Component
 @ConfigurationProperties(prefix = "wx.miniapp")
 public class WxMaProperties {
 

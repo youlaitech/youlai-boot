@@ -2,6 +2,7 @@ package com.youlai.boot.module.workflow.util;
 
 import cn.hutool.core.util.StrUtil;
 import com.youlai.boot.module.workflow.model.vo.ApprovalHistoryVO;
+import com.youlai.boot.module.workflow.config.ConditionalOnWorkflowEnabled;
 import lombok.RequiredArgsConstructor;
 import org.flowable.engine.HistoryService;
 import org.flowable.engine.TaskService;
@@ -19,6 +20,7 @@ import java.util.stream.Collectors;
  * @author Ray.Hao
  * @since 4.9.0
  */
+@ConditionalOnWorkflowEnabled
 @Component
 @RequiredArgsConstructor
 public class ApprovalHistoryHelper {

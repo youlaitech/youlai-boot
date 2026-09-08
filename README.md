@@ -149,9 +149,8 @@ youlai-boot/
 │   │   │   └── util/          # 安全工具类
 │   │   └── web/               # Web 层（全局异常/跨域/限流）
 │   ├── module/                # 业务扩展模块
-│   │   ├── config/            # 模块装配（工作流按 flowable.enabled 开关）
 │   │   ├── form/              # 动态表单
-│   │   └── workflow/          # 工作流（Flowable 审批流）
+│   │   └── workflow/          # 工作流
 │   ├── support/               # 能力服务
 │   │   ├── file/              # 文件存储（RustFS/阿里云OSS/本地）
 │   │   ├── mail/              # 邮件服务
@@ -215,9 +214,13 @@ youlai-boot/
 2. 在 `application-{profile}.yml` 中开启：
 
    ```yaml
-   flowable:
+   workflow:
      enabled: true
    ```
+
+   Flowable 引擎开关（process / idm / eventregistry）在同一 `application-{profile}.yml` 中以占位符跟随 `workflow.enabled`，无需单独维护。
+
+   演示流程的启动自动部署由同文件 `workflow.demo.enabled` 控制（dev/youlai 默认 `true`、prod 默认 `false`，仅在模块开启后生效）。
 
 **多租户**
 
@@ -229,8 +232,23 @@ youlai-boot/
 
 如需技术支持、商务合作、二次开发、项目定制或私有化部署，可联系作者微信（见下方二维码）。
 
-| 公众号「有来技术」 | <br /> | 小程序「有来技术」 | <br /> | 添加作者微信 |
-| --------- | ------ | --------- | ------ | ------ |
-| <br />    | <br /> | <br />    | <br /> | <br /> |
+<table align="center">
+  <tr>
+    <td align="center">
+      <img src="./docs/images/qrcode/wechat-official.jpg" height="180" alt="公众号「有来技术」"><br>
+      <sub>公众号「有来技术」</sub>
+    </td>
+    <td>&nbsp;&nbsp;&nbsp;&nbsp;</td>
+    <td align="center">
+      <img src="./docs/images/qrcode/wechat-mp.jpg" height="180" alt="小程序「有来技术」"><br>
+      <sub>小程序「有来技术」</sub>
+    </td>
+    <td>&nbsp;&nbsp;&nbsp;&nbsp;</td>
+    <td align="center">
+      <img src="./docs/images/qrcode/wechat-personal.png" height="180" alt="添加作者微信"><br>
+      <sub>添加作者微信</sub>
+    </td>
+  </tr>
+</table>
 
 <p align="center"><em>技术交流 · 问题反馈 · 商务合作</em></p>

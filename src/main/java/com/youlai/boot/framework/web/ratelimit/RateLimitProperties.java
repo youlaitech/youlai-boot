@@ -2,6 +2,7 @@ package com.youlai.boot.framework.web.ratelimit;
 
 import lombok.Data;
 import org.springframework.boot.context.properties.ConfigurationProperties;
+import org.springframework.stereotype.Component;
 
 import java.time.Duration;
 
@@ -13,6 +14,7 @@ import java.time.Duration;
  * @since 4.3.1
  */
 @Data
+@Component
 @ConfigurationProperties(prefix = "rate-limit")
 public class RateLimitProperties {
 

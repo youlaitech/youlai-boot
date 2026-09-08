@@ -15,6 +15,7 @@ import com.youlai.boot.system.model.entity.UserRole;
 import com.youlai.boot.system.service.RoleService;
 import com.youlai.boot.system.service.UserService;
 import com.youlai.boot.system.service.UserRoleService;
+import com.youlai.boot.module.workflow.config.ConditionalOnWorkflowEnabled;
 import lombok.RequiredArgsConstructor;
 import org.flowable.engine.RepositoryService;
 import org.flowable.engine.repository.ProcessDefinition;
@@ -34,6 +35,7 @@ import java.util.stream.Collectors;
  * @author Ray.Hao
  * @since 4.9.0
  */
+@ConditionalOnWorkflowEnabled
 @Service
 @RequiredArgsConstructor
 public class WorkflowDefinitionServiceImpl implements WorkflowDefinitionService {

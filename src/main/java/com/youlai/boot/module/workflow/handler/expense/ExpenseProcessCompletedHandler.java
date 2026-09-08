@@ -5,6 +5,7 @@ import com.youlai.boot.module.form.model.vo.FormDataVO;
 import com.youlai.boot.module.form.service.FormDataService;
 import com.youlai.boot.module.workflow.handler.ProcessCompletedContext;
 import com.youlai.boot.module.workflow.handler.ProcessCompletedHandler;
+import com.youlai.boot.module.workflow.config.ConditionalOnWorkflowEnabled;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
@@ -19,6 +20,7 @@ import org.springframework.stereotype.Component;
  * @since 4.9.0
  */
 @Slf4j
+@ConditionalOnWorkflowEnabled
 @Component
 @RequiredArgsConstructor
 public class ExpenseProcessCompletedHandler implements ProcessCompletedHandler {

@@ -88,7 +88,6 @@ public class FormDataServiceImpl extends ServiceImpl<FormDataMapper, FormData> i
     @Override
     public boolean savePublicFormData(String formKey, Map<String, Object> data, String ip) {
         FormDefinition form = formDefinitionService.getByFormKey(formKey);
-        // 公开访问总闸：未开启公开或未发布的表单拿 key 也提交不了
         if (!FormStatusEnum.PUBLISHED.getValue().equals(form.getStatus())
                 || !Integer.valueOf(1).equals(form.getIsPublic())) {
             throw new BusinessException("表单不存在或未开放公开访问");
@@ -217,8 +216,6 @@ public class FormDataServiceImpl extends ServiceImpl<FormDataMapper, FormData> i
 
     /**
      * 按表单标识删除全部提交数据（演示数据重置用）
-     *
-     * <p>formKey 到 formId 的解析与删除条件封装在本模块内部，跨模块调用方不感知表单实体与查询条件</p>
      *
      * @param formKey 表单唯一标识
      */

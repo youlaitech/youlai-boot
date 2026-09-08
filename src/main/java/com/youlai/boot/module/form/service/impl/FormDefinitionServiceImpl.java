@@ -229,7 +229,6 @@ public class FormDefinitionServiceImpl extends ServiceImpl<FormDefinitionMapper,
                 .setSql("version = version + 1")
         );
         if (result) {
-            // 回读原子自增后的最新表单，快照记录与当前定义一致的规则
             FormDefinition published = this.getById(id);
             // 固化版本快照：数据回显按提交时版本加载，防止规则变更（字段删除/改名）导致历史数据漂移
             FormSnapshot snapshot = new FormSnapshot();
@@ -451,7 +450,6 @@ public class FormDefinitionServiceImpl extends ServiceImpl<FormDefinitionMapper,
         menuFormData.setParentId(underAdminCatalog ? adminCatalog.getId() : 0L);
         menuFormData.setName(DEFAULT_CATALOG_NAME);
         menuFormData.setType(MenuTypeEnum.CATALOG.getValue());
-        menuFormData.setRouteName("FormCenter");
         menuFormData.setRoutePath(underAdminCatalog ? "center" : "/form-center");
         menuFormData.setComponent("Layout");
         // alwaysShow=1：角色仅有单个表单入口时父级目录不被侧边栏折叠吞掉
@@ -462,10 +460,14 @@ public class FormDefinitionServiceImpl extends ServiceImpl<FormDefinitionMapper,
         menuFormData.setIcon("el-icon-EditPen");
         menuService.saveMenu(menuFormData);
 
-        return menuService.getOne(new LambdaQueryWrapper<Menu>()
-                .eq(Menu::getRouteName, "FormCenter")
+        // 目录类型保存时 routeName 被置空，按名称+类型回查
+        Menu createdCatalog = menuService.getOne(new LambdaQueryWrapper<Menu>()
+                .eq(Menu::getName, DEFAULT_CATALOG_NAME)
+                .eq(Menu::getType, MenuTypeEnum.CATALOG.getValue())
                 .last("LIMIT 1")
         );
+        Assert.notNull(createdCatalog, "默认目录创建失败");
+        return createdCatalog;
     }
 
     /**

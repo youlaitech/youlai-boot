@@ -2,6 +2,7 @@ package com.youlai.boot.support.mail;
 
 import lombok.Data;
 import org.springframework.boot.context.properties.ConfigurationProperties;
+import org.springframework.stereotype.Component;
 
 /**
  * 邮件配置属性
@@ -9,6 +10,7 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
  * @author Ray
  * @since 2024/8/17
  */
+@Component
 @ConfigurationProperties(prefix = "spring.mail")
 @Data
 public class MailProperties {

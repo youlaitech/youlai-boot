@@ -2,6 +2,7 @@ package com.youlai.boot.auth.password.config;
 
 import lombok.Data;
 import org.springframework.boot.context.properties.ConfigurationProperties;
+import org.springframework.stereotype.Component;
 
 /**
  * 验证码配置属性
@@ -9,6 +10,7 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
  * @author Ray.Hao
  * @since 2023/11/24
  */
+@Component
 @ConfigurationProperties(prefix = "captcha")
 @Data
 public class CaptchaProperties {

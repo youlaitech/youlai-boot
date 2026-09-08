@@ -70,9 +70,6 @@ public interface FormDataService {
     /**
      * 按表单标识删除全部提交数据（演示数据重置用）
      *
-     * <p>跨模块窄接口：formKey 到 formId 的解析与删除条件封装在 form 模块内部，
-     * 调用方（workflow）不感知表单实体与查询条件</p>
-     *
      * @param formKey 表单唯一标识
      */
     void removeByFormKey(String formKey);

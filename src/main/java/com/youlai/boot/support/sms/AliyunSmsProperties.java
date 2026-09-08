@@ -2,6 +2,7 @@ package com.youlai.boot.support.sms;
 
 import lombok.Data;
 import org.springframework.boot.context.properties.ConfigurationProperties;
+import org.springframework.stereotype.Component;
 
 import java.util.Map;
 
@@ -12,6 +13,7 @@ import java.util.Map;
  * @since 2024/8/17
  */
 @Data
+@Component
 @ConfigurationProperties(prefix = "sms.aliyun")
 public class AliyunSmsProperties {
 
