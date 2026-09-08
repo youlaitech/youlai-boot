@@ -57,7 +57,7 @@ public class NoticeServiceImpl extends ServiceImpl<NoticeMapper, Notice> impleme
      * 获取通知公告分页列表
      *
      * @param queryParams 查询参数
-     * @return {@link IPage< NoticePageVO >} 通知公告分页列表
+     * @return {@link IPage<NoticePageVO>} 通知公告分页列表
      */
     @Override
     public IPage<NoticePageVO> getNoticePage(NoticeQuery queryParams) {
