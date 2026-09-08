@@ -7,11 +7,11 @@ import cn.hutool.core.util.StrUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
-import com.youlai.boot.codegen.model.entity.GenTable;
 import com.youlai.boot.common.exception.BusinessException;
 import com.youlai.boot.framework.security.util.SecurityUtils;
 import com.youlai.boot.system.converter.MenuConverter;
 import com.youlai.boot.system.mapper.MenuMapper;
+import com.youlai.boot.system.model.dto.MenuCreateDTO;
 import com.youlai.boot.system.model.entity.Menu;
 import com.youlai.boot.system.model.form.MenuForm;
 import com.youlai.boot.system.model.query.MenuQuery;
@@ -441,19 +441,17 @@ public class MenuServiceImpl extends ServiceImpl<MenuMapper, Menu> implements Me
     }
 
     /**
-     * 代码生成时添加菜单
+     * 为代码生成创建菜单
      *
      * @param parentMenuId 父菜单ID
-     * @param genTable    实体名称
+     * @param dto          创建菜单数据载体
      */
     @Override
-    public void addMenuForCodegen(Long parentMenuId, GenTable genTable) {
+    public void addMenuForCodegen(Long parentMenuId, MenuCreateDTO dto) {
         Menu parentMenu = this.getById(parentMenuId);
         Assert.notNull(parentMenu, "上级菜单不存在");
 
-        String entityName = genTable.getEntityName();
-
-        long count = this.count(new LambdaQueryWrapper<Menu>().eq(Menu::getRouteName, entityName));
+        long count = this.count(new LambdaQueryWrapper<Menu>().eq(Menu::getRouteName, dto.routeName()));
         if (count > 0) {
             return;
         }
@@ -470,11 +468,11 @@ public class MenuServiceImpl extends ServiceImpl<MenuMapper, Menu> implements Me
 
         Menu menu = new Menu();
         menu.setParentId(parentMenuId);
-        menu.setName(genTable.getBusinessName());
+        menu.setName(dto.name());
 
-        menu.setRouteName(entityName);
-        menu.setRoutePath(StrUtil.toSymbolCase(entityName, '-'));
-        menu.setComponent(genTable.getModuleName() + "/" + StrUtil.toSymbolCase(entityName, '-') + "/index");
+        menu.setRouteName(dto.routeName());
+        menu.setRoutePath(StrUtil.toSymbolCase(dto.routeName(), '-'));
+        menu.setComponent(dto.moduleName() + "/" + StrUtil.toSymbolCase(dto.routeName(), '-') + "/index");
         menu.setType(MenuTypeEnum.MENU.getValue());
         menu.setSort(sort);
         menu.setVisible(1);
@@ -486,8 +484,8 @@ public class MenuServiceImpl extends ServiceImpl<MenuMapper, Menu> implements Me
             menu.setTreePath(treePath);
             this.updateById(menu);
 
-            // 生成CURD按钮权限
-            String permPrefix = genTable.getModuleName() + ":" + genTable.getTableName().replace("_", "-") + ":";
+            // 生成 CRUD 按钮权限
+            String permPrefix = dto.moduleName() + ":" + dto.tableName().replace("_", "-") + ":";
             String[] actions = {"查询", "新增", "修改", "删除"};
             String[] perms = {"list", "create", "update", "delete"};
 

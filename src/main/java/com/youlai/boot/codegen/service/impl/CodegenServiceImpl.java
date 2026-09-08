@@ -12,7 +12,7 @@ import cn.hutool.extra.template.TemplateUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.youlai.boot.codegen.enums.JavaTypeEnum;
-import com.youlai.boot.codegen.config.CodegenProperties;
+import com.youlai.boot.codegen.property.CodegenProperties;
 import com.youlai.boot.codegen.service.GenTableService;
 import com.youlai.boot.codegen.service.GenTableColumnService;
 import com.youlai.boot.codegen.service.CodegenService;

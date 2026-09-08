@@ -8,7 +8,6 @@ spring:
     url: jdbc:mysql://www.youlai.tech:3306/youlai_admin?zeroDateTimeBehavior=convertToNull&useUnicode=true&characterEncoding=UTF-8&serverTimezone=Asia/Shanghai&autoReconnect=true&allowMultiQueries=true
     username: youlai
     password: 123456
-
   data:
     redis:
       database: 0
@@ -79,16 +78,16 @@ rate-limit:
 
 # 安全配置
 security:
-  session:
-    type: jwt # 会话方式 [jwt|redis-token]
+  token:
+    type: jwt # 令牌策略 [jwt|redis-token]
     access-token-time-to-live: 7200 # 访问令牌 有效期(单位：秒)，默认 2 小时，-1 表示永不过期
     refresh-token-time-to-live: 604800 # 刷新令牌有效期(单位：秒)，默认 7 天，-1 表示永不过期
     jwt:
       secret-key: SecretKey012345678901234567890123456789012345678901234567890123456789 # JWT密钥(HS256算法至少32字符)
     redis-token:
       allow-multi-login: true # 是否允许多设备登录
-  # 安全白名单路径，仅跳过 AuthorizationFilter 过滤器，还是会走 Spring Security 的其他过滤器(CSRF、CORS等)
-  ignore-urls:
+  # 匿名放行路径，仅跳过认证与授权判断，仍走过滤器链（保留安全响应头）
+  permit-all-urls:
     - /api/v1/auth/login/** # 登录接口(账号密码登录)
     - /api/v1/auth/captcha # 验证码获取接口
     - /api/v1/auth/sms/** # 短信验证码接口(发送验证码、短信登录)
@@ -97,9 +96,7 @@ security:
     - /api/v1/logs/** # 日志接口(访问日志列表)
     - /api/v1/auth/qr-code/** # 扫码登录接口(生成票据/查询状态/换取令牌)
     - /api/v1/forms/public/** # 公开表单接口(匿名渲染/提交，Service 校验 is_public 总闸 + IP 限流)
-  # 非安全端点路径，完全绕过 Spring Security 的过滤器
-  unsecured-urls:
-    - ${springdoc.swagger-ui.path}
+    - ${springdoc.swagger-ui.path} # Swagger UI 路径
     - /doc.html
     - /swagger-ui/**
     - /v3/api-docs/**
@@ -169,11 +166,15 @@ springdoc:
     - group: "系统管理" # 分组名称
       paths-to-match: "/**" # 匹配的请求路径
       packages-to-scan: # 扫描的 Controller 包，限制只生成指定包的接口文档
-        - com.youlai.boot.auth.controller
+        - com.youlai.boot.auth.password.controller
+        - com.youlai.boot.auth.sms.controller
+        - com.youlai.boot.auth.qrcode.controller
+        - com.youlai.boot.auth.wxma.controller
+        - com.youlai.boot.auth.session.controller
         - com.youlai.boot.system.controller
-        - com.youlai.boot.file.controller
         - com.youlai.boot.codegen.controller
-        - com.youlai.boot.message.controller
+        - com.youlai.boot.module.form.controller
+        - com.youlai.boot.module.workflow.controller
   default-flat-param-object: true
 
 # knife4j 配置
@@ -235,3 +236,13 @@ wx:
   miniapp:
     appid: Your_AppId
     secret: Your_AppSecret
+
+# 工作流（默认关闭，开启见 README「可选扩展」）
+flowable:
+  # 工作流总开关，未配置视为关闭
+  enabled: true
+  # 引擎表初始化策略，true 启动时检查并自动建/更新 ACT_* 表；可选 true/false/create/create-drop
+  database-schema-update: true
+  demo:
+    # 演示流程自动部署开关
+    enabled: true

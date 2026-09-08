@@ -10,7 +10,7 @@ import java.time.LocalDateTime;
  * 表单定义分页VO
  *
  * @author Ray.Hao
- * @since 4.8.0
+ * @since 4.9.0
  */
 @Schema(description = "表单定义分页对象")
 @Getter
@@ -37,6 +37,9 @@ public class FormDefinitionPageVO {
 
     @Schema(description = "是否允许匿名公开访问(0否 1是)")
     private Integer isPublic;
+
+    @Schema(description = "表单类型(normal通用表单 workflow审批表单)")
+    private String category;
 
     @Schema(description = "创建时间")
     private LocalDateTime createTime;

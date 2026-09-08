@@ -10,7 +10,7 @@ import lombok.Data;
  * 表单定义表单对象
  *
  * @author Ray.Hao
- * @since 4.8.0
+ * @since 4.9.0
  */
 @Schema(description = "表单定义")
 @Data
@@ -42,5 +42,9 @@ public class FormDefinitionForm {
 
     @Schema(description = "是否允许匿名公开访问(0否 1是)，公开访问总开关")
     private Integer isPublic;
+
+    @Schema(description = "表单类型(normal通用表单 workflow工作流表单，缺省normal)", example = "normal")
+    @Pattern(regexp = "^(normal|workflow)$", message = "表单类型不合法")
+    private String category;
 
 }

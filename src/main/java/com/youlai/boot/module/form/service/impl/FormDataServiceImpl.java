@@ -13,7 +13,7 @@ import com.youlai.boot.module.form.mapper.FormSnapshotMapper;
 import com.youlai.boot.module.form.model.entity.FormData;
 import com.youlai.boot.module.form.model.entity.FormDefinition;
 import com.youlai.boot.module.form.model.entity.FormSnapshot;
-import com.youlai.boot.module.form.model.query.FormDataQuery;
+import com.youlai.boot.module.form.model.query.FormDataPageQuery;
 import com.youlai.boot.module.form.model.vo.FormDataVO;
 import com.youlai.boot.module.form.service.FormDataService;
 import com.youlai.boot.module.form.service.FormDefinitionService;
@@ -31,7 +31,7 @@ import java.util.Map;
  * 表单数据业务实现类
  *
  * @author Ray.Hao
- * @since 4.8.0
+ * @since 4.9.0
  */
 @Service
 @RequiredArgsConstructor
@@ -55,13 +55,22 @@ public class FormDataServiceImpl extends ServiceImpl<FormDataMapper, FormData> i
     /**
      * 提交表单数据
      *
-     * <p>仅已发布表单可提交；提交时快照表单版本，供数据追溯到产出规则</p>
-     *
      * @param formKey 表单唯一标识
      * @param data    表单数据（field -> value 映射）
      */
     @Override
     public boolean saveFormData(String formKey, Map<String, Object> data) {
+        return this.saveFormDataReturnId(formKey, data) != null;
+    }
+
+    /**
+     * 提交表单数据并返回数据ID
+     *
+     * @param formKey 表单唯一标识
+     * @param data    表单数据（field -> value 映射）
+     */
+    @Override
+    public Long saveFormDataReturnId(String formKey, Map<String, Object> data) {
         FormDefinition form = formDefinitionService.getByFormKey(formKey);
         if (!FormStatusEnum.PUBLISHED.getValue().equals(form.getStatus())) {
             throw new BusinessException("表单未发布或已停用");
@@ -86,7 +95,7 @@ public class FormDataServiceImpl extends ServiceImpl<FormDataMapper, FormData> i
         }
         checkPublicSubmitLimit(formKey, ip);
         log.info("公开表单匿名提交  formKey={}  ip={}", formKey, ip);
-        return this.persistFormData(form, data);
+        return this.persistFormData(form, data) != null;
     }
 
     /**
@@ -94,15 +103,16 @@ public class FormDataServiceImpl extends ServiceImpl<FormDataMapper, FormData> i
      *
      * @param form 表单定义
      * @param data 提交数据
+     * @return 数据ID（落库失败为 null）
      */
-    private boolean persistFormData(FormDefinition form, Map<String, Object> data) {
+    private Long persistFormData(FormDefinition form, Map<String, Object> data) {
         Map<String, Object> filteredData = FormRuleValidator.validateAndFilter(form.getFormJson(), data);
 
         FormData entity = new FormData();
         entity.setFormId(form.getId());
         entity.setFormVersion(form.getVersion());
         entity.setDataJson(JSONUtil.toJsonStr(filteredData));
-        return this.save(entity);
+        return this.save(entity) ? entity.getId() : null;
     }
 
     /**
@@ -138,7 +148,7 @@ public class FormDataServiceImpl extends ServiceImpl<FormDataMapper, FormData> i
      * @param queryParams 查询参数
      */
     @Override
-    public Page<FormDataVO> getFormDataPage(String formKey, FormDataQuery queryParams) {
+    public Page<FormDataVO> getFormDataPage(String formKey, FormDataPageQuery queryParams) {
         FormDefinition form = formDefinitionService.getByFormKey(formKey);
         int pageNum = queryParams.getPageNum();
         int pageSize = queryParams.getPageSize();
@@ -148,13 +158,15 @@ public class FormDataServiceImpl extends ServiceImpl<FormDataMapper, FormData> i
     /**
      * 获取表单数据详情（只读回显）
      *
+     * <p>数据不存在时返回 null，由调用方决定语义：控制器直查需提示用户，工作流回显需静默降级</p>
+     *
      * @param dataId 数据ID
      */
     @Override
     public FormDataVO getFormDataDetail(Long dataId) {
         FormData entity = this.getById(dataId);
         if (entity == null) {
-            throw new BusinessException("表单数据不存在");
+            return null;
         }
         FormDataVO vo = new FormDataVO();
         vo.setId(entity.getId());
@@ -186,7 +198,7 @@ public class FormDataServiceImpl extends ServiceImpl<FormDataMapper, FormData> i
             vo.setOptionsJson(snapshot.getOptionsJson());
             return;
         }
-        FormDefinition form = formDefinitionService.getById(formId);
+        FormDefinition form = formDefinitionService.getFormDefinition(formId);
         if (form != null) {
             vo.setFormJson(form.getFormJson());
             vo.setOptionsJson(form.getOptionsJson());
@@ -201,6 +213,23 @@ public class FormDataServiceImpl extends ServiceImpl<FormDataMapper, FormData> i
     @Override
     public void removeFormData(List<Long> ids) {
         this.removeByIds(ids);
+    }
+
+    /**
+     * 按表单标识删除全部提交数据（演示数据重置用）
+     *
+     * <p>formKey 到 formId 的解析与删除条件封装在本模块内部，跨模块调用方不感知表单实体与查询条件</p>
+     *
+     * @param formKey 表单唯一标识
+     */
+    @Override
+    public void removeByFormKey(String formKey) {
+        FormDefinition form = formDefinitionService.getByFormKey(formKey);
+        if (form == null) {
+            return;
+        }
+        this.remove(new LambdaQueryWrapper<FormData>()
+                .eq(FormData::getFormId, form.getId()));
     }
 
 }

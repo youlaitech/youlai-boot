@@ -2,17 +2,17 @@ package com.youlai.boot.config;
 
 import cn.binarywang.wx.miniapp.api.WxMaService;
 import cn.hutool.core.util.ArrayUtil;
-import com.youlai.boot.auth.service.CaptchaService;
-import com.youlai.boot.config.property.SecurityProperties;
+import com.youlai.boot.auth.password.service.CaptchaService;
+import com.youlai.boot.framework.security.config.SecurityProperties;
 import com.youlai.boot.framework.security.filter.TokenAuthenticationFilter;
+import com.youlai.boot.framework.security.handler.JsonAccessDeniedHandler;
+import com.youlai.boot.framework.security.handler.JsonAuthenticationEntryPoint;
 import com.youlai.boot.framework.security.port.UserAuthenticationPort;
 import com.youlai.boot.framework.security.service.SecurityUserDetailsService;
 import com.youlai.boot.framework.security.token.TokenManager;
-import com.youlai.boot.auth.security.filter.CaptchaValidationFilter;
-import com.youlai.boot.auth.security.handler.JsonAccessDeniedHandler;
-import com.youlai.boot.auth.security.handler.JsonAuthenticationEntryPoint;
-import com.youlai.boot.auth.security.provider.SmsAuthenticationProvider;
-import com.youlai.boot.auth.security.provider.WxMaAuthenticationProvider;
+import com.youlai.boot.auth.password.filter.CaptchaValidationFilter;
+import com.youlai.boot.auth.sms.provider.SmsAuthenticationProvider;
+import com.youlai.boot.auth.wxma.provider.WxMaAuthenticationProvider;
 import com.youlai.boot.system.service.UserSocialService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
@@ -24,7 +24,6 @@ import org.springframework.security.authentication.dao.DaoAuthenticationProvider
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
-import org.springframework.security.config.annotation.web.configuration.WebSecurityCustomizer;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.config.annotation.web.configurers.HeadersConfigurer;
 import org.springframework.security.config.http.SessionCreationPolicy;
@@ -60,9 +59,9 @@ public class SecurityConfig {
                 .authorizeHttpRequests(requestMatcherRegistry -> {
                             // ASYNC 分发（SSE 超时/完成后的异步 dispatch）无 Authorization 头，直接放行
                             requestMatcherRegistry.dispatcherTypeMatchers(DispatcherType.ASYNC).permitAll();
-                            String[] ignoreUrls = securityProperties.getIgnoreUrls();
-                            if (ArrayUtil.isNotEmpty(ignoreUrls)) {
-                                requestMatcherRegistry.requestMatchers(ignoreUrls).permitAll();
+                            String[] permitAllUrls = securityProperties.getPermitAllUrls();
+                            if (ArrayUtil.isNotEmpty(permitAllUrls)) {
+                                requestMatcherRegistry.requestMatchers(permitAllUrls).permitAll();
                             }
                             requestMatcherRegistry.anyRequest().authenticated();
                         }
@@ -84,16 +83,6 @@ public class SecurityConfig {
                 // Token 认证（Starter 过滤器，抛 AuthenticationException 交给 ExceptionTranslationFilter 处理）
                 .addFilterBefore(new TokenAuthenticationFilter(tokenManager), AuthorizationFilter.class)
                 .build();
-    }
-
-    @Bean
-    public WebSecurityCustomizer webSecurityCustomizer() {
-        return (web) -> {
-            String[] unsecuredUrls = securityProperties.getUnsecuredUrls();
-            if (ArrayUtil.isNotEmpty(unsecuredUrls)) {
-                web.ignoring().requestMatchers(unsecuredUrls);
-            }
-        };
     }
 
     @Bean

@@ -13,7 +13,7 @@ import com.youlai.boot.common.constant.JwtClaimConstants;
 import com.youlai.boot.common.constant.RedisConstants;
 import com.youlai.boot.common.constant.SecurityConstants;
 import com.youlai.boot.common.result.ResultCode;
-import com.youlai.boot.config.property.SecurityProperties;
+import com.youlai.boot.framework.security.config.SecurityProperties;
 import com.youlai.boot.common.exception.TokenInvalidException;
 import com.youlai.boot.framework.security.model.AuthenticationToken;
 import com.youlai.boot.framework.security.model.RoleDataScope;
@@ -40,7 +40,7 @@ import java.util.stream.Collectors;
  * @author Ray.Hao
  * @since 2024/11/15
  */
-@ConditionalOnProperty(value = "security.session.type", havingValue = "jwt")
+@ConditionalOnProperty(value = "security.token.type", havingValue = "jwt")
 @Service
 public class JwtTokenManager implements TokenManager {
 
@@ -51,13 +51,13 @@ public class JwtTokenManager implements TokenManager {
     public JwtTokenManager(SecurityProperties securityProperties, RedisTemplate<String, Object> redisTemplate) {
         this.securityProperties = securityProperties;
         this.redisTemplate = redisTemplate;
-        this.secretKey = securityProperties.getSession().getJwt().getSecretKey().getBytes();
+        this.secretKey = securityProperties.getToken().getJwt().getSecretKey().getBytes();
     }
 
     @Override
     public AuthenticationToken generateToken(Authentication authentication) {
-        int accessTokenTimeToLive = securityProperties.getSession().getAccessTokenTimeToLive();
-        int refreshTokenTimeToLive = securityProperties.getSession().getRefreshTokenTimeToLive();
+        int accessTokenTimeToLive = securityProperties.getToken().getAccessTokenTimeToLive();
+        int refreshTokenTimeToLive = securityProperties.getToken().getRefreshTokenTimeToLive();
 
         String accessToken = generateToken(authentication, accessTokenTimeToLive);
         String refreshToken = generateToken(authentication, refreshTokenTimeToLive, true);
@@ -189,7 +189,7 @@ public class JwtTokenManager implements TokenManager {
             throw new TokenInvalidException(ResultCode.REFRESH_TOKEN_INVALID);
         }
         Authentication authentication = parseToken(refreshToken);
-        int accessTokenExpiration = securityProperties.getSession().getAccessTokenTimeToLive();
+        int accessTokenExpiration = securityProperties.getToken().getAccessTokenTimeToLive();
         String newAccessToken = generateToken(authentication, accessTokenExpiration);
         return AuthenticationToken.builder()
                 .accessToken(newAccessToken)

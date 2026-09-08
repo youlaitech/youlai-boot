@@ -2,7 +2,7 @@ package com.youlai.boot.system.controller;
 
 import com.youlai.boot.common.enums.ActionTypeEnum;
 import com.youlai.boot.common.enums.LogModuleEnum;
-import com.youlai.boot.common.annotation.RepeatSubmit;
+import com.youlai.boot.framework.web.repeatsubmit.RepeatSubmit;
 import com.youlai.boot.common.model.Option;
 import com.youlai.boot.common.result.Result;
 import com.youlai.boot.system.model.form.DeptForm;
@@ -38,7 +38,7 @@ public class DeptController {
     @GetMapping
     @Log(module = LogModuleEnum.DEPT, value = ActionTypeEnum.LIST)
     public Result<List<DeptVO>> getDeptList(
-             DeptQuery queryParams
+             @Valid DeptQuery queryParams
     ) {
         List<DeptVO> list = deptService.getDeptList(queryParams);
         return Result.success(list);
@@ -56,7 +56,7 @@ public class DeptController {
     @PreAuthorize("@ss.hasPerm('sys:dept:create')")
     @RepeatSubmit
     @Log(module = LogModuleEnum.DEPT, value = ActionTypeEnum.INSERT)
-    public Result<?> saveDept(
+    public Result<Long> saveDept(
             @Valid @RequestBody DeptForm formData
     ) {
         Long id = deptService.saveDept(formData);
@@ -76,7 +76,7 @@ public class DeptController {
     @PutMapping(value = "/{deptId}")
     @PreAuthorize("@ss.hasPerm('sys:dept:update')")
     @Log(module = LogModuleEnum.DEPT, value = ActionTypeEnum.UPDATE)
-    public Result<?> updateDept(
+    public Result<Long> updateDept(
             @PathVariable Long deptId,
             @Valid @RequestBody DeptForm formData
     ) {
@@ -88,7 +88,7 @@ public class DeptController {
     @DeleteMapping("/{ids}")
     @PreAuthorize("@ss.hasPerm('sys:dept:delete')")
     @Log(module = LogModuleEnum.DEPT, value = ActionTypeEnum.DELETE)
-    public Result<?> deleteDepartments(
+    public Result<Void> deleteDepartments(
             @Parameter(description ="部门ID，多个以英文逗号(,)分割") @PathVariable("ids") String ids
     ) {
         boolean result = deptService.deleteByIds(ids);

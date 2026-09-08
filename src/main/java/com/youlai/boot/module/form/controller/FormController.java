@@ -2,16 +2,18 @@ package com.youlai.boot.module.form.controller;
 
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.youlai.boot.common.annotation.Log;
-import com.youlai.boot.common.annotation.RepeatSubmit;
+import com.youlai.boot.framework.web.repeatsubmit.RepeatSubmit;
 import com.youlai.boot.common.enums.ActionTypeEnum;
 import com.youlai.boot.common.enums.LogModuleEnum;
 import com.youlai.boot.common.result.PageResult;
 import com.youlai.boot.common.result.Result;
-import com.youlai.boot.common.util.IPUtils;
+import com.youlai.boot.common.exception.BusinessException;
+import com.youlai.boot.common.model.Option;
+import com.youlai.boot.framework.web.util.IPUtils;
 import com.youlai.boot.module.form.model.form.FormDefinitionForm;
 import com.youlai.boot.module.form.model.form.FormMenuForm;
-import com.youlai.boot.module.form.model.query.FormDataQuery;
-import com.youlai.boot.module.form.model.query.FormDefinitionQuery;
+import com.youlai.boot.module.form.model.query.FormDataPageQuery;
+import com.youlai.boot.module.form.model.query.FormDefinitionPageQuery;
 import com.youlai.boot.module.form.model.vo.FormDataVO;
 import com.youlai.boot.module.form.model.vo.FormDefinitionPageVO;
 import com.youlai.boot.module.form.model.vo.FormMenuVO;
@@ -28,13 +30,14 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.Arrays;
+import java.util.List;
 import java.util.Map;
 
 /**
  * 表单控制层（表单定义、访问菜单、表单数据）
  *
  * @author Ray.Hao
- * @since 4.8.0
+ * @since 4.9.0
  */
 @Tag(name = "12.表单接口")
 @RestController
@@ -49,10 +52,16 @@ public class FormController {
     @GetMapping
     @Log(module = LogModuleEnum.FORM, value = ActionTypeEnum.LIST)
     public PageResult<FormDefinitionPageVO> getFormDefinitionPage(
-            FormDefinitionQuery queryParams
+            @Valid FormDefinitionPageQuery queryParams
     ) {
         Page<FormDefinitionPageVO> result = formDefinitionService.getFormDefinitionPage(queryParams);
         return PageResult.success(result);
+    }
+
+    @Operation(summary = "获取审批表单下拉选项（工作流设计器绑定表单用）")
+    @GetMapping("/options")
+    public Result<List<Option<String>>> listWorkflowFormOptions() {
+        return Result.success(formDefinitionService.listWorkflowFormOptions());
     }
 
     @Operation(summary = "获取表单定义表单数据")
@@ -69,7 +78,7 @@ public class FormController {
     @PreAuthorize("@ss.hasPerm('form:definition:create')")
     @RepeatSubmit
     @Log(module = LogModuleEnum.FORM, value = ActionTypeEnum.INSERT)
-    public Result<?> saveFormDefinition(@Valid @RequestBody FormDefinitionForm formData) {
+    public Result<Void> saveFormDefinition(@Valid @RequestBody FormDefinitionForm formData) {
         boolean result = formDefinitionService.saveFormDefinition(formData);
         return Result.judge(result);
     }
@@ -78,9 +87,9 @@ public class FormController {
     @PutMapping("/{formId}")
     @PreAuthorize("@ss.hasPerm('form:definition:update')")
     @Log(module = LogModuleEnum.FORM, value = ActionTypeEnum.UPDATE)
-    public Result<?> updateFormDefinition(
+    public Result<Void> updateFormDefinition(
             @Parameter(description = "表单ID") @PathVariable Long formId,
-            @RequestBody FormDefinitionForm formData
+            @RequestBody @Valid FormDefinitionForm formData
     ) {
         boolean result = formDefinitionService.updateFormDefinition(formId, formData);
         return Result.judge(result);
@@ -145,7 +154,7 @@ public class FormController {
     @PreAuthorize("@ss.hasPerm('form:definition:update')")
     @RepeatSubmit
     @Log(module = LogModuleEnum.FORM, value = ActionTypeEnum.INSERT)
-    public Result<?> saveFormMenu(
+    public Result<Void> saveFormMenu(
             @Parameter(description = "表单ID") @PathVariable Long formId,
             @Valid @RequestBody FormMenuForm menuForm
     ) {
@@ -168,7 +177,7 @@ public class FormController {
     @Operation(summary = "匿名提交公开表单数据")
     @PostMapping("/public/{formKey}/data")
     @RepeatSubmit
-    public Result<?> savePublicFormData(
+    public Result<Void> savePublicFormData(
             @Parameter(description = "表单唯一标识") @PathVariable String formKey,
             @RequestBody Map<String, Object> data,
             HttpServletRequest request
@@ -186,7 +195,7 @@ public class FormController {
     @Log(module = LogModuleEnum.FORM, value = ActionTypeEnum.LIST)
     public PageResult<FormDataVO> getFormDataPage(
             @Parameter(description = "表单唯一标识") @PathVariable String formKey,
-            FormDataQuery queryParams
+            @Valid FormDataPageQuery queryParams
     ) {
         Page<FormDataVO> result = formDataService.getFormDataPage(formKey, queryParams);
         return PageResult.success(result);
@@ -196,7 +205,7 @@ public class FormController {
     @PostMapping("/{formKey}/data")
     @RepeatSubmit
     @Log(module = LogModuleEnum.FORM, value = ActionTypeEnum.INSERT)
-    public Result<?> saveFormData(
+    public Result<Void> saveFormData(
             @Parameter(description = "表单唯一标识") @PathVariable String formKey,
             @RequestBody Map<String, Object> data
     ) {
@@ -212,6 +221,10 @@ public class FormController {
             @Parameter(description = "数据ID") @PathVariable Long dataId
     ) {
         FormDataVO dataVO = formDataService.getFormDataDetail(dataId);
+        // 直查数据详情时明确提示；工作流回显场景由服务层调用方自行降级
+        if (dataVO == null) {
+            throw new BusinessException("表单数据不存在");
+        }
         return Result.success(dataVO);
     }
 

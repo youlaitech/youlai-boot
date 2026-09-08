@@ -1,7 +1,7 @@
 package com.youlai.boot.system.controller;
 
 import com.youlai.boot.common.annotation.Log;
-import com.youlai.boot.common.annotation.RepeatSubmit;
+import com.youlai.boot.framework.web.repeatsubmit.RepeatSubmit;
 import com.youlai.boot.common.enums.ActionTypeEnum;
 import com.youlai.boot.common.enums.LogModuleEnum;
 import com.youlai.boot.common.model.Option;
@@ -14,6 +14,7 @@ import com.youlai.boot.system.service.MenuService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -39,7 +40,7 @@ public class MenuController {
     @Operation(summary = "菜单列表")
     @GetMapping
     @Log(module = LogModuleEnum.MENU, value = ActionTypeEnum.LIST)
-    public Result<List<MenuVO>> getMenus(MenuQuery queryParams) {
+    public Result<List<MenuVO>> getMenus(@Valid MenuQuery queryParams) {
         List<MenuVO> menuList = menuService.listMenus(queryParams);
         return Result.success(menuList);
     }
@@ -76,7 +77,7 @@ public class MenuController {
     @PreAuthorize("@ss.hasPerm('sys:menu:create')")
     @RepeatSubmit
     @Log(module = LogModuleEnum.MENU, value = ActionTypeEnum.INSERT)
-    public Result<?> addMenu(@RequestBody MenuForm menuForm) {
+    public Result<Void> addMenu(@RequestBody @Valid MenuForm menuForm) {
         boolean result = menuService.saveMenu(menuForm);
         return Result.judge(result);
     }
@@ -85,9 +86,9 @@ public class MenuController {
     @PutMapping(value = "/{menuId}")
     @PreAuthorize("@ss.hasPerm('sys:menu:update')")
     @Log(module = LogModuleEnum.MENU, value = ActionTypeEnum.UPDATE)
-    public Result<?> updateMenu(
+    public Result<Void> updateMenu(
             @Parameter(description = "菜单ID") @PathVariable Long menuId,
-            @RequestBody MenuForm menuForm
+            @RequestBody @Valid MenuForm menuForm
     ) {
         boolean result = menuService.saveMenu(menuForm);
         return Result.judge(result);
@@ -97,7 +98,7 @@ public class MenuController {
     @DeleteMapping("/{menuId}")
     @PreAuthorize("@ss.hasPerm('sys:menu:delete')")
     @Log(module = LogModuleEnum.MENU, value = ActionTypeEnum.DELETE)
-    public Result<?> deleteMenu(
+    public Result<Void> deleteMenu(
             @Parameter(description = "菜单ID，多个以英文(,)分割") @PathVariable Long menuId
     ) {
         boolean result = menuService.deleteMenu(menuId);
@@ -108,7 +109,7 @@ public class MenuController {
     @PatchMapping("/{menuId}")
     @PreAuthorize("@ss.hasPerm('sys:menu:update')")
     @Log(module = LogModuleEnum.MENU, value = ActionTypeEnum.UPDATE)
-    public Result<?> updateMenuVisible(
+    public Result<Void> updateMenuVisible(
             @Parameter(description = "菜单ID") @PathVariable Long menuId,
             @Parameter(description = "显示状态(1:显示;0:隐藏)") Integer visible
 

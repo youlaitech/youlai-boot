@@ -1,11 +1,11 @@
 package com.youlai.boot.module.form.service;
 
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
-import com.baomidou.mybatisplus.extension.service.IService;
+import com.youlai.boot.common.model.Option;
 import com.youlai.boot.module.form.model.entity.FormDefinition;
 import com.youlai.boot.module.form.model.form.FormDefinitionForm;
 import com.youlai.boot.module.form.model.form.FormMenuForm;
-import com.youlai.boot.module.form.model.query.FormDefinitionQuery;
+import com.youlai.boot.module.form.model.query.FormDefinitionPageQuery;
 import com.youlai.boot.module.form.model.vo.FormDefinitionPageVO;
 import com.youlai.boot.module.form.model.vo.FormMenuVO;
 import com.youlai.boot.module.form.model.vo.FormRenderVO;
@@ -16,9 +16,9 @@ import java.util.List;
  * 表单定义业务接口
  *
  * @author Ray.Hao
- * @since 4.8.0
+ * @since 4.9.0
  */
-public interface FormDefinitionService extends IService<FormDefinition> {
+public interface FormDefinitionService {
 
     /**
      * 表单定义分页列表
@@ -26,7 +26,15 @@ public interface FormDefinitionService extends IService<FormDefinition> {
      * @param queryParams 查询参数
      * @return 表单定义分页列表
      */
-    Page<FormDefinitionPageVO> getFormDefinitionPage(FormDefinitionQuery queryParams);
+    Page<FormDefinitionPageVO> getFormDefinitionPage(FormDefinitionPageQuery queryParams);
+
+    /**
+     * 按主键查询表单定义（供模块内回退取规则等场景）
+     *
+     * @param id 表单ID
+     * @return 表单定义实体；不存在返回 null
+     */
+    FormDefinition getFormDefinition(Long id);
 
     /**
      * 获取表单定义表单数据（编辑回显）
@@ -118,5 +126,15 @@ public interface FormDefinitionService extends IService<FormDefinition> {
      * @return 菜单配置；未生成过返回 null
      */
     FormMenuVO getFormMenu(Long formId);
+
+    /**
+     * 审批表单下拉选项（供工作流设计器绑定表单）
+     *
+     * <p>仅返回已发布且类型为 workflow 的表单；value 为 formKey（BPMN formKey 引用），
+     * 草稿/停用表单结构未定不应被流程绑定</p>
+     *
+     * @return 审批表单下拉选项列表
+     */
+    List<Option<String>> listWorkflowFormOptions();
 
 }

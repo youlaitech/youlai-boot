@@ -11,7 +11,7 @@ import lombok.EqualsAndHashCode;
  * 表单数据实体
  *
  * @author Ray.Hao
- * @since 4.8.0
+ * @since 4.9.0
  */
 @EqualsAndHashCode(callSuper = true)
 @TableName("form_data")

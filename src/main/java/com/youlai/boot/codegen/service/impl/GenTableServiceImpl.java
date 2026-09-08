@@ -11,7 +11,7 @@ import com.youlai.boot.codegen.enums.FormTypeEnum;
 import com.youlai.boot.codegen.enums.JavaTypeEnum;
 import com.youlai.boot.codegen.enums.QueryTypeEnum;
 import com.youlai.boot.common.exception.BusinessException;
-import com.youlai.boot.codegen.config.CodegenProperties;
+import com.youlai.boot.codegen.property.CodegenProperties;
 import com.youlai.boot.codegen.converter.CodegenConverter;
 import com.youlai.boot.codegen.mapper.DatabaseMapper;
 import com.youlai.boot.codegen.mapper.GenTableMapper;
@@ -22,6 +22,7 @@ import com.youlai.boot.codegen.model.entity.GenTableColumn;
 import com.youlai.boot.codegen.model.form.GenConfigForm;
 import com.youlai.boot.codegen.service.GenTableService;
 import com.youlai.boot.codegen.service.GenTableColumnService;
+import com.youlai.boot.system.model.dto.MenuCreateDTO;
 import com.youlai.boot.system.service.MenuService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
@@ -188,7 +189,13 @@ public class GenTableServiceImpl extends ServiceImpl<GenTableMapper, GenTable> i
         // 如果选择上级菜单且当前环境不是生产环境，则保存菜单
         Long parentMenuId = formData.getParentMenuId();
         if (parentMenuId != null && !EnvEnum.PROD.getValue().equals(springProfilesActive)) {
-            menuService.addMenuForCodegen(parentMenuId, genTable);
+            MenuCreateDTO dto = new MenuCreateDTO(
+                    genTable.getBusinessName(),
+                    genTable.getEntityName(),
+                    genTable.getModuleName(),
+                    genTable.getTableName()
+            );
+            menuService.addMenuForCodegen(parentMenuId, dto);
         }
 
         List<GenTableColumn> genTableColumns = codegenConverter.toGenTableColumn(formData.getFieldConfigs());

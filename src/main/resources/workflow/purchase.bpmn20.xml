@@ -1,0 +1,93 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<bpmn:definitions xmlns:bpmn="http://www.omg.org/spec/BPMN/20100524/MODEL"
+                  xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI"
+                  xmlns:dc="http://www.omg.org/spec/DD/20100524/DC"
+                  xmlns:di="http://www.omg.org/spec/DD/20100524/DI"
+                  xmlns:flowable="http://flowable.org/bpmn"
+                  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                  id="Definitions_purchase" targetNamespace="http://youlai.tech/workflow">
+  <bpmn:process id="purchase" name="采购申请" isExecutable="true">
+    <!-- flowable:initiator：启动时将发起人写入流程变量 initiator，供"采购执行"回退发起人办理 -->
+    <bpmn:startEvent id="startEvent" name="开始" flowable:formKey="purchase_apply" flowable:initiator="initiator">
+      <bpmn:outgoing>flow1</bpmn:outgoing>
+    </bpmn:startEvent>
+    <bpmn:userTask id="leaderApprove" name="部门主管审批" flowable:candidateGroups="DEPT_MANAGER">
+      <bpmn:incoming>flow1</bpmn:incoming>
+      <bpmn:outgoing>flow2</bpmn:outgoing>
+    </bpmn:userTask>
+    <bpmn:exclusiveGateway id="amountGateway" name="预估金额？" default="flow4">
+      <bpmn:incoming>flow2</bpmn:incoming>
+      <bpmn:outgoing>flow3</bpmn:outgoing>
+      <bpmn:outgoing>flow4</bpmn:outgoing>
+    </bpmn:exclusiveGateway>
+    <bpmn:userTask id="managerApprove" name="总经理审批" flowable:candidateGroups="GENERAL_MANAGER">
+      <bpmn:incoming>flow3</bpmn:incoming>
+      <bpmn:outgoing>flow5</bpmn:outgoing>
+    </bpmn:userTask>
+    <bpmn:userTask id="purchaseExecute" name="采购执行" flowable:assignee="${initiator}">
+      <bpmn:incoming>flow4</bpmn:incoming>
+      <bpmn:incoming>flow5</bpmn:incoming>
+      <bpmn:outgoing>flow6</bpmn:outgoing>
+    </bpmn:userTask>
+    <bpmn:endEvent id="endEvent" name="结束">
+      <bpmn:incoming>flow6</bpmn:incoming>
+    </bpmn:endEvent>
+    <bpmn:sequenceFlow id="flow1" sourceRef="startEvent" targetRef="leaderApprove"/>
+    <bpmn:sequenceFlow id="flow2" sourceRef="leaderApprove" targetRef="amountGateway"/>
+    <bpmn:sequenceFlow id="flow3" name="超过1万元" sourceRef="amountGateway" targetRef="managerApprove">
+      <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression">${amount > 10000}</bpmn:conditionExpression>
+    </bpmn:sequenceFlow>
+    <bpmn:sequenceFlow id="flow4" name="1万元以内" sourceRef="amountGateway" targetRef="purchaseExecute"/>
+    <bpmn:sequenceFlow id="flow5" sourceRef="managerApprove" targetRef="purchaseExecute"/>
+    <bpmn:sequenceFlow id="flow6" sourceRef="purchaseExecute" targetRef="endEvent"/>
+  </bpmn:process>
+  <bpmndi:BPMNDiagram id="BPMNDiagram_purchase">
+    <bpmndi:BPMNPlane id="BPMNPlane_purchase" bpmnElement="purchase">
+      <bpmndi:BPMNShape id="startEvent_di" bpmnElement="startEvent">
+        <dc:Bounds x="152" y="102" width="36" height="36"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="leaderApprove_di" bpmnElement="leaderApprove">
+        <dc:Bounds x="240" y="80" width="100" height="80"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="amountGateway_di" bpmnElement="amountGateway">
+        <dc:Bounds x="395" y="95" width="50" height="50"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="managerApprove_di" bpmnElement="managerApprove">
+        <dc:Bounds x="510" y="80" width="100" height="80"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="purchaseExecute_di" bpmnElement="purchaseExecute">
+        <dc:Bounds x="650" y="240" width="100" height="80"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="endEvent_di" bpmnElement="endEvent">
+        <dc:Bounds x="802" y="102" width="36" height="36"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge id="flow1_di" bpmnElement="flow1">
+        <di:waypoint x="188" y="120"/>
+        <di:waypoint x="240" y="120"/>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="flow2_di" bpmnElement="flow2">
+        <di:waypoint x="340" y="120"/>
+        <di:waypoint x="395" y="120"/>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="flow3_di" bpmnElement="flow3">
+        <di:waypoint x="445" y="120"/>
+        <di:waypoint x="510" y="120"/>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="flow4_di" bpmnElement="flow4">
+        <di:waypoint x="420" y="145"/>
+        <di:waypoint x="420" y="280"/>
+        <di:waypoint x="650" y="280"/>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="flow5_di" bpmnElement="flow5">
+        <di:waypoint x="610" y="120"/>
+        <di:waypoint x="700" y="120"/>
+        <di:waypoint x="700" y="240"/>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="flow6_di" bpmnElement="flow6">
+        <di:waypoint x="750" y="280"/>
+        <di:waypoint x="820" y="280"/>
+        <di:waypoint x="820" y="138"/>
+      </bpmndi:BPMNEdge>
+    </bpmndi:BPMNPlane>
+  </bpmndi:BPMNDiagram>
+</bpmn:definitions>

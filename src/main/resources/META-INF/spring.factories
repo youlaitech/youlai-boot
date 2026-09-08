@@ -1,0 +1,2 @@
+org.springframework.boot.EnvironmentPostProcessor=\
+  com.youlai.boot.module.config.WorkflowEnvironmentPostProcessor

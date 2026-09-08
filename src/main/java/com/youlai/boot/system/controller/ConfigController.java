@@ -39,7 +39,7 @@ public class ConfigController {
     @GetMapping
     @PreAuthorize("@ss.hasPerm('sys:config:list')")
     @Log(module = LogModuleEnum.CONFIG, value = ActionTypeEnum.LIST)
-    public PageResult<ConfigVO> page(@ParameterObject ConfigQuery queryParams) {
+    public PageResult<ConfigVO> page(@ParameterObject @Valid ConfigQuery queryParams) {
         IPage<ConfigVO> result = configService.page(queryParams);
         return PageResult.success(result);
     }
@@ -48,7 +48,7 @@ public class ConfigController {
     @PostMapping
     @PreAuthorize("@ss.hasPerm('sys:config:create')")
     @Log(module = LogModuleEnum.CONFIG, value = ActionTypeEnum.INSERT)
-    public Result<?> save(@RequestBody @Valid ConfigForm configForm) {
+    public Result<Void> save(@RequestBody @Valid ConfigForm configForm) {
         return Result.judge(configService.save(configForm));
     }
 
@@ -73,7 +73,7 @@ public class ConfigController {
     @PutMapping(value = "/{configId}")
     @PreAuthorize("@ss.hasPerm('sys:config:update')")
     @Log(module = LogModuleEnum.CONFIG, value = ActionTypeEnum.UPDATE)
-    public Result<?> update(@Valid @PathVariable Long configId, @RequestBody ConfigForm configForm) {
+    public Result<Void> update(@PathVariable Long configId, @RequestBody @Valid ConfigForm configForm) {
         return Result.judge(configService.edit(configId, configForm));
     }
 
@@ -81,7 +81,7 @@ public class ConfigController {
     @DeleteMapping("/{configId}")
     @PreAuthorize("@ss.hasPerm('sys:config:delete')")
     @Log(module = LogModuleEnum.CONFIG, value = ActionTypeEnum.DELETE)
-    public Result<?> delete(@PathVariable Long configId) {
+    public Result<Void> delete(@PathVariable Long configId) {
         return Result.judge(configService.delete(configId));
     }
 

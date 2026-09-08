@@ -1,9 +1,9 @@
 package com.youlai.boot.framework.web.filter;
 
-import com.youlai.boot.common.util.IPUtils;
+import com.youlai.boot.framework.web.util.IPUtils;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.context.annotation.Configuration;
+import org.springframework.stereotype.Component;
 import org.springframework.web.filter.CommonsRequestLoggingFilter;
 
 /**
@@ -12,7 +12,7 @@ import org.springframework.web.filter.CommonsRequestLoggingFilter;
  * @author haoxr
  * @since 2023/03/03
  */
-@Configuration
+@Component
 @Slf4j
 public class RequestLogFilter extends CommonsRequestLoggingFilter {
 

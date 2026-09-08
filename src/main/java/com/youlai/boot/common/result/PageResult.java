@@ -25,7 +25,7 @@ public class PageResult<T> implements Serializable {
     /**
      * 构建分页结果（MyBatis-Plus {@link IPage}）。
      *
-     * <p>data 为当前页记录列表；page 提供分页元信息。</p>
+     * <p>list 为当前页记录列表，total 为符合条件的总记录数。</p>
      */
     public static <T> PageResult<T> success(IPage<T> page) {
         PageResult<T> result = new PageResult<>();
@@ -47,7 +47,7 @@ public class PageResult<T> implements Serializable {
     /**
      * 构建列表结果（无分页）。
      *
-     * <p>page 置为 null，用于与分页返回区分。</p>
+     * <p>total 固定为 0，用于与分页返回区分。</p>
      */
     public static <T> PageResult<T> success(List<T> list) {
         PageResult<T> result = new PageResult<>();

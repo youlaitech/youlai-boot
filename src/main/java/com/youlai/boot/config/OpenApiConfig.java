@@ -1,7 +1,7 @@
 package com.youlai.boot.config;
 
 import cn.hutool.core.util.ArrayUtil;
-import com.youlai.boot.config.property.SecurityProperties;
+import com.youlai.boot.framework.security.config.SecurityProperties;
 import io.swagger.v3.oas.models.Components;
 import io.swagger.v3.oas.models.OpenAPI;
 import io.swagger.v3.oas.models.info.Contact;
@@ -78,12 +78,12 @@ public class OpenApiConfig {
             if (openApi.getPaths() != null) {
                 openApi.getPaths().forEach((path, pathItem) -> {
 
-                    // 忽略认证的请求无需携带 Authorization
-                    String[] ignoreUrls = securityProperties.getIgnoreUrls();
-                    if (ArrayUtil.isNotEmpty(ignoreUrls)) {
-                        // Ant 匹配忽略的路径，不添加Authorization
+                    // 匿名放行的请求无需携带 Authorization
+                    String[] permitAllUrls = securityProperties.getPermitAllUrls();
+                    if (ArrayUtil.isNotEmpty(permitAllUrls)) {
+                        // Ant 匹配放行路径，不添加Authorization
                         AntPathMatcher antPathMatcher = new AntPathMatcher();
-                        if (Stream.of(ignoreUrls).anyMatch(ignoreUrl -> antPathMatcher.match(ignoreUrl, path))) {
+                        if (Stream.of(permitAllUrls).anyMatch(permitAllUrl -> antPathMatcher.match(permitAllUrl, path))) {
                             return;
                         }
                     }

@@ -3,6 +3,8 @@ package com.youlai.boot.codegen.model.form;
 import com.youlai.boot.codegen.enums.FormTypeEnum;
 import com.youlai.boot.codegen.enums.QueryTypeEnum;
 import io.swagger.v3.oas.annotations.media.Schema;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Pattern;
 import lombok.Data;
 
 import java.util.List;
@@ -21,18 +23,26 @@ public class GenConfigForm {
     private Long id;
 
     @Schema(description = "表名",example = "sys_user")
+    @NotBlank(message = "表名不能为空")
     private String tableName;
 
     @Schema(description = "业务名",example = "用户")
+    @NotBlank(message = "业务名不能为空")
     private String businessName;
 
     @Schema(description = "模块名",example = "system")
+    @NotBlank(message = "模块名不能为空")
+    @Pattern(regexp = "[a-zA-Z][a-zA-Z0-9_]*", message = "模块名只能包含字母、数字和下划线，且以字母开头")
     private String moduleName;
 
     @Schema(description = "包名",example = "com.youlai")
+    @NotBlank(message = "包名不能为空")
+    @Pattern(regexp = "([a-zA-Z_][a-zA-Z0-9_]*\\.)*[a-zA-Z_][a-zA-Z0-9_]*", message = "包名格式不正确")
     private String packageName;
 
     @Schema(description = "实体名",example = "User")
+    @NotBlank(message = "实体名不能为空")
+    @Pattern(regexp = "[a-zA-Z][a-zA-Z0-9]*", message = "实体名只能包含字母和数字，且以字母开头")
     private String entityName;
 
     @Schema(description = "作者",example = "youlaitech")

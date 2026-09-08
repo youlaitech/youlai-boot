@@ -1,0 +1,139 @@
+package com.youlai.boot.auth.password.filter;
+
+import cn.hutool.core.util.StrUtil;
+import cn.hutool.json.JSONObject;
+import cn.hutool.json.JSONUtil;
+import com.youlai.boot.auth.password.exception.CaptchaException;
+import com.youlai.boot.auth.password.service.CaptchaService;
+import com.youlai.boot.common.constant.SecurityConstants;
+import com.youlai.boot.common.result.ResultCode;
+import com.youlai.boot.framework.web.util.ResponseWriter;
+import jakarta.servlet.FilterChain;
+import jakarta.servlet.ServletException;
+import jakarta.servlet.ServletInputStream;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletRequestWrapper;
+import jakarta.servlet.http.HttpServletResponse;
+import org.springframework.http.HttpMethod;
+import org.springframework.http.MediaType;
+import org.springframework.security.web.servlet.util.matcher.PathPatternRequestMatcher;
+import org.springframework.security.web.util.matcher.RequestMatcher;
+import org.springframework.util.StreamUtils;
+import org.springframework.web.filter.OncePerRequestFilter;
+import org.springframework.web.util.ContentCachingRequestWrapper;
+
+import java.io.BufferedReader;
+import java.io.ByteArrayInputStream;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.nio.charset.StandardCharsets;
+
+/**
+ * 图形验证码校验过滤器
+ * <p>
+ * 仅拦截账号密码登录请求：先校验验证码，校验通过后把请求体包装成可重复读取的 Request 再放行。
+ *
+ * @author Ray.Hao
+ */
+public class CaptchaValidationFilter extends OncePerRequestFilter {
+
+    private static final RequestMatcher LOGIN_PATH_REQUEST_MATCHER = PathPatternRequestMatcher.withDefaults()
+            .matcher(HttpMethod.POST, SecurityConstants.LOGIN_PATH);
+
+    public static final String CAPTCHA_CODE_PARAM_NAME = "captchaCode";
+    public static final String CAPTCHA_ID_PARAM_NAME = "captchaId";
+
+    private final CaptchaService captchaService;
+
+    public CaptchaValidationFilter(CaptchaService captchaService) {
+        this.captchaService = captchaService;
+    }
+
+    @Override
+    public void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain chain)
+            throws ServletException, IOException {
+
+        if (!LOGIN_PATH_REQUEST_MATCHER.matches(request)) {
+            chain.doFilter(request, response);
+            return;
+        }
+
+        String contentType = request.getContentType();
+        if (contentType == null || !contentType.contains(MediaType.APPLICATION_JSON_VALUE)) {
+            ResponseWriter.writeError(response, ResultCode.USER_VERIFICATION_CODE_ERROR);
+            return;
+        }
+
+        ContentCachingRequestWrapper requestWrapper = new ContentCachingRequestWrapper(request, -1);
+
+        byte[] bodyBytes = StreamUtils.copyToByteArray(requestWrapper.getInputStream());
+        String body = new String(bodyBytes, StandardCharsets.UTF_8);
+        String captchaCode = null;
+        String captchaId = null;
+
+        if (StrUtil.isNotBlank(body)) {
+            JSONObject jsonObject = JSONUtil.parseObj(body);
+            captchaCode = jsonObject.getStr(CAPTCHA_CODE_PARAM_NAME);
+            captchaId = jsonObject.getStr(CAPTCHA_ID_PARAM_NAME);
+        }
+
+        try {
+            captchaService.validate(captchaId, captchaCode);
+            HttpServletRequest repeatableRequest = new RepeatableReadRequestWrapper(requestWrapper, bodyBytes);
+            chain.doFilter(repeatableRequest, response);
+        } catch (CaptchaException e) {
+            ResponseWriter.writeError(response, e.getResultCode());
+        }
+    }
+
+    private static class RepeatableReadRequestWrapper extends HttpServletRequestWrapper {
+
+        private final byte[] cachedBody;
+
+        RepeatableReadRequestWrapper(HttpServletRequest request, byte[] cachedBody) {
+            super(request);
+            this.cachedBody = cachedBody != null ? cachedBody : new byte[0];
+        }
+
+        @Override
+        public ServletInputStream getInputStream() {
+            ByteArrayInputStream bais = new ByteArrayInputStream(cachedBody);
+            return new ServletInputStream() {
+                @Override
+                public int read() {
+                    return bais.read();
+                }
+
+                @Override
+                public boolean isFinished() {
+                    return bais.available() == 0;
+                }
+
+                @Override
+                public boolean isReady() {
+                    return true;
+                }
+
+                @Override
+                public void setReadListener(jakarta.servlet.ReadListener readListener) {
+                    // no-op
+                }
+            };
+        }
+
+        @Override
+        public BufferedReader getReader() {
+            return new BufferedReader(new InputStreamReader(getInputStream(), StandardCharsets.UTF_8));
+        }
+
+        @Override
+        public int getContentLength() {
+            return cachedBody.length;
+        }
+
+        @Override
+        public long getContentLengthLong() {
+            return cachedBody.length;
+        }
+    }
+}

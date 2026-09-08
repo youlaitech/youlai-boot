@@ -4,7 +4,7 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.youlai.boot.common.exception.BusinessException;
 import com.youlai.boot.common.result.PageResult;
 import com.youlai.boot.common.result.Result;
-import com.youlai.boot.codegen.config.CodegenProperties;
+import com.youlai.boot.codegen.property.CodegenProperties;
 import com.youlai.boot.common.enums.ActionTypeEnum;
 import com.youlai.boot.common.enums.LogModuleEnum;
 import com.youlai.boot.codegen.service.CodegenService;
@@ -18,6 +18,7 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.servlet.ServletOutputStream;
+import jakarta.validation.Valid;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -48,7 +49,7 @@ public class CodegenController {
     @Operation(summary = "获取数据表分页列表")
     @GetMapping("/table")
     public PageResult<TablePageVO> getTablePage(
-            TableQuery queryParams
+            @Valid TableQuery queryParams
     ) {
         Page<TablePageVO> result = codegenService.getTablePage(queryParams);
         return PageResult.success(result);
@@ -66,14 +67,14 @@ public class CodegenController {
     @Operation(summary = "保存代码生成配置")
     @PostMapping("/{tableName}/config")
     @Log(module = LogModuleEnum.CODEGEN, value = ActionTypeEnum.UPDATE)
-    public Result<?> saveGenConfig(@RequestBody GenConfigForm formData) {
+    public Result<Void> saveGenConfig(@RequestBody @Valid GenConfigForm formData) {
         genTableService.saveGenConfig(formData);
         return Result.success();
     }
 
     @Operation(summary = "删除代码生成配置")
     @DeleteMapping("/{tableName}/config")
-    public Result<?> deleteGenConfig(
+    public Result<Void> deleteGenConfig(
             @Parameter(description = "表名", example = "sys_user") @PathVariable String tableName
     ) {
         genTableService.deleteGenConfig(tableName);

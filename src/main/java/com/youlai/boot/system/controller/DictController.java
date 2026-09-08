@@ -12,14 +12,14 @@ import com.youlai.boot.system.model.query.DictQuery;
 import com.youlai.boot.system.model.vo.DictItemOptionVO;
 import com.youlai.boot.system.model.vo.DictItemPageVO;
 import com.youlai.boot.system.model.vo.DictPageVO;
-import com.youlai.boot.common.annotation.RepeatSubmit;
+import com.youlai.boot.framework.web.repeatsubmit.RepeatSubmit;
 import com.youlai.boot.system.model.form.DictForm;
 import com.youlai.boot.common.annotation.Log;
 import com.youlai.boot.system.service.DictItemService;
 import com.youlai.boot.system.service.DictService;
 import com.youlai.boot.support.sse.SseService;
 import com.youlai.boot.support.sse.constant.SseTopics;
-import com.youlai.boot.system.model.dto.DictChangeEvent;
+import com.youlai.boot.system.model.dto.DictChangeDTO;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import io.swagger.v3.oas.annotations.Operation;
@@ -53,7 +53,7 @@ public class DictController {
      * @param dictCode 字典编码
      */
     private void sendDictChange(String dictCode) {
-        sseService.broadcast(SseTopics.DICT, new DictChangeEvent(dictCode));
+        sseService.broadcast(SseTopics.DICT, new DictChangeDTO(dictCode));
     }
 
     //---------------------------------------------------
@@ -63,7 +63,7 @@ public class DictController {
     @GetMapping
     @Log(module = LogModuleEnum.DICT, value = ActionTypeEnum.LIST)
     public PageResult<DictPageVO> getDictPage(
-            DictQuery queryParams
+            @Valid DictQuery queryParams
     ) {
         Page<DictPageVO> result = dictService.getDictPage(queryParams);
         return PageResult.success(result);
@@ -91,7 +91,7 @@ public class DictController {
     @PreAuthorize("@ss.hasPerm('sys:dict:create')")
     @RepeatSubmit
     @Log(module = LogModuleEnum.DICT, value = ActionTypeEnum.INSERT)
-    public Result<?> saveDict(@Valid @RequestBody DictForm formData) {
+    public Result<Void> saveDict(@Valid @RequestBody DictForm formData) {
         boolean result = dictService.saveDict(formData);
         // 发送字典更新通知
         if (result) {
@@ -104,9 +104,9 @@ public class DictController {
     @PutMapping("/{dictId}")
     @PreAuthorize("@ss.hasPerm('sys:dict:update')")
     @Log(module = LogModuleEnum.DICT, value = ActionTypeEnum.UPDATE)
-    public Result<?> updateDict(
+    public Result<Void> updateDict(
             @PathVariable Long dictId,
-            @RequestBody DictForm dictForm
+            @RequestBody @Valid DictForm dictForm
     ) {
         boolean status = dictService.updateDict(dictId, dictForm);
         // 发送字典更新通知
@@ -120,7 +120,7 @@ public class DictController {
     @DeleteMapping("/{ids}")
     @PreAuthorize("@ss.hasPerm('sys:dict:delete')")
     @Log(module = LogModuleEnum.DICT, value = ActionTypeEnum.DELETE)
-    public Result<?> deleteDictionaries(
+    public Result<Void> deleteDictionaries(
             @Parameter(description = "字典ID，多个以英文逗号(,)拼接") @PathVariable String ids
     ) {
         // 获取字典编码列表，用于发送删除通知
@@ -144,7 +144,7 @@ public class DictController {
     @GetMapping("/{dictCode}/items")
     public PageResult<DictItemPageVO> getDictItemPage(
             @PathVariable String dictCode,
-            DictItemQuery queryParams
+            @Valid DictItemQuery queryParams
     ) {
         queryParams.setDictCode(dictCode);
         Page<DictItemPageVO> result = dictItemService.getDictItemPage(queryParams);
@@ -195,10 +195,10 @@ public class DictController {
     @PreAuthorize("@ss.hasPerm('sys:dict-item:update')")
     @RepeatSubmit
     @Log(module = LogModuleEnum.DICT, value = ActionTypeEnum.UPDATE)
-    public Result<?> updateDictItem(
+    public Result<Void> updateDictItem(
             @PathVariable String dictCode,
             @PathVariable Long itemId,
-            @RequestBody DictItemForm formData
+            @RequestBody @Valid DictItemForm formData
     ) {
         formData.setId(itemId);
         formData.setDictCode(dictCode);

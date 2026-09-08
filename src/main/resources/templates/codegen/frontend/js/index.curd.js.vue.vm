@@ -105,11 +105,11 @@ const searchConfig = reactive({
     },
 #else
     {
-#if($fieldConfig.javaType == "String")
+#if($fieldConfig.fieldType == "String")
       type: "input",
-#elseif($fieldConfig.javaType == "Integer" || $fieldConfig.javaType == "Long")
+#elseif($fieldConfig.fieldType == "Integer" || $fieldConfig.fieldType == "Long")
       type: "input-number",
-#elseif($fieldConfig.javaType == "Date" || $fieldConfig.javaType == "LocalDateTime")
+#elseif($fieldConfig.fieldType == "LocalDate" || $fieldConfig.fieldType == "LocalDateTime")
       type: "date-picker",
 #else
       type: "input",
@@ -118,7 +118,7 @@ const searchConfig = reactive({
       prop: "$fieldConfig.fieldName",
       attrs: {
         placeholder: "$fieldConfig.fieldComment",
-#if($fieldConfig.javaType == "Date" || $fieldConfig.javaType == "LocalDateTime")
+#if($fieldConfig.fieldType == "LocalDate" || $fieldConfig.fieldType == "LocalDateTime")
         type: "daterange",
         "range-separator": "~",
         "start-placeholder": "开始时间",
@@ -228,7 +228,7 @@ const addModalConfig = reactive({
     },
 #else
     {
-#if($fieldConfig.javaType == "String")
+#if($fieldConfig.fieldType == "String")
 #if($fieldConfig.fieldName.contains("password") || $fieldConfig.fieldName.contains("pwd"))
       type: "input",
       attrs: {
@@ -272,7 +272,7 @@ const addModalConfig = reactive({
       rules: [{ required: true, message: "$fieldConfig.fieldComment不能为空", trigger: "blur" }],
 #end
 #end
-#elseif($fieldConfig.javaType == "Integer" || $fieldConfig.javaType == "Long")
+#elseif($fieldConfig.fieldType == "Integer" || $fieldConfig.fieldType == "Long")
       type: "input-number",
       attrs: {
         placeholder: "$fieldConfig.fieldComment",
@@ -281,7 +281,7 @@ const addModalConfig = reactive({
 #if($fieldConfig.isRequired == 1)
       rules: [{ required: true, message: "$fieldConfig.fieldComment不能为空", trigger: "blur" }],
 #end
-#elseif($fieldConfig.javaType == "BigDecimal" || $fieldConfig.javaType == "Double")
+#elseif($fieldConfig.fieldType == "BigDecimal" || $fieldConfig.fieldType == "Double")
       type: "input-number",
       attrs: {
         placeholder: "$fieldConfig.fieldComment",
@@ -291,7 +291,7 @@ const addModalConfig = reactive({
 #if($fieldConfig.isRequired == 1)
       rules: [{ required: true, message: "$fieldConfig.fieldComment不能为空", trigger: "blur" }],
 #end
-#elseif($fieldConfig.javaType == "Date" || $fieldConfig.javaType == "LocalDateTime")
+#elseif($fieldConfig.fieldType == "LocalDate" || $fieldConfig.fieldType == "LocalDateTime")
       type: "date-picker",
       attrs: {
         type: "datetime",
@@ -303,7 +303,7 @@ const addModalConfig = reactive({
 #if($fieldConfig.isRequired == 1)
       rules: [{ required: true, message: "$fieldConfig.fieldComment不能为空", trigger: "change" }],
 #end
-#elseif($fieldConfig.javaType == "Boolean" || $fieldConfig.fieldName.contains("status"))
+#elseif($fieldConfig.fieldType == "Boolean" || $fieldConfig.fieldName.contains("status"))
       type: "switch",
       attrs: {
         activeText: "启用",

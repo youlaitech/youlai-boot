@@ -71,7 +71,11 @@
         <choose>
             <!-- 如果排序参数都传入 -->
             <when test="queryParams.sortBy != null and queryParams.sortBy != '' and queryParams.order != null">
-                ORDER BY u.${queryParams.sortBy} ${queryParams.order}
+                ORDER BY u.${queryParams.sortBy}
+                <choose>
+                    <when test='queryParams.order.equalsIgnoreCase("desc")'>DESC</when>
+                    <otherwise>ASC</otherwise>
+                </choose>
             </when>
             <!-- 默认排序 -->
             <otherwise>

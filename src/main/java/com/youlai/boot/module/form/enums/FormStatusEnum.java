@@ -12,7 +12,7 @@ import lombok.Getter;
  * <p>-1 为停用态，其余为正常生命周期</p>
  *
  * @author Ray.Hao
- * @since 4.8.0
+ * @since 4.9.0
  */
 @Schema(enumAsRef = true)
 @Getter

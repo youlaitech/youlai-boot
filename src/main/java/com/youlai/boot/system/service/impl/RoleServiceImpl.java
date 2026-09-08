@@ -99,6 +99,19 @@ public class RoleServiceImpl extends ServiceImpl<RoleMapper, Role> implements Ro
         return roleConverter.toOptions(roleList);
     }
 
+    @Override
+    public List<Option<String>> listRoleCodeOptions() {
+        // value 为角色编码（引擎候选组按编码匹配），与按 ID 取值的 listRoleOptions 区分
+        List<Role> roleList = this.list(new LambdaQueryWrapper<Role>()
+                .ne(!SecurityUtils.isRoot(), Role::getCode, SystemConstants.ROOT_ROLE_CODE)
+                .select(Role::getCode, Role::getName)
+                .orderByAsc(Role::getSort)
+        );
+        return roleList.stream()
+                .map(role -> new Option<>(role.getCode(), role.getName()))
+                .toList();
+    }
+
     /**
      * 保存角色
      *

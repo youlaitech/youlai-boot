@@ -14,6 +14,7 @@ import com.youlai.boot.system.service.LogService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 
@@ -37,7 +38,7 @@ public class LogController {
     @GetMapping
     @Log(module = LogModuleEnum.LOG, value = ActionTypeEnum.LIST)
     public PageResult<LogPageVO> getLogPage(
-             LogQuery queryParams
+             @Valid LogQuery queryParams
     ) {
         Page<LogPageVO> result = logService.getLogPage(queryParams);
         return PageResult.success(result);

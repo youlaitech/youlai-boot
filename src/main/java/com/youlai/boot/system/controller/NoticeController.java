@@ -42,7 +42,7 @@ public class NoticeController {
     @GetMapping
     @PreAuthorize("@ss.hasPerm('sys:notice:list')")
     @Log(module = LogModuleEnum.NOTICE, value = ActionTypeEnum.LIST)
-    public PageResult<NoticePageVO> getNoticePage(NoticeQuery queryParams) {
+    public PageResult<NoticePageVO> getNoticePage(@Valid NoticeQuery queryParams) {
         IPage<NoticePageVO> result = noticeService.getNoticePage(queryParams);
         return PageResult.success(result);
     }
@@ -51,7 +51,7 @@ public class NoticeController {
     @PostMapping
     @PreAuthorize("@ss.hasPerm('sys:notice:create')")
     @Log(module = LogModuleEnum.NOTICE, value = ActionTypeEnum.INSERT)
-    public Result<?> saveNotice(@RequestBody @Valid NoticeForm formData) {
+    public Result<Void> saveNotice(@RequestBody @Valid NoticeForm formData) {
         boolean result = noticeService.saveNotice(formData);
         return Result.judge(result);
     }
@@ -130,7 +130,7 @@ public class NoticeController {
     @Operation(summary = "获取我的通知公告分页列表")
     @GetMapping("/my")
     public PageResult<UserNoticePageVO> getMyNoticePage(
-            NoticeQuery queryParams
+            @Valid NoticeQuery queryParams
     ) {
         IPage<UserNoticePageVO> result = noticeService.getMyNoticePage(queryParams);
         return PageResult.success(result);

@@ -5,7 +5,7 @@ import cn.hutool.core.util.StrUtil;
 import com.youlai.boot.common.constant.RedisConstants;
 import com.youlai.boot.common.constant.SecurityConstants;
 import com.youlai.boot.common.result.ResultCode;
-import com.youlai.boot.config.property.SecurityProperties;
+import com.youlai.boot.framework.security.config.SecurityProperties;
 import com.youlai.boot.common.exception.TokenInvalidException;
 import com.youlai.boot.framework.security.model.AuthenticationToken;
 import com.youlai.boot.framework.security.model.SecurityUserDetails;
@@ -31,7 +31,7 @@ import java.util.concurrent.TimeUnit;
  * @author Ray.Hao
  * @since 2024/11/15
  */
-@ConditionalOnProperty(value = "security.session.type", havingValue = "redis-token")
+@ConditionalOnProperty(value = "security.token.type", havingValue = "redis-token")
 @Service
 public class RedisTokenManager implements TokenManager {
 
@@ -62,7 +62,7 @@ public class RedisTokenManager implements TokenManager {
         return AuthenticationToken.builder()
                 .accessToken(accessToken)
                 .refreshToken(refreshToken)
-                .expiresIn(securityProperties.getSession().getAccessTokenTimeToLive())
+                .expiresIn(securityProperties.getToken().getAccessTokenTimeToLive())
                 .build();
     }
 
@@ -102,7 +102,7 @@ public class RedisTokenManager implements TokenManager {
         String newAccessToken = IdUtil.fastSimpleUUID();
         storeAccessToken(newAccessToken, sessionUser);
 
-        int accessTtl = securityProperties.getSession().getAccessTokenTimeToLive();
+        int accessTtl = securityProperties.getToken().getAccessTokenTimeToLive();
         return AuthenticationToken.builder()
                 .accessToken(newAccessToken)
                 .refreshToken(refreshToken)
@@ -152,16 +152,16 @@ public class RedisTokenManager implements TokenManager {
 
     private void storeTokensInRedis(String accessToken, String refreshToken, SecurityUserDetails sessionUser) {
         setRedisValue(formatTokenKey(accessToken), sessionUser,
-                securityProperties.getSession().getAccessTokenTimeToLive());
+                securityProperties.getToken().getAccessTokenTimeToLive());
         String refreshTokenKey = StrUtil.format(RedisConstants.Auth.REFRESH_TOKEN_USER, refreshToken);
         setRedisValue(refreshTokenKey, sessionUser,
-                securityProperties.getSession().getRefreshTokenTimeToLive());
+                securityProperties.getToken().getRefreshTokenTimeToLive());
         setRedisValue(StrUtil.format(RedisConstants.Auth.USER_REFRESH_TOKEN, sessionUser.getUserId()),
-                refreshToken, securityProperties.getSession().getRefreshTokenTimeToLive());
+                refreshToken, securityProperties.getToken().getRefreshTokenTimeToLive());
     }
 
     private void handleSingleDeviceLogin(Long userId, String accessToken) {
-        Boolean allowMultiLogin = securityProperties.getSession().getRedisToken().getAllowMultiLogin();
+        Boolean allowMultiLogin = securityProperties.getToken().getRedisToken().getAllowMultiLogin();
         String userAccessKey = StrUtil.format(RedisConstants.Auth.USER_ACCESS_TOKEN, userId);
         if (!allowMultiLogin) {
             Object oldAccessTokenValue = redisTemplate.opsForValue().get(userAccessKey);
@@ -169,14 +169,14 @@ public class RedisTokenManager implements TokenManager {
                 redisTemplate.delete(formatTokenKey(oldAccessToken));
             }
         }
-        setRedisValue(userAccessKey, accessToken, securityProperties.getSession().getAccessTokenTimeToLive());
+        setRedisValue(userAccessKey, accessToken, securityProperties.getToken().getAccessTokenTimeToLive());
     }
 
     private void storeAccessToken(String newAccessToken, SecurityUserDetails sessionUser) {
         setRedisValue(StrUtil.format(RedisConstants.Auth.ACCESS_TOKEN_USER, newAccessToken), sessionUser,
-                securityProperties.getSession().getAccessTokenTimeToLive());
+                securityProperties.getToken().getAccessTokenTimeToLive());
         String userAccessKey = StrUtil.format(RedisConstants.Auth.USER_ACCESS_TOKEN, sessionUser.getUserId());
-        setRedisValue(userAccessKey, newAccessToken, securityProperties.getSession().getAccessTokenTimeToLive());
+        setRedisValue(userAccessKey, newAccessToken, securityProperties.getToken().getAccessTokenTimeToLive());
     }
 
     private String formatTokenKey(String token) {

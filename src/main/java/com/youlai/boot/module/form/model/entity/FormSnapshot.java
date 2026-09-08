@@ -13,7 +13,7 @@ import lombok.EqualsAndHashCode;
  * 快照只增不改，审计字段仅保留 BaseEntity 公共部分</p>
  *
  * @author Ray.Hao
- * @since 4.8.0
+ * @since 4.9.0
  */
 @EqualsAndHashCode(callSuper = true)
 @TableName("form_snapshot")

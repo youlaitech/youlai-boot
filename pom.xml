@@ -6,7 +6,7 @@
 
     <groupId>com.youlai</groupId>
     <artifactId>youlai-boot</artifactId>
-    <version>4.8.0</version>
+    <version>4.9.0</version>
     <description>基于 Java 17 + SpringBoot 4 + Spring Security 构建的权限管理系统。</description>
 
     <parent>
@@ -21,6 +21,9 @@
         <maven.compiler.target>17</maven.compiler.target>
 
         <hutool.version>5.8.41</hutool.version>
+
+        <!-- Flowable 8 基线即 Spring Boot 4，与项目 4.0.5 直接兼容 -->
+        <flowable.version>8.0.0</flowable.version>
 
         <mysql-connector-j.version>9.1.0</mysql-connector-j.version>
         <druid.version>1.2.24</druid.version>
@@ -61,6 +64,9 @@
 
         <!-- 阿里 TransmittableThreadLocal (支持异步场景的ThreadLocal传递) -->
         <transmittable-thread-local.version>2.14.5</transmittable-thread-local.version>
+
+        <!-- 架构约束测试 -->
+        <archunit.version>1.3.0</archunit.version>
 
         <weixin-java-miniapp.version>4.8.1.B</weixin-java-miniapp.version>
 
@@ -110,6 +116,13 @@
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-webmvc-test</artifactId>
+            <scope>test</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>com.tngtech.archunit</groupId>
+            <artifactId>archunit-junit5</artifactId>
+            <version>${archunit.version}</version>
             <scope>test</scope>
         </dependency>
 
@@ -280,6 +293,13 @@
             <groupId>com.github.binarywang</groupId>
             <artifactId>weixin-java-miniapp</artifactId>
             <version>${weixin-java-miniapp.version}</version>
+        </dependency>
+
+        <!-- 工作流引擎（可选扩展 module/workflow，只引 process 引擎，不含 CMMN/DMN） -->
+        <dependency>
+            <groupId>org.flowable</groupId>
+            <artifactId>flowable-spring-boot-starter-process</artifactId>
+            <version>${flowable.version}</version>
         </dependency>
 
     </dependencies>

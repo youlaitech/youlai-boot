@@ -5,7 +5,7 @@ import cn.hutool.core.util.StrUtil;
 import com.youlai.boot.common.exception.BusinessException;
 import com.youlai.boot.common.result.Result;
 import com.youlai.boot.common.result.ResultCode;
-import com.youlai.boot.config.property.StorageProperties;
+import com.youlai.boot.support.file.property.StorageProperties;
 import com.youlai.boot.support.file.model.FileInfo;
 import com.youlai.boot.support.file.service.FileService;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -55,7 +55,7 @@ public class FileController {
     @DeleteMapping
     @Operation(summary = "文件删除")
     @SneakyThrows
-    public Result<?> deleteFile(
+    public Result<Void> deleteFile(
             @Parameter(description = "文件路径") @RequestParam String filePath
     ) {
         boolean result = fileService.deleteFile(filePath);

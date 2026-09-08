@@ -3,9 +3,9 @@ package com.youlai.boot.framework.web.filter;
 import cn.hutool.core.util.StrUtil;
 import com.youlai.boot.common.constant.RedisConstants;
 import com.youlai.boot.common.result.ResultCode;
-import com.youlai.boot.common.util.IPUtils;
-import com.youlai.boot.config.property.RateLimitProperties;
-import com.youlai.boot.framework.web.ratelimit.SlidingWindowScript;
+import com.youlai.boot.framework.web.util.IPUtils;
+import com.youlai.boot.framework.web.ratelimit.RateLimitProperties;
+import com.youlai.boot.framework.web.ratelimit.RedisSlidingWindowRateLimiter;
 import com.youlai.boot.framework.web.util.ResponseWriter;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
@@ -15,7 +15,6 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.core.Ordered;
 import org.springframework.core.annotation.Order;
-import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 
@@ -51,7 +50,7 @@ import java.io.IOException;
 @Slf4j
 public class IpRateLimitFilter extends OncePerRequestFilter {
 
-    private final RedisTemplate<String, Object> redisTemplate;
+    private final RedisSlidingWindowRateLimiter rateLimiter;
     private final RateLimitProperties rateLimitProperties;
 
     @Override
@@ -70,14 +69,8 @@ public class IpRateLimitFilter extends OncePerRequestFilter {
         String key = StrUtil.format(RedisConstants.RateLimit.IP, ip);
         long windowMs = ipConfig.getWindow().toMillis();
 
-        // 执行滑动窗口计数（Lua 原子操作）；Redis 异常时 Fail-Open 放行
-        Long count;
-        try {
-            count = SlidingWindowScript.execute(redisTemplate, key, windowMs);
-        } catch (Exception e) {
-            log.warn("IP 限流 Redis 异常，Fail-Open 放行  ip={}", ip, e);
-            count = null;
-        }
+        // limiter 内部已统一 Fail-Open：Redis 异常返回 null，按未计数放行
+        Long count = rateLimiter.count(key, windowMs);
 
         int limit = ipConfig.getLimit();
         int current = count != null ? count.intValue() : 0;

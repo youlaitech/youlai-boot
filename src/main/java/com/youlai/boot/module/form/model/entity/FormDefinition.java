@@ -12,7 +12,7 @@ import lombok.EqualsAndHashCode;
  * 表单定义实体
  *
  * @author Ray.Hao
- * @since 4.8.0
+ * @since 4.9.0
  */
 @EqualsAndHashCode(callSuper = true)
 @TableName("form_definition")
@@ -55,6 +55,11 @@ public class FormDefinition extends BaseEntity {
      * 是否允许匿名公开访问(0否 1是)
      */
     private Integer isPublic;
+
+    /**
+     * 表单类型(normal通用表单 workflow审批表单)
+     */
+    private String category;
 
     /**
      * 生成的访问菜单ID（NULL未生成，幂等防重复）

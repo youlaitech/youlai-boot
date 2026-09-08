@@ -10,7 +10,7 @@ import java.util.List;
  * 表单菜单配置VO（发布向导回显已生成的菜单）
  *
  * @author Ray.Hao
- * @since 4.8.0
+ * @since 4.9.0
  */
 @Schema(description = "表单菜单配置对象")
 @Getter

@@ -3,7 +3,7 @@ package com.youlai.boot.system.controller;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.youlai.boot.common.enums.ActionTypeEnum;
 import com.youlai.boot.common.enums.LogModuleEnum;
-import com.youlai.boot.common.annotation.RepeatSubmit;
+import com.youlai.boot.framework.web.repeatsubmit.RepeatSubmit;
 import com.youlai.boot.common.model.Option;
 import com.youlai.boot.common.result.PageResult;
 import com.youlai.boot.common.result.Result;
@@ -41,7 +41,7 @@ public class RoleController {
     @GetMapping
     @Log(module = LogModuleEnum.ROLE, value = ActionTypeEnum.LIST)
     public PageResult<RolePageVO> getRolePage(
-            RoleQuery queryParams
+            @Valid RoleQuery queryParams
     ) {
         Page<RolePageVO> result = roleService.getRolePage(queryParams);
         return PageResult.success(result);
@@ -54,12 +54,18 @@ public class RoleController {
         return Result.success(list);
     }
 
+    @Operation(summary = "角色编码下拉列表")
+    @GetMapping("/code-options")
+    public Result<List<Option<String>>> listRoleCodeOptions() {
+        return Result.success(roleService.listRoleCodeOptions());
+    }
+
     @Operation(summary = "新增角色")
     @PostMapping
     @PreAuthorize("@ss.hasPerm('sys:role:create')")
     @RepeatSubmit
     @Log(module = LogModuleEnum.ROLE, value = ActionTypeEnum.INSERT)
-    public Result<?> addRole(@Valid @RequestBody RoleForm roleForm) {
+    public Result<Void> addRole(@Valid @RequestBody RoleForm roleForm) {
         boolean result = roleService.saveRole(roleForm);
         return Result.judge(result);
     }
@@ -78,7 +84,7 @@ public class RoleController {
     @PutMapping(value = "/{roleId}")
     @PreAuthorize("@ss.hasPerm('sys:role:update')")
     @Log(module = LogModuleEnum.ROLE, value = ActionTypeEnum.UPDATE)
-    public Result<?> updateRole(
+    public Result<Void> updateRole(
             @Parameter(description = "角色ID") @PathVariable Long roleId,
             @Valid @RequestBody RoleForm roleForm) {
         boolean result = roleService.saveRole(roleForm);
@@ -100,7 +106,7 @@ public class RoleController {
     @PutMapping(value = "/{roleId}/status")
     @PreAuthorize("@ss.hasPerm('sys:role:update')")
     @Log(module = LogModuleEnum.ROLE, value = ActionTypeEnum.UPDATE)
-    public Result<?> updateRoleStatus(
+    public Result<Void> updateRoleStatus(
             @Parameter(description = "角色ID") @PathVariable Long roleId,
             @Parameter(description = "状态(1:启用;0:禁用)") @RequestParam Integer status
     ) {

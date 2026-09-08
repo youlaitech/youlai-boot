@@ -6,7 +6,7 @@ import cn.hutool.http.useragent.UserAgentUtil;
 import com.youlai.boot.common.annotation.Log;
 import com.youlai.boot.common.enums.ActionTypeEnum;
 import com.youlai.boot.common.enums.LogModuleEnum;
-import com.youlai.boot.common.util.IPUtils;
+import com.youlai.boot.framework.web.util.IPUtils;
 import com.youlai.boot.framework.security.util.SecurityUtils;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.extern.slf4j.Slf4j;

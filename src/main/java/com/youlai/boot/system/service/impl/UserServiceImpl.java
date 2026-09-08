@@ -12,13 +12,13 @@ import com.youlai.boot.common.constant.RedisConstants;
 import com.youlai.boot.common.constant.SystemConstants;
 import com.youlai.boot.common.exception.BusinessException;
 import com.youlai.boot.common.model.Option;
-import com.youlai.boot.support.sms.SmsTypeEnum;
-import com.youlai.boot.support.mail.EmailService;
-import com.youlai.boot.support.sms.SmsService;
 import com.youlai.boot.framework.security.model.RoleDataScope;
 import com.youlai.boot.framework.security.model.SecurityUser;
 import com.youlai.boot.framework.security.token.TokenManager;
 import com.youlai.boot.framework.security.util.SecurityUtils;
+import com.youlai.boot.support.mail.service.EmailService;
+import com.youlai.boot.support.sms.SmsTypeEnum;
+import com.youlai.boot.support.sms.service.SmsService;
 import com.youlai.boot.system.converter.UserConverter;
 import com.youlai.boot.system.enums.DictCodeEnum;
 import com.youlai.boot.system.mapper.UserMapper;
@@ -101,9 +101,6 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, SysUser> implements
         int pageNum = queryParams.getPageNum();
         int pageSize = queryParams.getPageSize();
         Page<UserPageVO> page = new Page<>(pageNum, pageSize);
-
-        boolean isRoot = SecurityUtils.isRoot();
-        queryParams.setIsRoot(isRoot);
 
         // 查询数据
         return this.baseMapper.getUserPage(page, queryParams);
@@ -263,9 +260,6 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, SysUser> implements
      */
     @Override
     public List<UserExportVO> listExportUsers(UserQuery queryParams) {
-
-        boolean isRoot = SecurityUtils.isRoot();
-        queryParams.setIsRoot(isRoot);
 
         List<UserExportVO> exportUsers = this.baseMapper.listExportUsers(queryParams);
         if (CollectionUtil.isNotEmpty(exportUsers)) {

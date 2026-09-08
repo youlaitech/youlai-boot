@@ -5,20 +5,25 @@ import cn.hutool.core.collection.CollectionUtil;
 import cn.hutool.core.lang.Assert;
 import cn.hutool.core.util.StrUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.youlai.boot.common.constant.RedisConstants;
 import com.youlai.boot.common.exception.BusinessException;
 import com.youlai.boot.common.model.KeyValue;
+import com.youlai.boot.common.model.Option;
 import com.youlai.boot.module.form.converter.FormConverter;
+import com.youlai.boot.module.form.enums.FormCategoryEnum;
 import com.youlai.boot.module.form.enums.FormStatusEnum;
+import com.youlai.boot.module.form.mapper.FormDataMapper;
 import com.youlai.boot.module.form.mapper.FormDefinitionMapper;
 import com.youlai.boot.module.form.mapper.FormSnapshotMapper;
+import com.youlai.boot.module.form.model.entity.FormData;
 import com.youlai.boot.module.form.model.entity.FormDefinition;
 import com.youlai.boot.module.form.model.entity.FormSnapshot;
 import com.youlai.boot.module.form.model.form.FormDefinitionForm;
 import com.youlai.boot.module.form.model.form.FormMenuForm;
-import com.youlai.boot.module.form.model.query.FormDefinitionQuery;
+import com.youlai.boot.module.form.model.query.FormDefinitionPageQuery;
 import com.youlai.boot.module.form.model.vo.FormDefinitionPageVO;
 import com.youlai.boot.module.form.model.vo.FormMenuVO;
 import com.youlai.boot.module.form.model.vo.FormRenderVO;
@@ -38,13 +43,14 @@ import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
 /**
  * 表单定义业务实现类
  *
  * @author Ray.Hao
- * @since 4.8.0
+ * @since 4.9.0
  */
 @Service
 @RequiredArgsConstructor
@@ -55,6 +61,16 @@ public class FormDefinitionServiceImpl extends ServiceImpl<FormDefinitionMapper,
     private final MenuService menuService;
     private final RoleMenuService roleMenuService;
     private final FormSnapshotMapper formSnapshotMapper;
+    private final FormDataMapper formDataMapper;
+
+    /** 默认挂载目录名称：发布向导未显式选目录时自动使用/创建 */
+    private static final String DEFAULT_CATALOG_NAME = "表单中心";
+
+    /** 表单管理目录名称（顶级，dynamic-form.sql 预置）："表单中心"默认挂载其下，顶级入口聚合 */
+    private static final String FORM_ADMIN_CATALOG_NAME = "动态表单";
+
+    /** 渲染缓存兜底 TTL：事件驱动清缓存外再设过期，防 DB 更新与删缓存间应用重启导致脏缓存永续 */
+    private static final long RENDER_CACHE_TTL_MINUTES = 30;
 
     /**
      * 表单定义分页列表
@@ -62,10 +78,20 @@ public class FormDefinitionServiceImpl extends ServiceImpl<FormDefinitionMapper,
      * @param queryParams 查询参数
      */
     @Override
-    public Page<FormDefinitionPageVO> getFormDefinitionPage(FormDefinitionQuery queryParams) {
+    public Page<FormDefinitionPageVO> getFormDefinitionPage(FormDefinitionPageQuery queryParams) {
         int pageNum = queryParams.getPageNum();
         int pageSize = queryParams.getPageSize();
         return this.baseMapper.getFormDefinitionPage(new Page<>(pageNum, pageSize), queryParams);
+    }
+
+    /**
+     * 按主键查询表单定义
+     *
+     * @param id 表单ID
+     */
+    @Override
+    public FormDefinition getFormDefinition(Long id) {
+        return this.getById(id);
     }
 
     /**
@@ -100,6 +126,10 @@ public class FormDefinitionServiceImpl extends ServiceImpl<FormDefinitionMapper,
         // 新表单初始为草稿态；规则未设计时空数组占位，设计器打开为空白画布
         entity.setStatus(FormStatusEnum.DRAFT.getValue());
         entity.setVersion(1);
+        // 类型缺省为普通表单，须显式选择审批表单才可被工作流绑定
+        if (StrUtil.isBlank(entity.getCategory())) {
+            entity.setCategory(FormCategoryEnum.NORMAL.getValue());
+        }
         if (entity.getFormJson() == null) {
             entity.setFormJson("[]");
         }
@@ -132,6 +162,8 @@ public class FormDefinitionServiceImpl extends ServiceImpl<FormDefinitionMapper,
         if (FormStatusEnum.DRAFT.getValue().equals(entity.getStatus())) {
             updateEntity.setFormName(formData.getFormName());
             updateEntity.setDescription(formData.getDescription());
+            // 类型亦属元数据：草稿态可改，已发布后固定（防止流程绑定后类型被改走导致流程表单失联）
+            updateEntity.setCategory(formData.getCategory());
         }
         updateEntity.setFormJson(formData.getFormJson());
         updateEntity.setOptionsJson(formData.getOptionsJson());
@@ -149,45 +181,64 @@ public class FormDefinitionServiceImpl extends ServiceImpl<FormDefinitionMapper,
     /**
      * 批量删除表单定义
      *
+     * <p>级联清理关联数据，避免孤儿残留：生成的访问菜单（含其角色授权）、
+     * 提交数据、版本快照一并删除</p>
+     *
      * @param ids 表单ID列表
      */
     @Override
+    @Transactional(rollbackFor = Exception.class)
     public void removeFormDefinition(List<Long> ids) {
         List<FormDefinition> forms = this.listByIds(ids);
         this.removeByIds(ids);
-        // 已发布表单的渲染缓存一并清除，防止删除后仍可渲染
-        forms.stream()
-                .filter(form -> FormStatusEnum.PUBLISHED.getValue().equals(form.getStatus()))
-                .forEach(form -> this.evictRenderCache(form.getFormKey()));
+        for (FormDefinition form : forms) {
+            // 级联删除已生成的访问菜单（deleteMenu 内部同步清理其角色授权并刷新权限缓存）
+            if (form.getMenuId() != null) {
+                menuService.deleteMenu(form.getMenuId());
+            }
+            // 同步清理提交数据与版本快照，防止孤儿数据与死链接
+            formDataMapper.delete(new LambdaQueryWrapper<FormData>()
+                    .eq(FormData::getFormId, form.getId()));
+            formSnapshotMapper.delete(new LambdaQueryWrapper<FormSnapshot>()
+                    .eq(FormSnapshot::getFormId, form.getId()));
+            // 已发布表单的渲染缓存一并清除，防止删除后仍可渲染
+            if (FormStatusEnum.PUBLISHED.getValue().equals(form.getStatus())) {
+                this.evictRenderCache(form.getFormKey());
+            }
+        }
     }
 
     /**
      * 发布表单
      *
+     * <p>状态翻转 + 版本自增走单条原子 UPDATE，从 DB 侧消除并发发布的重号竞态；
+     * 更新成功后回读最新表单，用同一份规则固化版本快照</p>
+     *
      * @param id 表单ID
      */
     @Override
+    @Transactional(rollbackFor = Exception.class)
     public boolean publishFormDefinition(Long id) {
         FormDefinition entity = this.getById(id);
         if (entity == null) {
             throw new BusinessException("表单不存在");
         }
-        FormDefinition updateEntity = new FormDefinition();
-        updateEntity.setId(id);
-        updateEntity.setStatus(FormStatusEnum.PUBLISHED.getValue());
-        // 每次发布版本+1，供数据提交时记录版本快照
-        int newVersion = entity.getVersion() + 1;
-        updateEntity.setVersion(newVersion);
-        boolean result = this.updateById(updateEntity);
+        boolean result = this.update(new LambdaUpdateWrapper<FormDefinition>()
+                .eq(FormDefinition::getId, id)
+                .set(FormDefinition::getStatus, FormStatusEnum.PUBLISHED.getValue())
+                .setSql("version = version + 1")
+        );
         if (result) {
+            // 回读原子自增后的最新表单，快照记录与当前定义一致的规则
+            FormDefinition published = this.getById(id);
             // 固化版本快照：数据回显按提交时版本加载，防止规则变更（字段删除/改名）导致历史数据漂移
             FormSnapshot snapshot = new FormSnapshot();
             snapshot.setFormId(id);
-            snapshot.setVersion(newVersion);
-            snapshot.setFormJson(entity.getFormJson());
-            snapshot.setOptionsJson(entity.getOptionsJson());
+            snapshot.setVersion(published.getVersion());
+            snapshot.setFormJson(published.getFormJson());
+            snapshot.setOptionsJson(published.getOptionsJson());
             formSnapshotMapper.insert(snapshot);
-            this.evictRenderCache(entity.getFormKey());
+            this.evictRenderCache(published.getFormKey());
         }
         return result;
     }
@@ -220,7 +271,7 @@ public class FormDefinitionServiceImpl extends ServiceImpl<FormDefinitionMapper,
      */
     @Override
     public FormRenderVO getFormRender(String formKey) {
-        String cacheKey = RedisConstants.Form.RENDER_RULE.replace("{}", formKey);
+        String cacheKey = StrUtil.format(RedisConstants.Form.RENDER_RULE, formKey);
         Object cached = redisTemplate.opsForValue().get(cacheKey);
         if (cached instanceof FormRenderVO renderVO) {
             return renderVO;
@@ -238,15 +289,8 @@ public class FormDefinitionServiceImpl extends ServiceImpl<FormDefinitionMapper,
         if (entity == null) {
             throw new BusinessException("表单不存在或未发布");
         }
-
-        FormRenderVO renderVO = new FormRenderVO();
-        renderVO.setFormKey(entity.getFormKey());
-        renderVO.setFormName(entity.getFormName());
-        renderVO.setVersion(entity.getVersion());
-        renderVO.setFormJson(entity.getFormJson());
-        renderVO.setOptionsJson(entity.getOptionsJson());
-        redisTemplate.opsForValue().set(cacheKey, renderVO);
-        return renderVO;
+        redisTemplate.opsForValue().set(cacheKey, toRenderVO(entity), RENDER_CACHE_TTL_MINUTES, TimeUnit.MINUTES);
+        return toRenderVO(entity);
     }
 
     /**
@@ -255,7 +299,22 @@ public class FormDefinitionServiceImpl extends ServiceImpl<FormDefinitionMapper,
      * @param formKey 表单唯一标识
      */
     private void evictRenderCache(String formKey) {
-        redisTemplate.delete(RedisConstants.Form.RENDER_RULE.replace("{}", formKey));
+        redisTemplate.delete(StrUtil.format(RedisConstants.Form.RENDER_RULE, formKey));
+    }
+
+    /**
+     * 组装表单渲染 VO
+     *
+     * @param entity 表单定义实体
+     */
+    private FormRenderVO toRenderVO(FormDefinition entity) {
+        FormRenderVO renderVO = new FormRenderVO();
+        renderVO.setFormKey(entity.getFormKey());
+        renderVO.setFormName(entity.getFormName());
+        renderVO.setVersion(entity.getVersion());
+        renderVO.setFormJson(entity.getFormJson());
+        renderVO.setOptionsJson(entity.getOptionsJson());
+        return renderVO;
     }
 
     /**
@@ -277,14 +336,7 @@ public class FormDefinitionServiceImpl extends ServiceImpl<FormDefinitionMapper,
         if (entity == null) {
             throw new BusinessException("表单不存在或未开放公开访问");
         }
-
-        FormRenderVO renderVO = new FormRenderVO();
-        renderVO.setFormKey(entity.getFormKey());
-        renderVO.setFormName(entity.getFormName());
-        renderVO.setVersion(entity.getVersion());
-        renderVO.setFormJson(entity.getFormJson());
-        renderVO.setOptionsJson(entity.getOptionsJson());
-        return renderVO;
+        return toRenderVO(entity);
     }
 
     /**
@@ -303,9 +355,6 @@ public class FormDefinitionServiceImpl extends ServiceImpl<FormDefinitionMapper,
         }
         return form;
     }
-
-    /** 默认挂载目录名称：发布向导未显式选目录时自动使用/创建 */
-    private static final String DEFAULT_CATALOG_NAME = "表单中心";
 
     /**
      * 生成表单访问菜单并授权可见角色
@@ -369,9 +418,6 @@ public class FormDefinitionServiceImpl extends ServiceImpl<FormDefinitionMapper,
         this.assignMenuToRoles(menu.getId(), menuForm.getRoleIds());
         return true;
     }
-
-    /** 表单管理目录名称（顶级，form.sql 预置）："表单中心"默认挂载其下，顶级入口聚合 */
-    private static final String FORM_ADMIN_CATALOG_NAME = "动态表单";
 
     /**
      * 确保默认挂载目录"表单中心"存在，不存在则创建
@@ -493,6 +539,26 @@ public class FormDefinitionServiceImpl extends ServiceImpl<FormDefinitionMapper,
             // 授权变化后刷新角色权限缓存
             roleMenuService.refreshRolePermsCache();
         }
+    }
+
+    /**
+     * 审批表单下拉选项（供工作流设计器绑定表单）
+     *
+     * <p>仅返回已发布且类型为 workflow 的表单；value 为 formKey（BPMN formKey 引用），
+     * 草稿/停用表单结构未定不应被流程绑定</p>
+     *
+     * @return 审批表单下拉选项列表
+     */
+    @Override
+    public List<Option<String>> listWorkflowFormOptions() {
+        return this.list(new LambdaQueryWrapper<FormDefinition>()
+                        .eq(FormDefinition::getCategory, FormCategoryEnum.WORKFLOW.getValue())
+                        .eq(FormDefinition::getStatus, FormStatusEnum.PUBLISHED.getValue())
+                        .select(FormDefinition::getFormKey, FormDefinition::getFormName)
+                        .orderByAsc(FormDefinition::getCreateTime)
+                ).stream()
+                .map(form -> new Option<>(form.getFormKey(), form.getFormName()))
+                .toList();
     }
 
 }

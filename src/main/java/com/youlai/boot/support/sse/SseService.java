@@ -2,7 +2,6 @@ package com.youlai.boot.support.sse;
 
 import com.youlai.boot.support.sse.constant.SseEventConstants;
 import com.youlai.boot.support.sse.constant.SseTopics;
-import com.youlai.boot.support.sse.model.OnlineUserDTO;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;

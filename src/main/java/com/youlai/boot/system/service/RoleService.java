@@ -38,6 +38,15 @@ public interface RoleService extends IService<Role> {
     List<Option<Long>> listRoleOptions();
 
     /**
+     * 角色编码下拉列表（value 为角色编码）
+     *
+     * <p>供流程设计器候选组等按编码引用角色的场景选择</p>
+     *
+     * @return 角色编码选项列表
+     */
+    List<Option<String>> listRoleCodeOptions();
+
+    /**
      *
      * @param roleForm
      * @return

@@ -3,7 +3,7 @@ package com.youlai.boot.system.controller;
 import cn.idev.excel.EasyExcel;
 import cn.idev.excel.ExcelWriter;
 import com.youlai.boot.common.annotation.Log;
-import com.youlai.boot.common.annotation.RepeatSubmit;
+import com.youlai.boot.framework.web.repeatsubmit.RepeatSubmit;
 import com.youlai.boot.common.enums.ActionTypeEnum;
 import com.youlai.boot.common.enums.LogModuleEnum;
 import com.youlai.boot.common.enums.StatusEnum;
@@ -18,6 +18,7 @@ import com.youlai.boot.system.service.UserImportReader;
 import com.youlai.boot.system.model.form.EmailUpdateForm;
 import com.youlai.boot.system.model.form.MobileUpdateForm;
 import com.youlai.boot.system.model.form.PasswordUpdateForm;
+import com.youlai.boot.system.model.form.PasswordResetForm;
 import com.youlai.boot.system.model.form.PasswordVerifyForm;
 import com.youlai.boot.system.model.form.UserForm;
 import com.youlai.boot.system.model.form.UserImportForm;
@@ -87,7 +88,7 @@ public class UserController {
     @PreAuthorize("@ss.hasPerm('sys:user:create')")
     @RepeatSubmit
     @Log(module = LogModuleEnum.USER, value = ActionTypeEnum.INSERT)
-    public Result<?> saveUser(
+    public Result<Void> saveUser(
             @RequestBody @Valid UserForm userForm
     ) {
         boolean result = userService.saveUser(userForm);
@@ -147,11 +148,11 @@ public class UserController {
     @PutMapping(value = "/{userId}/password/reset")
     @PreAuthorize("@ss.hasPerm('sys:user:reset-password')")
     @Log(module = LogModuleEnum.USER, value = ActionTypeEnum.RESET_PASSWORD)
-    public Result<?> resetUserPassword(
+    public Result<Void> resetUserPassword(
             @Parameter(description = "用户ID") @PathVariable Long userId,
-            @RequestParam String password
+            @Parameter(description = "重置密码表单") @RequestBody @Valid PasswordResetForm formData
     ) {
-        boolean result = userService.resetUserPassword(userId, password);
+        boolean result = userService.resetUserPassword(userId, formData.getPassword());
         return Result.judge(result);
     }
 
@@ -194,7 +195,7 @@ public class UserController {
     @GetMapping("/export")
     @PreAuthorize("@ss.hasPerm('sys:user:export')")
     @Log(module = LogModuleEnum.USER, value = ActionTypeEnum.EXPORT)
-    public void exportUsers(UserQuery queryParams, HttpServletResponse response) throws IOException {
+    public void exportUsers(@Valid UserQuery queryParams, HttpServletResponse response) throws IOException {
         String fileName = "用户列表.xlsx";
         response.setContentType("application/vnd.openxmlformats-officedocument.spreadsheetml.sheet");
         response.setHeader("Content-Disposition", "attachment; filename=" + URLEncoder.encode(fileName, StandardCharsets.UTF_8));
@@ -222,7 +223,7 @@ public class UserController {
     @Operation(summary = "个人中心修改用户信息")
     @PutMapping("/profile")
     @Log(module = LogModuleEnum.USER, value = ActionTypeEnum.UPDATE)
-    public Result<?> updateUserProfile(@RequestBody UserProfileForm formData) {
+    public Result<Void> updateUserProfile(@RequestBody @Valid UserProfileForm formData) {
         boolean result = userService.updateUserProfile(formData);
         return Result.judge(result);
     }
@@ -231,8 +232,8 @@ public class UserController {
     @Operation(summary = "当前用户修改密码")
     @PutMapping(value = "/password")
     @Log(module = LogModuleEnum.USER, value = ActionTypeEnum.CHANGE_PASSWORD)
-    public Result<?> changeCurrentUserPassword(
-            @RequestBody PasswordUpdateForm data
+    public Result<Void> changeCurrentUserPassword(
+            @RequestBody @Valid PasswordUpdateForm data
     ) {
         Long currUserId = SecurityUtils.getUserId();
         boolean result = userService.changeUserPassword(currUserId, data);
@@ -241,7 +242,7 @@ public class UserController {
 
     @Operation(summary = "发送短信验证码（绑定或更换手机号）")
     @PostMapping(value = "/mobile/code")
-    public Result<?> sendMobileCode(
+    public Result<Void> sendMobileCode(
             @Parameter(description = "手机号码", required = true) @RequestParam String mobile
     ) {
         boolean result = userService.sendMobileCode(mobile);
@@ -250,7 +251,7 @@ public class UserController {
 
     @Operation(summary = "绑定或更换手机号")
     @PutMapping(value = "/mobile")
-    public Result<?> bindOrChangeMobile(
+    public Result<Void> bindOrChangeMobile(
             @RequestBody @Validated MobileUpdateForm data
     ) {
         boolean result = userService.bindOrChangeMobile(data);
@@ -259,7 +260,7 @@ public class UserController {
 
     @Operation(summary = "解绑手机号")
     @DeleteMapping(value = "/mobile")
-    public Result<?> unbindMobile(
+    public Result<Void> unbindMobile(
             @RequestBody @Validated PasswordVerifyForm data
     ) {
         boolean result = userService.unbindMobile(data);
@@ -277,7 +278,7 @@ public class UserController {
 
     @Operation(summary = "绑定或更换邮箱")
     @PutMapping(value = "/email")
-    public Result<?> bindOrChangeEmail(
+    public Result<Void> bindOrChangeEmail(
             @RequestBody @Validated EmailUpdateForm data
     ) {
         boolean result = userService.bindOrChangeEmail(data);
@@ -286,7 +287,7 @@ public class UserController {
 
     @Operation(summary = "解绑邮箱")
     @DeleteMapping(value = "/email")
-    public Result<?> unbindEmail(
+    public Result<Void> unbindEmail(
             @RequestBody @Validated PasswordVerifyForm data
     ) {
         boolean result = userService.unbindEmail(data);

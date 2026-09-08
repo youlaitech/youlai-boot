@@ -11,7 +11,7 @@ import java.util.List;
  * 表单菜单发布表单对象（发布向导"入口配置"步骤提交）
  *
  * @author Ray.Hao
- * @since 4.8.0
+ * @since 4.9.0
  */
 @Schema(description = "表单菜单发布对象")
 @Data
