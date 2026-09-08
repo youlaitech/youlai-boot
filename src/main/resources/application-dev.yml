@@ -237,7 +237,7 @@ wx:
     appid: Your_AppId
     secret: Your_AppSecret
 
-# 工作流（默认关闭，开启见 README「可选扩展」）
+# 工作流
 flowable:
   # 工作流总开关，未配置视为关闭
   enabled: false
