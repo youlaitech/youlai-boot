@@ -38,12 +38,12 @@ public class DictItemForm {
     @Range(min = 0, max = 9999, message = "排序值需在 0-9999 之间")
     private Integer sort;
 
-    @Schema(description = "状态（0：禁用，1：启用）")
+    @Schema(description = "状态（1-启用，0-禁用）")
     @Range(min = 0, max = 1, message = "状态取值不正确")
     private Integer status;
 
-    @Schema(description = "字典类型（用于显示样式）")
-    @Size(max = 30, message = "字典类型长度不能超过 30 个字符")
+    @Schema(description = "标签样式（primary-主要 success-成功 warning-警告 danger-危险 info-信息）")
+    @Size(max = 30, message = "标签样式长度不能超过 30 个字符")
     private String tagType;
 
 }

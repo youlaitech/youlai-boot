@@ -4,6 +4,7 @@ import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.core.collection.CollectionUtil;
 import cn.hutool.core.lang.Assert;
 import cn.hutool.core.util.StrUtil;
+import cn.hutool.json.JSONUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
@@ -28,6 +29,10 @@ import com.youlai.boot.module.form.model.vo.FormDefinitionPageVO;
 import com.youlai.boot.module.form.model.vo.FormMenuVO;
 import com.youlai.boot.module.form.model.vo.FormRenderVO;
 import com.youlai.boot.module.form.service.FormDefinitionService;
+import com.youlai.boot.module.form.util.FormRuleValidator;
+import com.youlai.boot.module.workflow.service.WorkflowModelService;
+import com.youlai.boot.support.ai.AiChatService;
+import com.youlai.boot.support.ai.PromptLoader;
 import com.youlai.boot.system.enums.MenuTypeEnum;
 import com.youlai.boot.system.model.entity.Menu;
 import com.youlai.boot.system.model.entity.RoleMenu;
@@ -35,6 +40,7 @@ import com.youlai.boot.system.model.form.MenuForm;
 import com.youlai.boot.system.service.MenuService;
 import com.youlai.boot.system.service.RoleMenuService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -42,6 +48,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
@@ -56,12 +63,18 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 public class FormDefinitionServiceImpl extends ServiceImpl<FormDefinitionMapper, FormDefinition> implements FormDefinitionService {
 
+    /** 系统提示词名称，对应 resources/prompts 下的相对路径 */
+    private static final String SYSTEM_PROMPT_PATH = "form/system.md";
+
     private final FormConverter formConverter;
     private final RedisTemplate<String, Object> redisTemplate;
     private final MenuService menuService;
     private final RoleMenuService roleMenuService;
     private final FormSnapshotMapper formSnapshotMapper;
     private final FormDataMapper formDataMapper;
+    private final ObjectProvider<WorkflowModelService> workflowModelServiceProvider;
+    private final AiChatService aiChatService;
+    private final PromptLoader promptLoader;
 
     /** 默认挂载目录名称：发布向导未显式选目录时自动使用/创建 */
     private static final String DEFAULT_CATALOG_NAME = "表单中心";
@@ -181,7 +194,7 @@ public class FormDefinitionServiceImpl extends ServiceImpl<FormDefinitionMapper,
     /**
      * 批量删除表单定义
      *
-     * <p>级联清理关联数据，避免孤儿残留：生成的访问菜单（含其角色授权）、
+     * <p>被流程引用的表单禁止删除；其余级联清理关联数据，避免孤儿残留：生成的访问菜单（含其角色授权）、
      * 提交数据、版本快照一并删除</p>
      *
      * @param ids 表单ID列表
@@ -190,6 +203,7 @@ public class FormDefinitionServiceImpl extends ServiceImpl<FormDefinitionMapper,
     @Transactional(rollbackFor = Exception.class)
     public void removeFormDefinition(List<Long> ids) {
         List<FormDefinition> forms = this.listByIds(ids);
+        this.checkProcessReferences(forms);
         this.removeByIds(ids);
         for (FormDefinition form : forms) {
             // 级联删除已生成的访问菜单（deleteMenu 内部同步清理其角色授权并刷新权限缓存）
@@ -205,6 +219,31 @@ public class FormDefinitionServiceImpl extends ServiceImpl<FormDefinitionMapper,
             if (FormStatusEnum.PUBLISHED.getValue().equals(form.getStatus())) {
                 this.evictRenderCache(form.getFormKey());
             }
+        }
+    }
+
+    /**
+     * 校验表单是否被流程引用
+     *
+     * <p>被引用的表单删除后，流程发起与审批时无表单可渲染，故在删除前整体拦截</p>
+     *
+     * @param forms 待删除表单
+     */
+    private void checkProcessReferences(List<FormDefinition> forms) {
+        // 工作流未启用时无流程服务，跳过校验
+        WorkflowModelService workflowModelService = workflowModelServiceProvider.getIfAvailable();
+        if (workflowModelService == null || forms.isEmpty()) {
+            return;
+        }
+        Map<String, Set<String>> references = workflowModelService.getFormReferences(
+                forms.stream().map(FormDefinition::getFormKey).collect(Collectors.toSet()));
+        List<String> blocked = forms.stream()
+                .filter(form -> references.containsKey(form.getFormKey()))
+                .map(form -> StrUtil.format("表单【{}】被流程【{}】引用", form.getFormName(),
+                        String.join("、", references.get(form.getFormKey()))))
+                .toList();
+        if (!blocked.isEmpty()) {
+            throw new BusinessException(String.join("；", blocked) + "，请先解除流程绑定后删除");
         }
     }
 
@@ -452,8 +491,6 @@ public class FormDefinitionServiceImpl extends ServiceImpl<FormDefinitionMapper,
         menuFormData.setType(MenuTypeEnum.CATALOG.getValue());
         menuFormData.setRoutePath(underAdminCatalog ? "center" : "/form-center");
         menuFormData.setComponent("Layout");
-        // alwaysShow=1：角色仅有单个表单入口时父级目录不被侧边栏折叠吞掉
-        menuFormData.setAlwaysShow(1);
         menuFormData.setVisible(1);
         menuFormData.setSort(5);
         // EP 图标（前端永久可渲染），避免空/失效图标名导致菜单显示异常
@@ -561,6 +598,33 @@ public class FormDefinitionServiceImpl extends ServiceImpl<FormDefinitionMapper,
                 ).stream()
                 .map(form -> new Option<>(form.getFormKey(), form.getFormName()))
                 .toList();
+    }
+
+    //---------------------------------------------------
+    // AI 辅助：未开启 AI 时调用返回业务异常
+    //---------------------------------------------------
+
+    /**
+     * 用 AI 把需求描述转成 form-create 规则
+     *
+     * @param description 需求描述
+     * @return 通过结构校验的 form-create rule JSON 字符串
+     */
+    @Override
+    public String aiGenerateRule(String description) {
+        List<Map<String, Object>> rules = aiChatService.chatJsonList(
+                promptLoader.get(SYSTEM_PROMPT_PATH), buildAiUserPrompt(description));
+        return FormRuleValidator.validateRule(JSONUtil.toJsonStr(rules));
+    }
+
+    /**
+     * 构造用户提示词
+     *
+     * @param description 需求描述
+     * @return 用户提示词
+     */
+    private String buildAiUserPrompt(String description) {
+        return "需求描述：\n" + description;
     }
 
 }

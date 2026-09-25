@@ -26,7 +26,3 @@ public interface DictMapper extends BaseMapper<Dict> {
     Page<DictPageVO> getDictPage(Page<DictPageVO> page, DictQuery queryParams);
 
 }
-
-
-
-

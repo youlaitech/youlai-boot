@@ -1,5 +1,6 @@
 package com.youlai.boot.module.workflow.service.impl;
 
+import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.lang.Assert;
 import cn.hutool.core.util.StrUtil;
 import cn.hutool.json.JSONObject;
@@ -18,18 +19,26 @@ import com.youlai.boot.system.model.entity.Role;
 import com.youlai.boot.system.service.RoleService;
 import com.youlai.boot.module.workflow.config.ConditionalOnWorkflowEnabled;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.flowable.engine.RepositoryService;
+import org.flowable.engine.RuntimeService;
 import org.flowable.engine.repository.Deployment;
 import org.flowable.engine.repository.Model;
 import org.flowable.engine.repository.ModelQuery;
 import org.flowable.engine.repository.ProcessDefinition;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.nio.charset.StandardCharsets;
+import java.util.Collection;
 import java.util.Date;
+import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Set;
+import java.util.TreeSet;
 import java.util.stream.Collectors;
 
 /**
@@ -43,9 +52,11 @@ import java.util.stream.Collectors;
 @ConditionalOnWorkflowEnabled
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class WorkflowModelServiceImpl implements WorkflowModelService {
 
     private final RepositoryService repositoryService;
+    private final RuntimeService runtimeService;
     private final BpmnModelHelper bpmnModelHelper;
     private final RoleService roleService;
 
@@ -193,22 +204,101 @@ public class WorkflowModelServiceImpl implements WorkflowModelService {
      * 删除流程模型
      *
      * <p>「流程」对用户是整体：删除设计草稿时级联删除其全部发布版本（含运行实例与历史），
-     * 避免残留孤儿定义导致列表出现无模型可管理的流程</p>
+     * 避免残留孤儿定义导致列表出现无模型可管理的流程；有在办实例的流程先拦截，防止在办任务被静默抹除</p>
      *
      * @param modelIds 模型ID集合
      */
     @Override
+    @Transactional(rollbackFor = Exception.class)
     public void removeModels(List<String> modelIds) {
-        modelIds.forEach(modelId -> {
-            Model model = repositoryService.getModel(modelId);
-            if (model == null) {
-                return;
+        // 先全量校验再删除：批量删除中途抛错时，前面已删的模型无法回退
+        List<Model> models = modelIds.stream()
+                .map(repositoryService::getModel)
+                .filter(Objects::nonNull)
+                .toList();
+        models.forEach(this::checkNoRunningInstance);
+        models.forEach(this::removeModelAndDeployments);
+    }
+
+    /**
+     * 校验流程无运行中实例
+     *
+     * <p>级联删除会连同在办任务一并抹除，审批人无从知晓，故有在办实例时禁止删除</p>
+     */
+    private void checkNoRunningInstance(Model model) {
+        long runningCount = runtimeService.createProcessInstanceQuery()
+                .processDefinitionKey(model.getKey())
+                .count();
+        if (runningCount > 0) {
+            throw new BusinessException("流程【" + model.getName() + "】存在 " + runningCount
+                    + " 个运行中的实例，请先撤销或办结后再删除");
+        }
+    }
+
+    /**
+     * 删除模型的全部发布版本（级联流程定义、实例与历史）及设计草稿
+     */
+    private void removeModelAndDeployments(Model model) {
+        repositoryService.createDeploymentQuery()
+                .processDefinitionKey(model.getKey()).list()
+                .forEach(deployment -> repositoryService.deleteDeployment(deployment.getId(), true));
+        repositoryService.deleteModel(model.getId());
+    }
+
+    /**
+     * 查询引用指定表单的流程
+     *
+     * <p>引用写在 BPMN 的开始节点与用户任务节点（flowable:formKey）；模型草稿虽未部署但已绑定表单，
+     * 一并计入：表单被删除后，流程发起或审批时无表单可渲染</p>
+     *
+     * @param formKeys 表单标识集合
+     * @return 表单标识 → 引用它的流程名称集合（无引用返回空 Map）
+     */
+    @Override
+    public Map<String, Set<String>> getFormReferences(Collection<String> formKeys) {
+        if (CollUtil.isEmpty(formKeys)) {
+            return Map.of();
+        }
+        Set<String> targets = new HashSet<>(formKeys);
+        Map<String, Set<String>> references = new HashMap<>();
+
+        // 已部署定义：全部版本都算引用，旧版本的实例仍在流转
+        for (ProcessDefinition definition : repositoryService.createProcessDefinitionQuery().list()) {
+            Set<String> referenced;
+            try {
+                referenced = bpmnModelHelper.getFormKeys(definition.getId());
+            } catch (Exception e) {
+                log.warn("流程定义 [{}] 表单引用解析失败，跳过校验", definition.getKey());
+                continue;
             }
-            repositoryService.createDeploymentQuery()
-                    .processDefinitionKey(model.getKey()).list()
-                    .forEach(deployment -> repositoryService.deleteDeployment(deployment.getId(), true));
-            repositoryService.deleteModel(modelId);
-        });
+            referenced.stream().filter(targets::contains)
+                    .forEach(formKey -> recordReference(references, formKey, definition.getName()));
+        }
+
+        // 模型草稿：设计器里已绑定表单，删除后该模型发布即成无表单流程
+        for (Model model : repositoryService.createModelQuery().list()) {
+            byte[] source = repositoryService.getModelEditorSource(model.getId());
+            if (source == null || source.length == 0) {
+                continue;
+            }
+            Set<String> referenced;
+            try {
+                referenced = bpmnModelHelper.getFormKeysFromXml(new String(source, StandardCharsets.UTF_8));
+            } catch (Exception e) {
+                log.warn("流程模型 [{}] 表单引用解析失败，跳过校验", model.getKey());
+                continue;
+            }
+            referenced.stream().filter(targets::contains)
+                    .forEach(formKey -> recordReference(references, formKey, model.getName()));
+        }
+        return references;
+    }
+
+    /**
+     * 记录一条引用关系（同一表单被多个流程引用时累加，按流程名称排序保证提示稳定）
+     */
+    private void recordReference(Map<String, Set<String>> references, String formKey, String processName) {
+        references.computeIfAbsent(formKey, key -> new TreeSet<>()).add(processName);
     }
 
     /**

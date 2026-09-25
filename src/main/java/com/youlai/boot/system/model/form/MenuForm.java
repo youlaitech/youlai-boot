@@ -60,10 +60,13 @@ public class MenuForm {
     @Schema(description = "【菜单】是否开启页面缓存", example = "1")
     private Integer keepAlive;
 
-    @Schema(description = "【目录】只有一个子路由是否始终显示", example = "1")
-    private Integer alwaysShow;
-
     @Schema(description = "路由参数")
     private List<KeyValue> params;
+
+    @Schema(description = "新增页面菜单时是否生成增删改查按钮")
+    private Boolean generateCrudButtons;
+
+    @Schema(description = "按钮权限标识前缀，如 sys:user")
+    private String buttonPermPrefix;
 
 }

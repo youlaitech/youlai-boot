@@ -98,4 +98,14 @@ public class WorkflowTaskController {
         return Result.success();
     }
 
+    // AI 辅助：未开启 AI 时调用返回业务异常
+
+    @Operation(summary = "AI 生成任务审批摘要")
+    @PostMapping("/{taskId}/ai-summary")
+    public Result<String> summarizeTask(
+            @Parameter(description = "任务ID") @PathVariable String taskId
+    ) {
+        return Result.success(workflowTaskService.aiSummarizeTask(taskId));
+    }
+
 }

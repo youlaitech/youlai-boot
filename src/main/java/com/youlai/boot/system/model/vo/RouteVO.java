@@ -50,10 +50,6 @@ public class RouteVO {
         @JsonInclude(JsonInclude.Include.NON_NULL)
         private Boolean keepAlive;
 
-        @Schema(description = "【目录】只有一个子路由是否始终显示", example = "true")
-        @JsonInclude(JsonInclude.Include.NON_NULL)
-        private Boolean alwaysShow;
-
         @Schema(description = "外链地址(内嵌模式用)", example = "https://www.youlai.tech")
         @JsonInclude(JsonInclude.Include.NON_NULL)
         private String externalUrl;

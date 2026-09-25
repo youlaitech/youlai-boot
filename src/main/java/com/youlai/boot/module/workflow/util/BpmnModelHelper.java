@@ -18,6 +18,7 @@ import java.io.ByteArrayInputStream;
 import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -96,6 +97,50 @@ public class BpmnModelHelper {
                 .findFirst()
                 .map(UserTask::getFormKey)
                 .orElse(null);
+    }
+
+    /**
+     * 获取流程定义引用的全部表单标识（开始节点与用户任务节点，去重）
+     *
+     * @param processDefinitionId 流程定义ID
+     * @return formKey 集合，未绑定返回空集合
+     */
+    public Set<String> getFormKeys(String processDefinitionId) {
+        Process process = getMainProcess(processDefinitionId);
+        if (process == null) {
+            return Set.of();
+        }
+        return extractFormKeys(process);
+    }
+
+    /**
+     * 提取 BPMN XML 引用的全部表单标识（开始节点与用户任务节点，去重）
+     *
+     * <p>供表单删除前校验使用：设计器草稿未部署，其引用不体现在流程定义里</p>
+     *
+     * @param bpmnXml BPMN 2.0 XML 字符串
+     * @return formKey 集合，无引用返回空集合
+     */
+    public Set<String> getFormKeysFromXml(String bpmnXml) {
+        BpmnModel bpmnModel = new BpmnXMLConverter().convertToBpmnModel(
+                () -> new ByteArrayInputStream(bpmnXml.getBytes(StandardCharsets.UTF_8)), false, true);
+        Process process = bpmnModel.getMainProcess();
+        if (process == null) {
+            throw new BusinessException("流程文件校验失败，未找到主流程");
+        }
+        return extractFormKeys(process);
+    }
+
+    /**
+     * 提取主流程中开始节点与用户任务节点引用的表单标识
+     */
+    private Set<String> extractFormKeys(Process process) {
+        Set<String> formKeys = new HashSet<>();
+        process.findFlowElementsOfType(StartEvent.class).stream()
+                .map(StartEvent::getFormKey).filter(StrUtil::isNotBlank).forEach(formKeys::add);
+        process.findFlowElementsOfType(UserTask.class).stream()
+                .map(UserTask::getFormKey).filter(StrUtil::isNotBlank).forEach(formKeys::add);
+        return formKeys;
     }
 
     /**

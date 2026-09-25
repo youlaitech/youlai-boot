@@ -1,15 +1,21 @@
 package com.youlai.boot.module.workflow.service.impl;
 
+import cn.hutool.core.collection.CollectionUtil;
 import cn.hutool.core.lang.Assert;
 import cn.hutool.core.util.NumberUtil;
 import cn.hutool.core.util.StrUtil;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.youlai.boot.common.exception.BusinessException;
 import com.youlai.boot.framework.security.util.SecurityUtils;
 import com.youlai.boot.module.form.model.vo.FormDataVO;
 import com.youlai.boot.module.form.service.FormDataService;
+import com.youlai.boot.module.form.util.FormRuleValidator;
 import com.youlai.boot.module.workflow.model.form.CompleteTaskForm;
 import com.youlai.boot.module.workflow.model.form.RejectTaskForm;
 import com.youlai.boot.module.workflow.model.query.WorkflowTaskPageQuery;
+import com.youlai.boot.module.workflow.model.vo.ApprovalHistoryVO;
 import com.youlai.boot.module.workflow.model.vo.DoneTaskVO;
 import com.youlai.boot.module.workflow.model.vo.RejectTargetVO;
 import com.youlai.boot.module.workflow.model.vo.TaskDetailVO;
@@ -19,6 +25,8 @@ import com.youlai.boot.module.workflow.service.WorkflowTaskService;
 import com.youlai.boot.module.workflow.util.ApprovalHistoryHelper;
 import com.youlai.boot.module.workflow.util.BpmnModelHelper;
 import com.youlai.boot.module.workflow.config.ConditionalOnWorkflowEnabled;
+import com.youlai.boot.support.ai.AiChatService;
+import com.youlai.boot.support.ai.PromptLoader;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.flowable.common.engine.impl.identity.Authentication;
@@ -37,6 +45,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -58,6 +67,11 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 public class WorkflowTaskServiceImpl implements WorkflowTaskService {
 
+    /** 系统提示词名称，对应 resources/prompts 下的相对路径 */
+    private static final String SYSTEM_PROMPT_PATH = "workflow/summary.md";
+
+    private static final ObjectMapper OBJECT_MAPPER = new ObjectMapper();
+
     private final TaskService taskService;
     private final RuntimeService runtimeService;
     private final HistoryService historyService;
@@ -66,6 +80,8 @@ public class WorkflowTaskServiceImpl implements WorkflowTaskService {
     private final WorkflowDefinitionService workflowDefinitionService;
     private final BpmnModelHelper bpmnModelHelper;
     private final ApprovalHistoryHelper approvalHistoryHelper;
+    private final AiChatService aiChatService;
+    private final PromptLoader promptLoader;
 
     /**
      * 待办任务分页列表
@@ -377,6 +393,74 @@ public class WorkflowTaskServiceImpl implements WorkflowTaskService {
         return runtimeService.createProcessInstanceQuery()
                 .processInstanceIds(processInstanceIds).list().stream()
                 .collect(Collectors.toMap(ProcessInstance::getId, instance -> instance));
+    }
+
+    //---------------------------------------------------
+    // AI 辅助：未开启 AI 时调用返回业务异常
+    //---------------------------------------------------
+
+    /**
+     * 用 AI 汇总表单数据与审批记录，生成审批摘要
+     *
+     * @param taskId 任务ID
+     * @return 摘要文本
+     */
+    @Override
+    public String aiSummarizeTask(String taskId) {
+        TaskDetailVO detail = getTaskDetail(taskId);
+        return aiChatService.chat(promptLoader.get(SYSTEM_PROMPT_PATH), buildAiUserPrompt(detail));
+    }
+
+    /**
+     * 构造用户提示词
+     *
+     * @param detail 任务详情
+     * @return 用户提示词
+     */
+    private String buildAiUserPrompt(TaskDetailVO detail) {
+        StringBuilder text = new StringBuilder();
+        text.append("流程名称：").append(StrUtil.blankToDefault(detail.getProcessName(), "未命名流程")).append("\n");
+        text.append("当前节点：").append(StrUtil.blankToDefault(detail.getTaskName(), "未命名节点")).append("\n");
+        text.append("表单数据：\n").append(buildAiFormDataText(detail));
+        if (CollectionUtil.isNotEmpty(detail.getHistory())) {
+            text.append("审批记录：\n");
+            for (ApprovalHistoryVO history : detail.getHistory()) {
+                text.append("- ")
+                        .append(StrUtil.blankToDefault(history.getActivityName(), "环节"))
+                        .append("（")
+                        .append(StrUtil.blankToDefault(history.getAssignee(), "待处理"))
+                        .append("）：")
+                        .append(StrUtil.blankToDefault(history.getComment(), "无意见"))
+                        .append("\n");
+            }
+        }
+        return text.toString();
+    }
+
+    /**
+     * 把表单数据按 rule 的中文标题输出，便于模型理解字段含义
+     *
+     * @param detail 任务详情
+     * @return 逐行「标题：值」文本
+     */
+    private String buildAiFormDataText(TaskDetailVO detail) {
+        Map<String, String> titles = FormRuleValidator.resolveTitles(detail.getFormJson());
+        if (StrUtil.isBlank(detail.getDataJson())) {
+            return "（无表单数据）\n";
+        }
+        StringBuilder text = new StringBuilder();
+        try {
+            JsonNode data = OBJECT_MAPPER.readTree(detail.getDataJson());
+            Iterator<Map.Entry<String, JsonNode>> fields = data.fields();
+            while (fields.hasNext()) {
+                Map.Entry<String, JsonNode> entry = fields.next();
+                String title = titles.getOrDefault(entry.getKey(), entry.getKey());
+                text.append(title).append("：").append(entry.getValue().asText()).append("\n");
+            }
+        } catch (Exception e) {
+            throw new BusinessException("表单数据解析失败");
+        }
+        return text.toString();
     }
 
 }

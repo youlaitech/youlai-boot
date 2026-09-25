@@ -152,6 +152,7 @@ youlai-boot/
 │   │   ├── form/              # 动态表单
 │   │   └── workflow/          # 工作流
 │   ├── support/               # 能力服务
+│   │   ├── ai/                # AI 对话（代码生成/动态表单/工作流辅助，默认关闭）
 │   │   ├── file/              # 文件存储（RustFS/阿里云OSS/本地）
 │   │   ├── mail/              # 邮件服务
 │   │   ├── sms/               # 短信服务
@@ -179,10 +180,10 @@ youlai-boot/
 | [youlai-gin](https://gitee.com/youlaiorg/youlai-gin)         | Go + Gorm                  | Go       | ✅️   |
 | [youlai-django](https://gitee.com/youlaiorg/youlai-django)   | Django + DRF               | Python   | ✅️   |
 | [youlai-fastapi](https://gitee.com/youlaiorg/youlai-fastapi) | FastAPI + SQLAlchemy       | Python   | ✅️   |
-| [youlai-laravel](https://gitee.com/youlaiorg/youlai-laravel) | Laravel + Eloquent         | PHP      | ✅️   |
 | [youlai-think](https://gitee.com/youlaiorg/youlai-think)     | ThinkPHP + ThinkORM        | PHP      | ✅️   |
 | [youlai-aspnet](https://gitee.com/youlaiorg/youlai-aspnet)   | ASP.NET Core + EF Core     | C#       | ✅️   |
 | [youlai-axum](https://gitee.com/youlaiorg/youlai-axum)       | Axum + SeaORM              | Rust     | ✅️   |
+| [youlai-laravel](https://gitee.com/youlaiorg/youlai-laravel) | Laravel + Eloquent         | PHP      | ❌️   |
 
 > 九种后端共享同一套 **RESTful API 规范** 和 **数据库结构**，前端可无缝切换。
 
@@ -194,8 +195,8 @@ youlai-boot/
 | [youlai-boot-flex](https://gitee.com/youlaiorg/youlai-boot-flex)                          | youlai-boot | 独立仓库 | 改用 MyBatis-Flex    | ✅️   |
 | [youlai-boot (db-pg)](https://gitee.com/youlaiorg/youlai-boot/tree/db-pg)                 | youlai-boot | 分支   | PostgreSQL 数据库分支   | ✅️   |
 | [youlai-boot (multi-module)](https://gitee.com/youlaiorg/youlai-boot/tree/multi-module)   | youlai-boot | 分支   | 多模块工程拆分            | ✅️   |
-| [youlai-boot (spring-boot-3)](https://gitee.com/youlaiorg/youlai-boot/tree/spring-boot-3) | youlai-boot | 分支   | Spring Boot 3 兼容分支 | ✅️   |
 | [youlai-nest (multi-tenant)](https://gitee.com/youlaiorg/youlai-nest/tree/multi-tenant)   | youlai-nest | 分支   | 多租户 SaaS，租户隔离与租户配置 | ✅️   |
+| [youlai-boot (spring-boot-3)](https://gitee.com/youlaiorg/youlai-boot/tree/spring-boot-3) | youlai-boot | 分支   | Spring Boot 3 兼容分支 | ❌️   |
 
 ## 可选扩展
 
@@ -218,7 +219,7 @@ youlai-boot/
      enabled: true
    ```
 
-   Flowable 引擎开关（process / idm / eventregistry）在同一 `application-{profile}.yml` 中以占位符跟随 `workflow.enabled`，无需单独维护。
+   Flowable 引擎开关（process / idm / eventregistry）在 `application.yml` 中以占位符跟随 `workflow.enabled`，无需单独维护；只改上面一处即可。
 
 **多租户**
 

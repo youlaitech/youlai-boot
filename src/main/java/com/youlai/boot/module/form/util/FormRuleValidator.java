@@ -1,5 +1,6 @@
 package com.youlai.boot.module.form.util;
 
+import cn.hutool.core.util.StrUtil;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.youlai.boot.common.exception.BusinessException;
@@ -57,6 +58,90 @@ public final class FormRuleValidator {
             throw new BusinessException(String.join("；", errors));
         }
         return filtered;
+    }
+
+    /**
+     * 校验表单规则结构（AI 生成或外部导入的规则先过这一层）
+     *
+     * @param formJson 表单规则（form-create rule 数组 JSON 字符串）
+     * @return 规则原文，便于链式使用
+     */
+    public static String validateRule(String formJson) {
+        JsonNode rules;
+        try {
+            rules = OBJECT_MAPPER.readTree(formJson);
+        } catch (Exception e) {
+            throw new BusinessException("表单规则解析失败");
+        }
+        if (!rules.isArray() || rules.isEmpty()) {
+            throw new BusinessException("表单规则格式非法：应为非空数组");
+        }
+        checkNodes(rules);
+        return formJson;
+    }
+
+    /**
+     * 递归校验规则节点：每个节点必须有 type，非容器节点必须有 field
+     *
+     * @param nodes 规则节点数组
+     */
+    private static void checkNodes(JsonNode nodes) {
+        for (JsonNode node : nodes) {
+            if (node == null || !node.isObject()) {
+                throw new BusinessException("表单规则格式非法：节点必须为对象");
+            }
+            if (!node.path("type").isTextual()) {
+                throw new BusinessException("表单规则格式非法：节点缺少 type");
+            }
+            JsonNode children = node.get("children");
+            if (children != null && children.isArray() && !children.isEmpty()) {
+                checkNodes(children);
+            } else if (!node.path("field").isTextual()) {
+                throw new BusinessException("表单规则格式非法：字段节点缺少 field");
+            }
+        }
+    }
+
+    /**
+     * 解析规则里 field -> title 的映射（摘要、导出等场景把字段名换成中文标题）
+     *
+     * @param formJson 表单规则
+     * @return field -> title 映射，规则为空或解析失败时返回空 Map
+     */
+    public static Map<String, String> resolveTitles(String formJson) {
+        Map<String, String> titles = new LinkedHashMap<>();
+        if (StrUtil.isBlank(formJson)) {
+            return titles;
+        }
+        try {
+            collectTitles(OBJECT_MAPPER.readTree(formJson), titles);
+        } catch (Exception ignored) {
+            return titles;
+        }
+        return titles;
+    }
+
+    /**
+     * 递归收集 field 与 title
+     *
+     * @param nodes  规则节点数组
+     * @param titles 映射结果（累积写入）
+     */
+    private static void collectTitles(JsonNode nodes, Map<String, String> titles) {
+        for (JsonNode node : nodes) {
+            if (node == null || !node.isObject()) {
+                continue;
+            }
+            JsonNode field = node.get("field");
+            JsonNode title = node.get("title");
+            if (field != null && field.isTextual() && title != null && title.isTextual()) {
+                titles.putIfAbsent(field.asText(), title.asText());
+            }
+            JsonNode children = node.get("children");
+            if (children != null && children.isArray()) {
+                collectTitles(children, titles);
+            }
+        }
     }
 
     /**

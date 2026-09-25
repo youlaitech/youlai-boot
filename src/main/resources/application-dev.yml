@@ -4,7 +4,6 @@ server:
 spring:
   datasource:
     type: com.alibaba.druid.pool.DruidDataSource
-    driver-class-name: com.mysql.cj.jdbc.Driver # 3.2.0开始支持SPI可省略此配置
     url: jdbc:mysql://www.youlai.tech:3306/youlai_admin?zeroDateTimeBehavior=convertToNull&useUnicode=true&characterEncoding=UTF-8&serverTimezone=Asia/Shanghai&autoReconnect=true&allowMultiQueries=true
     username: youlai
     password: 123456
@@ -49,6 +48,10 @@ spring:
           enable: true
     # 邮件发送者
     from: youlaitech@163.com
+  # AI 对话默认关闭；启用改 chat 为 openai 并配置 spring.ai.openai 的 api-key、base-url、chat.options.model
+  ai:
+    model:
+      chat: none
 mybatis-plus:
   mapper-locations: classpath*:/mapper/**/*.xml
   global-config:
@@ -88,14 +91,14 @@ security:
       allow-multi-login: true # 是否允许多设备登录
   # 匿名放行路径，仅跳过认证与授权判断，仍走过滤器链（保留安全响应头）
   permit-all-urls:
-    - /api/v1/auth/login/** # 登录接口(账号密码登录)
+    - /api/v1/auth/login # 登录接口(账号密码登录)
     - /api/v1/auth/captcha # 验证码获取接口
     - /api/v1/auth/sms/** # 短信验证码接口(发送验证码、短信登录)
     - /api/v1/auth/refresh-token # 刷新令牌接口
     - /api/v1/auth/wxma/** # 微信小程序认证接口(静默登录/手机号快捷登录/绑定手机号)
-    - /api/v1/logs/** # 日志接口(访问日志列表)
     - /api/v1/auth/qr-code/** # 扫码登录接口(生成票据/查询状态/换取令牌)
     - /api/v1/forms/public/** # 公开表单接口(匿名渲染/提交，Service 校验 is_public 总闸 + IP 限流)
+    - /api/v1/health # 健康检查接口(供探针与限流测试)
     - ${springdoc.swagger-ui.path} # Swagger UI 路径
     - /doc.html
     - /swagger-ui/**
@@ -137,23 +140,6 @@ storage:
     # 存储根目录（相对路径基于工作目录；生产建议挂载独立卷）
     path: ./uploads/
 
-# 短信配置
-sms:
-  # 阿里云短信
-  aliyun:
-    accessKeyId: LTAI5tSMgfxxxxxxdiBJLyR
-    accessKeySecret: SoOWRqpjtS7xxxxxxZ2PZiMTJOVC
-    domain: dysmsapi.aliyuncs.com
-    regionId: cn-shanghai
-    signName: 有来技术
-    templates:
-      #  注册短信验证码模板
-      register: SMS_22xxx771
-      # 登录短信验证码模板
-      login: SMS_22xxx772
-      # 修改手机号短信验证码模板
-      change-mobile: SMS_22xxx773
-
 # springdoc 配置文档: https://springdoc.org/properties.html
 springdoc:
   swagger-ui:
@@ -185,23 +171,6 @@ knife4j:
   setting:
     language: zh_cn
 
-# xxl-job 定时任务配置
-xxl:
-  job:
-    # 定时任务开关
-    enabled: false
-    admin:
-      # 多个地址使用,分割
-      addresses: http://127.0.0.1:8686/xxl-job-admin
-    accessToken: default_token
-    executor:
-      appname: xxl-job-executor-${spring.application.name}
-      address:
-      ip:
-      port: 9999
-      logpath: /data/applogs/xxl-job/jobhandler
-      logretentiondays: 30
-
 # 验证码配置
 captcha:
   # 验证码类型 circle-圆圈干扰验证码|gif-Gif验证码|line-干扰线验证码|shear-扭曲干扰验证码
@@ -231,27 +200,49 @@ captcha:
   # 验证码有效期(秒)
   expire-seconds: 120
 
+# 短信配置
+sms:
+  # 阿里云短信
+  aliyun:
+    accessKeyId: LTAI5tSMgfxxxxxxdiBJLyR
+    accessKeySecret: SoOWRqpjtS7xxxxxxZ2PZiMTJOVC
+    domain: dysmsapi.aliyuncs.com
+    regionId: cn-shanghai
+    signName: 有来技术
+    templates:
+      #  注册短信验证码模板
+      register: SMS_22xxx771
+      # 登录短信验证码模板
+      login: SMS_22xxx772
+      # 修改手机号短信验证码模板
+      change-mobile: SMS_22xxx773
+
+# xxl-job 定时任务配置
+xxl:
+  job:
+    # 定时任务开关
+    enabled: false
+    admin:
+      # 调度中心地址，多个地址用逗号分割；3.4.1 起调度中心 context-path 为 /，地址不带 /xxl-job-admin 后缀
+      addresses: http://127.0.0.1:8080
+    accessToken: default_token
+    executor:
+      appname: xxl-job-executor-${spring.application.name}
+      address:
+      ip:
+      port: 9999
+      logpath: /data/applogs/xxl-job/jobhandler
+      logretentiondays: 30
+
 # 微信小程序配置
 wx:
   miniapp:
-    appid: Your_AppId
-    secret: Your_AppSecret
+    appid: your-app-id
+    secret: your-app-secret
 
-# 工作流（默认关闭，开启见 README「可选扩展」）
+# 工作流（可选扩展，开启只需将 enabled 改为 true，引擎开关自动跟随）
 workflow:
-  # 工作流模块开关，未配置视为关闭
   enabled: false
   demo:
     # 演示流程自动部署开关
     enabled: true
-
-flowable:
-  # 引擎开关跟随 workflow.enabled
-  process:
-    enabled: ${workflow.enabled:false}
-  idm:
-    enabled: ${workflow.enabled:false}
-  eventregistry:
-    enabled: ${workflow.enabled:false}
-  # 引擎表初始化策略，true 启动时检查并自动建/更新 ACT_* 表；可选 true/false/create/create-drop
-  database-schema-update: true

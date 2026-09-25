@@ -6,8 +6,10 @@ import com.youlai.boot.common.enums.ActionTypeEnum;
 import com.youlai.boot.common.enums.LogModuleEnum;
 import com.youlai.boot.common.model.Option;
 import com.youlai.boot.common.result.Result;
+import com.youlai.boot.system.model.form.MenuAiFillForm;
 import com.youlai.boot.system.model.form.MenuForm;
 import com.youlai.boot.system.model.query.MenuQuery;
+import com.youlai.boot.system.model.vo.MenuAiVO;
 import com.youlai.boot.system.model.vo.MenuVO;
 import com.youlai.boot.system.model.vo.RouteVO;
 import com.youlai.boot.system.service.MenuService;
@@ -48,11 +50,8 @@ public class MenuController {
     @Operation(summary = "菜单下拉列表")
     @GetMapping("/options")
     public Result<List<Option<Long>>> getMenuOptions(
-            @Parameter(description = "是否只查询父级菜单")
-            @RequestParam(required = false, defaultValue = "false") boolean onlyParent
-    ) {
-        List<Option<Long>> menus = menuService.listMenuOptions(onlyParent);
-        return Result.success(menus);
+            @Parameter(description = "菜单类型，可传多个，为空查全部") @RequestParam(required = false) List<String> types) {
+        return Result.success(menuService.listMenuOptions(types));
     }
 
     @Operation(summary = "当前用户菜单路由列表")
@@ -116,6 +115,14 @@ public class MenuController {
     ) {
         boolean result = menuService.updateMenuVisible(menuId, visible);
         return Result.judge(result);
+    }
+
+    // AI 辅助：未开启 AI 时调用返回业务异常
+
+    @Operation(summary = "AI 推断菜单的访问路径与权限标识")
+    @PostMapping("/ai-fill")
+    public Result<MenuAiVO> aiFillMenu(@RequestBody @Valid MenuAiFillForm form) {
+        return Result.success(menuService.aiFillMenu(form));
     }
 
 }

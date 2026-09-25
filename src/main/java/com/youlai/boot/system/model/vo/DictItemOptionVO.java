@@ -21,9 +21,7 @@ public class DictItemOptionVO {
     @Schema(description = "字典项标签")
     private String label;
 
-    @Schema(description = "标签类型")
+    @Schema(description = "标签样式")
     private String tagType;
 
 }
-
- 

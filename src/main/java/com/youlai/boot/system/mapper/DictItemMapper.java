@@ -18,10 +18,10 @@ public interface DictItemMapper extends BaseMapper<DictItem> {
 
     /**
      * 字典项分页列表
+     *
+     * @param page 分页参数
+     * @param queryParams 查询参数
+     * @return 字典项分页列表
      */
     Page<DictItemPageVO> getDictItemPage(Page<DictItemPageVO> page, DictItemQuery queryParams);
 }
-
-
-
-

@@ -10,6 +10,7 @@ import com.youlai.boot.common.result.Result;
 import com.youlai.boot.common.exception.BusinessException;
 import com.youlai.boot.common.model.Option;
 import com.youlai.boot.framework.web.util.IPUtils;
+import com.youlai.boot.module.form.model.form.FormAiGenerateForm;
 import com.youlai.boot.module.form.model.form.FormDefinitionForm;
 import com.youlai.boot.module.form.model.form.FormMenuForm;
 import com.youlai.boot.module.form.model.query.FormDataPageQuery;
@@ -238,6 +239,16 @@ public class FormController {
     ) {
         formDataService.removeFormData(Arrays.stream(ids.split(",")).map(Long::valueOf).toList());
         return Result.success();
+    }
+
+    //---------------------------------------------------
+    // AI 辅助接口（未开启 AI 时调用返回业务异常）
+    //---------------------------------------------------
+
+    @Operation(summary = "AI 生成表单规则")
+    @PostMapping("/ai-generate")
+    public Result<String> generateRule(@RequestBody @Valid FormAiGenerateForm form) {
+        return Result.success(formDefinitionService.aiGenerateRule(form.getDescription()));
     }
 
 }

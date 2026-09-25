@@ -24,8 +24,6 @@ public class DictPageVO {
     @Schema(description = "字典编码")
     private String dictCode;
 
-    @Schema(description = "字典状态（1-启用，0-禁用）")
+    @Schema(description = "字典状态（1-启用，0-停用）")
     private Integer status;
 }
-
- 

@@ -28,12 +28,13 @@ public class DictItemPageVO {
     @Schema(description = "字典值")
     private String value;
 
+    @Schema(description = "标签样式")
+    private String tagType;
+
     @Schema(description = "排序")
     private Integer sort;
 
-    @Schema(description = "状态（1:启用，0:禁用）")
+    @Schema(description = "状态（1-启用，0-停用）")
     private Integer status;
 
 }
-
- 

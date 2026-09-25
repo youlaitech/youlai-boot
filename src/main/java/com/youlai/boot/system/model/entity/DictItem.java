@@ -37,7 +37,7 @@ public class DictItem extends BaseEntity {
     private Integer sort;
 
     /**
-     * 状态（1-正常，0-禁用）
+     * 状态（1-启用，0-停用）
      */
     private Integer status;
 
@@ -64,4 +64,10 @@ public class DictItem extends BaseEntity {
      */
     @TableField(fill = FieldFill.INSERT_UPDATE)
     private Long updateBy;
+
+    /**
+     * 逻辑删除(1-已删除 0-未删除)
+     */
+    private Integer isDeleted;
+
 }

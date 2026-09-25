@@ -1,28 +1,28 @@
 package com.youlai.boot.system.controller;
 
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import com.youlai.boot.common.annotation.Log;
+import com.youlai.boot.common.enums.ActionTypeEnum;
+import com.youlai.boot.common.enums.LogModuleEnum;
 import com.youlai.boot.common.model.Option;
 import com.youlai.boot.common.result.PageResult;
 import com.youlai.boot.common.result.Result;
-import com.youlai.boot.common.enums.ActionTypeEnum;
-import com.youlai.boot.common.enums.LogModuleEnum;
-import com.youlai.boot.system.model.form.DictItemForm;
-import com.youlai.boot.system.model.query.DictItemQuery;
-import com.youlai.boot.system.model.query.DictQuery;
-import com.youlai.boot.system.model.vo.DictItemOptionVO;
-import com.youlai.boot.system.model.vo.DictItemPageVO;
-import com.youlai.boot.system.model.vo.DictPageVO;
 import com.youlai.boot.framework.web.repeatsubmit.RepeatSubmit;
-import com.youlai.boot.system.model.form.DictForm;
-import com.youlai.boot.common.annotation.Log;
-import com.youlai.boot.system.service.DictItemService;
-import com.youlai.boot.system.service.DictService;
 import com.youlai.boot.support.sse.SseService;
 import com.youlai.boot.support.sse.constant.SseTopics;
 import com.youlai.boot.system.model.dto.DictChangeDTO;
+import com.youlai.boot.system.model.form.DictForm;
+import com.youlai.boot.system.model.form.DictItemForm;
+import com.youlai.boot.system.model.query.DictQuery;
+import com.youlai.boot.system.model.query.DictItemQuery;
+import com.youlai.boot.system.model.vo.DictItemOptionVO;
+import com.youlai.boot.system.model.vo.DictItemPageVO;
+import com.youlai.boot.system.model.vo.DictPageVO;
+import com.youlai.boot.system.service.DictItemService;
+import com.youlai.boot.system.service.DictService;
+import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
-import io.swagger.v3.oas.annotations.Operation;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -34,8 +34,8 @@ import java.util.List;
 /**
  * 字典控制层
  *
- * @author Ray.Hao
- * @since 2.9.0
+ * @author Ray Hao
+ * @since 2022/10/12
  */
 @Tag(name = "06.字典接口")
 @RestController
@@ -56,9 +56,6 @@ public class DictController {
         sseService.broadcast(SseTopics.DICT, new DictChangeDTO(dictCode));
     }
 
-    //---------------------------------------------------
-    // 字典相关接口
-    //---------------------------------------------------
     @Operation(summary = "字典分页列表")
     @GetMapping
     @Log(module = LogModuleEnum.DICT, value = ActionTypeEnum.LIST)
@@ -106,12 +103,12 @@ public class DictController {
     @Log(module = LogModuleEnum.DICT, value = ActionTypeEnum.UPDATE)
     public Result<Void> updateDict(
             @PathVariable Long dictId,
-            @RequestBody @Valid DictForm dictForm
+            @RequestBody @Valid DictForm formData
     ) {
-        boolean status = dictService.updateDict(dictId, dictForm);
+        boolean status = dictService.updateDict(dictId, formData);
         // 发送字典更新通知
-        if (status && dictForm.getDictCode() != null) {
-          sendDictChange(dictForm.getDictCode());
+        if (status && formData.getDictCode() != null) {
+            sendDictChange(formData.getDictCode());
         }
         return Result.judge(status);
     }
@@ -130,20 +127,16 @@ public class DictController {
 
         // 发送字典删除通知
         for (String dictCode : dictCodes) {
-          sendDictChange(dictCode);
+            sendDictChange(dictCode);
         }
 
         return Result.success();
     }
 
-
-    //---------------------------------------------------
-    // 字典项相关接口
-    //---------------------------------------------------
-    @Operation(summary = "字典项分页列表")
+    @Operation(summary = "获取字典项分页列表")
     @GetMapping("/{dictCode}/items")
-    public PageResult<DictItemPageVO> getDictItemPage(
-            @PathVariable String dictCode,
+    public PageResult<DictItemPageVO> getDictItemsPage(
+            @Parameter(description = "字典编码") @PathVariable String dictCode,
             @Valid DictItemQuery queryParams
     ) {
         queryParams.setDictCode(dictCode);
@@ -151,7 +144,7 @@ public class DictController {
         return PageResult.success(result);
     }
 
-    @Operation(summary = "字典项列表")
+    @Operation(summary = "获取字典项列表")
     @GetMapping("/{dictCode}/items/options")
     public Result<List<DictItemOptionVO>> getDictItems(
             @Parameter(description = "字典编码") @PathVariable String dictCode
@@ -160,8 +153,18 @@ public class DictController {
         return Result.success(list);
     }
 
+    @Operation(summary = "获取字典项表单数据")
+    @GetMapping("/{dictCode}/items/{itemId}/form")
+    public Result<DictItemForm> getDictItemForm(
+            @PathVariable String dictCode,
+            @Parameter(description = "字典ID") @PathVariable Long itemId
+    ) {
+        DictItemForm formData = dictItemService.getDictItemForm(itemId);
+        return Result.success(formData);
+    }
+
     @Operation(summary = "新增字典项")
-    @PostMapping("/{dictCode}/items")
+    @PostMapping(value = "/{dictCode}/items")
     @PreAuthorize("@ss.hasPerm('sys:dict-item:create')")
     @RepeatSubmit
     @Log(module = LogModuleEnum.DICT, value = ActionTypeEnum.INSERT)
@@ -174,20 +177,10 @@ public class DictController {
 
         // 发送字典更新通知
         if (result) {
-          sendDictChange(dictCode);
+            sendDictChange(dictCode);
         }
 
         return Result.judge(result);
-    }
-
-    @Operation(summary = "字典项表单数据")
-    @GetMapping("/{dictCode}/items/{itemId}/form")
-    public Result<DictItemForm> getDictItemForm(
-            @PathVariable String dictCode,
-            @Parameter(description = "字典项ID") @PathVariable Long itemId
-    ) {
-        DictItemForm formData = dictItemService.getDictItemForm(itemId);
-        return Result.success(formData);
     }
 
     @Operation(summary = "修改字典项")
@@ -216,15 +209,13 @@ public class DictController {
     @DeleteMapping("/{dictCode}/items/{itemIds}")
     @PreAuthorize("@ss.hasPerm('sys:dict-item:delete')")
     @Log(module = LogModuleEnum.DICT, value = ActionTypeEnum.DELETE)
-    public Result<Void> deleteDictItems(
+    public Result<Void> deleteDictItemByIds(
             @PathVariable String dictCode,
-            @Parameter(description = "字典ID，多个以英文逗号(,)拼接") @PathVariable String itemIds
+            @Parameter(description = "字典项ID，多个以英文逗号(,)拼接") @PathVariable String itemIds
     ) {
         dictItemService.deleteDictItemByIds(itemIds);
-
         // 发送字典更新通知
         sendDictChange(dictCode);
-
         return Result.success();
     }
 

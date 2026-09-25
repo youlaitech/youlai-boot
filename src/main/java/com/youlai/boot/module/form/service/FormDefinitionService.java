@@ -137,4 +137,12 @@ public interface FormDefinitionService {
      */
     List<Option<String>> listWorkflowFormOptions();
 
+    /**
+     * 用 AI 把需求描述转成 form-create 规则，产出经结构校验后才返回
+     *
+     * @param description 需求描述
+     * @return 通过结构校验的 form-create rule JSON 字符串
+     */
+    String aiGenerateRule(String description);
+
 }

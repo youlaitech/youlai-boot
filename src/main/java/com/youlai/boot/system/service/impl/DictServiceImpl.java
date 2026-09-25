@@ -134,7 +134,7 @@ public class DictServiceImpl extends ServiceImpl<DictMapper, Dict> implements Di
                             .eq(DictItem::getDictCode, entity.getDictCode())
                             .select(DictItem::getId)
             );
-            if (!dictItemList.isEmpty()){
+            if (!dictItemList.isEmpty()) {
                 List<Long> dictItemIds = dictItemList.stream().map(DictItem::getId).toList();
                 DictItem dictItem = new DictItem();
                 dictItem.setDictCode(dict.getDictCode());
@@ -155,13 +155,14 @@ public class DictServiceImpl extends ServiceImpl<DictMapper, Dict> implements Di
     @Transactional
     @Override
     public void deleteDictByIds(List<String> ids) {
+        // 先取字典编码：删除后再查会被逻辑删除条件过滤，导致字典项无法级联删除
+        List<String> dictCodes = this.listByIds(ids).stream().map(Dict::getDictCode).toList();
+
         // 删除字典
         this.removeByIds(ids);
 
         // 删除字典项
-        List<Dict> list = this.listByIds(ids);
-        if (!list.isEmpty()) {
-            List<String> dictCodes = list.stream().map(Dict::getDictCode).toList();
+        if (!dictCodes.isEmpty()) {
             dictItemService.remove(new LambdaQueryWrapper<DictItem>()
                     .in(DictItem::getDictCode, dictCodes)
             );
@@ -181,7 +182,3 @@ public class DictServiceImpl extends ServiceImpl<DictMapper, Dict> implements Di
     }
 
 }
-
-
-
-

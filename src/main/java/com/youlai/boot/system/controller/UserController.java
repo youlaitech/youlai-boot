@@ -170,7 +170,8 @@ public class UserController {
         response.setContentType("application/vnd.openxmlformats-officedocument.spreadsheetml.sheet");
         response.setHeader("Content-Disposition", "attachment; filename=" + URLEncoder.encode(fileName, StandardCharsets.UTF_8));
 
-        String fileClassPath = "templates" + File.separator + "excel" + File.separator + fileName;
+        // ClassLoader 只认 / 分隔，用 File.separator 打 jar 后（Linux）会取不到资源
+        String fileClassPath = "excel/" + fileName;
         InputStream inputStream = this.getClass().getClassLoader().getResourceAsStream(fileClassPath);
 
         try (ServletOutputStream outputStream = response.getOutputStream();

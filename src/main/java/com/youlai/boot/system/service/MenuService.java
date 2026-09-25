@@ -2,10 +2,12 @@ package com.youlai.boot.system.service;
 
 import com.baomidou.mybatisplus.extension.service.IService;
 import com.youlai.boot.system.model.dto.MenuCreateDTO;
+import com.youlai.boot.system.model.form.MenuAiFillForm;
 import com.youlai.boot.system.model.form.MenuForm;
 import com.youlai.boot.common.model.Option;
 import com.youlai.boot.system.model.entity.Menu;
 import com.youlai.boot.system.model.query.MenuQuery;
+import com.youlai.boot.system.model.vo.MenuAiVO;
 import com.youlai.boot.system.model.vo.MenuVO;
 import com.youlai.boot.system.model.vo.RouteVO;
 
@@ -27,9 +29,9 @@ public interface MenuService extends IService<Menu> {
     /**
      * 获取菜单下拉列表
      *
-     * @param onlyParent 是否只查询父级菜单
+     * @param types 菜单类型，为空查全部
      */
-    List<Option<Long>> listMenuOptions(boolean onlyParent);
+    List<Option<Long>> listMenuOptions(List<String> types);
 
     /**
      * 新增菜单
@@ -81,4 +83,12 @@ public interface MenuService extends IService<Menu> {
      * @param dto          创建菜单数据载体
      */
     void addMenuForCodegen(Long parentMenuId, MenuCreateDTO dto);
+
+    /**
+     * 用 AI 推断菜单的访问路径、权限标识与配套按钮，命名风格参照同级菜单
+     *
+     * @param form 菜单信息
+     * @return 推断结果
+     */
+    MenuAiVO aiFillMenu(MenuAiFillForm form);
 }

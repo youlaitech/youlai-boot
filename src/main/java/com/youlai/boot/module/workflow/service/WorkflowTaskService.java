@@ -67,4 +67,12 @@ public interface WorkflowTaskService {
      */
     void rejectTask(String taskId, RejectTaskForm formData);
 
+    /**
+     * 用 AI 汇总表单数据与审批记录，生成审批摘要
+     *
+     * @param taskId 任务ID
+     * @return 摘要文本
+     */
+    String aiSummarizeTask(String taskId);
+
 }

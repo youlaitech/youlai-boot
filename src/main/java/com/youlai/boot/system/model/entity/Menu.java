@@ -95,11 +95,6 @@ public class Menu extends BaseEntity {
     private Integer keepAlive;
 
     /**
-     * 【目录】只有一个子路由是否始终显示(1:是 0:否)
-     */
-    private Integer alwaysShow;
-
-    /**
      * 路由参数
      */
     @TableField(updateStrategy = FieldStrategy.ALWAYS, typeHandler = JacksonTypeHandler.class)
