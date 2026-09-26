@@ -58,7 +58,7 @@ public class CodegenProperties {
     public static class TemplateConfig {
 
         /**
-         * 模板路径 (e.g. /templates/codegen/controller.java.vm)
+         * 模板路径，相对模板根 classpath:codegen (e.g. backend/controller.java.vm)
          */
         private String templatePath;
 

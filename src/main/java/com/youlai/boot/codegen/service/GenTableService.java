@@ -36,4 +36,13 @@ public interface GenTableService extends IService<GenTable> {
      */
     void deleteGenConfig(String tableName);
 
+    /**
+     * 用 AI 推断代码生成配置，未推断出的字段沿用原有默认值
+     *
+     * @param tableName   表名
+     * @param requirement 补充需求描述，可为空
+     * @return 回填了 AI 推断结果的配置
+     */
+    GenConfigForm aiFillConfig(String tableName, String requirement);
+
 }

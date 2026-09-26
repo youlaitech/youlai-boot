@@ -3,6 +3,7 @@ package com.youlai.boot.codegen.service.impl;
 import cn.hutool.core.collection.CollectionUtil;
 import cn.hutool.core.lang.Assert;
 import cn.hutool.core.util.StrUtil;
+import cn.hutool.json.JSONUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.youlai.boot.YouLaiBootApplication;
@@ -20,8 +21,11 @@ import com.youlai.boot.codegen.model.vo.TableMetaVO;
 import com.youlai.boot.codegen.model.entity.GenTable;
 import com.youlai.boot.codegen.model.entity.GenTableColumn;
 import com.youlai.boot.codegen.model.form.GenConfigForm;
+import com.youlai.boot.codegen.model.vo.GenConfigAiVO;
 import com.youlai.boot.codegen.service.GenTableService;
 import com.youlai.boot.codegen.service.GenTableColumnService;
+import com.youlai.boot.support.ai.AiChatService;
+import com.youlai.boot.support.ai.PromptLoader;
 import com.youlai.boot.system.model.dto.MenuCreateDTO;
 import com.youlai.boot.system.service.MenuService;
 import lombok.RequiredArgsConstructor;
@@ -29,9 +33,14 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Comparator;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 
 /**
  * 数据库服务实现类
@@ -43,10 +52,15 @@ import java.util.Objects;
 @RequiredArgsConstructor
 public class GenTableServiceImpl extends ServiceImpl<GenTableMapper, GenTable> implements GenTableService {
 
+    /** 系统提示词名称，对应 resources/prompts 下的相对路径 */
+    private static final String SYSTEM_PROMPT_PATH = "codegen/system.md";
+
     private final DatabaseMapper databaseMapper;
     private final CodegenProperties codegenProperties;
     private final GenTableColumnService genTableColumnService;
     private final CodegenConverter codegenConverter;
+    private final AiChatService aiChatService;
+    private final PromptLoader promptLoader;
 
     @Value("${spring.profiles.active}")
     private String springProfilesActive;
@@ -229,6 +243,137 @@ public class GenTableServiceImpl extends ServiceImpl<GenTableMapper, GenTable> i
         }
     }
 
+    //---------------------------------------------------
+    // AI 辅助：未开启 AI 时调用返回业务异常
+    //---------------------------------------------------
 
+    /**
+     * 用 AI 推断代码生成配置
+     *
+     * @param tableName   表名 eg: sys_user
+     * @param requirement 补充需求描述，可为空
+     * @return 回填了 AI 推断结果的配置
+     */
+    @Override
+    public GenConfigForm aiFillConfig(String tableName, String requirement) {
+        GenConfigForm config = getGenTableFormData(tableName);
+        String systemPrompt = promptLoader.render(SYSTEM_PROMPT_PATH, buildAiPromptVariables());
+        GenConfigAiVO aiConfig = aiChatService.chatEntity(systemPrompt, buildAiUserPrompt(config, requirement), GenConfigAiVO.class);
+
+        if (StrUtil.isNotBlank(aiConfig.getBusinessName())) {
+            config.setBusinessName(aiConfig.getBusinessName().trim());
+        }
+        applyAiFieldConfigs(config, aiConfig.getFieldConfigs());
+        return config;
+    }
+
+    /**
+     * 构造系统提示词的变量值，表单类型与查询类型清单取自枚举，新增枚举值无需改动提示词
+     *
+     * @return 变量值
+     */
+    private Map<String, String> buildAiPromptVariables() {
+        String formTypes = Arrays.stream(FormTypeEnum.values())
+                .map(type -> type.name() + "(" + type.getLabel() + ")")
+                .collect(Collectors.joining("|"));
+        String queryTypes = Arrays.stream(QueryTypeEnum.values())
+                .map(Enum::name)
+                .collect(Collectors.joining("|"));
+        return Map.of("formTypes", formTypes, "queryTypes", queryTypes);
+    }
+
+    /**
+     * 按列名匹配回填字段配置
+     *
+     * @param config   原配置
+     * @param aiFields AI 返回的字段列表
+     */
+    private void applyAiFieldConfigs(GenConfigForm config, List<GenConfigAiVO.FieldAiVO> aiFields) {
+        if (CollectionUtil.isEmpty(aiFields) || CollectionUtil.isEmpty(config.getFieldConfigs())) {
+            return;
+        }
+        Map<String, GenConfigAiVO.FieldAiVO> aiFieldMap = aiFields.stream()
+                .filter(field -> StrUtil.isNotBlank(field.getColumnName()))
+                .collect(Collectors.toMap(GenConfigAiVO.FieldAiVO::getColumnName, Function.identity(),
+                        (existing, replacement) -> existing, LinkedHashMap::new));
+
+        config.getFieldConfigs().forEach(field -> {
+            GenConfigAiVO.FieldAiVO aiField = aiFieldMap.get(field.getColumnName());
+            if (aiField == null) {
+                return;
+            }
+            if (StrUtil.isNotBlank(aiField.getFieldComment())) {
+                field.setFieldComment(aiField.getFieldComment().trim());
+            }
+            if (StrUtil.isNotBlank(aiField.getDictType())) {
+                field.setDictType(aiField.getDictType().trim());
+            }
+            field.setFormType(parseAiEnum(aiField.getFormType(), FormTypeEnum::valueOf, field.getFormType()));
+            field.setQueryType(parseAiEnum(aiField.getQueryType(), QueryTypeEnum::valueOf, field.getQueryType()));
+            field.setIsRequired(resolveAiValue(aiField.getIsRequired(), field.getIsRequired()));
+            field.setIsShowInList(resolveAiValue(aiField.getIsShowInList(), field.getIsShowInList()));
+            field.setIsShowInForm(resolveAiValue(aiField.getIsShowInForm(), field.getIsShowInForm()));
+            field.setIsShowInQuery(resolveAiValue(aiField.getIsShowInQuery(), field.getIsShowInQuery()));
+        });
+    }
+
+    /**
+     * 解析枚举名，非法或未给出时沿用原值
+     *
+     * @param name     枚举名
+     * @param parser   枚举解析器
+     * @param fallback 原值
+     * @return 枚举或原值
+     */
+    private <T> T parseAiEnum(String name, Function<String, T> parser, T fallback) {
+        if (StrUtil.isBlank(name)) {
+            return fallback;
+        }
+        try {
+            return parser.apply(name.trim());
+        } catch (IllegalArgumentException e) {
+            return fallback;
+        }
+    }
+
+    /**
+     * AI 值缺失时沿用原值
+     *
+     * @param aiValue  AI 值
+     * @param fallback 原值
+     * @return 生效值
+     */
+    private <T> T resolveAiValue(T aiValue, T fallback) {
+        return aiValue != null ? aiValue : fallback;
+    }
+
+    /**
+     * 构造用户提示词
+     *
+     * @param config      当前配置
+     * @param requirement 补充需求描述
+     * @return 用户提示词
+     */
+    private String buildAiUserPrompt(GenConfigForm config, String requirement) {
+        List<Map<String, Object>> columns = new ArrayList<>();
+        if (CollectionUtil.isNotEmpty(config.getFieldConfigs())) {
+            config.getFieldConfigs().forEach(field -> {
+                Map<String, Object> column = new LinkedHashMap<>();
+                column.put("columnName", field.getColumnName());
+                column.put("columnType", field.getColumnType());
+                column.put("fieldComment", field.getFieldComment());
+                column.put("isRequired", field.getIsRequired());
+                columns.add(column);
+            });
+        }
+        return """
+                表名：%s
+                当前业务名：%s
+                补充说明：%s
+                字段列表：
+                %s
+                """.formatted(config.getTableName(), config.getBusinessName(),
+                StrUtil.blankToDefault(requirement, "无"), JSONUtil.toJsonStr(columns));
+    }
 
 }

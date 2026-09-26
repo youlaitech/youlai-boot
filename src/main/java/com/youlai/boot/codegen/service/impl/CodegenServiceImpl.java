@@ -85,10 +85,10 @@ public class CodegenServiceImpl implements CodegenService {
             return templateConfig.getTemplatePath();
         }
         if ("API".equals(templateName)) {
-            return "codegen/frontend/js/api.js.vm";
+            return "frontend/js/api.js.vm";
         }
         if ("VIEW".equals(templateName)) {
-            return "codegen/frontend/js/index.js.vue.vm";
+            return "frontend/js/index.js.vue.vm";
         }
         return templateConfig.getTemplatePath();
     }
@@ -352,14 +352,14 @@ public class CodegenServiceImpl implements CodegenService {
         bindMap.put("hasBigDecimal", hasBigDecimal);
         bindMap.put("hasRequiredField", hasRequiredField);
 
-        TemplateEngine templateEngine = TemplateUtil.createEngine(new TemplateConfig("templates", TemplateConfig.ResourceMode.CLASSPATH));
-        // 根据 ui 选择不同的前端页面模板：默认 index.vue.vm；封装版使用 index.curd.vue.vm
+        TemplateEngine templateEngine = TemplateUtil.createEngine(new TemplateConfig("codegen", TemplateConfig.ResourceMode.CLASSPATH));
+        // 根据 ui 选择不同的前端页面模板：默认 index.vue.vm；封装版使用 index.crud.vue.vm
         String path = templatePath;
-        if ("curd".equalsIgnoreCase(pageType)) {
+        if ("crud".equalsIgnoreCase(pageType)) {
             if (path.endsWith("index.js.vue.vm")) {
-                path = path.replace("index.js.vue.vm", "index.curd.js.vue.vm");
+                path = path.replace("index.js.vue.vm", "index.crud.js.vue.vm");
             } else if (path.endsWith("index.vue.vm")) {
-                path = path.replace("index.vue.vm", "index.curd.vue.vm");
+                path = path.replace("index.vue.vm", "index.crud.vue.vm");
             }
         }
         Template template = templateEngine.getTemplate(path);

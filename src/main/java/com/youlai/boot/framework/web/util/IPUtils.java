@@ -25,7 +25,7 @@ import java.nio.file.StandardCopyOption;
 @Component
 public class IPUtils {
 
-    private static final String DB_PATH = "/data/ip2region.xdb";
+    private static final String DB_PATH = "/ip2region/ip2region.xdb";
     private static Searcher searcher;
 
     @PostConstruct

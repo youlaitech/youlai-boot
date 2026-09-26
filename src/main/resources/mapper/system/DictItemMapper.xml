@@ -11,11 +11,13 @@
             dict_code,
             label,
             value,
+            tag_type,
             sort,
             status
         FROM
             sys_dict_item
         <where>
+            is_deleted = 0
             <if test="queryParams.keywords!=null and queryParams.keywords.trim() neq ''">
                AND (
                 value LIKE CONCAT('%', #{queryParams.keywords} ,'%')
@@ -27,5 +29,6 @@
                 AND dict_code = #{queryParams.dictCode}
             </if>
         </where>
+        ORDER BY sort ASC, id ASC
     </select>
 </mapper>

@@ -76,7 +76,7 @@ CREATE TABLE `form_snapshot` (
 
 -- ----------------------------
 -- 菜单（扩展段顶级 ID=8，基础段 1-7 见 youlai-admin.sql）
--- 目录与视图目录/URL 全链路对齐：views/dynamic-form + /dynamic-form（route_path/component 字段）
+-- 顶级目录 route_path 为 /dynamic-form，子菜单 component 指向 views/dynamic-form 下的视图且 route_path 只填当前段
 -- ----------------------------
 -- params 携 {"badge":"NEW"}：挂顶级"动态表单"一级可见（二级折叠态角标不可见），宣传期过后清空 params 即消失
 INSERT IGNORE INTO `sys_menu` (`id`, `parent_id`, `tree_path`, `name`, `type`, `route_name`, `route_path`, `component`, `perm`, `keep_alive`, `visible`, `sort`, `icon`, `redirect`, `create_time`, `update_time`, `params`) VALUES (8, 0, '0', '动态表单', 'C', '', '/dynamic-form', 'Layout', NULL, NULL, 1, 8, 'el-icon-Document', '/dynamic-form/definition', now(), now(), '{\"badge\":\"NEW\"}');

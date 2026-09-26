@@ -5,7 +5,6 @@
 #
 # 说明：
 # - name 固定项目名，容器统一管理和卸载，避免与其他项目冲突
-# - MySQL 首次启动时自动执行 ./sql 下初始化脚本（仅首次，数据卷已存在时跳过）
 # - 中间件配置全部内联于 command 参数，无需外部配置文件
 # - 数据持久化使用命名卷（docker volume 统一管理），不污染项目目录
 # - RustFS 兼容 MinIO 磁盘格式与 S3 协议（MinIO 社区版已于 2026 年停止维护）
@@ -25,7 +24,6 @@ services:
       - MYSQL_ROOT_PASSWORD=123456
     volumes:
       - youlai-mysql-data:/var/lib/mysql
-      - ./sql:/docker-entrypoint-initdb.d
     ports:
       - 3306:3306
 
@@ -58,7 +56,7 @@ services:
       - 9001:9001
 
   xxl-job-admin:
-    image: xuxueli/xxl-job-admin:2.4.0
+    image: xuxueli/xxl-job-admin:3.4.2
     container_name: xxl-job-admin
     restart: unless-stopped
     environment:

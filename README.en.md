@@ -178,10 +178,10 @@ youlai-boot/
 | [youlai-gin](https://gitee.com/youlaiorg/youlai-gin) | Go + Gorm | Go | ✅️ |
 | [youlai-django](https://gitee.com/youlaiorg/youlai-django) | Django + DRF | Python | ✅️ |
 | [youlai-fastapi](https://gitee.com/youlaiorg/youlai-fastapi) | FastAPI + SQLAlchemy | Python | ✅️ |
-| [youlai-laravel](https://gitee.com/youlaiorg/youlai-laravel) | Laravel + Eloquent | PHP | ✅️ |
 | [youlai-think](https://gitee.com/youlaiorg/youlai-think) | ThinkPHP + ThinkORM | PHP | ✅️ |
 | [youlai-aspnet](https://gitee.com/youlaiorg/youlai-aspnet) | ASP.NET Core + EF Core | C# | ✅️ |
 | [youlai-axum](https://gitee.com/youlaiorg/youlai-axum) | Axum + SeaORM | Rust | ✅️ |
+| [youlai-laravel](https://gitee.com/youlaiorg/youlai-laravel) | Laravel + Eloquent | PHP | ❌️ |
 
 > The nine backends share the same **RESTful API specification** and **database schema**, so the frontend can switch seamlessly.
 
@@ -193,8 +193,8 @@ youlai-boot/
 | [youlai-boot-flex](https://gitee.com/youlaiorg/youlai-boot-flex) | youlai-boot | Standalone repo | Built on MyBatis-Flex | ✅️ |
 | [youlai-boot (db-pg)](https://gitee.com/youlaiorg/youlai-boot/tree/db-pg) | youlai-boot | Branch | PostgreSQL database branch | ✅️ |
 | [youlai-boot (multi-module)](https://gitee.com/youlaiorg/youlai-boot/tree/multi-module) | youlai-boot | Branch | Multi-module project split | ✅️ |
-| [youlai-boot (spring-boot-3)](https://gitee.com/youlaiorg/youlai-boot/tree/spring-boot-3) | youlai-boot | Branch | Spring Boot 3 compatible branch | ✅️ |
 | [youlai-nest (multi-tenant)](https://gitee.com/youlaiorg/youlai-nest/tree/multi-tenant) | youlai-nest | Branch | Multi-tenant SaaS with tenant isolation & config | ✅️ |
+| [youlai-boot (spring-boot-3)](https://gitee.com/youlaiorg/youlai-boot/tree/spring-boot-3) | youlai-boot | Branch | Spring Boot 3 compatible branch | ❌️ |
 
 ## Optional Extensions
 

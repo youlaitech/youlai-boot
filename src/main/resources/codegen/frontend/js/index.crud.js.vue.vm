@@ -1,7 +1,7 @@
 <template>
   <div class="page-container h-full flex flex-1 flex-col">
     <!-- 搜索 -->
-    <PageSearch
+    <CrudSearch
       ref="searchRef"
       :search-config="searchConfig"
       @query-click="handleQueryClick"
@@ -14,10 +14,10 @@
       </template>
 #end
 #end
-    </PageSearch>
+    </CrudSearch>
 
     <!-- 列表 -->
-    <PageContent
+    <CrudTable
       ref="contentRef"
       :content-config="contentConfig"
       @add-click="handleAddClick"
@@ -34,10 +34,10 @@
       </template>
 #end
 #end
-    </PageContent>
+    </CrudTable>
 
     <!-- 新增 -->
-    <PageModal ref="addModalRef" :modal-config="addModalConfig" @submit-click="handleSubmitClick">
+    <CrudModal ref="addModalRef" :modal-config="addModalConfig" @submit-click="handleSubmitClick">
 #foreach($fieldConfig in $fieldConfigs)
 #if($fieldConfig.isShowInForm == 1 && $fieldConfig.formType.name() != "HIDDEN" && $fieldConfig.dictType && $fieldConfig.dictType.trim() != "")
       <template #$fieldConfig.fieldName="scope">
@@ -45,10 +45,10 @@
       </template>
 #end
 #end
-    </PageModal>
+    </CrudModal>
 
     <!-- 编辑 -->
-    <PageModal ref="editModalRef" :modal-config="editModalConfig" @submit-click="handleSubmitClick">
+    <CrudModal ref="editModalRef" :modal-config="editModalConfig" @submit-click="handleSubmitClick">
 #foreach($fieldConfig in $fieldConfigs)
 #if($fieldConfig.isShowInForm == 1 && $fieldConfig.formType.name() != "HIDDEN" && $fieldConfig.dictType && $fieldConfig.dictType.trim() != "")
       <template #$fieldConfig.fieldName="scope">
@@ -56,20 +56,18 @@
       </template>
 #end
 #end
-    </PageModal>
+    </CrudModal>
   </div>
 </template>
 
-<script setup lang="ts">
+<script setup>
 defineOptions({
   name: "$entityName",
   inheritAttrs: false,
 });
 
 import ${entityName}API from "@/api/${moduleName}/${entityKebab}";
-import type { ${entityName}Form, ${entityName}QueryParams } from "@/api/${moduleName}/${entityKebab}";
-import type { IObject, IOperateData, IModalConfig, IContentConfig, ISearchConfig } from "@/components/CURD/types";
-import usePage from "@/components/CURD/usePage";
+import useCrudPage from "@/components/Crud/useCrudPage";
 
 // 组合式 CRUD
 const {
@@ -85,10 +83,10 @@ const {
   handleExportClick,
   handleSearchClick,
   handleFilterChange,
-} = usePage();
+} = useCrudPage();
 
 // 搜索配置
-const searchConfig: ISearchConfig = reactive({
+const searchConfig = reactive({
   permPrefix: "${moduleName}:${entityKebab}",
   formItems: [
 #foreach($fieldConfig in $fieldConfigs)
@@ -138,7 +136,7 @@ const searchConfig: ISearchConfig = reactive({
 });
 
 // 列表配置
-const contentConfig: IContentConfig<${entityName}QueryParams> = reactive({
+const contentConfig = reactive({
   // 权限前缀
   permPrefix: "${moduleName}:${entityKebab}",
   table: {
@@ -152,7 +150,7 @@ const contentConfig: IContentConfig<${entityName}QueryParams> = reactive({
   // 删除接口
   deleteAction: ${entityName}API.deleteByIds,
   // 数据解析函数
-  parseData(res: any) {
+  parseData(res) {
     return {
       total: res?.total ?? 0,
       list: res?.list ?? [],
@@ -196,7 +194,7 @@ const contentConfig: IContentConfig<${entityName}QueryParams> = reactive({
 });
 
 // 新增配置
-const addModalConfig: IModalConfig<${entityName}Form> = reactive({
+const addModalConfig = reactive({
   // 权限前缀
   permPrefix: "${moduleName}:${entityKebab}",
   // 主键
@@ -331,10 +329,10 @@ const addModalConfig: IModalConfig<${entityName}Form> = reactive({
 #end
   ],
   // 提交函数
-  formAction: (data: ${entityName}Form) => {
+  formAction(data) {
     if (data.id) {
       // 编辑
-      return ${entityName}API.update(data.id as string, data);
+      return ${entityName}API.update(data.id, data);
     } else {
       // 新增
       return ${entityName}API.create(data);
@@ -343,7 +341,7 @@ const addModalConfig: IModalConfig<${entityName}Form> = reactive({
 });
 
 // 编辑配置
-const editModalConfig: IModalConfig<${entityName}Form> = reactive({
+const editModalConfig = reactive({
   permPrefix: "${moduleName}:${entityKebab}",
   component: "drawer",
   drawer: {
@@ -351,14 +349,14 @@ const editModalConfig: IModalConfig<${entityName}Form> = reactive({
     size: 500,
   },
   pk: "id",
-  formAction(data: any) {
-    return ${entityName}API.update(data.id as string, data);
+  formAction(data) {
+    return ${entityName}API.update(data.id, data);
   },
   formItems: addModalConfig.formItems, // 复用新增的表单项
 });
 
 // 处理操作按钮点击
-const handleOperateClick = (data: IOperateData) => {
+const handleOperateClick = (data) => {
   if (data.name === "edit") {
     handleEditClick(data.row, async () => {
       return await ${entityName}API.getFormData(String(data.row.id));
@@ -367,7 +365,7 @@ const handleOperateClick = (data: IOperateData) => {
 };
 
 // 处理工具栏按钮点击（删除等）
-const handleToolbarClick = (name: string) => {
+const handleToolbarClick = (name) => {
   console.log(name);
 };
 

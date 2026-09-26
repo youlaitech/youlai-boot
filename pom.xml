@@ -6,7 +6,7 @@
 
     <groupId>com.youlai</groupId>
     <artifactId>youlai-boot</artifactId>
-    <version>4.10.0</version>
+    <version>4.11.0</version>
     <description>基于 Java 17 + SpringBoot 4 + Spring Security 构建的权限管理系统。</description>
 
     <parent>
@@ -22,12 +22,10 @@
 
         <hutool.version>5.8.41</hutool.version>
 
-        <!-- Flowable 8 基线即 Spring Boot 4，与项目 4.0.5 直接兼容 -->
         <flowable.version>8.0.0</flowable.version>
 
         <mysql-connector-j.version>9.1.0</mysql-connector-j.version>
         <druid.version>1.2.24</druid.version>
-        <!-- Spring Boot 4.x 必须使用更新的版本 -->
         <mybatis-plus.version>3.5.15</mybatis-plus.version>
 
         <knife4j.version>4.5.0</knife4j.version>
@@ -70,7 +68,6 @@
 
         <weixin-java-miniapp.version>4.8.1.B</weixin-java-miniapp.version>
 
-        <!-- Spring AI（2.x 基线即 Spring Boot 4） -->
         <spring-ai.version>2.0.0</spring-ai.version>
 
     </properties>
@@ -196,7 +193,6 @@
             <version>${druid.version}</version>
         </dependency>
 
-        <!-- Spring Boot 4.x 必须使用boot4版本 -->
         <dependency>
             <groupId>com.baomidou</groupId>
             <artifactId>mybatis-plus-spring-boot4-starter</artifactId>

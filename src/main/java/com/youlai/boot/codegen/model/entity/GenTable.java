@@ -53,7 +53,7 @@ public class GenTable extends BaseEntity {
     private String author;
 
     /**
-     * 页面类型 classic|curd
+     * 页面类型 classic|crud
      */
     private String pageType;
 

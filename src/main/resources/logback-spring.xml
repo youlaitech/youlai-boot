@@ -47,17 +47,14 @@
         </filter>
     </appender>
 
-    <!-- 开发环境输出至控制台 -->
-    <springProfile name="dev">
-        <root level="INFO">
-            <appender-ref ref="CONSOLE"/>
-        </root>
-    </springProfile>
+    <!-- 默认输出至控制台，所有环境生效 -->
+    <root level="INFO">
+        <appender-ref ref="CONSOLE"/>
+    </root>
 
-    <!-- 生产环境输出至文件 -->
+    <!-- 生产环境额外写入文件 -->
     <springProfile name="prod">
         <root level="INFO">
-            <appender-ref ref="CONSOLE"/>
             <appender-ref ref="FILE"/>
         </root>
     </springProfile>

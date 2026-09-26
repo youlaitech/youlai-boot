@@ -8,6 +8,7 @@ import com.youlai.boot.codegen.property.CodegenProperties;
 import com.youlai.boot.common.enums.ActionTypeEnum;
 import com.youlai.boot.common.enums.LogModuleEnum;
 import com.youlai.boot.codegen.service.CodegenService;
+import com.youlai.boot.codegen.model.form.AiFillConfigForm;
 import com.youlai.boot.codegen.model.form.GenConfigForm;
 import com.youlai.boot.codegen.model.query.TableQuery;
 import com.youlai.boot.codegen.model.vo.CodegenPreviewVO;
@@ -110,5 +111,17 @@ public class CodegenController {
             log.error("Error while writing the zip file1 to response", e);
             throw new BusinessException("代码生成压缩包响应写入失败", e);
         }
+    }
+
+    // AI 辅助：未开启 AI 时调用返回业务异常
+
+    @Operation(summary = "AI 填充代码生成配置")
+    @PostMapping("/{tableName}/ai-config")
+    public Result<GenConfigForm> fillConfig(
+            @Parameter(description = "表名", example = "sys_user") @PathVariable String tableName,
+            @RequestBody(required = false) @Valid AiFillConfigForm form
+    ) {
+        String requirement = form == null ? null : form.getRequirement();
+        return Result.success(genTableService.aiFillConfig(tableName, requirement));
     }
 }

@@ -28,7 +28,7 @@ import java.util.stream.Collectors;
 public class RoleMenuServiceImpl extends ServiceImpl<RoleMenuMapper, RoleMenu> implements RoleMenuService {
 
     /**
-     * 权限缓存TTL：与 Caffeine 菜单缓存 expireAfterWrite=600s 对齐。
+     * 权限缓存 TTL（秒）。
      * Hash 写入默认永不过期，直接改库（SQL 脚本/手工修数）不触发任何刷新点时会永久陈旧；
      * 加 TTL 后过期整 Key 消失，Read-Through 按角色逐个回源重建，实现最终一致自愈
      */

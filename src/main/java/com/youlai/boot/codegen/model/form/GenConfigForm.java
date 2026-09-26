@@ -19,36 +19,36 @@ import java.util.List;
 @Data
 public class GenConfigForm {
 
-    @Schema(description = "主键",example = "1")
+    @Schema(description = "主键", example = "1")
     private Long id;
 
-    @Schema(description = "表名",example = "sys_user")
+    @Schema(description = "表名", example = "sys_user")
     @NotBlank(message = "表名不能为空")
     private String tableName;
 
-    @Schema(description = "业务名",example = "用户")
+    @Schema(description = "业务名", example = "用户")
     @NotBlank(message = "业务名不能为空")
     private String businessName;
 
-    @Schema(description = "模块名",example = "system")
+    @Schema(description = "模块名", example = "system")
     @NotBlank(message = "模块名不能为空")
     @Pattern(regexp = "[a-zA-Z][a-zA-Z0-9_]*", message = "模块名只能包含字母、数字和下划线，且以字母开头")
     private String moduleName;
 
-    @Schema(description = "包名",example = "com.youlai")
+    @Schema(description = "包名", example = "com.youlai")
     @NotBlank(message = "包名不能为空")
     @Pattern(regexp = "([a-zA-Z_][a-zA-Z0-9_]*\\.)*[a-zA-Z_][a-zA-Z0-9_]*", message = "包名格式不正确")
     private String packageName;
 
-    @Schema(description = "实体名",example = "User")
+    @Schema(description = "实体名", example = "User")
     @NotBlank(message = "实体名不能为空")
     @Pattern(regexp = "[a-zA-Z][a-zA-Z0-9]*", message = "实体名只能包含字母和数字，且以字母开头")
     private String entityName;
 
-    @Schema(description = "作者",example = "youlaitech")
+    @Schema(description = "作者", example = "youlaitech")
     private String author;
 
-    @Schema(description = "上级菜单ID",example = "1")
+    @Schema(description = "上级菜单ID", example = "1")
     private Long parentMenuId;
 
     @Schema(description = "字段配置列表")
@@ -60,7 +60,7 @@ public class GenConfigForm {
     @Schema(description = "前端应用名")
     private String frontendAppName;
 
-    @Schema(description = "页面类型 classic|curd", example = "classic")
+    @Schema(description = "页面类型 classic|crud", example = "classic")
     private String pageType;
 
     @Schema(description = "要移除的表前缀，如: sys_", example = "sys_")

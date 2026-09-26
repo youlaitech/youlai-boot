@@ -24,7 +24,6 @@
             t1.visible,
             t1.redirect,
             t1.type,
-            t1.always_show,
             t1.keep_alive,
             t1.params
         FROM
