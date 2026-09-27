@@ -37,11 +37,6 @@ public class PasswordAuthService {
                 new UsernamePasswordAuthenticationToken(username.trim(), password);
 
         // 2. 执行认证（认证中）
-        // 说明：这里的认证流程由 Spring Security 提供的 AuthenticationManager 执行。
-        // 默认情况下会委托给 DaoAuthenticationProvider：
-        // 1) retrieveUser(...)：内部通过 UserDetailsService.loadUserByUsername(...) 获取用户信息（本项目为 SecurityUserDetailsService 实现）
-        // 2) additionalAuthenticationChecks(...)：对比请求密码与用户存储密码（由 PasswordEncoder 完成匹配）
-        // 认证通过后返回已认证的 Authentication（principal 为 SecurityUserDetails，authorities 为角色/权限集合）。
         Authentication authentication = authenticationManager.authenticate(authenticationToken);
 
         // 3. 认证成功后生成 JWT 令牌，并存入 Security 上下文，供登录日志 AOP 使用（已认证）

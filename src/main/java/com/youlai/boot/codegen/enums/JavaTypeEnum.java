@@ -93,15 +93,15 @@ public enum JavaTypeEnum {
         if (columnType == null) {
             return "";
         }
-        // Handle values like: varchar(255), bigint unsigned, INT
+        // 处理 varchar(255)、bigint unsigned、INT 等列类型写法
         String normalized = columnType.trim().toLowerCase();
         int parenIndex = normalized.indexOf('(');
         if (parenIndex > -1) {
             normalized = normalized.substring(0, parenIndex);
         }
-        // Remove modifiers
+        // 去除修饰符
         normalized = normalized.replace("unsigned", "").replace("zerofill", "").trim();
-        // Collapse repeated spaces
+        // 合并连续空格
         normalized = normalized.replaceAll("\\s+", " ");
         return normalized;
     }

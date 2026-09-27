@@ -229,7 +229,7 @@ public class RoleServiceImpl extends ServiceImpl<RoleMapper, Role> implements Ro
             // 刷新角色的权限缓存
             roleMenuService.refreshRolePermsCache(role.getCode());
 
-            // When role is disabled, invalidate sessions of all users with this role
+            // 角色禁用时使该角色下所有用户的会话失效
             if (status == 0) {
                 List<Long> userIds = userRoleService.listUserIdsByRoleId(roleId);
                 for (Long userId : userIds) {

@@ -18,7 +18,7 @@ SET NAMES utf8mb4;  # 设置字符集
 SET FOREIGN_KEY_CHECKS = 0; # 关闭外键检查，加快导入速度
 
 -- ----------------------------
--- Table structure for sys_dept
+-- 表结构：sys_dept
 -- ----------------------------
 DROP TABLE IF EXISTS `sys_dept`;
 CREATE TABLE `sys_dept`  (
@@ -39,14 +39,14 @@ CREATE TABLE `sys_dept`  (
 ) ENGINE = InnoDB CHARACTER SET = utf8mb4 COMMENT = '部门管理表';
 
 -- ----------------------------
--- Records of sys_dept
+-- 表数据：sys_dept
 -- ----------------------------
 INSERT INTO `sys_dept` VALUES (1, '有来技术', 'YOULAI', 0, '0', 1, 1, 1, NULL, 1, now(), 0);
 INSERT INTO `sys_dept` VALUES (2, '研发部门', 'RD001', 1, '0,1', 1, 1, 2, NULL, 2, now(), 0);
 INSERT INTO `sys_dept` VALUES (3, '测试部门', 'QA001', 1, '0,1', 1, 1, 2, NULL, 2, now(), 0);
 
 -- ----------------------------
--- Table structure for sys_dict
+-- 表结构：sys_dict
 -- ----------------------------
 DROP TABLE IF EXISTS `sys_dict`;
 CREATE TABLE `sys_dict` (
@@ -64,7 +64,7 @@ CREATE TABLE `sys_dict` (
                             KEY `idx_dict_code` (`dict_code`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='字典表';
 -- ----------------------------
--- Records of sys_dict
+-- 表数据：sys_dict
 -- ----------------------------
 INSERT INTO `sys_dict` VALUES (1, 'gender', '性别', 1, NULL, now(), 1, now(), 1, 0);
 INSERT INTO `sys_dict` VALUES (2, 'notice_type', '通知类型', 1, NULL, now(), 1, now(), 1, 0);
@@ -72,7 +72,7 @@ INSERT INTO `sys_dict` VALUES (3, 'notice_level', '通知级别', 1, NULL, now()
 
 
 -- ----------------------------
--- Table structure for sys_dict_item
+-- 表结构：sys_dict_item
 -- ----------------------------
 DROP TABLE IF EXISTS `sys_dict_item`;
 CREATE TABLE `sys_dict_item` (
@@ -94,7 +94,7 @@ CREATE TABLE `sys_dict_item` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='字典项表';
 
 -- ----------------------------
--- Records of sys_dict_item
+-- 表数据：sys_dict_item
 -- ----------------------------
 INSERT INTO `sys_dict_item` VALUES (1, 'gender', '1', '男', 'primary', 1, 1, NULL, now(), 1, now(), 1, 0);
 INSERT INTO `sys_dict_item` VALUES (2, 'gender', '2', '女', 'danger', 1, 2, NULL, now(), 1, now(), 1, 0);
@@ -110,7 +110,7 @@ INSERT INTO `sys_dict_item` VALUES (11, 'notice_level', 'M', '中', 'warning', 1
 INSERT INTO `sys_dict_item` VALUES (12, 'notice_level', 'H', '高', 'danger', 1, 3, '', now(), 1, now(), 1, 0);
 
 -- ----------------------------
--- Table structure for sys_menu
+-- 表结构：sys_menu
 -- ----------------------------
 DROP TABLE IF EXISTS `sys_menu`;
 CREATE TABLE `sys_menu`  (
@@ -136,7 +136,7 @@ CREATE TABLE `sys_menu`  (
 ) ENGINE = InnoDB CHARACTER SET = utf8mb4 COMMENT = '系统菜单表';
 
 -- ----------------------------
--- Records of sys_menu
+-- 表数据：sys_menu
 -- ----------------------------
 -- 顶级菜单（基础段 ID=sort 1-7）：系统管理(1)/数据大屏(2)/代码生成(3)/通用组件(4)/多级菜单(5)/路由示例(6)/项目资源(7)
 -- 扩展段 8-99 由 sql/extensions/ 脚本占用：动态表单(8,dynamic-form.sql)/工作流(9,workflow.sql)，新扩展模块从 10 领号顺延
@@ -264,7 +264,7 @@ INSERT INTO `sys_menu` (`id`, `parent_id`, `tree_path`, `name`, `type`, `route_n
 INSERT INTO `sys_menu` (`id`, `parent_id`, `tree_path`, `name`, `type`, `route_name`, `route_path`, `component`, `perm`, `keep_alive`, `visible`, `sort`, `icon`, `redirect`, `create_time`, `update_time`, `params`) VALUES (604, 6, '0,6', '页面跳转', 'M', 'RouteNavigate', 'navigate', 'demo/route/navigate/index', NULL, 1, 1, 4, 'el-icon-Position', NULL, now(), now(), NULL);
 
 -- ----------------------------
--- Table structure for sys_role
+-- 表结构：sys_role
 -- ----------------------------
 DROP TABLE IF EXISTS `sys_role`;
 CREATE TABLE `sys_role`  (
@@ -285,7 +285,7 @@ CREATE TABLE `sys_role`  (
 ) ENGINE = InnoDB CHARACTER SET = utf8mb4 COMMENT = '系统角色表';
 
 -- ----------------------------
--- Records of sys_role
+-- 表数据：sys_role
 -- ----------------------------
 INSERT INTO `sys_role` VALUES (1, '超级管理员', 'ROOT', 1, 1, 1, NULL, now(), NULL, now(), 0);
 INSERT INTO `sys_role` VALUES (2, '系统管理员', 'ADMIN', 2, 1, 1, NULL, now(), NULL, NULL, 0);
@@ -296,7 +296,7 @@ INSERT INTO `sys_role` VALUES (6, '普通员工', 'EMPLOYEE', 6, 1, 4, NULL, now
 INSERT INTO `sys_role` VALUES (7, '自定义权限用户', 'CUSTOM_USER', 7, 1, 5, NULL, now(), NULL, now(), 0);
 
 -- ----------------------------
--- Table structure for sys_role_menu
+-- 表结构：sys_role_menu
 -- ----------------------------
 DROP TABLE IF EXISTS `sys_role_menu`;
 CREATE TABLE `sys_role_menu`  (
@@ -306,7 +306,7 @@ CREATE TABLE `sys_role_menu`  (
 ) ENGINE = InnoDB CHARACTER SET = utf8mb4 COMMENT = '角色菜单关联表';
 
 -- ----------------------------
--- Table structure for sys_role_dept
+-- 表结构：sys_role_dept
 -- ----------------------------
 DROP TABLE IF EXISTS `sys_role_dept`;
 CREATE TABLE `sys_role_dept`  (
@@ -316,7 +316,7 @@ CREATE TABLE `sys_role_dept`  (
 ) ENGINE = InnoDB CHARACTER SET = utf8mb4 COMMENT = '角色部门关联表';
 
 -- ----------------------------
--- Records of sys_role_dept
+-- 表数据：sys_role_dept
 -- ----------------------------
 INSERT IGNORE INTO `sys_role_dept` VALUES (7, 1);
 INSERT IGNORE INTO `sys_role_dept` VALUES (7, 2);
@@ -362,7 +362,7 @@ INSERT INTO `sys_role_menu` VALUES (2, 601), (2, 602), (2, 603), (2, 604);
 INSERT INTO `sys_role_menu` VALUES (2, 201), (2, 202), (2, 203);
 
 -- ----------------------------
--- Table structure for sys_user
+-- 表结构：sys_user
 -- ----------------------------
 DROP TABLE IF EXISTS `sys_user`;
 CREATE TABLE `sys_user`  (
@@ -385,7 +385,7 @@ CREATE TABLE `sys_user`  (
 ) ENGINE = InnoDB CHARACTER SET = utf8mb4 COMMENT = '系统用户表';
 
 -- ----------------------------
--- Records of sys_user
+-- 表数据：sys_user
 -- ----------------------------
 INSERT INTO `sys_user` VALUES (1, 'youlai', '有来技术', 0, '$2a$10$xVWsNOhHrCxh5UbpCE7/HuJ.PAOKcYAqRxD2CO2nVnJS.IAXkr5aq', NULL, 'https://foruda.gitee.com/images/1723603502796844527/03cdca2a_716974.gif', '18812345677', 1, 'youlaitech@163.com', now(), NULL, now(), NULL, 0);
 INSERT INTO `sys_user` VALUES (2, 'admin', '系统管理员', 1, '$2a$10$xVWsNOhHrCxh5UbpCE7/HuJ.PAOKcYAqRxD2CO2nVnJS.IAXkr5aq', 1, 'https://foruda.gitee.com/images/1723603502796844527/03cdca2a_716974.gif', '18888888888', 1, 'youlaitech@163.com', now(), NULL, now(), NULL, 0);
@@ -396,7 +396,7 @@ INSERT INTO `sys_user` VALUES (6, 'employee', '普通员工', 1, '$2a$10$xVWsNOh
 INSERT INTO `sys_user` VALUES (7, 'custom_user', '自定义权限用户', 1, '$2a$10$xVWsNOhHrCxh5UbpCE7/HuJ.PAOKcYAqRxD2CO2nVnJS.IAXkr5aq', 3, 'https://foruda.gitee.com/images/1723603502796844527/03cdca2a_716974.gif', '18812345683', 1, 'custom@youlaitech.com', now(), NULL, now(), NULL, 0);
 
 -- ----------------------------
--- Table structure for sys_user_role
+-- 表结构：sys_user_role
 -- ----------------------------
 DROP TABLE IF EXISTS `sys_user_role`;
 CREATE TABLE `sys_user_role`  (
@@ -406,7 +406,7 @@ CREATE TABLE `sys_user_role`  (
 ) ENGINE = InnoDB CHARACTER SET = utf8mb4 COMMENT = '用户角色关联表';
 
 -- ----------------------------
--- Records of sys_user_role
+-- 表数据：sys_user_role
 -- ----------------------------
 INSERT IGNORE INTO `sys_user_role` VALUES (1, 1);
 INSERT IGNORE INTO `sys_user_role` VALUES (2, 2);
@@ -418,7 +418,7 @@ INSERT IGNORE INTO `sys_user_role` VALUES (7, 7);
 
 
 -- ----------------------------
--- Table structure for sys_log
+-- 表结构：sys_log
 -- ----------------------------
 DROP TABLE IF EXISTS `sys_log`;
 CREATE TABLE `sys_log` (
@@ -448,7 +448,7 @@ CREATE TABLE `sys_log` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='系统操作日志表';
 
 -- ----------------------------
--- Table structure for gen_table
+-- 表结构：gen_table
 -- ----------------------------
 DROP TABLE IF EXISTS `gen_table`;
 CREATE TABLE `gen_table` (
@@ -470,7 +470,7 @@ CREATE TABLE `gen_table` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='代码生成配置表';
 
 -- ----------------------------
--- Table structure for gen_table_column
+-- 表结构：gen_table_column
 -- ----------------------------
 DROP TABLE IF EXISTS `gen_table_column`;
 CREATE TABLE `gen_table_column` (
@@ -603,7 +603,7 @@ INSERT INTO `sys_user_notice` VALUES (28, 9, 3, 1, NULL, now(), now(), 0);
 INSERT INTO `sys_user_notice` VALUES (29, 10, 3, 0, NULL, now(), now(), 0);
 
 -- ----------------------------
--- Table structure for sys_user_social
+-- 表结构：sys_user_social
 -- ----------------------------
 DROP TABLE IF EXISTS `sys_user_social`;
 CREATE TABLE `sys_user_social` (

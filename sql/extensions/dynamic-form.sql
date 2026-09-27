@@ -11,7 +11,7 @@ SET NAMES utf8mb4;
 SET FOREIGN_KEY_CHECKS = 0;
 
 -- ----------------------------
--- Table structure for form_definition
+-- 表结构：form_definition
 -- ----------------------------
 DROP TABLE IF EXISTS `form_definition`;
 CREATE TABLE `form_definition` (
@@ -36,7 +36,7 @@ CREATE TABLE `form_definition` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='表单定义表';
 
 -- ----------------------------
--- Table structure for form_data
+-- 表结构：form_data
 -- ----------------------------
 DROP TABLE IF EXISTS `form_data`;
 CREATE TABLE `form_data` (
@@ -55,7 +55,7 @@ CREATE TABLE `form_data` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='表单数据表';
 
 -- ----------------------------
--- Table structure for form_snapshot
+-- 表结构：form_snapshot
 -- ----------------------------
 -- 版本快照表：发布时固化规则，数据回显按提交时版本加载，
 -- 防止表单定义变更（字段删除/改名）导致历史数据回显漂移；

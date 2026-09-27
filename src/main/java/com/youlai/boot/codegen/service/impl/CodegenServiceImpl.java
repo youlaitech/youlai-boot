@@ -155,12 +155,8 @@ public class CodegenServiceImpl implements CodegenService {
 
             String effectiveTemplatePath = resolveFrontendTemplatePath(templateName, templateConfig, frontendType);
             String extension = resolveFrontendExtension(templateName, templateConfig, frontendType);
-
-            /* 1. 生成文件名 UserController */
-            // User Role Menu Dept
+            /* 1. 生成文件名 */
             String entityName = genTable.getEntityName();
-            // Controller Service Mapper Entity
-            // .java .ts .vue
 
             // 文件名 UserController.java
             String fileName = getFileName(entityName, templateName, extension);
