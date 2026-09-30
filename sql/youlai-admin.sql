@@ -138,17 +138,12 @@ CREATE TABLE `sys_menu`  (
 -- ----------------------------
 -- 表数据：sys_menu
 -- ----------------------------
--- 顶级菜单（基础段 ID=sort 1-7）：系统管理(1)/数据大屏(2)/代码生成(3)/通用组件(4)/多级菜单(5)/路由示例(6)/项目资源(7)
 -- 扩展段 8-99 由 sql/extensions/ 脚本占用：动态表单(8,dynamic-form.sql)/工作流(9,workflow.sql)，新扩展模块从 10 领号顺延
 -- ID 规则：子 ID = 父 ID × 100 + 两位序号（如 10101 即用户管理 101 的第 1 个按钮），tree_path 与 ID 同构可机器校验
 INSERT INTO `sys_menu` (`id`, `parent_id`, `tree_path`, `name`, `type`, `route_name`, `route_path`, `component`, `perm`, `keep_alive`, `visible`, `sort`, `icon`, `redirect`, `create_time`, `update_time`, `params`) VALUES (1, 0, '0', '系统管理', 'C', '', '/system', 'Layout', NULL, NULL, 1, 1, 'system', '/system/user', now(), now(), NULL);
-INSERT INTO `sys_menu` (`id`, `parent_id`, `tree_path`, `name`, `type`, `route_name`, `route_path`, `component`, `perm`, `keep_alive`, `visible`, `sort`, `icon`, `redirect`, `create_time`, `update_time`, `params`) VALUES (2, 0, '0', '数据大屏', 'C', '', '/screen', 'Layout', NULL, NULL, 1, 2, 'el-icon-Monitor', '/screen/system', now(), now(), NULL);
--- 数据大屏示例（keep_alive 关，每次进入重新加载）
-INSERT INTO `sys_menu` (`id`, `parent_id`, `tree_path`, `name`, `type`, `route_name`, `route_path`, `component`, `perm`, `keep_alive`, `visible`, `sort`, `icon`, `redirect`, `create_time`, `update_time`, `params`) VALUES (201, 2, '0,2', '系统运营大屏', 'M', 'ScreenSystem', 'system', 'demo/screen/system/index', NULL, 0, 1, 1, 'el-icon-DataLine', NULL, now(), now(), NULL);
-INSERT INTO `sys_menu` (`id`, `parent_id`, `tree_path`, `name`, `type`, `route_name`, `route_path`, `component`, `perm`, `keep_alive`, `visible`, `sort`, `icon`, `redirect`, `create_time`, `update_time`, `params`) VALUES (202, 2, '0,2', '设备监控大屏', 'M', 'ScreenDevice', 'device', 'demo/screen/device/index', NULL, 0, 1, 2, 'el-icon-Cpu', NULL, now(), now(), NULL);
-INSERT INTO `sys_menu` (`id`, `parent_id`, `tree_path`, `name`, `type`, `route_name`, `route_path`, `component`, `perm`, `keep_alive`, `visible`, `sort`, `icon`, `redirect`, `create_time`, `update_time`, `params`) VALUES (203, 2, '0,2', '电商销售大屏', 'M', 'ScreenEcommerce', 'ecommerce', 'demo/screen/ecommerce/index', NULL, 0, 1, 3, 'el-icon-ShoppingCart', NULL, now(), now(), NULL);
+-- 数据大屏走站内外链：E 型新标签页模式，external_url 填站内路径（前端按当前站点补全域名），指向布局外的独立全屏页
+INSERT INTO `sys_menu` (`id`, `parent_id`, `tree_path`, `name`, `type`, `route_name`, `route_path`, `component`, `external_url`, `perm`, `keep_alive`, `visible`, `sort`, `icon`, `redirect`, `create_time`, `update_time`, `params`) VALUES (2, 0, '0', '数据大屏', 'E', NULL, NULL, NULL, '/data-screen', NULL, NULL, 1, 2, 'el-icon-Monitor', NULL, now(), now(), NULL);
 INSERT INTO `sys_menu` (`id`, `parent_id`, `tree_path`, `name`, `type`, `route_name`, `route_path`, `component`, `perm`, `keep_alive`, `visible`, `sort`, `icon`, `redirect`, `create_time`, `update_time`, `params`) VALUES (3, 0, '0', '代码生成', 'M', 'Codegen', '/codegen', 'codegen/index', NULL, 1, 1, 3, 'code', NULL, now(), now(), NULL);
-INSERT INTO `sys_menu` (`id`, `parent_id`, `tree_path`, `name`, `type`, `route_name`, `route_path`, `component`, `perm`, `keep_alive`, `visible`, `sort`, `icon`, `redirect`, `create_time`, `update_time`, `params`) VALUES (7, 0, '0', '项目资源', 'C', '', '/resource', 'Layout', NULL, NULL, 1, 7, 'document', '/resource/practice-doc', now(), now(), NULL);
 
 -- 系统管理
 INSERT INTO `sys_menu` (`id`, `parent_id`, `tree_path`, `name`, `type`, `route_name`, `route_path`, `component`, `perm`, `keep_alive`, `visible`, `sort`, `icon`, `redirect`, `create_time`, `update_time`, `params`) VALUES (101, 1, '0,1', '用户管理', 'M', 'User', 'user', 'system/user/index', NULL, 1, 1, 1, 'el-icon-User', NULL, now(), now(), NULL);
@@ -208,16 +203,7 @@ INSERT INTO `sys_menu` (`id`, `parent_id`, `tree_path`, `name`, `type`, `route_n
 INSERT INTO `sys_menu` (`id`, `parent_id`, `tree_path`, `name`, `type`, `route_name`, `route_path`, `component`, `perm`, `keep_alive`, `visible`, `sort`, `icon`, `redirect`, `create_time`, `update_time`, `params`) VALUES (10905, 109, '0,1,109', '通知发布', 'B', NULL, '', NULL, 'sys:notice:publish', 1, 1, 5, '', NULL, now(), now(), NULL);
 INSERT INTO `sys_menu` (`id`, `parent_id`, `tree_path`, `name`, `type`, `route_name`, `route_path`, `component`, `perm`, `keep_alive`, `visible`, `sort`, `icon`, `redirect`, `create_time`, `update_time`, `params`) VALUES (10906, 109, '0,1,109', '通知撤回', 'B', NULL, '', NULL, 'sys:notice:revoke', 1, 1, 6, '', NULL, now(), now(), NULL);
 
--- 项目资源（原"项目文档"；范围扩展为文档 + 接口 + 源码仓库的资源导航）
 -- 实战文档双形态置顶（内嵌 iframe + 外链新标签），直观演示系统对两种外链打开方式的支持
-INSERT INTO `sys_menu` (`id`, `parent_id`, `tree_path`, `name`, `type`, `route_name`, `route_path`, `component`, `external_url`, `perm`, `keep_alive`, `visible`, `sort`, `icon`, `redirect`, `create_time`, `update_time`, `params`) VALUES (701, 7, '0,7', '实战文档(内嵌)', 'E', 'PracticeDoc', 'practice-doc', 'iframe', 'https://juejin.cn/post/7228990409909108793', NULL, 1, 1, 1, 'el-icon-Document', '', now(), now(), NULL);
-INSERT INTO `sys_menu` (`id`, `parent_id`, `tree_path`, `name`, `type`, `route_name`, `route_path`, `component`, `external_url`, `perm`, `keep_alive`, `visible`, `sort`, `icon`, `redirect`, `create_time`, `update_time`, `params`) VALUES (702, 7, '0,7', '实战文档(外链)', 'E', NULL, NULL, NULL, 'https://juejin.cn/post/7228990409909108793', NULL, NULL, 1, 2, 'el-icon-Link', '', now(), now(), NULL);
-INSERT INTO `sys_menu` (`id`, `parent_id`, `tree_path`, `name`, `type`, `route_name`, `route_path`, `component`, `external_url`, `perm`, `keep_alive`, `visible`, `sort`, `icon`, `redirect`, `create_time`, `update_time`, `params`) VALUES (703, 7, '0,7', '接口文档', 'E', 'Apifox', 'apifox', 'iframe', 'https://www.apifox.cn/apidoc/shared-195e783f-4d85-4235-a038-eec696de4ea5', NULL, 1, 1, 3, 'api', '', now(), now(), NULL);
-INSERT INTO `sys_menu` (`id`, `parent_id`, `tree_path`, `name`, `type`, `route_name`, `route_path`, `component`, `external_url`, `perm`, `keep_alive`, `visible`, `sort`, `icon`, `redirect`, `create_time`, `update_time`, `params`) VALUES (704, 7, '0,7', '后端文档', 'E', NULL, NULL, NULL, 'https://youlai.blog.csdn.net/article/details/145178880', NULL, NULL, 1, 4, 'document', '', now(), now(), NULL);
-INSERT INTO `sys_menu` (`id`, `parent_id`, `tree_path`, `name`, `type`, `route_name`, `route_path`, `component`, `external_url`, `perm`, `keep_alive`, `visible`, `sort`, `icon`, `redirect`, `create_time`, `update_time`, `params`) VALUES (705, 7, '0,7', '移动端文档', 'E', NULL, NULL, NULL, 'https://youlai.blog.csdn.net/article/details/143222890', NULL, NULL, 1, 5, 'document', '', now(), now(), NULL);
-INSERT INTO `sys_menu` (`id`, `parent_id`, `tree_path`, `name`, `type`, `route_name`, `route_path`, `component`, `external_url`, `perm`, `keep_alive`, `visible`, `sort`, `icon`, `redirect`, `create_time`, `update_time`, `params`) VALUES (706, 7, '0,7', '前端仓库', 'E', NULL, NULL, NULL, 'https://gitee.com/youlaiorg/vue3-element-admin', NULL, NULL, 1, 6, 'gitee', '', now(), now(), NULL);
-INSERT INTO `sys_menu` (`id`, `parent_id`, `tree_path`, `name`, `type`, `route_name`, `route_path`, `component`, `external_url`, `perm`, `keep_alive`, `visible`, `sort`, `icon`, `redirect`, `create_time`, `update_time`, `params`) VALUES (707, 7, '0,7', '后端仓库', 'E', NULL, NULL, NULL, 'https://gitee.com/youlaiorg/youlai-boot', NULL, NULL, 1, 7, 'gitee', '', now(), now(), NULL);
-INSERT INTO `sys_menu` (`id`, `parent_id`, `tree_path`, `name`, `type`, `route_name`, `route_path`, `component`, `external_url`, `perm`, `keep_alive`, `visible`, `sort`, `icon`, `redirect`, `create_time`, `update_time`, `params`) VALUES (708, 7, '0,7', '移动端仓库', 'E', NULL, NULL, NULL, 'https://gitee.com/youlaiorg/vue-uniapp-template', NULL, NULL, 1, 8, 'gitee', '', now(), now(), NULL);
 
 -- ============================ 通用组件（顶级 ID=4） ============================
 -- 前端模板招牌能力聚合，独立顶级便于访客沉淀组件库；按用途三分组：基础/表单/表格
@@ -256,12 +242,13 @@ INSERT INTO `sys_menu` (`id`, `parent_id`, `tree_path`, `name`, `type`, `route_n
 INSERT INTO `sys_menu` (`id`, `parent_id`, `tree_path`, `name`, `type`, `route_name`, `route_path`, `component`, `perm`, `keep_alive`, `visible`, `sort`, `icon`, `redirect`, `create_time`, `update_time`, `params`) VALUES (5010102, 50101, '0,5,501,50101', '三级菜单 B', 'M', 'MultiLevelLevelThreeB', 'level-three-b', 'demo/route/multi-level/level-one/level-two/level-three-b/index', NULL, 1, 1, 2, '', '', now(), now(), NULL);
 
 -- ============================ 路由示例（顶级 ID=6） ============================
--- 同一页面按 params 区分菜单入口的传参演示；缓存与跳转为独立页面，跳转目标 /detail/:id 走常量路由不占菜单
-INSERT INTO `sys_menu` (`id`, `parent_id`, `tree_path`, `name`, `type`, `route_name`, `route_path`, `component`, `perm`, `keep_alive`, `visible`, `sort`, `icon`, `redirect`, `create_time`, `update_time`, `params`) VALUES (6, 0, '0', '路由示例', 'C', '', '/route-example', 'Layout', NULL, NULL, 1, 6, 'el-icon-Share', '/route-example/params-type-1', now(), now(), NULL);
-INSERT INTO `sys_menu` (`id`, `parent_id`, `tree_path`, `name`, `type`, `route_name`, `route_path`, `component`, `perm`, `keep_alive`, `visible`, `sort`, `icon`, `redirect`, `create_time`, `update_time`, `params`) VALUES (601, 6, '0,6', '路由参数(type=1)', 'M', 'RouteParamType1', 'params-type-1', 'demo/route/route-param', NULL, 1, 1, 1, 'el-icon-Star', NULL, now(), now(), '{\"type\": \"1\"}');
-INSERT INTO `sys_menu` (`id`, `parent_id`, `tree_path`, `name`, `type`, `route_name`, `route_path`, `component`, `perm`, `keep_alive`, `visible`, `sort`, `icon`, `redirect`, `create_time`, `update_time`, `params`) VALUES (602, 6, '0,6', '路由参数(type=2)', 'M', 'RouteParamType2', 'params-type-2', 'demo/route/route-param', NULL, 1, 1, 2, 'el-icon-StarFilled', NULL, now(), now(), '{\"type\": \"2\"}');
-INSERT INTO `sys_menu` (`id`, `parent_id`, `tree_path`, `name`, `type`, `route_name`, `route_path`, `component`, `perm`, `keep_alive`, `visible`, `sort`, `icon`, `redirect`, `create_time`, `update_time`, `params`) VALUES (603, 6, '0,6', '页面缓存', 'M', 'RouteCache', 'cache', 'demo/route/cache/index', NULL, 1, 1, 3, 'el-icon-Stopwatch', NULL, now(), now(), NULL);
-INSERT INTO `sys_menu` (`id`, `parent_id`, `tree_path`, `name`, `type`, `route_name`, `route_path`, `component`, `perm`, `keep_alive`, `visible`, `sort`, `icon`, `redirect`, `create_time`, `update_time`, `params`) VALUES (604, 6, '0,6', '页面跳转', 'M', 'RouteNavigate', 'navigate', 'demo/route/navigate/index', NULL, 1, 1, 4, 'el-icon-Position', NULL, now(), now(), NULL);
+-- 路由层能力演示：传参（页内切换）、页面缓存、页面跳转、内嵌页面（iframe）、外部链接（E 型新标签）
+INSERT INTO `sys_menu` (`id`, `parent_id`, `tree_path`, `name`, `type`, `route_name`, `route_path`, `component`, `perm`, `keep_alive`, `visible`, `sort`, `icon`, `redirect`, `create_time`, `update_time`, `params`) VALUES (6, 0, '0', '路由示例', 'C', '', '/route-example', 'Layout', NULL, NULL, 1, 6, 'el-icon-Share', '/route-example/route-param', now(), now(), NULL);
+INSERT INTO `sys_menu` (`id`, `parent_id`, `tree_path`, `name`, `type`, `route_name`, `route_path`, `component`, `perm`, `keep_alive`, `visible`, `sort`, `icon`, `redirect`, `create_time`, `update_time`, `params`) VALUES (601, 6, '0,6', '路由参数', 'M', 'RouteParam', 'route-param', 'demo/route/route-param', NULL, 1, 1, 1, 'el-icon-Star', NULL, now(), now(), NULL);
+INSERT INTO `sys_menu` (`id`, `parent_id`, `tree_path`, `name`, `type`, `route_name`, `route_path`, `component`, `perm`, `keep_alive`, `visible`, `sort`, `icon`, `redirect`, `create_time`, `update_time`, `params`) VALUES (602, 6, '0,6', '页面缓存', 'M', 'RouteCache', 'cache', 'demo/route/cache/index', NULL, 1, 1, 2, 'el-icon-Stopwatch', NULL, now(), now(), NULL);
+INSERT INTO `sys_menu` (`id`, `parent_id`, `tree_path`, `name`, `type`, `route_name`, `route_path`, `component`, `perm`, `keep_alive`, `visible`, `sort`, `icon`, `redirect`, `create_time`, `update_time`, `params`) VALUES (603, 6, '0,6', '页面跳转', 'M', 'RouteNavigate', 'navigate', 'demo/route/navigate/index', NULL, 1, 1, 3, 'el-icon-Position', NULL, now(), now(), NULL);
+INSERT INTO `sys_menu` (`id`, `parent_id`, `tree_path`, `name`, `type`, `route_name`, `route_path`, `component`, `external_url`, `perm`, `keep_alive`, `visible`, `sort`, `icon`, `redirect`, `create_time`, `update_time`, `params`) VALUES (604, 6, '0,6', '内嵌页面', 'E', 'PracticeDoc', 'iframe', 'iframe', 'https://www.apifox.cn/apidoc/shared-195e783f-4d85-4235-a038-eec696de4ea5', NULL, 1, 1, 4, 'el-icon-Document', '', now(), now(), NULL);
+INSERT INTO `sys_menu` (`id`, `parent_id`, `tree_path`, `name`, `type`, `route_name`, `route_path`, `component`, `external_url`, `perm`, `keep_alive`, `visible`, `sort`, `icon`, `redirect`, `create_time`, `update_time`, `params`) VALUES (605, 6, '0,6', '外部链接', 'E', NULL, NULL, NULL, 'https://juejin.cn/post/7228990409909108793', NULL, NULL, 1, 5, 'el-icon-Link', '', now(), now(), NULL);
 
 -- ----------------------------
 -- 表结构：sys_role
@@ -322,8 +309,8 @@ INSERT IGNORE INTO `sys_role_dept` VALUES (7, 1);
 INSERT IGNORE INTO `sys_role_dept` VALUES (7, 2);
 
 -- ============================================
--- 系统管理员角色菜单权限（role_id=2，基础段顶级 1-7 全量）
-INSERT INTO `sys_role_menu` VALUES (2, 1), (2, 2), (2, 3), (2, 4), (2, 5), (2, 6), (2, 7);
+-- 系统管理员角色菜单权限（role_id=2，基础段顶级 1-6 全量）
+INSERT INTO `sys_role_menu` VALUES (2, 1), (2, 2), (2, 3), (2, 4), (2, 5), (2, 6);
 -- 系统管理
 INSERT INTO `sys_role_menu` VALUES (2, 101), (2, 10101), (2, 10102), (2, 10103), (2, 10104), (2, 10105), (2, 10106), (2, 10107);
 INSERT INTO `sys_role_menu` VALUES (2, 102), (2, 10201), (2, 10202), (2, 10203), (2, 10204), (2, 10205);
@@ -349,17 +336,13 @@ INSERT IGNORE INTO `sys_role_menu` VALUES (6, 102), (6, 10201), (6, 10202), (6, 
 INSERT IGNORE INTO `sys_role_menu` VALUES (7, 1);
 INSERT IGNORE INTO `sys_role_menu` VALUES (7, 101), (7, 10101), (7, 10102), (7, 10103), (7, 10104), (7, 10105), (7, 10106), (7, 10107);
 INSERT IGNORE INTO `sys_role_menu` VALUES (7, 102), (7, 10201), (7, 10202), (7, 10203), (7, 10204), (7, 10205);
--- 项目资源
-INSERT INTO `sys_role_menu` VALUES (2, 701), (2, 702), (2, 703), (2, 704), (2, 705), (2, 706), (2, 707), (2, 708);
 -- 通用组件（401 基础 / 402 表单 / 403 表格）
 INSERT INTO `sys_role_menu` VALUES (2, 401), (2, 40101), (2, 40102), (2, 40103), (2, 40104);
 INSERT INTO `sys_role_menu` VALUES (2, 402), (2, 40201), (2, 40202), (2, 40203), (2, 40204), (2, 40205);
 INSERT INTO `sys_role_menu` VALUES (2, 403), (2, 40301), (2, 40302), (2, 40303), (2, 40304);
 -- 多级菜单 / 路由示例
 INSERT INTO `sys_role_menu` VALUES (2, 501), (2, 50101), (2, 5010101), (2, 5010102);
-INSERT INTO `sys_role_menu` VALUES (2, 601), (2, 602), (2, 603), (2, 604);
--- 数据大屏（三个示例子菜单）
-INSERT INTO `sys_role_menu` VALUES (2, 201), (2, 202), (2, 203);
+INSERT INTO `sys_role_menu` VALUES (2, 601), (2, 602), (2, 603), (2, 604), (2, 605);
 
 -- ----------------------------
 -- 表结构：sys_user
@@ -579,7 +562,7 @@ INSERT INTO `sys_user_notice` VALUES (8, 8, 2, 1, NULL, now(), now(), 0);
 INSERT INTO `sys_user_notice` VALUES (9, 9, 2, 0, NULL, now(), now(), 0);
 INSERT INTO `sys_user_notice` VALUES (10, 10, 2, 1, NULL, now(), now(), 0);
 
--- root 用户 (user_id=1) 绑定全部通知，5 条未读展示红点效果
+-- youlai 用户 (user_id=1) 绑定全部通知，5 条未读展示红点效果
 INSERT INTO `sys_user_notice` VALUES (11, 1, 1, 0, NULL, now(), now(), 0);
 INSERT INTO `sys_user_notice` VALUES (12, 2, 1, 1, NULL, now(), now(), 0);
 INSERT INTO `sys_user_notice` VALUES (13, 3, 1, 0, NULL, now(), now(), 0);

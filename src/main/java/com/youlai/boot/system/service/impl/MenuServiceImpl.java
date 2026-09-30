@@ -51,7 +51,7 @@ public class MenuServiceImpl extends ServiceImpl<MenuMapper, Menu> implements Me
 
     private final RoleMenuService roleMenuService;
 
-    /** 系统提示词名称，对应 resources/prompts 下的相对路径 */
+    // 系统提示词名称，对应 resources/prompts 下的相对路径
     private static final String SYSTEM_PROMPT_PATH = "menu/system.md";
 
     private final AiChatService aiChatService;
@@ -277,7 +277,8 @@ public class MenuServiceImpl extends ServiceImpl<MenuMapper, Menu> implements Me
                 && ObjectUtil.equals(menu.getKeepAlive(), 1)) {
             meta.setKeepAlive(true);
         }
-        if (isEmbedded && StrUtil.isNotBlank(externalUrl)) {
+        // 外链地址透传前端：新标签页按站内外链打开，内嵌模式供 iframe 页取址
+        if (isExternal && StrUtil.isNotBlank(externalUrl)) {
             meta.setExternalUrl(externalUrl);
         }
 
@@ -611,10 +612,11 @@ public class MenuServiceImpl extends ServiceImpl<MenuMapper, Menu> implements Me
         if (CollectionUtil.isEmpty(siblings)) {
             text.append("（无）\n");
         } else {
+            // 示例路径只展示当前这一级的路径片段
             siblings.forEach(menu -> text.append("- ")
                     .append(menu.getName())
                     .append("（类型 ").append(menuTypeLabel(menu.getType()))
-                    .append("，路径片段 ").append(StrUtil.blankToDefault(menu.getRoutePath(), "无"))
+                    .append("，路径片段 ").append(StrUtil.blankToDefault(StrUtil.removePrefix(menu.getRoutePath(), "/"), "无"))
                     .append("，权限 ").append(StrUtil.blankToDefault(menu.getPerm(), "无"))
                     .append("）\n"));
         }
