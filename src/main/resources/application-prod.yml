@@ -48,10 +48,26 @@ spring:
           enable: true
     # 邮件发送者
     from: youlaitech@163.com
-  # AI 对话默认关闭；启用改 chat 为 openai 并配置 spring.ai.openai 的 api-key、base-url、chat.options.model
+  # AI 对话（本环境无默认密钥，默认关闭；演示环境配置见 application-youlai.yml）
   ai:
+    # 装配开关：none 关闭，openai 启用
     model:
       chat: none
+    # 启用后在此填写模型凭据与名称
+    openai:
+      # 厂商接口地址（OpenAI 兼容根地址）
+      base-url: https://dashscope.aliyuncs.com/compatible-mode/v1
+      # 厂商 API 密钥（本文件入版本库，用环境变量 AI_API_KEY 提供）
+      api-key: ${AI_API_KEY:}
+      chat:
+        options:
+          # 对话模型标识
+          model: qwen3.7-flash
+          # 采样温度，取值 0~1，越小输出越稳定
+          temperature: 0.3
+          # 百炼私有参数：推理模型的思考内容耗时可占整次调用的大头，false 关闭
+          extra-body:
+            enable_thinking: false
 mybatis-plus:
   mapper-locations: classpath*:/mapper/**/*.xml
   global-config:
