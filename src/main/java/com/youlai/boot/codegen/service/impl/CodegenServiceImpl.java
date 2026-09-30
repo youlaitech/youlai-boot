@@ -38,10 +38,6 @@ import java.util.zip.ZipOutputStream;
 /**
  * 代码生成服务实现类。
  *
- * <p>
- * 根据代码生成配置（{@link CodegenProperties}）与表/字段元数据，渲染模板并提供预览与下载能力。
- * </p>
- *
  * @author Ray
  * @since 2.10.0
  */
@@ -206,8 +202,6 @@ public class CodegenServiceImpl implements CodegenService {
 
     /**
      * 生成文件名。
-     *
-     * <p>部分模板需要使用约定的命名规则（例如前端 API 文件）。</p>
      *
      * @param entityName   实体名（例如 User）
      * @param templateName 模板名（例如 Entity、Controller、API）

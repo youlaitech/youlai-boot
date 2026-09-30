@@ -10,8 +10,6 @@ public interface WorkflowDemoService {
 
     /**
      * 幂等初始化演示流程（已存在则跳过）：部署流程定义 + 创建模型草稿
-     *
-     * <p>单个流程失败仅记录日志，不阻断其余流程与应用启动</p>
      */
     void initIfAbsent();
 

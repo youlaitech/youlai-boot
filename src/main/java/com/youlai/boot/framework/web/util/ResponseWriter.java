@@ -13,7 +13,6 @@ import java.nio.charset.StandardCharsets;
 
 /**
  * 响应写入器
- * <p>用于过滤器、Security处理器等场景统一写入HTTP响应</p>
  */
 @Slf4j
 public final class ResponseWriter {

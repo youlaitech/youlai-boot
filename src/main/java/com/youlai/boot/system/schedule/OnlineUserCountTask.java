@@ -8,7 +8,6 @@ import org.springframework.stereotype.Component;
 
 /**
  * 在线用户统计定时任务
- * <p>每 3 分钟统计并广播当前在线用户数量</p>
  *
  * @author Ray.Hao
  * @since 3.1.0

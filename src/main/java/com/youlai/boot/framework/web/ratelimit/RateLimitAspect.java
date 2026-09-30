@@ -21,16 +21,6 @@ import org.springframework.web.context.request.ServletRequestAttributes;
 
 /**
  * 接口级限流切面
- * <p>
- * 对标注了 {@link RateLimit} 的 Controller 方法做 Redis 滑动窗口计数。
- * 超阈值抛出 {@link RateLimitException}（A0502），全局异常处理器统一返回 JSON。
- * </p>
- *
- * <h3>升级历史</h3>
- * <ul>
- *   <li>4.3.1 — 初始版本：固定窗口计数器</li>
- *   <li>4.4.0 — 升级为滑动窗口 + X-RateLimit-* 渐进式响应头</li>
- * </ul>
  *
  * @author Ray.Hao
  * @since 4.3.1

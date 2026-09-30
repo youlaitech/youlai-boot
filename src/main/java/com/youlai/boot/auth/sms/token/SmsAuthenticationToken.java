@@ -9,8 +9,6 @@ import java.util.Collection;
 
 /**
  * 短信验证码认证 Token。
- * <p>
- * 未认证：principal=手机号，credentials=验证码；已认证：principal=SecurityUserDetails，credentials=null。
  *
  * @author Ray.Hao
  * @since 2.20.0

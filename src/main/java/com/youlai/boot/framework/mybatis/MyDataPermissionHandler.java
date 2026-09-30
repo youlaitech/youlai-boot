@@ -24,12 +24,6 @@ import java.util.List;
 
 /**
  * 数据权限处理器
- * <p>
- * 支持多角色数据权限合并（并集策略）：
- * - 如果任一角色是 ALL，则跳过数据权限过滤
- * - 否则用 OR 连接各角色的数据权限条件
- * <p>
- * 使用 JSQLParser 构建 SQL 条件，避免字符串拼接，提高代码安全性和可读性。
  *
  * @author Ray.Hao
  * @since 2021/12/10
@@ -108,8 +102,6 @@ public class MyDataPermissionHandler implements DataPermissionHandler {
 
     /**
      * 使用并集策略进行数据权限过滤
-     * <p>
-     * 多个角色的数据权限通过 OR 连接，实现并集效果
      *
      * @param annotation  数据权限注解
      * @param dataScopes  数据权限列表
@@ -158,8 +150,6 @@ public class MyDataPermissionHandler implements DataPermissionHandler {
 
     /**
      * 构建单个角色的数据权限SQL条件
-     * <p>
-     * 使用 JSQLParser 构建 Expression，避免字符串拼接
      *
      * @param deptAlias        部门表别名
      * @param deptIdColumnName 部门ID字段名
@@ -221,8 +211,6 @@ public class MyDataPermissionHandler implements DataPermissionHandler {
 
     /**
      * 构建部门及子部门数据权限条件
-     * <p>
-     * SQL: dept_id IN (SELECT id FROM sys_dept WHERE id = ? OR FIND_IN_SET(?, tree_path))
      *
      * @param deptColumn 部门列
      * @param deptId     部门ID
@@ -230,8 +218,7 @@ public class MyDataPermissionHandler implements DataPermissionHandler {
      */
     @SneakyThrows
     private Expression buildDeptAndSubExpression(Column deptColumn, Long deptId) {
-        // 使用字符串解析，避免不同 JSqlParser 版本下 InExpression/ItemsList 渲染差异导致 SQL 语法错误
-        // SQL: dept_id IN (SELECT id FROM sys_dept WHERE id = ? OR FIND_IN_SET(?, tree_path))
+        // 直接拼 SQL 字符串解析，规避 JSqlParser 版本间表达式渲染差异
         String columnName = deptColumn.toString();
         String sql = columnName + " IN (SELECT " + DEPT_ID_COLUMN + " FROM " + DEPT_TABLE +
                 " WHERE " + DEPT_ID_COLUMN + " = " + deptId +
@@ -241,8 +228,6 @@ public class MyDataPermissionHandler implements DataPermissionHandler {
 
     /**
      * 构建自定义部门数据权限条件
-     * <p>
-     * SQL: dept_id IN (?, ?, ...)
      *
      * @param deptColumn    部门列
      * @param customDeptIds 自定义部门ID列表

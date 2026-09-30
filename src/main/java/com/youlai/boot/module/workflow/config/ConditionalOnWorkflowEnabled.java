@@ -11,8 +11,6 @@ import org.springframework.boot.autoconfigure.condition.ConditionalOnBooleanProp
 /**
  * 工作流启用条件
  *
- * <p>workflow.enabled 显式为 true 时生效，未配置视为关闭</p>
- *
  * @author Ray.Hao
  * @since 4.9.0
  */

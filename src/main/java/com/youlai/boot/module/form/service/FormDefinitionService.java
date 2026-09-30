@@ -55,8 +55,6 @@ public interface FormDefinitionService {
     /**
      * 修改表单定义
      *
-     * <p>formKey 创建后不可修改；草稿态可修改元数据与规则，非草稿态仅可修改规则</p>
-     *
      * @param id       表单ID
      * @param formData 表单定义表单数据
      * @return 是否修改成功
@@ -129,9 +127,6 @@ public interface FormDefinitionService {
 
     /**
      * 审批表单下拉选项（供工作流设计器绑定表单）
-     *
-     * <p>仅返回已发布且类型为 workflow 的表单；value 为 formKey（BPMN formKey 引用），
-     * 草稿/停用表单结构未定不应被流程绑定</p>
      *
      * @return 审批表单下拉选项列表
      */

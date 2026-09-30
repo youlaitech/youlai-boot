@@ -41,9 +41,6 @@ import java.util.Set;
 /**
  * 流程实例业务实现类
  *
- * <p>发起时绑定动态表单：表单数据落库后以数据ID作为 businessKey，表单字段随流程变量提交，
- * 网关条件可直接引用表单字段（如 ${days > 3}）</p>
- *
  * @author Ray.Hao
  * @since 4.9.0
  */
@@ -259,9 +256,6 @@ public class WorkflowInstanceServiceImpl implements WorkflowInstanceService {
 
     /**
      * 发起表单数据回显（按提交时快照严格回显）
-     *
-     * <p>表单数据缺失时静默降级：业务表重装（dynamic-form.sql 重建）而引擎表保留、
-     * 或数据被手动删除时实例仍在，详情页可继续展示审批记录/流程走向/流程图，不因表单缺失整体报错</p>
      */
     private void fillFormData(InstanceDetailVO detailVO, String formKey, String businessKey) {
         if (StrUtil.isBlank(formKey) || StrUtil.isBlank(businessKey)) {

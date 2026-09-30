@@ -9,8 +9,6 @@ import java.io.Serializable;
 
 /**
  * 字典变更通知数据
- * <p>
- * 字典数据发生变更时作为 SSE 推送载荷广播至前端（主题 {@code SseTopics.DICT}），前端据此清除字典缓存。
  *
  * @author Ray.Hao
  * @since 3.0.0
@@ -23,10 +21,10 @@ public class DictChangeDTO implements Serializable {
     @Serial
     private static final long serialVersionUID = 1L;
 
-    /** 字典编码 */
+    // 字典编码
     private String dictCode;
 
-    /** 变更时间戳 */
+    // 变更时间戳
     private long timestamp;
 
     /**

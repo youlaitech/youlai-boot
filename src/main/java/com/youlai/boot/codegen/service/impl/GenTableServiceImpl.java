@@ -52,7 +52,7 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 public class GenTableServiceImpl extends ServiceImpl<GenTableMapper, GenTable> implements GenTableService {
 
-    /** 系统提示词名称，对应 resources/prompts 下的相对路径 */
+    // 系统提示词名称，对应 resources/prompts 下的相对路径
     private static final String SYSTEM_PROMPT_PATH = "codegen/system.md";
 
     private final DatabaseMapper databaseMapper;

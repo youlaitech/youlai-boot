@@ -27,10 +27,6 @@ import java.time.LocalDateTime;
 
 /**
  * 阿里云 OSS 文件存储服务。
- * <p>
- * 当 {@code storage.type=aliyun} 时生效。
- * 上传文件按日期分目录存储，URL 格式：{@code 协议://bucket.endpoint/yyyyMMdd/uuid.suffix}，
- * 协议取自 endpoint 配置（未指定时默认 https）。
  */
 @Component
 @Slf4j
@@ -40,13 +36,13 @@ import java.time.LocalDateTime;
 @Data
 public class AliyunFileServiceImpl implements FileService {
 
-    /** OSS 地域节点，如 {@code oss-cn-hangzhou.aliyuncs.com}，兼容带 {@code http(s)://} 前缀写法 */
+    // OSS 地域节点，如 {@code oss-cn-hangzhou.aliyuncs.com}，兼容带 {@code http(s)://} 前缀写法
     private String endpoint;
-    /** AccessKey ID */
+    // 访问密钥 ID
     private String accessKeyId;
-    /** AccessKey Secret */
+    // 访问密钥 Secret
     private String accessKeySecret;
-    /** 存储空间名称 */
+    // 存储空间名称
     private String bucket;
 
     private OSS aliyunOssClient;
@@ -110,8 +106,6 @@ public class AliyunFileServiceImpl implements FileService {
 
     /**
      * 获取文件访问主机地址（含协议），如 {@code https://bucket.oss-cn-hangzhou.aliyuncs.com}。
-     * <p>
-     * 协议以 endpoint 配置为准，未指定时默认 https。
      */
     private String getFileHost() {
         String endpointWithProtocol = endpointWithProtocol();

@@ -22,11 +22,6 @@ import java.util.concurrent.TimeUnit;
 
 /**
  * Redis Token 管理器。
- * <p>
- * 基于 Redis 的有状态 Token 认证，支持 Access + Refresh 双令牌、
- * 单/多设备登录控制、用户级会话失效。
- * <p>
- * 直接存取 {@link SecurityUserDetails}（password 置 null），无需 UserSession 中间层。
  *
  * @author Ray.Hao
  * @since 2024/11/15

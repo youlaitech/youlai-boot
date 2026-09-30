@@ -14,24 +14,16 @@ import java.util.List;
 @Data
 public class ExcelResult {
 
-    /**
-     * 响应码，来确定是否导入成功
-     */
+    // 响应码，来确定是否导入成功
     private String code;
 
-    /**
-     * 有效条数
-     */
+    // 有效条数
     private Integer validCount;
 
-    /**
-     * 无效条数
-     */
+    // 无效条数
     private Integer invalidCount;
 
-    /**
-     * 错误提示信息
-     */
+    // 错误提示信息
     private List<String> messageList;
 
     public ExcelResult() {

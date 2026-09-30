@@ -39,9 +39,6 @@ import java.util.List;
 /**
  * 防重复提交切面
  *
- * <p>用 Redis 的「不存在才写入 + TTL」原子占位实现：同一请求标识在过期时间内
- * 第二次提交直接拒绝，占位到期自动释放，无需手动解锁。</p>
- *
  * @author Ray.Hao
  * @since 4.3.1
  */
@@ -55,7 +52,7 @@ public class RepeatSubmitAspect {
     private static final ExpressionParser SPEL_PARSER = new SpelExpressionParser();
     private static final ParameterNameDiscoverer PARAMETER_NAME_DISCOVERER = new DefaultParameterNameDiscoverer();
 
-    /** 生成请求指纹时排除的参数类型，这些对象序列化结果不稳定或无业务含义 */
+    // 生成请求指纹时排除的参数类型，这些对象序列化结果不稳定或无业务含义
     private static final List<Class<?>> EXCLUDED_PARAM_TYPES =
             List.of(ServletRequest.class, ServletResponse.class, MultipartFile.class, BindingResult.class);
 
@@ -77,8 +74,6 @@ public class RepeatSubmitAspect {
 
     /**
      * 生成防重占位的 key
-     *
-     * <p>注解配置了 key 表达式时以表达式的值区分请求；否则对过滤后的业务参数做哈希。</p>
      */
     private String buildLockKey(ProceedingJoinPoint pjp, RepeatSubmit repeatSubmit) {
         HttpServletRequest request = ((ServletRequestAttributes) RequestContextHolder.getRequestAttributes()).getRequest();
@@ -90,14 +85,18 @@ public class RepeatSubmitAspect {
         return StrUtil.format(RedisConstants.Lock.RESUBMIT, userIdentifier, requestIdentifier + ":" + requestFingerprint);
     }
 
-    /** 过滤掉不可稳定序列化的参数后再生成指纹 */
+    /**
+     * 过滤掉不可稳定序列化的参数后再生成指纹
+     */
     private Object[] filterArgs(ProceedingJoinPoint pjp) {
         return Arrays.stream(pjp.getArgs())
                 .filter(arg -> arg == null || EXCLUDED_PARAM_TYPES.stream().noneMatch(type -> type.isInstance(arg)))
                 .toArray();
     }
 
-    /** 解析注解上的 SpEL key 表达式，方法参数可直接引用 */
+    /**
+     * 解析注解上的 SpEL key 表达式，方法参数可直接引用
+     */
     private String evaluateKey(ProceedingJoinPoint pjp, String spel) {
         Method method = ((MethodSignature) pjp.getSignature()).getMethod();
         MethodBasedEvaluationContext context = new MethodBasedEvaluationContext(

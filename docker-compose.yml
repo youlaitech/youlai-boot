@@ -7,7 +7,7 @@
 # - name 固定项目名，容器统一管理和卸载，避免与其他项目冲突
 # - 中间件配置全部内联于 command 参数，无需外部配置文件
 # - 数据持久化使用命名卷（docker volume 统一管理），不污染项目目录
-# - RustFS 兼容 MinIO 磁盘格式与 S3 协议（MinIO 社区版已于 2026 年停止维护）
+# - 对象存储使用 RustFS（S3 协议兼容）
 
 name: youlai-boot
 

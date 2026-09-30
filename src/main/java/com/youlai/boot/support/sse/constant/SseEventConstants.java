@@ -11,9 +11,9 @@ public final class SseEventConstants {
     private SseEventConstants() {
     }
 
-    /** 心跳事件 */
+    // 心跳事件
     public static final String PING = "ping";
 
-    /** 在线用户数事件 */
+    // 在线用户数事件
     public static final String ONLINE_USERS = "online-users";
 }

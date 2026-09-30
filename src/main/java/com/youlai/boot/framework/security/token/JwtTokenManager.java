@@ -31,11 +31,6 @@ import java.util.stream.Collectors;
 
 /**
  * JWT Token 管理器。
- * <p>
- * 基于 JWT 的无状态认证，支持 Access + Refresh 双令牌、Token 撤销（jti 黑名单）、
- * 用户级会话失效（tokenVersion）、多角色数据权限存储。
- * <p>
- * JWT claims 中存储角色编码（不带 ROLE_ 前缀），解析后由 {@link SecurityUserDetails#getAuthorities()} 运行时补前缀。
  *
  * @author Ray.Hao
  * @since 2024/11/15

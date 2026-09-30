@@ -13,9 +13,6 @@ import java.util.Set;
 
 /**
  * Spring Security 权限校验组件。
- * <p>
- * 用于 SpEL 表达式：{@code @PreAuthorize("@ss.hasPerm('sys:user:create')")}。
- * 通过 {@link PermissionPort} 查询角色权限，不直接依赖 system 模块。
  *
  * @author Ray.Hao
  * @since 0.0.1

@@ -13,8 +13,6 @@ import java.util.Map;
 
 /**
  * SSE 推送服务
- * <p>
- * 组合 {@link SseSessionManager} 提供 SSE 建连、广播、定向推送、在线用户统计等能力。
  *
  * @author Ray.Hao
  * @since 3.1.0

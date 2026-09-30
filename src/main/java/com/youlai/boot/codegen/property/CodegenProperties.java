@@ -21,34 +21,22 @@ import java.util.Map;
 public class CodegenProperties {
 
 
-    /**
-     * 默认配置
-     */
+    // 默认配置
     private DefaultConfig defaultConfig ;
 
-    /**
-     * 模板配置
-     */
+    // 模板配置
     private Map<String, TemplateConfig> templateConfigs = MapUtil.newHashMap(true);
 
-    /**
-     * 后端应用名
-     */
+    // 后端应用名
     private String backendAppName;
 
-    /**
-     * 前端应用名
-     */
+    // 前端应用名
     private String frontendAppName;
 
-    /**
-     * 下载文件名
-     */
+    // 下载文件名
     private String downloadFileName;
 
-    /**
-     * 排除数据表
-     */
+    // 排除数据表
     private List<String> excludeTables;
 
     /**
@@ -57,19 +45,13 @@ public class CodegenProperties {
     @Data
     public static class TemplateConfig {
 
-        /**
-         * 模板路径，相对模板根 classpath:codegen (e.g. backend/controller.java.vm)
-         */
+        // 模板路径，相对模板根 classpath:codegen (e.g. backend/controller.java.vm)
         private String templatePath;
 
-        /**
-         * 子包名 (e.g. controller/service/mapper/model)
-         */
+        // 子包名 (e.g. controller/service/mapper/model)
         private String subpackageName;
 
-        /**
-         * 文件扩展名，如 .java
-         */
+        // 文件扩展名，如 .java
         private String extension = FileNameUtil.EXT_JAVA;
 
     }
@@ -80,14 +62,10 @@ public class CodegenProperties {
     @Data
     public static class DefaultConfig {
 
-        /**
-         * 作者 (e.g. Ray)
-         */
+        // 作者 (e.g. Ray)
         private String author;
 
-        /**
-         * 默认模块名(e.g. system)
-         */
+        // 默认模块名(e.g. system)
         private String moduleName;
 
     }

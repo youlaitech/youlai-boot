@@ -16,58 +16,38 @@ import lombok.EqualsAndHashCode;
 @Data
 public class DictItem extends BaseEntity {
 
-    /**
-     * 字典编码
-     */
+    // 字典编码
     private String dictCode;
 
-    /**
-     * 字典项名称
-     */
+    // 字典项名称
     private String label;
 
-    /**
-     * 字典项值
-     */
+    // 字典项值
     private String value;
 
-    /**
-     * 排序
-     */
+    // 排序
     private Integer sort;
 
-    /**
-     * 状态（1-启用，0-停用）
-     */
+    // 状态（1-启用，0-停用）
     private Integer status;
 
-    /**
-     * 备注
-     */
+    // 备注
     @TableField(updateStrategy = FieldStrategy.ALWAYS)
     private String remark;
 
-    /**
-     * 标签类型
-     */
+    // 标签类型
     @TableField(updateStrategy = FieldStrategy.ALWAYS)
     private String tagType;
 
-    /**
-     * 创建人 ID
-     */
+    // 创建人 ID
     @TableField(fill = FieldFill.INSERT)
     private Long createBy;
 
-    /**
-     * 更新人 ID
-     */
+    // 更新人 ID
     @TableField(fill = FieldFill.INSERT_UPDATE)
     private Long updateBy;
 
-    /**
-     * 逻辑删除(1-已删除 0-未删除)
-     */
+    // 逻辑删除(1-已删除 0-未删除)
     private Integer isDeleted;
 
 }

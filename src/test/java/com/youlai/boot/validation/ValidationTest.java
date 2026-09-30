@@ -24,8 +24,6 @@ import static org.assertj.core.api.Assertions.assertThat;
 /**
  * 参数校验约束测试
  *
- * <p>验证关键 Form 的约束行为，并扫描全部 Controller 保证每个 @RequestBody 参数都触发 Bean Validation。</p>
- *
  * @author Ray.Hao
  * @since 4.8.0
  */

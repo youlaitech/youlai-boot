@@ -77,8 +77,6 @@ public interface MenuService extends IService<Menu> {
     /**
      * 为代码生成创建菜单
      *
-     * <p>菜单已存在（routeName 相同）时直接返回；创建成功后一并生成查询/新增/修改/删除四个按钮权限。
-     *
      * @param parentMenuId 父菜单ID
      * @param dto          创建菜单数据载体
      */

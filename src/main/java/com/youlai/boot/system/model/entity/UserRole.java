@@ -17,13 +17,9 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 public class UserRole {
-    /**
-     * 用户ID
-     */
+    // 用户ID
     private Long userId;
 
-    /**
-     * 角色ID
-     */
+    // 角色ID
     private Long roleId;
 }

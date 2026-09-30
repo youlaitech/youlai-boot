@@ -9,8 +9,6 @@ import java.util.List;
 
 /**
  * 角色数据权限信息
- * <p>
- * 用于存储单个角色的数据权限范围信息，支持多角色数据权限合并（并集策略）
  *
  * @author Ray.Hao
  * @since 3.0.0
@@ -22,20 +20,13 @@ public class RoleDataScope implements Serializable {
 
     private static final long serialVersionUID = 1L;
 
-    /**
-     * 角色编码
-     */
+    // 角色编码
     private String roleCode;
 
-    /**
-     * 数据权限范围值
-     * 1-所有数据 2-部门及子部门数据 3-本部门数据 4-本人数据 5-自定义部门数据
-     */
+    // 数据权限范围值
     private Integer dataScope;
 
-    /**
-     * 自定义部门ID列表（仅当 dataScope=5 时有效）
-     */
+    // 自定义部门ID列表（仅当 dataScope=5 时有效）
     private List<Long> customDeptIds;
 
     /**

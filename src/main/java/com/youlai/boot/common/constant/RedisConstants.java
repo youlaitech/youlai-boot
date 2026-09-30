@@ -12,10 +12,10 @@ public interface RedisConstants {
      * 限流相关键
      */
     interface RateLimit {
-        /** 接口级限流 Key（示例：rate_limit:api:{user}:{uri}） */
+        // 接口级限流 Key（示例：rate_limit:api:{user}:{uri}）
         String API = "rate_limit:api:{}:{}";
 
-        /** IP 全局限流 Key（示例：rate_limit:ip:192.168.1.100） */
+        // IP 全局限流 Key（示例：rate_limit:ip:192.168.1.100）
         String IP = "rate_limit:ip:{}";
     }
 
@@ -70,9 +70,9 @@ public interface RedisConstants {
      * 表单模块
      */
     interface Form {
-        /** 已发布表单渲染规则（formKey -> FormRenderVO，发布/停用/改规则/删除时主动失效） */
+        // 已发布表单渲染规则（formKey -> FormRenderVO，发布/停用/改规则/删除时主动失效）
         String RENDER_RULE = "form:render:{}";
-        /** 公开表单匿名提交计数（formKey:ip 维度滑动窗口，防刷限流） */
+        // 公开表单匿名提交计数（formKey:ip 维度滑动窗口，防刷限流）
         String PUBLIC_SUBMIT_COUNT = "form:public:submit:{}:{}";
     }
 

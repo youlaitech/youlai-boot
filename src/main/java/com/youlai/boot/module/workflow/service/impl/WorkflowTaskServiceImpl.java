@@ -55,9 +55,6 @@ import java.util.stream.Collectors;
 /**
  * 流程任务业务实现类
  *
- * <p>任务归属以用户名为准（引擎 assignee 与登录用户名一致）；候选组任务（candidateGroups 对应角色编码）
- * 待办可见、办理时自动认领，审批意见归档为引擎评论</p>
- *
  * @author Ray.Hao
  * @since 4.9.0
  */
@@ -67,7 +64,7 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 public class WorkflowTaskServiceImpl implements WorkflowTaskService {
 
-    /** 系统提示词名称，对应 resources/prompts 下的相对路径 */
+    // 系统提示词名称，对应 resources/prompts 下的相对路径
     private static final String SYSTEM_PROMPT_PATH = "workflow/summary.md";
 
     private static final ObjectMapper OBJECT_MAPPER = new ObjectMapper();
@@ -285,9 +282,6 @@ public class WorkflowTaskServiceImpl implements WorkflowTaskService {
 
     /**
      * 当前用户的候选任务查询：本人任务（办理人/候选用户）或所属角色候选组的任务
-     *
-     * <p>引擎未同步用户-角色关系，单参 candidateOrAssigned 匹配不到候选组，
-     * 以 or 查询显式传入登录用户的角色编码集合（BPMN candidateGroups 对应系统角色编码）</p>
      */
     private TaskQuery createCandidateTaskQuery() {
         String username = SecurityUtils.getUsername();
@@ -329,9 +323,6 @@ public class WorkflowTaskServiceImpl implements WorkflowTaskService {
 
     /**
      * 发起表单数据回显（按提交时快照严格回显）
-     *
-     * <p>表单数据缺失时静默降级（业务表重装或数据被删而实例仍在），
-     * 办理弹窗可继续展示审批记录/流程走向，不因表单缺失整体报错</p>
      */
     private void fillFormData(TaskDetailVO detailVO, String formKey, String businessKey) {
         if (StrUtil.isBlank(formKey) || StrUtil.isBlank(businessKey)) {

@@ -11,15 +11,15 @@ public final class SseTopics {
     private SseTopics() {
     }
 
-    /** 字典变更事件 */
+    // 字典变更事件
     public static final String DICT = "dict";
 
-    /** 系统消息事件 */
+    // 系统消息事件
     public static final String SYSTEM = "system";
 
-    /** 通知事件 */
+    // 通知事件
     public static final String NOTICE = "notice";
 
-    /** 通知撤回事件 */
+    // 通知撤回事件
     public static final String NOTICE_REVOKE = "notice-revoke";
 }

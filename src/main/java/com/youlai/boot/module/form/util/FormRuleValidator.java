@@ -14,17 +14,12 @@ import java.util.Map;
 /**
  * 表单规则校验器（后端基础校验 + 字段白名单）
  *
- * <p>按 form-create rule 的 validate 声明校验必填（required）与基础类型（number/array），
- * 并按 rule 声明的 field 过滤数据</p>
- *
  * @author Ray.Hao
  * @since 4.9.0
  */
 public final class FormRuleValidator {
 
-    /**
-     * Jackson 线程安全，静态复用
-     */
+    // Jackson 线程安全，静态复用
     private static final ObjectMapper OBJECT_MAPPER = new ObjectMapper();
 
     private FormRuleValidator() {
@@ -32,9 +27,6 @@ public final class FormRuleValidator {
 
     /**
      * 校验并过滤表单数据
-     *
-     * <p>白名单：仅保留 rule 中声明 field 的数据项；
-     * 校验：逐字段执行 required/类型校验，任一失败抛业务异常并列出全部错误</p>
      *
      * @param formJson 表单规则（form-create rule 数组 JSON 字符串）
      * @param data     提交数据（field -> value 映射）

@@ -19,9 +19,6 @@ import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * SSE 会话管理器
- * <p>
- * 维护 SSE 连接的用户会话信息，支持多设备同时登录。
- * 职责：建连 / 断开 / 心跳检测 / 定向推送 / 全员广播
  *
  * @author Ray.Hao
  * @since 3.1.0
@@ -30,16 +27,16 @@ import java.util.concurrent.ConcurrentHashMap;
 @Component
 public class SseSessionManager {
 
-    /** SSE 连接超时时间：30 分钟 */
+    // SSE 连接超时时间：30 分钟
     public static final long TIMEOUT = 30 * 60 * 1000L;
 
-    /** 用户名 -> SseEmitter 集合（支持多设备） */
+    // 用户名 -> SseEmitter 集合（支持多设备）
     private final Map<String, Set<SseEmitter>> userEmittersMap = new ConcurrentHashMap<>();
 
-    /** SseEmitter -> 用户名（快速定位用户） */
+    // SseEmitter -> 用户名（快速定位用户）
     private final Map<SseEmitter, String> emitterUserMap = new ConcurrentHashMap<>();
 
-    /** SseEmitter -> 连接时间 */
+    // SseEmitter -> 连接时间
     private final Map<SseEmitter, Long> emitterTimeMap = new ConcurrentHashMap<>();
 
     /**

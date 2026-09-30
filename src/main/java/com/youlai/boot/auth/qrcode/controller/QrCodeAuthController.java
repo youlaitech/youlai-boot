@@ -24,9 +24,6 @@ import org.springframework.web.bind.annotation.RestController;
 /**
  * 扫码登录认证接口
  *
- * <p>generate/status/login 不需要登录态（PC 端未登录），由 Security 配置放行；
- * scan/confirm/cancel 需要 APP 端登录态，当前用户 ID 从 Security 上下文获取。</p>
- *
  * @author Ray.Hao
  * @since 4.5.0
  */

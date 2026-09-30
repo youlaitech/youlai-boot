@@ -12,9 +12,6 @@ import java.util.stream.Collectors;
 /**
  * 文件存储配置属性类
  *
- * <p>映射 application.yml 中 storage 前缀的配置；s3 / aliyun / local
- * 子配置由各自的 {@code FileService} 实现类绑定</p>
- *
  * @author Ray.Hao
  * @since 4.8.0
  */
@@ -23,19 +20,10 @@ import java.util.stream.Collectors;
 @ConfigurationProperties(prefix = "storage")
 public class StorageProperties {
 
-    /**
-     * 存储类型，决定激活哪个 FileService 实现类
-     * <ul>
-     *   <li>s3 - S3 协议兼容对象存储（当前部署 RustFS）</li>
-     *   <li>aliyun - 阿里云 OSS</li>
-     *   <li>local - 本地磁盘存储</li>
-     * </ul>
-     */
+    // 存储类型，决定激活哪个 FileService 实现类
     private String type;
 
-    /**
-     * 上传限制
-     */
+    // 上传限制
     private Upload upload = new Upload();
 
     /**
@@ -44,16 +32,10 @@ public class StorageProperties {
     @Data
     public static class Upload {
 
-        /**
-         * 单文件大小上限，如 50MB
-         * <p>同时作为 spring.servlet.multipart 的上限，保持单一来源</p>
-         */
+        // 单文件大小上限，如 50MB
         private String maxFileSize;
 
-        /**
-         * 允许上传的文件扩展名白名单
-         * <p>置空表示不限制</p>
-         */
+        // 允许上传的文件扩展名白名单
         private List<String> allowedExtensions;
     }
 

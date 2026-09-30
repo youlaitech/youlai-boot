@@ -63,7 +63,7 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 public class FormDefinitionServiceImpl extends ServiceImpl<FormDefinitionMapper, FormDefinition> implements FormDefinitionService {
 
-    /** 系统提示词名称，对应 resources/prompts 下的相对路径 */
+    // 系统提示词名称，对应 resources/prompts 下的相对路径
     private static final String SYSTEM_PROMPT_PATH = "form/system.md";
 
     private final FormConverter formConverter;
@@ -76,13 +76,13 @@ public class FormDefinitionServiceImpl extends ServiceImpl<FormDefinitionMapper,
     private final AiChatService aiChatService;
     private final PromptLoader promptLoader;
 
-    /** 默认挂载目录名称：发布向导未显式选目录时自动使用/创建 */
+    // 默认挂载目录名称：发布向导未显式选目录时自动使用/创建
     private static final String DEFAULT_CATALOG_NAME = "表单中心";
 
-    /** 表单管理目录名称（顶级，dynamic-form.sql 预置）："表单中心"默认挂载其下，顶级入口聚合 */
+    // 表单管理目录名称（顶级，dynamic-form.sql 预置）："表单中心"默认挂载其下，顶级入口聚合
     private static final String FORM_ADMIN_CATALOG_NAME = "动态表单";
 
-    /** 渲染缓存兜底 TTL：事件驱动清缓存外再设过期，防 DB 更新与删缓存间应用重启导致脏缓存永续 */
+    // 渲染缓存兜底 TTL：事件驱动清缓存外再设过期，防 DB 更新与删缓存间应用重启导致脏缓存永续
     private static final long RENDER_CACHE_TTL_MINUTES = 30;
 
     /**
@@ -152,8 +152,6 @@ public class FormDefinitionServiceImpl extends ServiceImpl<FormDefinitionMapper,
     /**
      * 修改表单定义
      *
-     * <p>formKey 创建后不可修改；草稿态可修改元数据与规则，非草稿态仅可修改规则</p>
-     *
      * @param id       表单ID
      * @param formData 表单定义表单数据
      */
@@ -194,9 +192,6 @@ public class FormDefinitionServiceImpl extends ServiceImpl<FormDefinitionMapper,
     /**
      * 批量删除表单定义
      *
-     * <p>被流程引用的表单禁止删除；其余级联清理关联数据，避免孤儿残留：生成的访问菜单（含其角色授权）、
-     * 提交数据、版本快照一并删除</p>
-     *
      * @param ids 表单ID列表
      */
     @Override
@@ -225,8 +220,6 @@ public class FormDefinitionServiceImpl extends ServiceImpl<FormDefinitionMapper,
     /**
      * 校验表单是否被流程引用
      *
-     * <p>被引用的表单删除后，流程发起与审批时无表单可渲染，故在删除前整体拦截</p>
-     *
      * @param forms 待删除表单
      */
     private void checkProcessReferences(List<FormDefinition> forms) {
@@ -249,9 +242,6 @@ public class FormDefinitionServiceImpl extends ServiceImpl<FormDefinitionMapper,
 
     /**
      * 发布表单
-     *
-     * <p>状态翻转 + 版本自增走单条原子 UPDATE，从 DB 侧消除并发发布的重号竞态；
-     * 更新成功后回读最新表单，用同一份规则固化版本快照</p>
      *
      * @param id 表单ID
      */
@@ -358,9 +348,6 @@ public class FormDefinitionServiceImpl extends ServiceImpl<FormDefinitionMapper,
     /**
      * 按 formKey 获取公开表单的渲染规则（匿名接口）
      *
-     * <p>仅返回已发布且 isPublic=1 的表单；直查库，不读 {@link #getFormRender(String)} 的
-     * Redis 缓存——缓存 VO 不含 isPublic，命中会绕过公开开关校验</p>
-     *
      * @param formKey 表单唯一标识
      */
     @Override
@@ -460,9 +447,6 @@ public class FormDefinitionServiceImpl extends ServiceImpl<FormDefinitionMapper,
     /**
      * 确保默认挂载目录"表单中心"存在，不存在则创建
      *
-     * <p>挂到顶级"动态表单"目录下，该目录缺失时退化为顶级创建；
-     * 无子菜单的目录在侧边栏不渲染</p>
-     *
      * @return 默认目录实体
      */
     private Menu ensureDefaultCatalog() {
@@ -536,9 +520,6 @@ public class FormDefinitionServiceImpl extends ServiceImpl<FormDefinitionMapper,
     /**
      * 追加式角色授权：向角色授予菜单及 tree_path 祖先目录
      *
-     * <p>踩坑1：只授子菜单不授父目录，buildRoutes 构树出孤儿节点，侧边栏不渲染；
-     * 踩坑2：不能复用 assignMenusToRole——它是整体替换语义，会清空角色原有菜单授权</p>
-     *
      * @param menuId  菜单ID
      * @param roleIds 角色ID列表
      */
@@ -582,9 +563,6 @@ public class FormDefinitionServiceImpl extends ServiceImpl<FormDefinitionMapper,
 
     /**
      * 审批表单下拉选项（供工作流设计器绑定表单）
-     *
-     * <p>仅返回已发布且类型为 workflow 的表单；value 为 formKey（BPMN formKey 引用），
-     * 草稿/停用表单结构未定不应被流程绑定</p>
      *
      * @return 审批表单下拉选项列表
      */

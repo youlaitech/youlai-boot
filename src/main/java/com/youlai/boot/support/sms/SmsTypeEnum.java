@@ -5,8 +5,6 @@ import lombok.Getter;
 
 /**
  * 短信类型枚举
- * <p>
- * value 值对应 application-*.yml 中的 sms.templates.* 配置
  *
  * @author Ray.Hao
  * @since 2.21.0

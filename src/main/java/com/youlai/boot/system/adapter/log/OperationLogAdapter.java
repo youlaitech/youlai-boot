@@ -9,7 +9,6 @@ import org.springframework.stereotype.Component;
 
 /**
  * 操作日志适配器
- * <p>实现 {@link OperationLogPort}，落库 sys_log</p>
  *
  * @author Ray.Hao
  * @since 4.7.0

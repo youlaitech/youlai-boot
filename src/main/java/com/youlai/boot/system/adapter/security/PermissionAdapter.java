@@ -9,8 +9,6 @@ import java.util.Set;
 
 /**
  * 权限查询适配器。
- * <p>
- * 实现 framework 层的 {@link PermissionPort}，委托 {@link RoleMenuService} 查询权限集合。
  *
  * @author Ray.Hao
  * @since 3.1.0

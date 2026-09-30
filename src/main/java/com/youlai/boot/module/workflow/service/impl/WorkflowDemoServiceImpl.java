@@ -26,11 +26,6 @@ import java.util.Set;
 /**
  * 演示流程服务实现（请假、报销、采购、用章）
  *
- * <p>初始化按 key 幂等双写：部署流程定义（可发起）+ 创建模型草稿（流程模型页可见），两者各自查重互不依赖。
- * 引擎表（ACT_*）不走 SQL 预置：流程定义跨三表且主键由引擎生成，直接写库绕过解析校验，重置同理依赖引擎级联删除</p>
- *
- * <p>重置供演示环境定期复原，数据效果等价业务脚本"DROP 重建"，不动引擎表结构</p>
- *
  * @author Ray.Hao
  * @since 4.9.0
  */
@@ -44,9 +39,7 @@ public class WorkflowDemoServiceImpl implements WorkflowDemoService {
     private final FormDataService formDataService;
     private final BpmnModelHelper bpmnModelHelper;
 
-    /**
-     * 演示流程清单（key 与 resources/workflow/ 下同名 BPMN 文件的 process id 一致）
-     */
+    // 演示流程清单（key 与 resources/workflow/ 下同名 BPMN 文件的 process id 一致）
     private static final List<DemoProcess> DEMO_PROCESSES = List.of(
             new DemoProcess("leave", "请假审批"),
             new DemoProcess("expense", "报销审批"),

@@ -44,8 +44,6 @@ import java.util.stream.Collectors;
 /**
  * 流程模型业务实现类
  *
- * <p>模型即设计草稿，editorSource 持久化 bpmn-js 产出的 BPMN XML；部署后生成不可变的流程定义</p>
- *
  * @author Ray.Hao
  * @since 4.9.0
  */
@@ -60,9 +58,7 @@ public class WorkflowModelServiceImpl implements WorkflowModelService {
     private final BpmnModelHelper bpmnModelHelper;
     private final RoleService roleService;
 
-    /**
-     * 新模型初始模板：开始 → 审批 → 结束，设计器打开即可直接编辑
-     */
+    // 新模型初始模板：开始 → 审批 → 结束，设计器打开即可直接编辑
     private static final String INITIAL_XML_TEMPLATE = """
             <?xml version="1.0" encoding="UTF-8"?>
             <bpmn:definitions xmlns:bpmn="http://www.omg.org/spec/BPMN/20100524/MODEL"
@@ -134,8 +130,6 @@ public class WorkflowModelServiceImpl implements WorkflowModelService {
 
     /**
      * 填充发布状态：模型与流程定义经 key 关联，未发布的模型无定义信息
-     *
-     * <p>列表页即呈现"未发布 / v2 已启用 / v3 已停用"，发布管理不必独立成页</p>
      */
     private void fillPublishState(List<ModelVO> records) {
         if (records.isEmpty()) {
@@ -203,9 +197,6 @@ public class WorkflowModelServiceImpl implements WorkflowModelService {
     /**
      * 删除流程模型
      *
-     * <p>「流程」对用户是整体：删除设计草稿时级联删除其全部发布版本（含运行实例与历史），
-     * 避免残留孤儿定义导致列表出现无模型可管理的流程；有在办实例的流程先拦截，防止在办任务被静默抹除</p>
-     *
      * @param modelIds 模型ID集合
      */
     @Override
@@ -222,8 +213,6 @@ public class WorkflowModelServiceImpl implements WorkflowModelService {
 
     /**
      * 校验流程无运行中实例
-     *
-     * <p>级联删除会连同在办任务一并抹除，审批人无从知晓，故有在办实例时禁止删除</p>
      */
     private void checkNoRunningInstance(Model model) {
         long runningCount = runtimeService.createProcessInstanceQuery()
@@ -247,9 +236,6 @@ public class WorkflowModelServiceImpl implements WorkflowModelService {
 
     /**
      * 查询引用指定表单的流程
-     *
-     * <p>引用写在 BPMN 的开始节点与用户任务节点（flowable:formKey）；模型草稿虽未部署但已绑定表单，
-     * 一并计入：表单被删除后，流程发起或审批时无表单可渲染</p>
      *
      * @param formKeys 表单标识集合
      * @return 表单标识 → 引用它的流程名称集合（无引用返回空 Map）

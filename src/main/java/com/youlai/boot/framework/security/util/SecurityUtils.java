@@ -64,8 +64,6 @@ public class SecurityUtils {
 
     /**
      * 获取角色编码集合，不带 ROLE_ 前缀。
-     * <p>
-     * 直接从 {@link SecurityUserDetails#getRoles()} 取值，不做 stripping 和过滤。
      */
     public static Set<String> getRoles() {
         return getUser().map(SecurityUserDetails::getRoles).orElse(Set.of());

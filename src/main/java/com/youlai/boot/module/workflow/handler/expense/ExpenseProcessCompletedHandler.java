@@ -13,9 +13,6 @@ import org.springframework.stereotype.Component;
 /**
  * 报销流程审批通过后的业务处理（示例：财务入账）
  *
- * <p>演示项目的入账为日志占位，未真实对接财务系统；
- * businessKey 即发起时提交的报销表单数据ID，可回读申请人填写的金额等内容</p>
- *
  * @author Ray.Hao
  * @since 4.9.0
  */

@@ -10,8 +10,6 @@ import static com.tngtech.archunit.library.dependencies.SlicesRuleDefinition.sli
 /**
  * 分层依赖约束
  *
- * <p>固化包之间的依赖方向，防止 common 反向依赖上层、业务模块之间形成环。</p>
- *
  * @author Ray.Hao
  * @since 4.8.0
  */

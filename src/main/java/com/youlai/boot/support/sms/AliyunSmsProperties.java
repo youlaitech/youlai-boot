@@ -17,22 +17,22 @@ import java.util.Map;
 @ConfigurationProperties(prefix = "sms.aliyun")
 public class AliyunSmsProperties {
 
-    /** Access Key ID */
+    // 访问密钥 ID
     private String accessKeyId;
 
-    /** Access Key Secret */
+    // 访问密钥 Secret
     private String accessKeySecret;
 
-    /** API 域名，如 dysmsapi.aliyuncs.com */
+    // API 域名，如 dysmsapi.aliyuncs.com
     private String domain;
 
-    /** 区域，如 cn-shanghai */
+    // 区域，如 cn-shanghai
     private String regionId;
 
-    /** 短信签名 */
+    // 短信签名
     private String signName;
 
-    /** 短信模板集合，key 为模板用途(login/register)，value 为模板CODE */
+    // 短信模板集合，key 为模板用途(login/register)，value 为模板CODE
     private Map<String, String> templates;
 
 }

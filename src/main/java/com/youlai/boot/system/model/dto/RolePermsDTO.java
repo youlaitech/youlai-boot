@@ -12,13 +12,9 @@ import java.util.Set;
 @Data
 public class RolePermsDTO {
 
-    /**
-     * 角色编码
-     */
+    // 角色编码
     private String roleCode;
 
-    /**
-     * 权限集合
-     */
+    // 权限集合
     private Set<String> perms;
 }

@@ -20,8 +20,6 @@ import java.util.List;
 /**
  * 流程定义控制层（发布产物：发布后供发起、审批与流程图查看）
  *
- * <p>定义的发布在模型接口（deploy），删除随模型级联</p>
- *
  * @author Ray.Hao
  * @since 4.9.0
  */

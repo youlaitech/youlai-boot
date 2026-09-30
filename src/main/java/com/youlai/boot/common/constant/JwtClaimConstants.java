@@ -8,39 +8,22 @@ package com.youlai.boot.common.constant;
  */
 public interface JwtClaimConstants {
 
-    /**
-     * 令牌类型
-     */
+    // 令牌类型
     String TOKEN_TYPE = "tokenType";
 
-    /**
-     * 用户ID
-     */
+    // 用户ID
     String USER_ID = "userId";
 
-    /**
-     * 部门ID
-     */
+    // 部门ID
     String DEPT_ID = "deptId";
 
-    /**
-     * 数据权限列表
-     * <p>
-     * 存储用户所有角色的数据权限范围，用于实现多角色权限合并（并集策略）
-     */
+    // 数据权限列表
     String DATA_SCOPES = "dataScopes";
 
-    /**
-     * 角色编码集合（不带 ROLE_ 前缀）
-     */
+    // 角色编码集合（不带 ROLE_ 前缀）
     String ROLES = "roles";
 
-    /**
-     * Token 版本号
-     * <p>
-     * 用于用户级会话失效，当用户修改密码、被禁用、强制下线时递增版本号，
-     * 使该用户之前签发的所有 Token 失效。
-     */
+    // Token 版本号
     String TOKEN_VERSION = "tokenVersion";
 
 }

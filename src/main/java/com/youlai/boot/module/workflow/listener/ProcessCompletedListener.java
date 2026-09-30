@@ -21,9 +21,6 @@ import java.util.stream.Collectors;
 /**
  * 流程完成事件监听器：审批通过（实例正常结束）后按流程定义 Key 路由到业务处理器
  *
- * <p>挂在引擎全局（见 WorkflowEngineConfig），任意流程结束均会派发本监听器；
- * 只响应 PROCESS_COMPLETED，取消/删除流程不触发业务后处理</p>
- *
  * @author Ray.Hao
  * @since 4.9.0
  */
@@ -68,9 +65,6 @@ public class ProcessCompletedListener implements FlowableEventListener {
 
     /**
      * 监听器异常不回滚审批事务：后处理（入账/入库）失败不阻断流程结束
-     *
-     * <p>强一致场景（后处理失败必须连带回滚审批）改为 true，
-     * 异常将随 completeTask 的事务一起回滚</p>
      */
     @Override
     public boolean isFailOnException() {

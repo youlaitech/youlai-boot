@@ -11,8 +11,6 @@ import org.springframework.stereotype.Service;
 /**
  * 登录态服务
  *
- * <p>承载各登录方式共用的注销与令牌刷新。</p>
- *
  * @author Ray.Hao
  * @since 4.8.0
  */

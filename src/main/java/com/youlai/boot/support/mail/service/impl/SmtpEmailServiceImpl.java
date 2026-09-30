@@ -20,8 +20,6 @@ import java.nio.charset.StandardCharsets;
 
 /**
  * SMTP 邮件服务。
- * <p>
- * 当 {@code mail.type=smtp}（默认）时生效。基于 Spring {@link JavaMailSender} 发送邮件。
  *
  * @author Ray.Hao
  * @since 3.1.0
@@ -33,7 +31,7 @@ import java.nio.charset.StandardCharsets;
 public class SmtpEmailServiceImpl implements EmailService {
 
     private final JavaMailSender mailSender;
-    /** 发件人地址等邮件配置，来自 {@code mail.*} */
+    // 发件人地址等邮件配置，来自 {@code mail.*}
     private final MailProperties mailProperties;
 
     /**

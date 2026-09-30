@@ -17,49 +17,31 @@ import lombok.Setter;
 @Setter
 public class GenTable extends BaseEntity {
 
-    /**
-     * 表名
-     */
+    // 表名
     private String tableName;
 
-    /**
-     * 包名
-     */
+    // 包名
     private String packageName;
 
-    /**
-     * 模块名
-     */
+    // 模块名
     private String moduleName;
 
-    /**
-     * 实体类名
-     */
+    // 实体类名
     private String entityName;
 
-    /**
-     * 业务名
-     */
+    // 业务名
     private String businessName;
 
-    /**
-     * 父菜单ID
-     */
+    // 父菜单ID
     private Long parentMenuId;
 
-    /**
-     * 作者
-     */
+    // 作者
     private String author;
 
-    /**
-     * 页面类型 classic|crud
-     */
+    // 页面类型 classic|crud
     private String pageType;
 
-    /**
-     * 要移除的表前缀，如: sys_
-     */
+    // 要移除的表前缀，如: sys_
     private String removeTablePrefix;
 }
 

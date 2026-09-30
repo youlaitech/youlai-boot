@@ -19,8 +19,6 @@ import org.springframework.web.bind.annotation.RestController;
 /**
  * 登录态管理接口
  *
- * <p>注销与刷新令牌，各登录方式共用。</p>
- *
  * @author Ray.Hao
  * @since 4.8.0
  */

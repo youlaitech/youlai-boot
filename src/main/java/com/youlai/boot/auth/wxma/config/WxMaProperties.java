@@ -14,9 +14,9 @@ import org.springframework.stereotype.Component;
 @ConfigurationProperties(prefix = "wx.miniapp")
 public class WxMaProperties {
 
-    /** 小程序 appid */
+    // 小程序 appid
     private String appid;
 
-    /** 小程序 appsecret */
+    // 小程序 appsecret
     private String secret;
 }

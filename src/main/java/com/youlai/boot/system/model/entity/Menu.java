@@ -18,85 +18,55 @@ import java.util.Map;
 @Data
 @EqualsAndHashCode(callSuper = true)
 public class Menu extends BaseEntity {
-    /**
-     * 父菜单ID
-     */
+    // 父菜单ID
     private Long parentId;
 
-    /**
-     * 菜单名称
-     */
+    // 菜单名称
     private String name;
 
-    /**
-     * 菜单类型(C-目录 M-菜单 E-外链 B-按钮)
-     */
+    // 菜单类型(C-目录 M-菜单 E-外链 B-按钮)
     private String type;
 
-    /**
-     * 路由名称（Vue Router 中定义的路由名称）
-     */
+    // 路由名称（Vue Router 中定义的路由名称）
     @TableField(updateStrategy = FieldStrategy.ALWAYS)
     private String routeName;
 
-    /**
-     * 路由路径（Vue Router 中定义的 URL 路径）
-     */
+    // 路由路径（Vue Router 中定义的 URL 路径）
     private String routePath;
 
-    /**
-     * 组件路径(vue页面完整路径，省略.vue后缀)
-     */
+    // 组件路径(vue页面完整路径，省略.vue后缀)
     @TableField(updateStrategy = FieldStrategy.ALWAYS)
     private String component;
 
-    /**
-     * 外链地址
-     */
+    // 外链地址
     @TableField(updateStrategy = FieldStrategy.ALWAYS)
     private String externalUrl;
 
-    /**
-     * 权限标识
-     */
+    // 权限标识
     @TableField(updateStrategy = FieldStrategy.ALWAYS)
     private String perm;
 
-    /**
-     * 显示状态(1:显示;0:隐藏)
-     */
+    // 显示状态(1:显示;0:隐藏)
     private Integer visible;
 
-    /**
-     * 排序
-     */
+    // 排序
     private Integer sort;
 
-    /**
-     * 菜单图标
-     */
+    // 菜单图标
     @TableField(updateStrategy = FieldStrategy.ALWAYS)
     private String icon;
 
-    /**
-     * 跳转路径
-     */
+    // 跳转路径
     @TableField(updateStrategy = FieldStrategy.ALWAYS)
     private String redirect;
 
-    /**
-     * 父节点路径，以英文逗号(,)分割
-     */
+    // 父节点路径，以英文逗号(,)分割
     private String treePath;
 
-    /**
-     * 【菜单】是否开启页面缓存(1:开启;0:关闭)
-     */
+    // 【菜单】是否开启页面缓存(1:开启;0:关闭)
     private Integer keepAlive;
 
-    /**
-     * 路由参数
-     */
+    // 路由参数
     @TableField(updateStrategy = FieldStrategy.ALWAYS, typeHandler = JacksonTypeHandler.class)
     private Map<String, Object> params;
 

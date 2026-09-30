@@ -116,8 +116,6 @@ public class BpmnModelHelper {
     /**
      * 提取 BPMN XML 引用的全部表单标识（开始节点与用户任务节点，去重）
      *
-     * <p>供表单删除前校验使用：设计器草稿未部署，其引用不体现在流程定义里</p>
-     *
      * @param bpmnXml BPMN 2.0 XML 字符串
      * @return formKey 集合，无引用返回空集合
      */
@@ -165,9 +163,6 @@ public class BpmnModelHelper {
     /**
      * 校验 BPMN XML 中用户任务节点的办理人配置
      *
-     * <p>assignee/候选组/候选用户三者均未配置的任务会成为无主任务：
-     * 不出现在任何人的待办列表，流程将永久卡在该节点</p>
-     *
      * @param bpmnXml BPMN 2.0 XML 字符串
      * @return 未配置办理人的节点名称列表（全部已配置返回空列表）
      */
@@ -193,8 +188,6 @@ public class BpmnModelHelper {
 
     /**
      * 提取 BPMN XML 中全部用户任务引用的候选组编码（去重）
-     *
-     * <p>供发布校验核对角色存在性：候选组指向不存在的角色时任务无人可见，同样会卡死流程</p>
      *
      * @param bpmnXml BPMN 2.0 XML 字符串
      * @return 候选组角色编码集合（无候选组返回空集合）

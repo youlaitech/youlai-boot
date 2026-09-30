@@ -6,8 +6,6 @@ import java.util.Map;
 
 /**
  * 短信发送服务接口。
- * <p>
- * 由各短信供应商实现（阿里云、腾讯云等），通过 {@code sms.type} 配置项选择。
  *
  * @author Ray.Hao
  * @since 2024/8/17

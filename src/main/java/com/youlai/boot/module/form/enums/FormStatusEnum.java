@@ -9,8 +9,6 @@ import lombok.Getter;
 /**
  * 表单状态枚举
  *
- * <p>-1 为停用态，其余为正常生命周期</p>
- *
  * @author Ray.Hao
  * @since 4.9.0
  */

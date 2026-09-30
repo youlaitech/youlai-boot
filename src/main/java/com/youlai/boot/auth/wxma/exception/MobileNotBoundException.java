@@ -4,8 +4,6 @@ import org.springframework.security.core.AuthenticationException;
 
 /**
  * 微信小程序登录时手机号未绑定异常。
- * <p>
- * 携带 openid 和 sessionKey 供前端引导用户完成手机号绑定。
  *
  * @author Ray.Hao
  * @since 3.1.0

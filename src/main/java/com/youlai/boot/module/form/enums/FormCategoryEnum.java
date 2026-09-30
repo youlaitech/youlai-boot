@@ -9,9 +9,6 @@ import lombok.Getter;
 /**
  * 表单类型枚举
  *
- * <p>类型驱动消费方行为：设计器绑定流程时仅列出 workflow 类型，
- * 避免"意见反馈"等通用收集表单混入流程表单候选项</p>
- *
  * @author Ray.Hao
  * @since 4.9.0
  */

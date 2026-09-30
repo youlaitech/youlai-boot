@@ -12,8 +12,6 @@ import org.springframework.stereotype.Service;
 
 /**
  * 系统用户认证 DetailsService。
- * <p>
- * 通过 {@link UserAuthenticationPort} 获取认证信息，不直接依赖 system 模块。
  *
  * @author Ray.Hao
  * @since 2021/10/19

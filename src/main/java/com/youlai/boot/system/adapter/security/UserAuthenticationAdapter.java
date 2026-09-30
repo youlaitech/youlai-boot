@@ -10,8 +10,6 @@ import org.springframework.stereotype.Component;
 
 /**
  * 用户认证信息查询适配器。
- * <p>
- * 实现 framework 层的 {@link UserAuthenticationPort}，委托 system 层服务完成查询。
  *
  * @author Ray.Hao
  * @since 3.1.0

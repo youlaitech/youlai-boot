@@ -43,9 +43,7 @@ public class SmsAuthService {
      */
     public void sendSmsCode(String mobile) {
 
-        // 随机生成4位验证码
-        // String code = String.valueOf((int) ((Math.random() * 9 + 1) * 1000));
-        // TODO 为了方便测试，验证码固定为 1234，实际开发中在配置了厂商短信服务后，可以使用上面的随机验证码
+        // TODO 固定验证码 1234 便于测试，接入短信厂商后改为随机生成
         String code = "1234";
 
         // 发送短信验证码

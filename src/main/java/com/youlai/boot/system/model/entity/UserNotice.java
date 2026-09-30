@@ -20,15 +20,15 @@ import java.time.LocalDateTime;
 @TableName("sys_user_notice")
 public class UserNotice extends BaseEntity {
 
-    /** 公共通知id */
+    // 公共通知id
     private Long noticeId;
-    /** 用户id */
+    // 用户id
     private Long userId;
-    /** 读取状态，0未读，1已读 */
+    // 读取状态，0未读，1已读
     private Integer isRead;
-    /** 用户阅读时间 */
+    // 用户阅读时间
     private LocalDateTime readTime;
-    /** 逻辑删除标识(0-未删除 1-已删除) */
+    // 逻辑删除标识(0-未删除 1-已删除)
     @TableLogic(value = "0", delval = "1")
     private Integer isDeleted;
 }

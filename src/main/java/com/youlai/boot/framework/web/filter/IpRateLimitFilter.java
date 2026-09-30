@@ -22,24 +22,6 @@ import java.io.IOException;
 
 /**
  * IP 全局限流过滤器
- * <p>
- * 在所有请求进入 Controller 之前，按 IP 维度做滑动窗口限流。
- * 与 {@code @RateLimit} 注解级限流叠加：先过 IP 全局，再过接口级。
- * </p>
- *
- * <h3>限流维度</h3>
- * <pre>{@code
- *   Key: rate_limit:ip:{clientIp}
- *   默认: 1000 req / 60s（可通过 rate-limit.ip.* 配置）
- * }</pre>
- *
- * <h3>响应头</h3>
- * <table>
- *   <tr><td>X-RateLimit-Limit</td><td>窗口内最大允许请求数</td></tr>
- *   <tr><td>X-RateLimit-Remaining</td><td>窗口内剩余可用请求数</td></tr>
- *   <tr><td>X-RateLimit-Reset</td><td>窗口重置时间（Unix 秒）</td></tr>
- *   <tr><td>Retry-After</td><td>超限时建议重试等待秒数（仅 429）</td></tr>
- * </table>
  *
  * @author Ray.Hao
  * @since 4.4.0

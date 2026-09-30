@@ -13,9 +13,6 @@ import org.springframework.stereotype.Component;
 /**
  * 采购流程审批通过后的业务处理（示例：采购入库）
  *
- * <p>演示项目的入库为日志占位，未真实对接仓储系统；
- * 正式对接时在 handle 中完成入库单生成与库存变更</p>
- *
  * @author Ray.Hao
  * @since 4.9.0
  */

@@ -22,9 +22,7 @@ public class TablePageQuery extends BaseQuery {
     @Schema(description="关键字(表名)")
     private String keywords;
 
-    /**
-     * 排除的表名
-     */
+    // 排除的表名
     @JsonIgnore
     private List<String> excludeTables;
 

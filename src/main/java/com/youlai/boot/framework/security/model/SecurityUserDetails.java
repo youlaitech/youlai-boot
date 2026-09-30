@@ -14,10 +14,6 @@ import java.util.stream.Collectors;
 
 /**
  * Spring Security 用户认证对象。
- * <p>
- * 实现 {@link UserDetails}，封装用户标识、角色、数据权限等认证信息。
- * {@link #roles} 字段存储角色编码（不带 ROLE_ 前缀），
- * {@link #getAuthorities()} 运行时补前缀并转为 {@link SimpleGrantedAuthority}。
  *
  * @author Ray.Hao
  * @version 3.0.0
@@ -26,39 +22,25 @@ import java.util.stream.Collectors;
 @NoArgsConstructor
 public class SecurityUserDetails implements UserDetails {
 
-    /**
-     * 用户ID
-     */
+    // 用户ID
     private Long userId;
 
-    /**
-     * 用户名
-     */
+    // 用户名
     private String username;
 
-    /**
-     * 密码
-     */
+    // 密码
     private String password;
 
-    /**
-     * 账号是否启用(true:启用 false:禁用)
-     */
+    // 账号是否启用(true:启用 false:禁用)
     private Boolean enabled;
 
-    /**
-     * 部门ID
-     */
+    // 部门ID
     private Long deptId;
 
-    /**
-     * 数据权限列表
-     */
+    // 数据权限列表
     private List<RoleDataScope> dataScopes;
 
-    /**
-     * 角色编码集合（不带 ROLE_ 前缀）
-     */
+    // 角色编码集合（不带 ROLE_ 前缀）
     private Set<String> roles;
 
     /**

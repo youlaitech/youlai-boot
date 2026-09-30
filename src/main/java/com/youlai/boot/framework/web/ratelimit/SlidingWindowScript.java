@@ -8,16 +8,6 @@ import java.util.UUID;
 
 /**
  * 滑动窗口限流 Lua 脚本（共享工具）
- * <p>
- * 基于 Redis Sorted Set 实现原子化的滑动窗口计数：
- * <ol>
- *   <li>ZREMRANGEBYSCORE 清除窗口外旧请求</li>
- *   <li>ZADD 添加当前请求</li>
- *   <li>ZCARD 统计窗口内请求数</li>
- *   <li>PEXPIRE 设置 Key 过期（窗口 + 1s 冗余）</li>
- * </ol>
- * 一次网络往返完成全部操作，避免多次 Redis 调用之间的竞态条件。
- * </p>
  *
  * @author Ray.Hao
  * @since 4.4.0

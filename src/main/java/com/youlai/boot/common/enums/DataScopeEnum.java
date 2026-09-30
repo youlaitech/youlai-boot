@@ -5,9 +5,6 @@ import lombok.Getter;
 
 /**
  * 数据权限枚举
- * <p>
- * 多角色数据权限合并策略：取并集（OR），即用户能看到所有角色权限范围内的数据。
- * 如果任一角色是 ALL，则直接跳过数据权限过滤。
  *
  * @author Ray.Hao
  * @since 2.3.0
@@ -37,8 +34,6 @@ public enum DataScopeEnum implements IBaseEnum<Integer> {
 
     /**
      * 自定义部门数据 - 可查看指定部门的数据
-     * <p>
-     * 需要配合 sys_role_dept 表使用，存储角色可访问的部门ID列表
      */
     CUSTOM(5, "自定义部门数据");
 

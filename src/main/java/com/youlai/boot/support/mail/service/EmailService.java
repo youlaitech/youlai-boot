@@ -2,8 +2,6 @@ package com.youlai.boot.support.mail.service;
 
 /**
  * 邮件发送服务接口。
- * <p>
- * 由各邮件供应商实现（SMTP、SendGrid 等），通过 {@code mail.type} 配置项选择。
  *
  * @author Ray.Hao
  * @since 3.1.0

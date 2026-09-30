@@ -14,11 +14,6 @@ import java.util.TimeZone;
 /**
  * Jackson 全局序列化配置
  *
- * <p>本项目的统一序列化策略：
- * <br>- 统一时区 GMT+8 统一日期格式 yyyy-MM-dd HH:mm:ss
- * <br>- Long/BigInteger 序列化为字符串，避免前端精度丢失
- * <br>- 禁用 WRITE_DATES_AS_TIMESTAMPS，避免日期输出为时间戳</p>
- * 
  * @author Ray.Hao
  * @since 2026/1/12
  */

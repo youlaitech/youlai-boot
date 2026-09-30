@@ -41,12 +41,6 @@ import java.time.LocalDateTime;
 /**
  * S3 协议文件存储实现类（当前部署为 RustFS）
  *
- * <p>当 {@code storage.type=s3} 时生效。</p>
- * <ul>
- *   <li>配置了 {@code storage.s3.domain} 时直接用域名拼接 URL</li>
- *   <li>未配置则用预签名 GET URL（去掉 query 参数后的纯路径）</li>
- * </ul>
- *
  * @author Ray.Hao
  * @since 4.8.0
  */
@@ -58,15 +52,15 @@ import java.time.LocalDateTime;
 @Slf4j
 public class S3FileServiceImpl implements FileService {
 
-    /** S3 对象存储服务端点，如 {@code http://localhost:9000} */
+    // S3 对象存储服务端点，如 {@code http://localhost:9000}
     private String endpoint;
-    /** 访问密钥 */
+    // 访问密钥
     private String accessKey;
-    /** 秘密密钥 */
+    // 秘密密钥
     private String secretKey;
-    /** 存储桶名称 */
+    // 存储桶名称
     private String bucket;
-    /** 自定义域名（可选），配置后不再使用预签名 URL */
+    // 自定义域名（可选），配置后不再使用预签名 URL
     private String domain;
 
     private S3Client s3Client;
@@ -153,8 +147,6 @@ public class S3FileServiceImpl implements FileService {
 
     /**
      * 删除文件。
-     * <p>
-     * 从完整 URL 中提取对象名后调用 S3 删除。
      *
      * @param filePath 文件完整 URL
      * @return 删除成功返回 true
@@ -178,7 +170,9 @@ public class S3FileServiceImpl implements FileService {
         }
     }
 
-    /** 公开只读策略：匿名可列桶与读对象，禁止任何匿名写入 */
+    /**
+     * 公开只读策略：匿名可列桶与读对象，禁止任何匿名写入
+     */
     private static String publicBucketPolicy(String bucket) {
         return "{\"Version\":\"2012-10-17\","
                 + "\"Statement\":[{\"Effect\":\"Allow\","

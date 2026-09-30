@@ -9,8 +9,6 @@ import java.util.Collection;
 
 /**
  * 微信小程序认证 Token。
- * <p>
- * 未认证：principal=微信code；已认证：principal=SecurityUserDetails。
  *
  * @author Ray.Hao
  * @since 4.0.0

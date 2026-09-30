@@ -119,7 +119,6 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, SysUser> implements
 
     /**
      * 新增用户.
-     * <p>校验用户名唯一性，设置默认加密密码，保存用户角色关联（事务一致）。
      *
      * @param userForm 用户表单（username 必填且唯一，roleIds 为角色 ID 列表）
      * @return 新增成功返回 true
@@ -155,7 +154,6 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, SysUser> implements
 
     /**
      * 更新用户.
-     * <p>校验用户名唯一性（排除自身），同步更新角色关联（事务一致）。
      *
      * @param userId   用户 ID
      * @param userForm 用户表单（username 必填且唯一，roleIds 为角色 ID 列表）
@@ -214,7 +212,6 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, SysUser> implements
 
     /**
      * 根据用户名获取认证凭证信息.
-     * <p>含角色集合和数据权限范围。
      *
      * @param username 用户名（唯一）
      * @return 认证凭证，用户不存在时返回 null
@@ -232,7 +229,6 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, SysUser> implements
 
     /**
      * 根据手机号获取认证凭证信息.
-     * <p>含角色集合和数据权限范围。
      *
      * @param mobile 手机号
      * @return 认证凭证，手机号为空或用户不存在时返回 null
@@ -253,7 +249,6 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, SysUser> implements
 
     /**
      * 获取导出用户列表.
-     * <p>含性别字典翻译，用于 Excel 导出。
      *
      * @param queryParams 查询条件（含关键字、状态、部门过滤）
      * @return 导出用户列表（gender 字段已翻译为中文）
@@ -290,7 +285,6 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, SysUser> implements
 
     /**
      * 获取当前登录用户信息.
-     * <p>含基础信息、部门名称、角色集合、权限集合（缓存未命中时触发全量刷新）。
      *
      * @return 当前用户信息（含角色、权限）
      */
@@ -367,7 +361,6 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, SysUser> implements
 
     /**
      * 修改个人中心用户信息.
-     * <p>仅支持修改昵称、头像、性别，至少修改一个字段。
      *
      * @param formData 个人中心表单（nickname/avatar/gender 至少一个非空）
      * @return 修改成功返回 true
@@ -391,7 +384,6 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, SysUser> implements
 
     /**
      * 修改当前用户密码.
-     * <p>校验原密码，确认新旧不同，密码变更后使所有会话失效。
      *
      * @param userId 用户 ID
      * @param data   密码表单（含原密码、新密码、确认密码）
@@ -437,7 +429,6 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, SysUser> implements
 
     /**
      * 重置用户密码.
-     * <p>管理员操作，重置后使该用户所有会话失效。
      *
      * @param userId   用户 ID
      * @param password 新密码（明文，内部加密存储）
@@ -458,7 +449,6 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, SysUser> implements
 
     /**
      * 发送短信验证码（绑定或更换手机号）.
-     * <p>校验手机号未被其他账号绑定，验证码缓存 5 分钟。
      *
      * @param mobile 手机号
      * @return 发送成功返回 true，失败返回 false 并记录日志
@@ -476,8 +466,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, SysUser> implements
             throw new BusinessException("手机号已被其他账号绑定");
         }
 
-        // String code = String.valueOf((int) ((Math.random() * 9 + 1) * 1000));
-        // TODO 为了方便测试，验证码固定为 123456，实际开发中在配置了厂商短信服务后，可以使用上面的随机验证码
+        // TODO 固定验证码 123456 便于测试，接入短信厂商后改为随机生成
         String code = "123456";
 
         Map<String, String> templateParams = new HashMap<>();
@@ -499,7 +488,6 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, SysUser> implements
 
     /**
      * 绑定或更换手机号.
-     * <p>校验密码、验证码、手机号唯一性，成功后删除验证码缓存。
      *
      * @param form 手机号绑定表单（含密码、手机号、验证码）
      * @return 绑定成功返回 true
@@ -554,7 +542,6 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, SysUser> implements
 
     /**
      * 发送邮箱验证码（绑定或更换邮箱）.
-     * <p>校验邮箱未被其他账号绑定，验证码缓存 5 分钟。
      *
      * @param email 邮箱地址
      * @throws BusinessException 如果邮箱已被其他账号绑定
@@ -571,8 +558,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, SysUser> implements
             throw new BusinessException("邮箱已被其他账号绑定");
         }
 
-        // String code = String.valueOf((int) ((Math.random() * 9 + 1) * 1000));
-        // TODO 为了方便测试，验证码固定为 123456，实际开发中在配置了邮箱服务后，可以使用上面的随机验证码
+        // TODO 固定验证码 123456 便于测试，接入邮箱服务后改为随机生成
         String code = "123456";
 
         emailService.send(email, "邮箱验证码", "您的验证码为：" + code + "，请在5分钟内使用");
@@ -583,7 +569,6 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, SysUser> implements
 
     /**
      * 绑定或更换邮箱.
-     * <p>校验密码、验证码、邮箱唯一性，成功后删除验证码缓存。
      *
      * @param form 邮箱绑定表单（含密码、邮箱、验证码）
      * @return 绑定成功返回 true
@@ -639,7 +624,6 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, SysUser> implements
 
     /**
      * 解绑手机号.
-     * <p>校验密码后将手机号置空。
      *
      * @param form 密码验证表单（含密码）
      * @return 解绑成功返回 true
@@ -671,7 +655,6 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, SysUser> implements
 
     /**
      * 解绑邮箱.
-     * <p>校验密码后将邮箱置空。
      *
      * @param form 密码验证表单（含密码）
      * @return 解绑成功返回 true

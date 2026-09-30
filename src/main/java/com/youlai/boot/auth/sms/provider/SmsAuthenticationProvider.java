@@ -18,15 +18,6 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 
 /**
  * 短信验证码认证 Provider
- * <p>
- * 认证流程：
- * <ol>
- *   <li>根据手机号查询用户信息</li>
- *   <li>校验用户状态</li>
- *   <li>校验短信验证码（与 Redis 缓存比对）</li>
- *   <li>验证成功后删除验证码</li>
- *   <li>返回已认证的 Authentication</li>
- * </ol>
  *
  * @author Ray.Hao
  * @since 2.17.0

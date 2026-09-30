@@ -10,9 +10,6 @@ import java.time.LocalDateTime;
 /**
  * MyBatis-Plus 字段自动填充
  *
- * <p>自动填充 createTime/updateTime（时间戳）和 createBy/updateBy（操作人ID）</p>
- * <p>实体字段需标注 {@code @TableField(fill = FieldFill.INSERT)} 或 {@code FieldFill.INSERT_UPDATE} 才会触发</p>
- *
  * @author Ray.Hao
  * @since 3.0.0
  */

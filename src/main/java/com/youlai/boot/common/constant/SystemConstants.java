@@ -8,19 +8,13 @@ package com.youlai.boot.common.constant;
  */
 public interface SystemConstants {
 
-    /**
-     * 根节点ID
-     */
+    // 根节点ID
     Long ROOT_NODE_ID = 0L;
 
-    /**
-     * 系统默认密码
-     */
+    // 系统默认密码
     String DEFAULT_PASSWORD = "123456";
 
-    /**
-     * 超级管理员角色编码
-     */
+    // 超级管理员角色编码
     String ROOT_ROLE_CODE = "ROOT";
 
 }

@@ -17,9 +17,6 @@ import java.util.concurrent.ConcurrentHashMap;
 /**
  * 提示词加载器
  *
- * <p>提示词文本统一放在类路径的 prompts 目录下，一个文件对应一段系统提示词，
- * 应用启动时全部载入并缓存；文本中的 {{键}} 在渲染时替换为变量值</p>
- *
  * @author Ray.Hao
  * @since 0.1.0
  */
@@ -27,29 +24,19 @@ import java.util.concurrent.ConcurrentHashMap;
 @Component
 public class PromptLoader {
 
-    /**
-     * 提示词文件位置
-     */
+    // 提示词文件位置
     private static final String LOCATION_PATTERN = "classpath*:prompts/**/*.md";
 
-    /**
-     * 提示词目录，用于从资源地址截取提示词名称
-     */
+    // 提示词目录，用于从资源地址截取提示词名称
     private static final String DIRECTORY = "prompts/";
 
-    /**
-     * 占位符左标记
-     */
+    // 占位符左标记
     private static final String PLACEHOLDER_LEFT = "{{";
 
-    /**
-     * 占位符右标记
-     */
+    // 占位符右标记
     private static final String PLACEHOLDER_RIGHT = "}}";
 
-    /**
-     * 提示词内容，键为 prompts 下的相对路径
-     */
+    // 提示词内容，键为 prompts 下的相对路径
     private final Map<String, String> prompts = new ConcurrentHashMap<>();
 
     /**

@@ -46,8 +46,6 @@ public interface RoleMenuService extends IService<RoleMenu> {
 
     /**
      * 获取角色权限集合（带缓存）
-     * <p>
-     * 采用 Read-Through 缓存策略，缓存未命中时自动回源数据库
      *
      * @param roleCodes 角色编码集合
      * @return 权限集合

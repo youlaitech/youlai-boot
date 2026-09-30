@@ -14,9 +14,6 @@ import java.time.LocalDateTime;
 /**
  * 基础实体类
  *
- * <p>包含主键和创建/更新时间，适用于所有实体（含关联表）</p>
- * <p>审计字段（createBy/updateBy）和逻辑删除字段（isDeleted）由需要的实体自行声明</p>
- *
  * @author Ray.Hao
  * @since 4.3.1
  */
@@ -26,22 +23,16 @@ public class BaseEntity implements Serializable {
     @Serial
     private static final long serialVersionUID = 1L;
 
-    /**
-     * 主键ID
-     */
+    // 主键ID
     @TableId(type = IdType.AUTO)
     private Long id;
 
-    /**
-     * 创建时间
-     */
+    // 创建时间
     @TableField(fill = FieldFill.INSERT)
     @JsonInclude(value = JsonInclude.Include.NON_NULL)
     private LocalDateTime createTime;
 
-    /**
-     * 更新时间
-     */
+    // 更新时间
     @TableField(fill = FieldFill.INSERT_UPDATE)
     @JsonInclude(value = JsonInclude.Include.NON_NULL)
     private LocalDateTime updateTime;

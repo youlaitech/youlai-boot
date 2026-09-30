@@ -28,8 +28,6 @@ public interface RoleMapper extends BaseMapper<Role> {
 
     /**
      * 获取角色的数据权限信息列表
-     * <p>
-     * 返回角色编码和数据权限范围的映射列表
      *
      * @param roleCodes 角色编码集合
      * @return 角色数据权限信息列表 [{code: 'ADMIN', data_scope: 1}, ...]

@@ -4,8 +4,6 @@ import lombok.Getter;
 
 /**
  * 数据权限异常
- * <p>
- * 当数据权限拦截器拼接SQL条件失败时抛出，属于系统级异常，非业务异常。
  *
  * @author zc
  * @since 2.0.0

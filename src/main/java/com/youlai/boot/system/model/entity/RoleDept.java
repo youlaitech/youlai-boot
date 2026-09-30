@@ -7,8 +7,6 @@ import lombok.NoArgsConstructor;
 
 /**
  * 角色部门关联实体
- * <p>
- * 用于存储角色自定义数据权限时，可访问的部门ID列表
  *
  * @author Ray.Hao
  * @since 3.0.0
@@ -19,14 +17,10 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 public class RoleDept {
 
-    /**
-     * 角色ID
-     */
+    // 角色ID
     private Long roleId;
 
-    /**
-     * 部门ID
-     */
+    // 部门ID
     private Long deptId;
 
 }

@@ -22,8 +22,6 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 
 /**
  * 微信小程序认证 Provider
- * <p>
- * 用微信登录凭证换取 openid，已绑定手机号的用户返回认证结果，未绑定抛出 MobileNotBoundException。
  *
  * @author Ray.Hao
  */

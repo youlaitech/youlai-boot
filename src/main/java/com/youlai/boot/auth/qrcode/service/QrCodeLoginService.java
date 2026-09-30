@@ -35,16 +35,13 @@ import java.util.concurrent.TimeUnit;
 @Slf4j
 public class QrCodeLoginService {
 
-    /** 票据默认有效期（秒） */
+    // 票据默认有效期（秒）
     private static final int DEFAULT_EXPIRE_SECONDS = 300;
 
-    /** 状态流转时若 Redis 剩余 TTL 小于该值，补足到此值 */
+    // 状态流转时若 Redis 剩余 TTL 小于该值，补足到此值
     private static final int MIN_REMAIN_SECONDS = 30;
 
-    /**
-     * 从 Redis 读回的值可能是不带类型信息的 Map（序列化器以 Object.class 存储），
-     * 用它把 Map 转回强类型上下文对象。JsonMapper 线程安全，复用单例。
-     */
+    // 从 Redis 读回的值可能是不带类型信息的 Map（序列化器以 Object.class 存储），
     private static final JsonMapper JSON_MAPPER = JsonMapper.builder().build();
 
     private final RedisTemplate<String, Object> redisTemplate;

@@ -11,9 +11,6 @@ import org.springframework.stereotype.Component;
 /**
  * 演示流程启动初始化器
  *
- * <p>委托 {@link WorkflowDemoService} 幂等初始化，重置能力由管理端接口提供。
- * 由 workflow.demo.enabled 控制（默认关闭），置 true 后启动时初始化演示流程</p>
- *
  * @author Ray.Hao
  * @since 4.9.0
  */

@@ -28,8 +28,6 @@ import java.util.stream.Collectors;
 
 /**
  * 用户导入读取器。
- * <p>
- * 基于 EasyExcel 的 {@link AnalysisEventListener}，逐行读取 Excel 并完成校验、持久化。
  *
  * @author Ray
  * @since 2022/4/10
@@ -37,9 +35,7 @@ import java.util.stream.Collectors;
 @Slf4j
 public class UserImportReader extends AnalysisEventListener<UserImportForm> {
 
-    /**
-     * Excel 导入结果
-     */
+    // Excel 导入结果
     @Getter
     private final ExcelResult excelResult;
 
@@ -52,14 +48,11 @@ public class UserImportReader extends AnalysisEventListener<UserImportForm> {
     private final List<Dept> deptList;
     private final List<DictItem> genderList;
 
-    /**
-     * 当前行
-     */
+    // 当前行
     private Integer currentRow = 1;
 
     /**
      * 构造方法
-     * <p>在构造方法中给需要查询的内容查询好，尽量避免每条数据查询一次</p>
      */
     public UserImportReader() {
         this.userService = SpringUtil.getBean(UserService.class);
@@ -78,9 +71,6 @@ public class UserImportReader extends AnalysisEventListener<UserImportForm> {
 
     /**
      * 每一条数据解析都会来调用
-     * <p>
-     * 1. 数据校验；全字段校验
-     * 2. 数据持久化；
      *
      * @param userImportDto 一行数据，类似于 {@link AnalysisContext#readRowHolder()}
      */

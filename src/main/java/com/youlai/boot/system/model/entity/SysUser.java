@@ -13,68 +13,44 @@ import lombok.EqualsAndHashCode;
 @EqualsAndHashCode(callSuper = true)
 public class SysUser extends BaseEntity {
 
-    /**
-     * 用户名
-     */
+    // 用户名
     private String username;
 
-    /**
-     * 昵称
-     */
+    // 昵称
     private String nickname;
 
-    /**
-     * 性别(1-男 2-女 0-保密)
-     */
+    // 性别(1-男 2-女 0-保密)
     private Integer gender;
 
-    /**
-     * 密码
-     */
+    // 密码
     private String password;
 
-    /**
-     * 部门ID
-     */
+    // 部门ID
     private Long deptId;
 
-    /**
-     * 用户头像
-     */
+    // 用户头像
     @TableField(updateStrategy = FieldStrategy.ALWAYS)
     private String avatar;
 
-    /**
-     * 联系方式
-     */
+    // 联系方式
     @TableField(updateStrategy = FieldStrategy.ALWAYS)
     private String mobile;
 
-    /**
-     * 状态(1-正常 0-禁用)
-     */
+    // 状态(1-正常 0-禁用)
     private Integer status;
 
-    /**
-     * 用户邮箱
-     */
+    // 用户邮箱
     @TableField(updateStrategy = FieldStrategy.ALWAYS)
     private String email;
 
-    /**
-     * 创建人 ID
-     */
+    // 创建人 ID
     @TableField(fill = FieldFill.INSERT)
     private Long createBy;
 
-    /**
-     * 更新人 ID
-     */
+    // 更新人 ID
     @TableField(fill = FieldFill.INSERT_UPDATE)
     private Long updateBy;
 
-    /**
-     * 是否删除(0-否 1-是)
-     */
+    // 是否删除(0-否 1-是)
     private Integer isDeleted;
 }

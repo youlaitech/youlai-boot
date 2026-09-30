@@ -42,14 +42,10 @@ public class FormDataServiceImpl extends ServiceImpl<FormDataMapper, FormData> i
     private final FormSnapshotMapper formSnapshotMapper;
     private final RedisTemplate<String, Object> redisTemplate;
 
-    /**
-     * 公开表单单 IP 提交上限（次/分钟）：匿名接口防刷阈值
-     */
+    // 公开表单单 IP 提交上限（次/分钟）：匿名接口防刷阈值
     private static final int PUBLIC_SUBMIT_LIMIT = 10;
 
-    /**
-     * 公开表单限流窗口：1 分钟
-     */
+    // 公开表单限流窗口：1 分钟
     private static final Duration PUBLIC_SUBMIT_WINDOW = Duration.ofMinutes(1);
 
     /**
@@ -157,8 +153,6 @@ public class FormDataServiceImpl extends ServiceImpl<FormDataMapper, FormData> i
     /**
      * 获取表单数据详情（只读回显）
      *
-     * <p>数据不存在时返回 null，由调用方决定语义：控制器直查需提示用户，工作流回显需静默降级</p>
-     *
      * @param dataId 数据ID
      */
     @Override
@@ -179,8 +173,6 @@ public class FormDataServiceImpl extends ServiceImpl<FormDataMapper, FormData> i
 
     /**
      * 填充回显规则：命中版本快照用快照规则，否则回退当前定义
-     *
-     * <p>回退分支兼容快照表启用前提交的历史数据</p>
      *
      * @param vo      数据详情 VO
      * @param formId  表单定义ID

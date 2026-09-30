@@ -336,8 +336,6 @@ public class RoleServiceImpl extends ServiceImpl<RoleMapper, Role> implements Ro
 
     /**
      * 获取用户所有角色的数据权限列表
-     * <p>
-     * 用于实现多角色数据权限合并（并集策略）
      *
      * @param roleCodes 角色编码集合
      * @return 角色数据权限列表

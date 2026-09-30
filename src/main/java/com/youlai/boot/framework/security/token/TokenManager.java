@@ -6,8 +6,6 @@ import org.springframework.security.core.Authentication;
 
 /**
  *  Token 管理器
- *  <p>
- *  用于生成、解析、校验、刷新 Token
  *
  * @author Ray.Hao
  * @since 2.16.0
@@ -60,8 +58,6 @@ public interface TokenManager {
      * @param token Token
      */
     default void invalidateToken(String token) {
-        // 默认实现可以是空的，或者抛出不支持的操作异常
-        // throw new UnsupportedOperationException("Not implemented");
     }
 
     /**

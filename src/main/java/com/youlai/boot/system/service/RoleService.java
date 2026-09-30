@@ -40,8 +40,6 @@ public interface RoleService extends IService<Role> {
     /**
      * 角色编码下拉列表（value 为角色编码）
      *
-     * <p>供流程设计器候选组等按编码引用角色的场景选择</p>
-     *
      * @return 角色编码选项列表
      */
     List<Option<String>> listRoleCodeOptions();
@@ -111,8 +109,6 @@ public interface RoleService extends IService<Role> {
 
     /**
      * 获取用户所有角色的数据权限列表
-     * <p>
-     * 用于实现多角色数据权限合并（并集策略）
      *
      * @param roleCodes 角色编码集合
      * @return 角色数据权限列表

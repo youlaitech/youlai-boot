@@ -17,9 +17,6 @@ import java.util.function.Supplier;
 /**
  * AI 对话服务
  *
- * <p>代码生成、动态表单、工作流的 AI 辅助功能统一走这里；对话客户端由 spring.ai 自动装配提供，
- * 未开启时调用返回业务异常，不影响应用启动</p>
- *
  * @author Ray.Hao
  * @since 0.1.0
  */
@@ -32,9 +29,7 @@ public class AiChatService {
 
     private final ObjectProvider<ChatClient.Builder> chatClientBuilderProvider;
 
-    /**
-     * 对话客户端，首次调用时构建
-     */
+    // 对话客户端，首次调用时构建
     private ChatClient chatClient;
 
     /**
@@ -54,8 +49,6 @@ public class AiChatService {
     /**
      * 发送提示词并映射为实体
      *
-     * <p>实体结构不符时框架会携带校验错误自动重试，无需手工解析 JSON</p>
-     *
      * @param systemPrompt 系统提示词（角色与约束）
      * @param userPrompt   用户提示词（输入数据）
      * @param type         目标实体类型
@@ -69,8 +62,6 @@ public class AiChatService {
 
     /**
      * 发送提示词并映射为 JSON 数组
-     *
-     * <p>元素结构开放（如 form-create rule）时使用，产出后仍需业务侧校验</p>
      *
      * @param systemPrompt 系统提示词（角色与约束）
      * @param userPrompt   用户提示词（输入数据）

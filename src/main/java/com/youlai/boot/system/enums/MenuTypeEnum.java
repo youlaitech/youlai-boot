@@ -20,15 +20,11 @@ public enum MenuTypeEnum implements IBaseEnum<String> {
     EXTERNAL("E", "外链"),
     BUTTON("B", "按钮");
 
-    /**
-     * 数据库存储值
-     */
+    // 数据库存储值
     @EnumValue
     private final String value;
 
-    /**
-     * 友好名称
-     */
+    // 友好名称
     private final String label;
 
     MenuTypeEnum(String value, String label) {

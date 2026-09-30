@@ -30,8 +30,6 @@ import java.nio.charset.StandardCharsets;
 
 /**
  * 图形验证码校验过滤器
- * <p>
- * 仅拦截账号密码登录请求：先校验验证码，校验通过后把请求体包装成可重复读取的 Request 再放行。
  *
  * @author Ray.Hao
  */
