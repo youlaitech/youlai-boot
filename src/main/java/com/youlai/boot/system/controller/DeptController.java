@@ -36,6 +36,7 @@ public class DeptController {
 
     @Operation(summary = "部门列表")
     @GetMapping
+    @PreAuthorize("@ss.hasPerm('sys:dept:list')")
     @Log(module = LogModuleEnum.DEPT, value = ActionTypeEnum.LIST)
     public Result<List<DeptVO>> getDeptList(
              @Valid DeptQuery queryParams

@@ -58,6 +58,7 @@ public class DictController {
 
     @Operation(summary = "字典分页列表")
     @GetMapping
+    @PreAuthorize("@ss.hasPerm('sys:dict:list')")
     @Log(module = LogModuleEnum.DICT, value = ActionTypeEnum.LIST)
     public PageResult<DictPageVO> getDictPage(
             @Valid DictQuery queryParams
@@ -135,6 +136,7 @@ public class DictController {
 
     @Operation(summary = "获取字典项分页列表")
     @GetMapping("/{dictCode}/items")
+    @PreAuthorize("@ss.hasPerm('sys:dict-item:list')")
     public PageResult<DictItemPageVO> getDictItemsPage(
             @Parameter(description = "字典编码") @PathVariable String dictCode,
             @Valid DictItemQuery queryParams

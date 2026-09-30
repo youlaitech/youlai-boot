@@ -16,6 +16,7 @@ import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDate;
@@ -36,6 +37,7 @@ public class LogController {
 
     @Operation(summary = "日志分页列表")
     @GetMapping
+    @PreAuthorize("@ss.hasPerm('sys:log:list')")
     @Log(module = LogModuleEnum.LOG, value = ActionTypeEnum.LIST)
     public PageResult<LogPageVO> getLogPage(
              @Valid LogQuery queryParams

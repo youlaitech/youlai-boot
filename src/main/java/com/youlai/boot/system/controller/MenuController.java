@@ -41,6 +41,7 @@ public class MenuController {
 
     @Operation(summary = "菜单列表")
     @GetMapping
+    @PreAuthorize("@ss.hasPerm('sys:menu:list')")
     @Log(module = LogModuleEnum.MENU, value = ActionTypeEnum.LIST)
     public Result<List<MenuVO>> getMenus(@Valid MenuQuery queryParams) {
         List<MenuVO> menuList = menuService.listMenus(queryParams);

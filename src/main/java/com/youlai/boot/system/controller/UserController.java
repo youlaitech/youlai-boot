@@ -76,6 +76,7 @@ public class UserController {
 
     @Operation(summary = "用户列表")
     @GetMapping
+    @PreAuthorize("@ss.hasPerm('sys:user:list')")
     @Log(module = LogModuleEnum.USER, value = ActionTypeEnum.LIST)
     public PageResult<UserPageVO> getUserList(
             @Valid UserQuery queryParams

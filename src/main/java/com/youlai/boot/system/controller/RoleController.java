@@ -39,6 +39,7 @@ public class RoleController {
 
     @Operation(summary = "角色分页列表")
     @GetMapping
+    @PreAuthorize("@ss.hasPerm('sys:role:list')")
     @Log(module = LogModuleEnum.ROLE, value = ActionTypeEnum.LIST)
     public PageResult<RolePageVO> getRolePage(
             @Valid RoleQuery queryParams
