@@ -2,7 +2,7 @@ spring:
   application:
     name: youlai-boot
   profiles:
-    active: youlai
+    active: dev
   config:
     # 引入代码生成模块的配置（数据源、表前缀等），由 codegen.yml 提供
     import: classpath:codegen.yml
