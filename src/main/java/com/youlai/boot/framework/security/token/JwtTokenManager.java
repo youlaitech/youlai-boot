@@ -39,6 +39,9 @@ import java.util.stream.Collectors;
 @Service
 public class JwtTokenManager implements TokenManager {
 
+    // 允许的签名算法，防止 alg:none 等算法降级攻击
+    private static final String ALLOWED_ALGORITHM = "HS256";
+
     private final SecurityProperties securityProperties;
     private final RedisTemplate<String, Object> redisTemplate;
     private final byte[] secretKey;
@@ -68,6 +71,9 @@ public class JwtTokenManager implements TokenManager {
     @Override
     public Authentication parseToken(String token) {
         JWT jwt = JWTUtil.parseToken(token);
+        if (!isAlgorithmAllowed(jwt) || !jwt.setKey(secretKey).verify()) {
+            throw new TokenInvalidException(ResultCode.ACCESS_TOKEN_INVALID);
+        }
         JSONObject payloads = jwt.getPayloads();
         SecurityUserDetails userDetails = new SecurityUserDetails();
         userDetails.setUserId(payloads.getLong(JwtClaimConstants.USER_ID));
@@ -118,6 +124,9 @@ public class JwtTokenManager implements TokenManager {
 
     private boolean validateToken(String token, boolean validateRefreshToken) {
         JWT jwt = JWTUtil.parseToken(token);
+        if (!isAlgorithmAllowed(jwt)) {
+            return false;
+        }
         boolean isValid = jwt.setKey(secretKey).validate(0);
 
         if (isValid) {
@@ -162,6 +171,9 @@ public class JwtTokenManager implements TokenManager {
             token = token.substring(SecurityConstants.BEARER_TOKEN_PREFIX.length());
         }
         JWT jwt = JWTUtil.parseToken(token);
+        if (!isAlgorithmAllowed(jwt) || !jwt.setKey(secretKey).verify()) {
+            return;
+        }
         JSONObject payloads = jwt.getPayloads();
         String jti = payloads.getStr(JWTPayload.JWT_ID);
         Integer expirationAt = payloads.getInt(JWTPayload.EXPIRES_AT);
@@ -272,5 +284,16 @@ public class JwtTokenManager implements TokenManager {
         } else {
             redisTemplate.opsForValue().set(revokedJtiKey, Boolean.TRUE);
         }
+    }
+
+    /**
+     * 校验 JWT 头部算法是否在允许的白名单中，防止 alg:none 等算法降级攻击
+     *
+     * @param jwt JWT 对象
+     * @return 是否允许
+     */
+    private boolean isAlgorithmAllowed(JWT jwt) {
+        Object algorithm = jwt.getHeader("alg");
+        return algorithm != null && ALLOWED_ALGORITHM.equals(algorithm.toString());
     }
 }
