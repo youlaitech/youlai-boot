@@ -53,6 +53,12 @@ spring:
     # 装配开关：none 关闭，openai 启用
     model:
       chat: none
+      embedding: none
+      image: none
+      moderation: none
+      audio:
+        speech: none
+        transcription: none
     # 启用后在此填写模型凭据与名称
     openai:
       # 厂商接口地址（OpenAI 兼容根地址）
@@ -68,6 +74,11 @@ spring:
           # 百炼私有参数：推理模型的思考内容耗时可占整次调用的大头，false 关闭
           extra-body:
             enable_thinking: false
+  servlet:
+    multipart:
+      # 单文件大小上限，单一来源绑定 storage.upload.max-file-size
+      max-file-size: ${storage.upload.max-file-size:50MB}
+      max-request-size: ${storage.upload.max-file-size:50MB}
 mybatis-plus:
   mapper-locations: classpath*:/mapper/**/*.xml
   global-config:
@@ -262,6 +273,15 @@ workflow:
     # 演示流程自动部署开关
     enabled: false
 
+# 工作流引擎
 flowable:
-  # 引擎表初始化策略，false 要求 ACT_* 表已存在
+  # 流程引擎跟随业务开关 workflow.enabled
+  process:
+    enabled: ${workflow.enabled:false}
+  # 用户与角色走系统自有体系（sys_user/sys_role），不启用 Flowable IDM 与事件注册表
+  idm:
+    enabled: false
+  eventregistry:
+    enabled: false
+  # 引擎表初始化策略，true 启动时检查并自动建/更新 ACT_* 表；可选 true/false/create/create-drop
   database-schema-update: false

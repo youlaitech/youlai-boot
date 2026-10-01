@@ -6,30 +6,3 @@ spring:
   config:
     # 引入代码生成模块的配置（数据源、表前缀等），由 codegen.yml 提供
     import: classpath:codegen.yml
-  servlet:
-    multipart:
-      # 单文件大小上限，取自 storage.upload.max-file-size（单一来源）
-      max-file-size: ${storage.upload.max-file-size:50MB}
-      max-request-size: ${storage.upload.max-file-size:50MB}
-  # 项目只用对话模型，其余类型关闭自动装配，否则未配置密钥时启动就要求凭据
-  ai:
-    model:
-      embedding: none
-      image: none
-      moderation: none
-      audio:
-        speech: none
-        transcription: none
-
-# 工作流引擎（业务开关 workflow.enabled 在 application-{profile}.yml）
-flowable:
-  # 流程引擎跟随业务开关
-  process:
-    enabled: ${workflow.enabled:false}
-  # 用户与角色走系统自有体系（sys_user/sys_role），不启用 Flowable IDM 与事件注册表
-  idm:
-    enabled: false
-  eventregistry:
-    enabled: false
-  # 引擎表初始化策略，true 启动时检查并自动建/更新 ACT_* 表；可选 true/false/create/create-drop
-  database-schema-update: true
