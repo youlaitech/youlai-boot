@@ -33,7 +33,7 @@ public class NoticeDetailVO {
     @Schema(description = "优先级(L-低 M-中 H-高)")
     private String level;
 
-    @Schema(description = "发布状态(0-未发布 1已发布 2已撤回) 冗余字段，方便判断是否已经发布")
+    @Schema(description = "发布状态(0-未发布 1已发布 -1已撤回) 冗余字段，方便判断是否已经发布")
     private Integer publishStatus;
 
     @Schema(description = "发布时间")
