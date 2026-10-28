@@ -15,13 +15,13 @@ import java.util.List;
 public interface UserRoleService extends IService<UserRole> {
 
     /**
-     * 保存用户角色
+     * 替换用户角色，空列表表示移除全部角色
      *
      * @param userId 用户ID
      * @param roleIds 角色ID列表
-     * @return
+     * @return 角色集合是否发生变化
      */
-    void saveUserRoles(Long userId, List<Long> roleIds);
+    boolean replaceUserRoles(Long userId, List<Long> roleIds);
 
     /**
      * 判断角色是否存在绑定的用户

@@ -7,7 +7,7 @@ import com.youlai.boot.common.annotation.Log;
 import com.youlai.boot.common.enums.ActionTypeEnum;
 import com.youlai.boot.common.enums.LogModuleEnum;
 import com.youlai.boot.common.result.Result;
-import com.youlai.boot.framework.security.model.AuthenticationToken;
+import com.youlai.boot.framework.security.model.TokenPair;
 import com.youlai.boot.framework.web.ratelimit.RateLimit;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -33,6 +33,9 @@ public class PasswordAuthController {
 
     private final PasswordAuthService passwordAuthService;
 
+    /**
+     * 生成登录图形验证码
+     */
     @Operation(summary = "获取验证码")
     @GetMapping("/captcha")
     public Result<CaptchaVO> getCaptcha() {
@@ -40,12 +43,15 @@ public class PasswordAuthController {
         return Result.success(captcha);
     }
 
+    /**
+     * 校验账号密码并创建登录会话
+     */
     @Operation(summary = "账号密码登录")
     @PostMapping("/login")
     @Log(module = LogModuleEnum.LOGIN, value = ActionTypeEnum.LOGIN)
     @RateLimit
-    public Result<AuthenticationToken> login(@RequestBody @Valid LoginForm request) {
-        AuthenticationToken authenticationToken = passwordAuthService.login(request.getUsername(), request.getPassword());
+    public Result<TokenPair> login(@RequestBody @Valid LoginForm request) {
+        TokenPair authenticationToken = passwordAuthService.login(request.getUsername(), request.getPassword());
         return Result.success(authenticationToken);
     }
 

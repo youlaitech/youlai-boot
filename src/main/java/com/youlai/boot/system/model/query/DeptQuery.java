@@ -9,7 +9,7 @@ import lombok.Data;
  * @author haoxr
  * @since 2022/6/11
  */
-@Schema(description ="部门分页查询对象")
+@Schema(description ="部门查询条件")
 @Data
 public class DeptQuery {
 

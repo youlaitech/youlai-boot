@@ -5,20 +5,8 @@
 <!--suppress ALL -->
 <mapper namespace="com.youlai.boot.system.mapper.UserMapper">
 
-    <!-- 用户分页列表 -->
-    <select id="getUserPage" resultType="com.youlai.boot.system.model.vo.UserPageVO">
-        SELECT
-            u.id,
-            u.username,
-            u.nickname,
-            u.mobile,
-            u.gender,
-            u.avatar,
-            u.STATUS,
-            u.email,
-            d.NAME AS dept_name,
-            GROUP_CONCAT( r.NAME ) AS roleNames,
-            u.create_time
+    <!-- 列表和导出共用筛选范围，排序由服务层生成。 -->
+    <sql id="UserQuery">
         FROM
             sys_user u
                 LEFT JOIN sys_dept d ON u.dept_id = d.id
@@ -54,34 +42,42 @@
                     <bind name="startDate" value="queryParams.createTime[0].length() == 10 ? queryParams.createTime[0] + ' 00:00:00' : queryParams.createTime[0]"/>
                     AND u.create_time &gt;= #{startDate}
                 </if>
-                <if test="queryParams.createTime[1] != null and queryParams.createTime[1] != ''">
+                <if test="queryParams.createTime.size > 1 and queryParams.createTime[1] != null and queryParams.createTime[1] != ''">
                     <bind name="endDate" value="queryParams.createTime[1].length() == 10 ? queryParams.createTime[1] + ' 23:59:59' : queryParams.createTime[1]"/>
                     AND u.create_time &lt;= #{endDate}
                 </if>
             </if>
             <if test="queryParams.roleIds != null and queryParams.roleIds.size() > 0">
-                AND sur.role_id IN
-                <foreach item="roleId" collection="queryParams.roleIds" open="(" separator="," close=")">
-                    #{roleId}
-                </foreach>
+                AND EXISTS (
+                    SELECT 1
+                    FROM sys_user_role filtered_role
+                    WHERE filtered_role.user_id = u.id
+                      AND filtered_role.role_id IN
+                    <foreach item="roleId" collection="queryParams.roleIds" open="(" separator="," close=")">
+                        #{roleId}
+                    </foreach>
+                )
             </if>
         </where>
         GROUP BY
             u.id
-        <choose>
-            <!-- 如果排序参数都传入 -->
-            <when test="queryParams.sortBy != null and queryParams.sortBy != '' and queryParams.order != null">
-                ORDER BY u.${queryParams.sortBy}
-                <choose>
-                    <when test='queryParams.order.equalsIgnoreCase("desc")'>DESC</when>
-                    <otherwise>ASC</otherwise>
-                </choose>
-            </when>
-            <!-- 默认排序 -->
-            <otherwise>
-                ORDER BY u.update_time DESC, u.create_time DESC
-            </otherwise>
-        </choose>
+    </sql>
+
+    <!-- 用户分页列表 -->
+    <select id="getUserPage" resultType="com.youlai.boot.system.model.vo.UserPageVO">
+        SELECT
+            u.id,
+            u.username,
+            u.nickname,
+            u.mobile,
+            u.gender,
+            u.avatar,
+            u.STATUS,
+            u.email,
+            d.NAME AS dept_name,
+            GROUP_CONCAT( r.NAME ) AS roleNames,
+            u.create_time
+        <include refid="UserQuery"/>
     </select>
 
     <!-- 用户表单信息映射 -->
@@ -178,33 +174,7 @@
             u.gender,
             d.NAME AS dept_name,
             u.create_time
-        FROM
-            sys_user u
-                LEFT JOIN sys_dept d ON u.dept_id = d.id
-        <where>
-            u.is_deleted = 0
-            AND NOT EXISTS (
-                SELECT
-                    1
-                FROM sys_user_role sur
-                    INNER JOIN sys_role r ON sur.role_id = r.id
-                WHERE
-                    sur.user_id = u.id
-                    AND r.code = '${@com.youlai.boot.common.constant.SystemConstants@ROOT_ROLE_CODE}'
-            )
-            <if test='keywords!=null and keywords.trim() neq ""'>
-                AND (u.username LIKE CONCAT('%',#{keywords},'%')
-                OR u.nickname LIKE CONCAT('%',#{keywords},'%')
-                OR u.mobile LIKE CONCAT('%',#{keywords},'%'))
-            </if>
-            <if test='status!=null'>
-                AND u.status = #{status}
-            </if>
-            <if test='deptId!=null'>
-                AND concat(',',concat(d.tree_path,',',d.id),',') like concat('%,',#{deptId},',%')
-            </if>
-        </where>
-        GROUP BY u.id
+        <include refid="UserQuery"/>
     </select>
 
     <!-- 根据用户ID获取用户详情 -->

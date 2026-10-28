@@ -6,9 +6,9 @@
     <select id="get${entityName}Page" resultType="${packageName}.${moduleName}.model.vo.${entityName}VO">
         SELECT
         #if($fieldConfigs)
-            #set ($fields = [])
+            #set ($fields = ["id"])
             #foreach($fieldConfig in ${fieldConfigs})
-                #if($fieldConfig.isShowInList)
+                #if($fieldConfig.isShowInList && $fieldConfig.fieldName != "id")
                 #set ($discard = $fields.add(${fieldConfig.columnName}))
                 #end
             #end
@@ -42,7 +42,7 @@
                     <bind name="startDate" value="queryParams.${fieldConfig.fieldName}[0].length() == 10 ? queryParams.${fieldConfig.fieldName}[0] + ' 00:00:00' : queryParams.${fieldConfig.fieldName}[0]"/>
                     AND ${fieldConfig.columnName} &gt;= #{startDate}
                 </if>
-                <if test="queryParams.${fieldConfig.fieldName}[1] != null and queryParams.${fieldConfig.fieldName}[1] != ''">
+                <if test="queryParams.${fieldConfig.fieldName}.size() > 1 and queryParams.${fieldConfig.fieldName}[1] != null and queryParams.${fieldConfig.fieldName}[1] != ''">
                     <bind name="endDate" value="queryParams.${fieldConfig.fieldName}[1].length() == 10 ? queryParams.${fieldConfig.fieldName}[1] + ' 23:59:59' : queryParams.${fieldConfig.fieldName}[1]"/>
                     AND ${fieldConfig.columnName} &lt;= #{endDate}
                 </if>
@@ -50,7 +50,7 @@
                 <if test="queryParams.${fieldConfig.fieldName}[0] != null and queryParams.${fieldConfig.fieldName}[0] != ''">
                     AND ${fieldConfig.columnName} &gt;= #{queryParams.${fieldConfig.fieldName}[0]}
                 </if>
-                <if test="queryParams.${fieldConfig.fieldName}[1] != null and queryParams.${fieldConfig.fieldName}[1] != ''">
+                <if test="queryParams.${fieldConfig.fieldName}.size() > 1 and queryParams.${fieldConfig.fieldName}[1] != null and queryParams.${fieldConfig.fieldName}[1] != ''">
                     AND ${fieldConfig.columnName} &lt;= #{queryParams.${fieldConfig.fieldName}[1]}
                 </if>
                     #end

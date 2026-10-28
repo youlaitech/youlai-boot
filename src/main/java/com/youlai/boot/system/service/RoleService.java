@@ -45,11 +45,14 @@ public interface RoleService extends IService<Role> {
     List<Option<String>> listRoleCodeOptions();
 
     /**
-     *
-     * @param roleForm
-     * @return
+     * 新增角色，忽略表单中的主键
      */
     boolean saveRole(RoleForm roleForm);
+
+    /**
+     * 更新指定角色；目标不存在时拒绝保存
+     */
+    boolean updateRole(Long roleId, RoleForm roleForm);
 
     /**
      * 获取角色表单数据

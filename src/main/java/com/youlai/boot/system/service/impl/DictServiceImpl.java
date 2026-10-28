@@ -15,6 +15,11 @@ import com.youlai.boot.system.model.query.DictQuery;
 import com.youlai.boot.system.model.vo.DictPageVO;
 import com.youlai.boot.system.service.DictItemService;
 import com.youlai.boot.system.service.DictService;
+import com.youlai.boot.system.event.DictChangedEvent;
+import com.youlai.boot.support.realtime.RealtimeService;
+import org.springframework.context.ApplicationEventPublisher;
+import org.springframework.transaction.event.TransactionalEventListener;
+import java.util.Map;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -33,6 +38,8 @@ public class DictServiceImpl extends ServiceImpl<DictMapper, Dict> implements Di
 
     private final DictItemService dictItemService;
     private final DictConverter dictConverter;
+    private final ApplicationEventPublisher events;
+    private final RealtimeService realtime;
 
     /**
      * 字典分页列表
@@ -69,6 +76,7 @@ public class DictServiceImpl extends ServiceImpl<DictMapper, Dict> implements Di
      * @param dictForm 字典表单数据
      */
     @Override
+    @Transactional
     public boolean saveDict(DictForm dictForm) {
         // 保存字典
         Dict entity = dictConverter.toEntity(dictForm);
@@ -82,7 +90,9 @@ public class DictServiceImpl extends ServiceImpl<DictMapper, Dict> implements Di
 
         Assert.isTrue(count == 0, "字典编码已存在");
 
-        return this.save(entity);
+        boolean saved = this.save(entity);
+        if (saved) events.publishEvent(new DictChangedEvent(dictCode));
+        return saved;
     }
 
 
@@ -128,6 +138,10 @@ public class DictServiceImpl extends ServiceImpl<DictMapper, Dict> implements Di
         dict.setId(id);
         boolean result = this.updateById(dict);
         if (result) {
+            events.publishEvent(new DictChangedEvent(entity.getDictCode()));
+            if (!entity.getDictCode().equals(dictCode)) {
+                events.publishEvent(new DictChangedEvent(dictCode));
+            }
             // 更新字典数据
             List<DictItem> dictItemList = dictItemService.list(
                     new LambdaQueryWrapper<DictItem>()
@@ -166,6 +180,7 @@ public class DictServiceImpl extends ServiceImpl<DictMapper, Dict> implements Di
             dictItemService.remove(new LambdaQueryWrapper<DictItem>()
                     .in(DictItem::getDictCode, dictCodes)
             );
+            dictCodes.forEach(code -> events.publishEvent(new DictChangedEvent(code)));
         }
     }
 
@@ -179,6 +194,14 @@ public class DictServiceImpl extends ServiceImpl<DictMapper, Dict> implements Di
     public List<String> getDictCodesByIds(List<String> ids) {
         List<Dict> dictList = this.listByIds(ids);
         return dictList.stream().map(Dict::getDictCode).toList();
+    }
+
+    /**
+     * 提交后广播失效提示，事务回滚时不触发客户端刷新
+     */
+    @TransactionalEventListener
+    public void onDictChanged(DictChangedEvent event) {
+        realtime.broadcast("dict", "dict.changed", Map.of("dictCode", event.dictCode()));
     }
 
 }

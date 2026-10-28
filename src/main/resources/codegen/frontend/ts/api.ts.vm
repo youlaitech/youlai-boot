@@ -1,51 +1,60 @@
 import request from "@/utils/request";
-import type { ${entityName}Form, ${entityName}QueryParams, ${entityName}Item } from "./types";
+import type { ${entityName}Form, ${entityName}Query, ${entityName}Item } from "./types";
 import type { PageResult } from "@/api/common";
 
 const ${entityUpperSnake}_BASE_URL = "/api/v1/${entityKebab}";
 
 const ${entityName}API = {
-    /** 获取${businessName}分页数据 */
-    getPage(queryParams?: ${entityName}QueryParams) {
-        return request<unknown, PageResult<${entityName}Item>>({
-            url: `${${entityUpperSnake}_BASE_URL}`,
-            method: "get",
-            params: queryParams,
-        });
-    },
-    /** 获取${businessName}表单数据 */
-    getFormData(id: string) {
-        return request<unknown, ${entityName}Form>({
-            url: `${${entityUpperSnake}_BASE_URL}/${id}/form`,
-            method: "get",
-        });
-    },
-    /** 新增${businessName} */
-    create(data: ${entityName}Form) {
-        return request({
-            url: `${${entityUpperSnake}_BASE_URL}`,
-            method: "post",
-            data,
-        });
-    },
-    /** 更新${businessName} */
-     update(id: string, data: ${entityName}Form) {
-        return request({
-            url: `${${entityUpperSnake}_BASE_URL}/${id}`,
-            method: "put",
-            data,
-        });
-    },
-    /** 批量删除${businessName}，多个以英文逗号(,)分割 */
-     deleteByIds(ids: string) {
-        return request({
-            url: `${${entityUpperSnake}_BASE_URL}/${ids}`,
-            method: "delete",
-        });
-    }
-}
+  /**
+   * 获取${businessName}分页数据
+   */
+  getPage(queryParams?: ${entityName}Query) {
+    return request<unknown, PageResult<${entityName}Item>>({
+      url: ${entityUpperSnake}_BASE_URL,
+      method: "get",
+      params: queryParams,
+    });
+  },
+  /**
+   * 获取${businessName}表单数据
+   */
+  getFormData(id: string) {
+    return request<unknown, ${entityName}Form>({
+      url: `${${entityUpperSnake}_BASE_URL}/${id}/form`,
+      method: "get",
+    });
+  },
+  /**
+   * 新增${businessName}
+   */
+  create(data: ${entityName}Form) {
+    return request({
+      url: ${entityUpperSnake}_BASE_URL,
+      method: "post",
+      data,
+    });
+  },
+  /**
+   * 更新${businessName}
+   */
+  update(id: string, data: ${entityName}Form) {
+    return request({
+      url: `${${entityUpperSnake}_BASE_URL}/${id}`,
+      method: "put",
+      data,
+    });
+  },
+  /**
+   * 批量删除${businessName}，多个以英文逗号(,)分割
+   */
+  deleteByIds(ids: string) {
+    return request({
+      url: `${${entityUpperSnake}_BASE_URL}/${ids}`,
+      method: "delete",
+    });
+  },
+};
 
 export default ${entityName}API;
 
-// 重导出类型
 export * from "./types";

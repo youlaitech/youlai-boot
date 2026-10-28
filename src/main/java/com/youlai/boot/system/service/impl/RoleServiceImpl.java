@@ -4,7 +4,7 @@ import cn.hutool.core.collection.CollectionUtil;
 import cn.hutool.core.lang.Assert;
 import cn.hutool.core.util.ObjectUtil;
 import cn.hutool.core.util.StrUtil;
-import com.youlai.boot.framework.security.token.TokenManager;
+import com.youlai.boot.framework.security.session.SessionService;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
@@ -32,6 +32,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Arrays;
 import java.util.List;
+import java.util.Objects;
 import java.util.Map;
 import java.util.Set;
 
@@ -48,7 +49,7 @@ public class RoleServiceImpl extends ServiceImpl<RoleMapper, Role> implements Ro
     private final RoleMenuService roleMenuService;
     private final RoleDeptService roleDeptService;
     private final UserRoleService userRoleService;
-    private final TokenManager tokenManager;
+    private final SessionService sessionService;
     private final RoleConverter roleConverter;
 
     /**
@@ -113,15 +114,30 @@ public class RoleServiceImpl extends ServiceImpl<RoleMapper, Role> implements Ro
     }
 
     /**
-     * 保存角色
-     *
-     * @param roleForm 角色表单数据
-     * @return {@link Boolean}
+     * 新增角色，主键由持久化层生成
      */
     @Override
     @Transactional(rollbackFor = Exception.class)
     public boolean saveRole(RoleForm roleForm) {
+        roleForm.setId(null);
+        return persistRole(roleForm);
+    }
 
+    /**
+     * 更新指定角色，忽略表单中原有的主键
+     */
+    @Override
+    @Transactional(rollbackFor = Exception.class)
+    public boolean updateRole(Long roleId, RoleForm roleForm) {
+        Assert.notNull(roleId, "角色ID不能为空");
+        roleForm.setId(roleId);
+        return persistRole(roleForm);
+    }
+
+    /**
+     * 保存角色资料及关联部门，并处理权限变更
+     */
+    private boolean persistRole(RoleForm roleForm) {
         Long roleId = roleForm.getId();
 
         // 编辑角色时，判断角色是否存在
@@ -147,7 +163,7 @@ public class RoleServiceImpl extends ServiceImpl<RoleMapper, Role> implements Ro
         // 实体转换
         Role role = roleConverter.toEntity(roleForm);
 
-        boolean result = this.saveOrUpdate(role);
+        boolean result = roleId == null ? this.save(role) : this.updateById(role);
         if (result) {
             // 保存自定义数据权限部门
             Long savedRoleId = role.getId();
@@ -168,7 +184,7 @@ public class RoleServiceImpl extends ServiceImpl<RoleMapper, Role> implements Ro
                 roleMenuService.refreshRolePermsCache(oldRole.getCode(), roleCode);
             }
 
-            // 数据权限发生变化时，失效该角色关联用户的登录态（JWT tokenVersion）
+            // 会话保存角色编码与数据范围，相关字段变更后统一撤销旧快照
             if (oldRole != null) {
                 boolean dataScopeChanged = !ObjectUtil.equals(oldRole.getDataScope(), roleForm.getDataScope());
 
@@ -179,10 +195,12 @@ public class RoleServiceImpl extends ServiceImpl<RoleMapper, Role> implements Ro
                     customDeptChanged = !new java.util.HashSet<>(oldIds).equals(new java.util.HashSet<>(newDeptIds));
                 }
 
-                if (dataScopeChanged || customDeptChanged) {
+                boolean identityChanged = !Objects.equals(oldRole.getCode(), role.getCode())
+                        || !Objects.equals(oldRole.getStatus(), role.getStatus());
+                if (dataScopeChanged || customDeptChanged || identityChanged) {
                     List<Long> userIds = userRoleService.listUserIdsByRoleId(savedRoleId);
                     if (CollectionUtil.isNotEmpty(userIds)) {
-                        userIds.forEach(tokenManager::invalidateUserSessions);
+                        userIds.forEach(sessionService::revokeUserSessions);
                     }
                 }
             }
@@ -216,6 +234,7 @@ public class RoleServiceImpl extends ServiceImpl<RoleMapper, Role> implements Ro
      * @return {@link Boolean}
      */
     @Override
+    @Transactional(rollbackFor = Exception.class)
     public boolean updateRoleStatus(Long roleId, Integer status) {
 
         Role role = this.getById(roleId);
@@ -233,7 +252,7 @@ public class RoleServiceImpl extends ServiceImpl<RoleMapper, Role> implements Ro
             if (status == 0) {
                 List<Long> userIds = userRoleService.listUserIdsByRoleId(roleId);
                 for (Long userId : userIds) {
-                    tokenManager.invalidateUserSessions(userId);
+                    sessionService.revokeUserSessions(userId);
                 }
             }
         }

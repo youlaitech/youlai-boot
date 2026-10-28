@@ -30,21 +30,19 @@ public interface RedisConstants {
      * 认证模块
      */
     interface Auth {
-        // 存储访问令牌对应的用户会话信息（accessToken -> UserSession）
-        String ACCESS_TOKEN_USER = "auth:token:access:{}";
-        // 存储刷新令牌对应的用户会话信息（refreshToken -> UserSession）
-        String REFRESH_TOKEN_USER = "auth:token:refresh:{}";
-        // 用户与访问令牌的映射（userId -> accessToken）
-        String USER_ACCESS_TOKEN = "auth:user:access:{}";
-        // 用户与刷新令牌的映射（userId -> refreshToken））
-        String USER_REFRESH_TOKEN = "auth:user:refresh:{}";
-        // 已撤销 Token 的 JTI（单端退出/会话注销）：如果 jti 在撤销列表中，则 Token 立即无效
-        String BLACKLIST_TOKEN = "auth:token:blacklist:{}";
-        String REVOKED_JTI = BLACKLIST_TOKEN;
-        // 用户 Token 版本号（用于按用户失效历史 JWT）：token.tokenVersion != redis.tokenVersion => token 无效
-        String USER_TOKEN_VERSION = "auth:user:token_version:{}";
         // 扫码登录票据上下文（ticket -> QrCodeLoginContext）
-        String QR_CODE_LOGIN = "auth:qr_code:{}";
+        String QR_CODE_LOGIN = "auth:qr_code:v2:{}";
+        // 统一认证一次性交接票据（ticket -> OidcTicketContext）
+        String OIDC_TICKET = "auth:oidc:ticket:v2:{}";
+    }
+
+    /**
+     * 微信小程序模块
+     */
+    interface WxMa {
+        // 微信会话密钥（provider + OpenID -> session_key），不同小程序分别存储
+        String SESSION_KEY = "auth:wxma:session_key:{}:{}";
+        long SESSION_KEY_TTL_DAYS = 3;
     }
 
     /**

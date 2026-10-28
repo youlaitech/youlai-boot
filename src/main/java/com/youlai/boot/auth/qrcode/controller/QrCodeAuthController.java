@@ -5,7 +5,7 @@ import com.youlai.boot.auth.qrcode.model.vo.QrCodeGenerateVO;
 import com.youlai.boot.auth.qrcode.model.vo.QrCodeStatusVO;
 import com.youlai.boot.auth.qrcode.service.QrCodeLoginService;
 import com.youlai.boot.common.result.Result;
-import com.youlai.boot.framework.security.model.AuthenticationToken;
+import com.youlai.boot.framework.security.model.TokenPair;
 import com.youlai.boot.framework.security.util.SecurityUtils;
 import com.youlai.boot.framework.web.ratelimit.RateLimit;
 import com.youlai.boot.framework.web.util.IPUtils;
@@ -87,7 +87,7 @@ public class QrCodeAuthController {
      */
     @Operation(summary = "[扫码]PC 端换取会话令牌")
     @PostMapping("/login")
-    public Result<AuthenticationToken> login(@RequestBody @Valid QrCodeTicketForm form) {
+    public Result<TokenPair> login(@RequestBody @Valid QrCodeTicketForm form) {
         return Result.success(qrCodeLoginService.login(form.getTicket()));
     }
 }

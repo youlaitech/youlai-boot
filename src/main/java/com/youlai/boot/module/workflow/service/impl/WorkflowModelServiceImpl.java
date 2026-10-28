@@ -10,7 +10,7 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.youlai.boot.common.exception.BusinessException;
 import com.youlai.boot.module.workflow.model.form.ModelForm;
 import com.youlai.boot.module.workflow.model.form.ModelXmlForm;
-import com.youlai.boot.module.workflow.model.query.WorkflowModelPageQuery;
+import com.youlai.boot.module.workflow.model.query.WorkflowModelQuery;
 import com.youlai.boot.module.workflow.model.vo.ModelVO;
 import com.youlai.boot.module.workflow.model.vo.ModelXmlVO;
 import com.youlai.boot.module.workflow.service.WorkflowModelService;
@@ -111,7 +111,7 @@ public class WorkflowModelServiceImpl implements WorkflowModelService {
      * @param queryParams 查询参数
      */
     @Override
-    public Page<ModelVO> getModelPage(WorkflowModelPageQuery queryParams) {
+    public Page<ModelVO> getModelPage(WorkflowModelQuery queryParams) {
         ModelQuery query = repositoryService.createModelQuery();
         if (StrUtil.isNotBlank(queryParams.getKeywords())) {
             query.modelNameLike("%" + queryParams.getKeywords() + "%");

@@ -42,7 +42,7 @@
     </select>
 
     <!-- 获取通知公告详情 -->
-    <select id="getNoticeDetail" resultType="com.youlai.boot.system.model.vo.NoticeDetailVO">
+    <select id="getNoticePreview" resultType="com.youlai.boot.system.model.vo.NoticeDetailVO">
         SELECT
             t1.id,
             t1.title,
@@ -57,6 +57,17 @@
                 LEFT JOIN sys_user t2 ON t2.id = t1.publisher_id
         WHERE
             t1.id = #{id} AND t1.is_deleted = 0
+    </select>
+
+    <select id="getNoticeDetail" resultType="com.youlai.boot.system.model.vo.NoticeDetailVO">
+        SELECT n.id, n.title, n.content, n.type, u.nickname AS publisherName,
+               n.level, n.publish_status, n.publish_time
+        FROM sys_notice n LEFT JOIN sys_user u ON u.id = n.publisher_id
+        WHERE n.id = #{id} AND n.is_deleted = 0 AND n.publish_status = 1
+          AND EXISTS (
+              SELECT 1 FROM sys_user_notice un
+              WHERE un.notice_id = n.id AND un.user_id = #{userId} AND un.is_deleted = 0
+          )
     </select>
 
 </mapper>

@@ -1,15 +1,14 @@
 package com.youlai.boot.system.adapter.security;
 
-import com.youlai.boot.common.enums.SocialPlatformEnum;
 import com.youlai.boot.framework.security.model.SecurityUser;
 import com.youlai.boot.framework.security.port.UserAuthenticationPort;
+import com.youlai.boot.system.service.UserIdentityService;
 import com.youlai.boot.system.service.UserService;
-import com.youlai.boot.system.service.UserSocialService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
 /**
- * 用户认证信息查询适配器。
+ * 用户认证信息查询适配器
  *
  * @author Ray.Hao
  * @since 3.1.0
@@ -20,7 +19,12 @@ import org.springframework.stereotype.Component;
 public class UserAuthenticationAdapter implements UserAuthenticationPort {
 
     private final UserService userService;
-    private final UserSocialService userSocialService;
+    private final UserIdentityService userIdentityService;
+
+    @Override
+    public SecurityUser getAuthInfoByUserId(Long userId) {
+        return userIdentityService.getAuthInfoByUserId(userId);
+    }
 
     @Override
     public SecurityUser getAuthInfoByUsername(String username) {
@@ -33,7 +37,7 @@ public class UserAuthenticationAdapter implements UserAuthenticationPort {
     }
 
     @Override
-    public SecurityUser getAuthInfoByOpenid(SocialPlatformEnum platform, String openid) {
-        return userSocialService.getAuthInfoByOpenid(platform, openid);
+    public SecurityUser getAuthInfoByProviderAccount(String provider, String providerAccountId) {
+        return userIdentityService.getAuthInfoByProviderAccount(provider, providerAccountId);
     }
 }

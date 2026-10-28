@@ -66,6 +66,11 @@ public class OperationLogAspect {
         } finally {
             long elapsed = System.currentTimeMillis() - start;
             try {
+                // 登录前没有操作者；退出前已取快照，不能在清理上下文后重新读取
+                if (logAnnotation.value() == ActionTypeEnum.LOGIN && failure == null) {
+                    userId = SecurityUtils.getUserId();
+                    username = SecurityUtils.getUsername();
+                }
                 OperationLog operationLog = buildOperationLog(logAnnotation, elapsed, failure, userId, username);
                 if (operationLog != null) {
                     operationLogExecutor.execute(() -> {

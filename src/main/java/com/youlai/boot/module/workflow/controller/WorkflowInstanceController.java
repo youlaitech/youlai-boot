@@ -8,7 +8,7 @@ import com.youlai.boot.common.enums.LogModuleEnum;
 import com.youlai.boot.common.result.PageResult;
 import com.youlai.boot.common.result.Result;
 import com.youlai.boot.module.workflow.model.form.StartProcessForm;
-import com.youlai.boot.module.workflow.model.query.WorkflowInstancePageQuery;
+import com.youlai.boot.module.workflow.model.query.WorkflowInstanceQuery;
 import com.youlai.boot.module.workflow.model.vo.InstanceDetailVO;
 import com.youlai.boot.module.workflow.model.vo.InstancePageVO;
 import com.youlai.boot.module.workflow.model.vo.ProcessDiagramVO;
@@ -48,7 +48,7 @@ public class WorkflowInstanceController {
     @Operation(summary = "我的流程分页列表")
     @GetMapping
     @Log(module = LogModuleEnum.WORKFLOW, value = ActionTypeEnum.LIST, title = "我的流程")
-    public PageResult<InstancePageVO> getInstancePage(@Valid WorkflowInstancePageQuery queryParams) {
+    public PageResult<InstancePageVO> getInstancePage(@Valid WorkflowInstanceQuery queryParams) {
         Page<InstancePageVO> result = workflowInstanceService.getInstancePage(queryParams);
         return PageResult.success(result);
     }

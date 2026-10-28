@@ -9,6 +9,9 @@ import com.youlai.boot.system.model.vo.NoticePageVO;
 import com.youlai.boot.system.model.vo.UserNoticePageVO;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
+import org.apache.ibatis.annotations.Select;
+import org.apache.ibatis.annotations.Options;
+import java.util.List;
 
 
 /**
@@ -19,6 +22,15 @@ import org.apache.ibatis.annotations.Param;
  */
 @Mapper
 public interface UserNoticeMapper extends BaseMapper<UserNotice> {
+    /**
+     * 按用户 ID 游标分批查询公告接收人
+     */
+    @Select("SELECT DISTINCT user_id FROM sys_user_notice WHERE notice_id = #{noticeId} "
+            + "AND is_deleted = 0 AND user_id > #{afterUserId} ORDER BY user_id LIMIT #{limit}")
+    @Options(timeout = 5)
+    List<Long> findRecipientsAfter(@Param("noticeId") Long noticeId, @Param("afterUserId") long afterUserId,
+                                   @Param("limit") int limit);
+
     /**
      * 分页获取我的通知公告
      * @param page 分页对象

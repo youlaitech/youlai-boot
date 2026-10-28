@@ -9,7 +9,7 @@ import com.youlai.boot.common.result.PageResult;
 import com.youlai.boot.common.result.Result;
 import com.youlai.boot.module.workflow.model.form.ModelForm;
 import com.youlai.boot.module.workflow.model.form.ModelXmlForm;
-import com.youlai.boot.module.workflow.model.query.WorkflowModelPageQuery;
+import com.youlai.boot.module.workflow.model.query.WorkflowModelQuery;
 import com.youlai.boot.module.workflow.model.vo.ModelVO;
 import com.youlai.boot.module.workflow.model.vo.ModelXmlVO;
 import com.youlai.boot.module.workflow.service.WorkflowDemoService;
@@ -45,7 +45,7 @@ public class WorkflowModelController {
     @GetMapping
     @PreAuthorize("@ss.hasPerm('workflow:model:list')")
     @Log(module = LogModuleEnum.WORKFLOW, value = ActionTypeEnum.LIST)
-    public PageResult<ModelVO> getModelPage(@Valid WorkflowModelPageQuery queryParams) {
+    public PageResult<ModelVO> getModelPage(@Valid WorkflowModelQuery queryParams) {
         Page<ModelVO> result = workflowModelService.getModelPage(queryParams);
         return PageResult.success(result);
     }

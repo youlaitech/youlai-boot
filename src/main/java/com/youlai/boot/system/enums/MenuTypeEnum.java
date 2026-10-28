@@ -5,12 +5,10 @@ import com.youlai.boot.common.base.IBaseEnum;
 import lombok.Getter;
 
 /**
- * 菜单类型枚举（char）
+ * 菜单类型枚举
  *
- * C：目录
- * M：菜单
- * E：外链
- * B：按钮
+ * @author Ray.Hao
+ * @since 4.13.0
  */
 @Getter
 public enum MenuTypeEnum implements IBaseEnum<String> {

@@ -14,6 +14,9 @@ import com.youlai.boot.system.model.vo.DictItemPageVO;
 import com.youlai.boot.system.service.DictItemService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+import org.springframework.context.ApplicationEventPublisher;
+import com.youlai.boot.system.event.DictChangedEvent;
 
 import java.util.Arrays;
 import java.util.List;
@@ -29,6 +32,7 @@ import java.util.List;
 public class DictItemServiceImpl extends ServiceImpl<DictItemMapper, DictItem> implements DictItemService {
 
     private final DictItemConverter dictItemConverter;
+    private final ApplicationEventPublisher events;
 
     /**
      * 获取字典项分页列表
@@ -87,10 +91,13 @@ public class DictItemServiceImpl extends ServiceImpl<DictItemMapper, DictItem> i
      * @return 是否成功
      */
     @Override
+    @Transactional
     public boolean saveDictItem(DictItemForm formData) {
         validateValueUnique(formData.getDictCode(), formData.getValue(), null);
         DictItem entity = dictItemConverter.toEntity(formData);
-        return this.save(entity);
+        boolean saved = this.save(entity);
+        if (saved) events.publishEvent(new DictChangedEvent(entity.getDictCode()));
+        return saved;
     }
 
     /**
@@ -100,10 +107,19 @@ public class DictItemServiceImpl extends ServiceImpl<DictItemMapper, DictItem> i
      * @return 是否成功
      */
     @Override
+    @Transactional
     public boolean updateDictItem(DictItemForm formData) {
+        DictItem previous = this.getById(formData.getId());
         validateValueUnique(formData.getDictCode(), formData.getValue(), formData.getId());
         DictItem entity = dictItemConverter.toEntity(formData);
-        return this.updateById(entity);
+        boolean updated = this.updateById(entity);
+        if (updated) {
+            events.publishEvent(new DictChangedEvent(entity.getDictCode()));
+            if (previous != null && !previous.getDictCode().equals(entity.getDictCode())) {
+                events.publishEvent(new DictChangedEvent(previous.getDictCode()));
+            }
+        }
+        return updated;
     }
 
     /**
@@ -112,11 +128,14 @@ public class DictItemServiceImpl extends ServiceImpl<DictItemMapper, DictItem> i
      * @param ids 字典项ID集合
      */
     @Override
+    @Transactional
     public void deleteDictItemByIds(String ids) {
         List<Long> idList = Arrays.stream(ids.split(","))
           .map(Long::parseLong)
           .toList();
+        List<String> codes = this.listByIds(idList).stream().map(DictItem::getDictCode).distinct().toList();
         this.removeByIds(idList);
+        codes.forEach(code -> events.publishEvent(new DictChangedEvent(code)));
     }
 
     /**

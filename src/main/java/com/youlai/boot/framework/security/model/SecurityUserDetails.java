@@ -5,6 +5,7 @@ import cn.hutool.core.util.ObjectUtil;
 import com.youlai.boot.common.constant.SecurityConstants;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import lombok.ToString;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -13,10 +14,11 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 /**
- * Spring Security 用户认证对象。
+ * Spring Security 用户认证对象
  *
  * @author Ray.Hao
  * @version 3.0.0
+ * @since 4.13.0
  */
 @Data
 @NoArgsConstructor
@@ -29,6 +31,7 @@ public class SecurityUserDetails implements UserDetails {
     private String username;
 
     // 密码
+    @ToString.Exclude
     private String password;
 
     // 账号是否启用(true:启用 false:禁用)
@@ -44,7 +47,7 @@ public class SecurityUserDetails implements UserDetails {
     private Set<String> roles;
 
     /**
-     * 构造函数：根据 {@link SecurityUser} 初始化。
+     * 构造函数：根据 {@link SecurityUser} 初始化
      */
     public SecurityUserDetails(SecurityUser user) {
         this.userId = user.getUserId();
@@ -78,7 +81,7 @@ public class SecurityUserDetails implements UserDetails {
 
     @Override
     public boolean isEnabled() {
-        return this.enabled;
+        return Boolean.TRUE.equals(this.enabled);
     }
 
     /**

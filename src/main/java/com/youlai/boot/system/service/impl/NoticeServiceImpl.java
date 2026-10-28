@@ -9,7 +9,9 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.youlai.boot.common.exception.BusinessException;
 import com.youlai.boot.framework.security.util.SecurityUtils;
-import com.youlai.boot.support.sse.OnlineUserDTO;
+import com.youlai.boot.support.realtime.RealtimeService;
+import com.youlai.boot.system.event.NoticeChangedEvent;
+import com.youlai.boot.system.mapper.UserNoticeMapper;
 import com.youlai.boot.system.converter.NoticeConverter;
 import com.youlai.boot.system.enums.NoticePublishStatusEnum;
 import com.youlai.boot.system.enums.NoticeTargetEnum;
@@ -17,7 +19,6 @@ import com.youlai.boot.system.mapper.NoticeMapper;
 import com.youlai.boot.system.model.vo.NoticePageVO;
 import com.youlai.boot.system.model.vo.UserNoticePageVO;
 import com.youlai.boot.system.model.vo.NoticeDetailVO;
-import com.youlai.boot.system.model.vo.NoticeVO;
 import com.youlai.boot.system.model.entity.Notice;
 import com.youlai.boot.system.model.entity.UserNotice;
 import com.youlai.boot.system.model.entity.SysUser;
@@ -26,17 +27,17 @@ import com.youlai.boot.system.model.query.NoticeQuery;
 import com.youlai.boot.system.service.NoticeService;
 import com.youlai.boot.system.service.UserNoticeService;
 import com.youlai.boot.system.service.UserService;
-import com.youlai.boot.support.sse.SseService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.context.ApplicationEventPublisher;
+import org.springframework.transaction.event.TransactionalEventListener;
+import org.springframework.transaction.event.TransactionPhase;
 
 import java.time.LocalDateTime;
 import java.util.Arrays;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
-import java.util.stream.Collectors;
+import java.util.Map;
 
 /**
  * 通知公告服务实现类
@@ -51,7 +52,9 @@ public class NoticeServiceImpl extends ServiceImpl<NoticeMapper, Notice> impleme
     private final NoticeConverter noticeConverter;
     private final UserNoticeService userNoticeService;
     private final UserService userService;
-    private final SseService sseService;
+    private final ApplicationEventPublisher events;
+    private final RealtimeService realtime;
+    private final UserNoticeMapper userNoticeMapper;
 
     /**
      * 获取通知公告分页列表
@@ -207,24 +210,7 @@ public class NoticeServiceImpl extends ServiceImpl<NoticeMapper, Notice> impleme
                 userNoticeService.saveBatch(userNoticeList);
             }
 
-            Set<String> receivers = targetUserList.stream().map(SysUser::getUsername).collect(Collectors.toSet());
-
-            // 获取在线用户名集合
-            Set<String> allOnlineUsers = sseService.getOnlineUsers().stream()
-                    .map(OnlineUserDTO::getUsername)
-                    .collect(Collectors.toSet());
-
-            // 找出在线用户的通知接收者
-            Set<String> onlineReceivers = new HashSet<>(CollectionUtil.intersection(receivers, allOnlineUsers));
-
-            NoticeVO noticeVo = new NoticeVO();
-            noticeVo.setId(id);
-            noticeVo.setTitle(notice.getTitle());
-            noticeVo.setType(notice.getType());
-            noticeVo.setPublishTime(notice.getPublishTime());
-
-            // 向在线接收者推送通知
-            onlineReceivers.forEach(receiver -> sseService.sendToUser(receiver, "notice", noticeVo));
+            events.publishEvent(new NoticeChangedEvent(id, "published"));
         }
         return publishResult;
     }
@@ -253,23 +239,8 @@ public class NoticeServiceImpl extends ServiceImpl<NoticeMapper, Notice> impleme
         boolean revokeResult = this.updateById(notice);
 
         if (revokeResult) {
-            // 撤回通知公告的同时，需要删除通知公告对应的用户通知状态
-            userNoticeService.remove(new LambdaQueryWrapper<UserNotice>()
-                    .eq(UserNotice::getNoticeId, id)
-            );
-
-            // 通知前端移除该通知
-            NoticeVO noticeVo = new NoticeVO();
-            noticeVo.setId(id);
-
-            // 获取所有在线用户
-            Set<String> allOnlineUsers = sseService.getOnlineUsers().stream()
-                    .map(OnlineUserDTO::getUsername)
-                    .collect(Collectors.toSet());
-
-            // 向所有在线用户推送撤回通知
-            allOnlineUsers.forEach(username ->
-                    sseService.sendToUser(username, "notice-revoke", noticeVo));
+            // 保留受众关系，以便定向通知撤回；查询接口按发布状态屏蔽正文
+            events.publishEvent(new NoticeChangedEvent(id, "revoked"));
         }
         return revokeResult;
     }
@@ -281,15 +252,32 @@ public class NoticeServiceImpl extends ServiceImpl<NoticeMapper, Notice> impleme
      */
     @Override
     public NoticeDetailVO getNoticeDetail(Long id) {
-        NoticeDetailVO detail = this.baseMapper.getNoticeDetail(id);
-        // 更新用户通知公告的阅读状态
         Long userId = SecurityUtils.getUserId();
+        NoticeDetailVO detail = this.baseMapper.getNoticeDetail(id, userId);
+        if (detail == null) throw new BusinessException("通知不存在或无权查看");
+        // 只有已发布通知的接收者可以读取正文和修改阅读状态
         userNoticeService.update(new LambdaUpdateWrapper<UserNotice>()
                 .eq(UserNotice::getNoticeId, id)
                 .eq(UserNotice::getUserId, userId)
                 .eq(UserNotice::getIsRead, 0)
                 .set(UserNotice::getIsRead, 1)
         );
+        return detail;
+    }
+
+    /**
+     * 事务提交后再通知收件人，避免客户端补拉到尚未提交的状态
+     */
+    @TransactionalEventListener(phase = TransactionPhase.AFTER_COMMIT)
+    public void onNoticeChanged(NoticeChangedEvent event) {
+        realtime.sendBatches("notice.changed", Map.of("noticeId", event.noticeId().toString(), "action", event.action()),
+                (afterUserId, limit) -> userNoticeMapper.findRecipientsAfter(event.noticeId(), afterUserId, limit));
+    }
+
+    @Override
+    public NoticeDetailVO getNoticePreview(Long id) {
+        NoticeDetailVO detail = this.baseMapper.getNoticePreview(id);
+        if (detail == null) throw new BusinessException("通知不存在");
         return detail;
     }
 

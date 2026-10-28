@@ -14,7 +14,7 @@ import com.youlai.boot.module.form.service.FormDataService;
 import com.youlai.boot.module.form.util.FormRuleValidator;
 import com.youlai.boot.module.workflow.model.form.CompleteTaskForm;
 import com.youlai.boot.module.workflow.model.form.RejectTaskForm;
-import com.youlai.boot.module.workflow.model.query.WorkflowTaskPageQuery;
+import com.youlai.boot.module.workflow.model.query.WorkflowTaskQuery;
 import com.youlai.boot.module.workflow.model.vo.ApprovalHistoryVO;
 import com.youlai.boot.module.workflow.model.vo.DoneTaskVO;
 import com.youlai.boot.module.workflow.model.vo.RejectTargetVO;
@@ -86,7 +86,7 @@ public class WorkflowTaskServiceImpl implements WorkflowTaskService {
      * @param queryParams 查询参数
      */
     @Override
-    public Page<TodoTaskVO> getTodoTaskPage(WorkflowTaskPageQuery queryParams) {
+    public Page<TodoTaskVO> getTodoTaskPage(WorkflowTaskQuery queryParams) {
         TaskQuery query = this.createCandidateTaskQuery();
         if (StrUtil.isNotBlank(queryParams.getKeywords())) {
             query.taskNameLike("%" + queryParams.getKeywords() + "%");
@@ -130,7 +130,7 @@ public class WorkflowTaskServiceImpl implements WorkflowTaskService {
      * @param queryParams 查询参数
      */
     @Override
-    public Page<DoneTaskVO> getDoneTaskPage(WorkflowTaskPageQuery queryParams) {
+    public Page<DoneTaskVO> getDoneTaskPage(WorkflowTaskQuery queryParams) {
         HistoricTaskInstanceQuery query = historyService.createHistoricTaskInstanceQuery()
                 .taskAssignee(SecurityUtils.getUsername()).finished();
         if (StrUtil.isNotBlank(queryParams.getKeywords())) {
@@ -386,9 +386,7 @@ public class WorkflowTaskServiceImpl implements WorkflowTaskService {
                 .collect(Collectors.toMap(ProcessInstance::getId, instance -> instance));
     }
 
-    //---------------------------------------------------
-    // AI 辅助：未开启 AI 时调用返回业务异常
-    //---------------------------------------------------
+    // AI 未启用时返回业务异常
 
     /**
      * 用 AI 汇总表单数据与审批记录，生成审批摘要

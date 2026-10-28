@@ -20,6 +20,8 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import jakarta.validation.Valid;
+import jakarta.validation.constraints.Max;
+import jakarta.validation.constraints.Min;
 
 import java.util.List;
 
@@ -61,6 +63,9 @@ public class RoleController {
         return Result.success(roleService.listRoleCodeOptions());
     }
 
+    /**
+     * 新增角色，由持久化层生成主键
+     */
     @Operation(summary = "新增角色")
     @PostMapping
     @PreAuthorize("@ss.hasPerm('sys:role:create')")
@@ -81,6 +86,9 @@ public class RoleController {
         return Result.success(roleForm);
     }
 
+    /**
+     * 更新路径指定的角色，不使用表单主键切换目标
+     */
     @Operation(summary = "修改角色")
     @PutMapping(value = "/{roleId}")
     @PreAuthorize("@ss.hasPerm('sys:role:update')")
@@ -88,7 +96,7 @@ public class RoleController {
     public Result<Void> updateRole(
             @Parameter(description = "角色ID") @PathVariable Long roleId,
             @Valid @RequestBody RoleForm roleForm) {
-        boolean result = roleService.saveRole(roleForm);
+        boolean result = roleService.updateRole(roleId, roleForm);
         return Result.judge(result);
     }
 
@@ -103,13 +111,18 @@ public class RoleController {
         return Result.success();
     }
 
+    /**
+     * 修改角色状态，仅接受0或1
+     */
     @Operation(summary = "修改角色状态")
     @PutMapping(value = "/{roleId}/status")
     @PreAuthorize("@ss.hasPerm('sys:role:update')")
     @Log(module = LogModuleEnum.ROLE, value = ActionTypeEnum.UPDATE)
     public Result<Void> updateRoleStatus(
             @Parameter(description = "角色ID") @PathVariable Long roleId,
-            @Parameter(description = "状态(1:启用;0:禁用)") @RequestParam Integer status
+            @Parameter(description = "状态(1:启用;0:禁用)") @RequestParam
+            @Min(value = 0, message = "角色状态只能为0或1")
+            @Max(value = 1, message = "角色状态只能为0或1") Integer status
     ) {
         boolean result = roleService.updateRoleStatus(roleId, status);
         return Result.judge(result);

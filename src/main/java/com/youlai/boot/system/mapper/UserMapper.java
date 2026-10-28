@@ -65,7 +65,7 @@ public interface UserMapper extends BaseMapper<SysUser> {
      * @return 导出用户列表
      */
     @DataPermission(deptAlias = "u", userAlias = "u")
-    List<UserExportVO> listExportUsers(UserQuery queryParams);
+    List<UserExportVO> listExportUsers(Page<UserExportVO> page, @Param("queryParams") UserQuery queryParams);
 
     /**
      * 获取用户个人中心信息

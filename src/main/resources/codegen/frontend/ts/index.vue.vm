@@ -295,7 +295,7 @@
   import { FullScreen, Refresh } from "@element-plus/icons-vue";
   import { usePageTable, useTableSelection } from "@/composables";
   import ${entityName}API from "@/api/${moduleName}/${entityKebab}";
-  import type { ${entityName}Item, ${entityName}Form, ${entityName}QueryParams } from "@/api/${moduleName}/${entityKebab}";
+  import type { ${entityName}Item, ${entityName}Form, ${entityName}Query } from "@/api/${moduleName}/${entityKebab}";
 
   defineOptions({
     name: "${entityName}",
@@ -313,12 +313,12 @@
   // $!{businessName}表格数据
   const { loading, list, total, params, fetchData, handleQuery, handleResetQuery } = usePageTable<
     ${entityName}Item,
-    ${entityName}QueryParams
+    ${entityName}Query
   >({
     initialParams: {
       pageNum: 1,
       pageSize: 10,
-    } as ${entityName}QueryParams,
+    } as ${entityName}Query,
     request: ${entityName}API.getPage,
     onBeforeReset: () => queryFormRef.value?.resetFields(),
   });

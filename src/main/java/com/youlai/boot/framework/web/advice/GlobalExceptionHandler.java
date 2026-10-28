@@ -7,18 +7,21 @@ import com.youlai.boot.common.result.ResultCode;
 import com.youlai.boot.common.exception.TokenInvalidException;
 import com.youlai.boot.common.exception.RateLimitException;
 import jakarta.servlet.ServletException;
-import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.ConstraintViolation;
 import jakarta.validation.ConstraintViolationException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.TypeMismatchException;
 import org.springframework.context.support.DefaultMessageSourceResolvable;
+import org.springframework.context.MessageSourceResolvable;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.jdbc.BadSqlGrammarException;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.core.AuthenticationException;
+import org.springframework.security.authentication.AuthenticationServiceException;
+import org.springframework.security.authentication.BadCredentialsException;
+import org.springframework.security.authentication.DisabledException;
 import org.springframework.validation.BindException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.MissingServletRequestParameterException;
@@ -26,6 +29,7 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
+import org.springframework.web.method.annotation.HandlerMethodValidationException;
 import org.springframework.web.servlet.NoHandlerFoundException;
 import tools.jackson.core.JacksonException;
 
@@ -46,27 +50,41 @@ import java.util.stream.Collectors;
 public class GlobalExceptionHandler {
 
     @ExceptionHandler(BindException.class)
-    @ResponseStatus(HttpStatus.OK)
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
     public <T> Result<T> processException(BindException e) {
-        log.error("BindException:{}", e.getMessage());
         String msg = e.getAllErrors().stream().map(DefaultMessageSourceResolvable::getDefaultMessage).collect(Collectors.joining("；"));
         return Result.failed(ResultCode.USER_REQUEST_PARAMETER_ERROR, msg);
     }
 
     @ExceptionHandler(ConstraintViolationException.class)
-    @ResponseStatus(HttpStatus.OK)
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
     public <T> Result<T> processException(ConstraintViolationException e) {
-        log.error("ConstraintViolationException:{}", e.getMessage());
         String msg = e.getConstraintViolations().stream().map(ConstraintViolation::getMessage).collect(Collectors.joining("；"));
         return Result.failed(ResultCode.INVALID_USER_INPUT, msg);
     }
 
     @ExceptionHandler(MethodArgumentNotValidException.class)
-    @ResponseStatus(HttpStatus.OK)
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
     public <T> Result<T> processException(MethodArgumentNotValidException e) {
-        log.error("MethodArgumentNotValidException:{}", e.getMessage());
         String msg = e.getBindingResult().getAllErrors().stream().map(DefaultMessageSourceResolvable::getDefaultMessage).collect(Collectors.joining("；"));
         return Result.failed(ResultCode.INVALID_USER_INPUT, msg);
+    }
+
+    /**
+     * 参数约束失败返回400，返回值约束失败保留500
+     */
+    @ExceptionHandler(HandlerMethodValidationException.class)
+    public ResponseEntity<Result<Void>> handleMethodValidationException(HandlerMethodValidationException e) {
+        if (e.isForReturnValue()) {
+            log.error("接口返回值校验失败", e);
+            return ResponseEntity.status(e.getStatusCode()).body(Result.failed(ResultCode.SYSTEM_ERROR));
+        }
+        String message = e.getAllErrors().stream()
+                .map(MessageSourceResolvable::getDefaultMessage)
+                .filter(StrUtil::isNotBlank)
+                .distinct()
+                .collect(Collectors.joining("；"));
+        return ResponseEntity.status(e.getStatusCode()).body(Result.failed(ResultCode.INVALID_USER_INPUT, message));
     }
 
     @ExceptionHandler(NoHandlerFoundException.class)
@@ -77,14 +95,14 @@ public class GlobalExceptionHandler {
     }
 
     @ExceptionHandler(MissingServletRequestParameterException.class)
-    @ResponseStatus(HttpStatus.OK)
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
     public <T> Result<T> processException(MissingServletRequestParameterException e) {
         log.error(e.getMessage(), e);
         return Result.failed(ResultCode.REQUEST_REQUIRED_PARAMETER_IS_EMPTY);
     }
 
     @ExceptionHandler(MethodArgumentTypeMismatchException.class)
-    @ResponseStatus(HttpStatus.OK)
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
     public <T> Result<T> processException(MethodArgumentTypeMismatchException e) {
         log.error(e.getMessage(), e);
         return Result.failed(ResultCode.PARAMETER_FORMAT_MISMATCH, "类型错误");
@@ -98,23 +116,21 @@ public class GlobalExceptionHandler {
     }
 
     @ExceptionHandler(IllegalArgumentException.class)
-    @ResponseStatus(HttpStatus.OK)
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
     public <T> Result<T> handleIllegalArgumentException(IllegalArgumentException e) {
         log.error("非法参数异常，异常原因：{}", e.getMessage(), e);
         return Result.failed(e.getMessage());
     }
 
     @ExceptionHandler(JacksonException.class)
-    @ResponseStatus(HttpStatus.OK)
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
     public <T> Result<T> handleJacksonException(JacksonException e) {
-        log.error("Json转换异常，异常原因：{}", e.getMessage(), e);
-        return Result.failed(e.getMessage());
+        return Result.failed(ResultCode.PARAMETER_FORMAT_MISMATCH);
     }
 
     @ExceptionHandler(HttpMessageNotReadableException.class)
-    @ResponseStatus(HttpStatus.OK)
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
     public <T> Result<T> processException(HttpMessageNotReadableException e) {
-        log.error(e.getMessage(), e);
         String errorMessage = "请求体不可为空";
         Throwable cause = e.getCause();
         if (cause != null) {
@@ -124,7 +140,7 @@ public class GlobalExceptionHandler {
     }
 
     @ExceptionHandler(TypeMismatchException.class)
-    @ResponseStatus(HttpStatus.OK)
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
     public <T> Result<T> processException(TypeMismatchException e) {
         log.error(e.getMessage(), e);
         return Result.failed(e.getMessage());
@@ -160,6 +176,23 @@ public class GlobalExceptionHandler {
         return Result.failed(e.getResultCode());
     }
 
+    @ExceptionHandler(AuthenticationServiceException.class)
+    @ResponseStatus(HttpStatus.SERVICE_UNAVAILABLE)
+    public Result<Void> handleAuthenticationServiceException(
+            AuthenticationServiceException exception) {
+        log.error("认证服务不可用", exception);
+        return Result.failed(ResultCode.AUTH_SERVICE_UNAVAILABLE);
+    }
+
+    @ExceptionHandler(AuthenticationException.class)
+    @ResponseStatus(HttpStatus.UNAUTHORIZED)
+    public Result<Void> handleAuthenticationException(AuthenticationException exception) {
+        ResultCode code = exception instanceof DisabledException ? ResultCode.ACCOUNT_FROZEN
+                : exception instanceof BadCredentialsException ? ResultCode.USER_PASSWORD_ERROR
+                : ResultCode.USER_LOGIN_EXCEPTION;
+        return Result.failed(code);
+    }
+
     @ExceptionHandler(RateLimitException.class)
     @ResponseStatus(HttpStatus.TOO_MANY_REQUESTS)
     public <T> Result<T> handleRateLimitException(RateLimitException e) {
@@ -178,17 +211,12 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(Exception.class)
     @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
-    public <T> Result<T> handleException(Exception e, HttpServletRequest request) throws Exception {
-        if (e instanceof AccessDeniedException
-                || e instanceof AuthenticationException) {
-            throw e;
-        }
-        String accept = request.getHeader("Accept");
-        if (accept != null && accept.contains(MediaType.TEXT_EVENT_STREAM_VALUE)) {
+    public <T> Result<T> handleException(Exception e) throws Exception {
+        if (e instanceof AccessDeniedException) {
             throw e;
         }
         log.error("unknown exception", e);
-        return Result.failed(e.getLocalizedMessage());
+        return Result.failed(ResultCode.SYSTEM_ERROR);
     }
 
     private String convertMessage(Throwable throwable) {

@@ -1,6 +1,5 @@
 package com.youlai.boot.auth.qrcode.service;
 
-import cn.hutool.core.util.IdUtil;
 import cn.hutool.core.util.StrUtil;
 import com.youlai.boot.auth.qrcode.enums.QrCodeLoginStatusEnum;
 import com.youlai.boot.auth.qrcode.model.context.QrCodeLoginContext;
@@ -9,19 +8,23 @@ import com.youlai.boot.auth.qrcode.model.vo.QrCodeStatusVO;
 import com.youlai.boot.common.constant.RedisConstants;
 import com.youlai.boot.common.exception.TokenInvalidException;
 import com.youlai.boot.common.result.ResultCode;
-import com.youlai.boot.framework.security.model.AuthenticationToken;
+import com.youlai.boot.framework.security.model.TokenPair;
 import com.youlai.boot.framework.security.model.SecurityUser;
 import com.youlai.boot.framework.security.model.SecurityUserDetails;
-import com.youlai.boot.framework.security.token.TokenManager;
-import com.youlai.boot.system.service.UserSocialService;
+import com.youlai.boot.framework.security.session.SessionService;
+import com.youlai.boot.framework.security.token.SecureTokenGenerator;
+import com.youlai.boot.system.service.UserIdentityService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.data.redis.core.StringRedisTemplate;
+import org.springframework.data.redis.core.script.DefaultRedisScript;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Service;
 import tools.jackson.databind.json.JsonMapper;
 
+import java.time.Duration;
+import java.util.List;
 import java.util.concurrent.TimeUnit;
 
 /**
@@ -38,27 +41,33 @@ public class QrCodeLoginService {
     // 票据默认有效期（秒）
     private static final int DEFAULT_EXPIRE_SECONDS = 300;
 
-    // 状态流转时若 Redis 剩余 TTL 小于该值，补足到此值
-    private static final int MIN_REMAIN_SECONDS = 30;
+    // 状态只能单向推进，写入沿用票据剩余有效期
+    private static final DefaultRedisScript<Long> TRANSITION = new DefaultRedisScript<>("""
+            local raw = redis.call('GET', KEYS[1])
+            if not raw or cjson.decode(raw).status ~= ARGV[1] then return 0 end
+            local ttl = redis.call('PTTL', KEYS[1])
+            if ttl <= 0 then return 0 end
+            redis.call('SET', KEYS[1], ARGV[2], 'PX', ttl)
+            return 1
+            """, Long.class);
 
-    // 从 Redis 读回的值可能是不带类型信息的 Map（序列化器以 Object.class 存储），
-    private static final JsonMapper JSON_MAPPER = JsonMapper.builder().build();
-
-    private final RedisTemplate<String, Object> redisTemplate;
-    private final TokenManager tokenManager;
-    private final UserSocialService userSocialService;
+    private final StringRedisTemplate redisTemplate;
+    private final JsonMapper json;
+    private final SessionService sessionService;
+    private final UserIdentityService userIdentityService;
 
     /**
      * 生成扫码票据，写入 Redis 后返回 ticket 和有效期
      */
     public QrCodeGenerateVO generate(String clientIp) {
-        String ticket = IdUtil.fastSimpleUUID();
+        String ticket = SecureTokenGenerator.generate();
         QrCodeLoginContext ctx = new QrCodeLoginContext();
         ctx.setTicket(ticket);
         ctx.setStatus(QrCodeLoginStatusEnum.WAITING.name());
         ctx.setCreatedAt(System.currentTimeMillis());
         ctx.setClientIp(clientIp);
-        save(ctx, DEFAULT_EXPIRE_SECONDS);
+        redisTemplate.opsForValue().set(key(ticket), json.writeValueAsString(ctx),
+                Duration.ofSeconds(DEFAULT_EXPIRE_SECONDS));
         return QrCodeGenerateVO.builder()
                 .ticket(ticket)
                 .expireSeconds(DEFAULT_EXPIRE_SECONDS)
@@ -82,7 +91,7 @@ public class QrCodeLoginService {
         fillUserInfo(ctx, userId);
         ctx.setStatus(QrCodeLoginStatusEnum.SCANNED.name());
         ctx.setScannedAt(System.currentTimeMillis());
-        save(ctx, refreshTtl(ticket));
+        transition(ctx, QrCodeLoginStatusEnum.WAITING);
         return toResp(ctx, remainingSeconds(ticket));
     }
 
@@ -95,7 +104,7 @@ public class QrCodeLoginService {
         requireSameUser(ctx, userId);
         ctx.setStatus(QrCodeLoginStatusEnum.CONFIRMED.name());
         ctx.setConfirmedAt(System.currentTimeMillis());
-        save(ctx, refreshTtl(ticket));
+        transition(ctx, QrCodeLoginStatusEnum.SCANNED);
         return toResp(ctx, remainingSeconds(ticket));
     }
 
@@ -116,49 +125,47 @@ public class QrCodeLoginService {
             requireSameUser(ctx, userId);
         }
         ctx.setStatus(QrCodeLoginStatusEnum.CANCELED.name());
-        save(ctx, refreshTtl(ticket));
+        transition(ctx, current);
         return toResp(ctx, remainingSeconds(ticket));
     }
 
     /**
      * PC 端用票据换取会话令牌，CONFIRMED → LOGGED_IN（一次性）
      */
-    public AuthenticationToken login(String ticket) {
+    public TokenPair login(String ticket) {
         QrCodeLoginContext ctx = loadOrThrow(ticket);
         requireStatus(ctx, QrCodeLoginStatusEnum.CONFIRMED);
-        SecurityUser securityUser = userSocialService.getAuthInfoByUserId(ctx.getUserId());
+        SecurityUser securityUser = userIdentityService.getAuthInfoByUserId(ctx.getUserId());
         if (securityUser == null) {
             throw new TokenInvalidException(ResultCode.ACCOUNT_NOT_FOUND);
+        }
+        if (!Integer.valueOf(1).equals(securityUser.getStatus())) {
+            throw new TokenInvalidException(ResultCode.ACCOUNT_FROZEN);
         }
         SecurityUserDetails details = new SecurityUserDetails(securityUser);
         Authentication authentication = new UsernamePasswordAuthenticationToken(
                 details, null, details.getAuthorities());
-        AuthenticationToken token = tokenManager.generateToken(authentication);
-        // 换取令牌成功后立即把票据置为已使用（一次性），再次 login 会在 requireStatus(CONFIRMED) 处被拒
+        // 先原子消费，再签发凭证，确保并发兑换最多成功一次
         ctx.setStatus(QrCodeLoginStatusEnum.LOGGED_IN.name());
-        save(ctx, Math.max(remainingSeconds(ticket), MIN_REMAIN_SECONDS));
-        return token;
+        transition(ctx, QrCodeLoginStatusEnum.CONFIRMED);
+        return sessionService.create(authentication);
     }
 
     /**
      * 读取票据上下文，票据为空、不存在或已过期都视为 QR_CODE_NOT_FOUND
      */
     private QrCodeLoginContext loadOrThrow(String ticket) {
-        if (StrUtil.isBlank(ticket)) {
+        if (ticket == null || !ticket.matches("[A-Za-z0-9_-]{43}")) {
             throw new TokenInvalidException(ResultCode.QR_CODE_NOT_FOUND);
         }
-        Object raw = redisTemplate.opsForValue().get(key(ticket));
+        String raw = redisTemplate.opsForValue().get(key(ticket));
         if (raw == null) {
             throw new TokenInvalidException(ResultCode.QR_CODE_NOT_FOUND);
         }
-        if (raw instanceof QrCodeLoginContext ctx) {
-            return ctx;
-        }
-        // 序列化器以 Object.class 存储、未带类型信息，读回来是 Map，这里再转回强类型
         try {
-            return JSON_MAPPER.convertValue(raw, QrCodeLoginContext.class);
-        } catch (Exception e) {
-            log.error("扫码登录上下文反序列化失败, ticket={}", ticket, e);
+            return json.readValue(raw, QrCodeLoginContext.class);
+        } catch (tools.jackson.core.JacksonException exception) {
+            log.warn("扫码票据数据格式错误");
             throw new TokenInvalidException(ResultCode.QR_CODE_NOT_FOUND);
         }
     }
@@ -185,7 +192,7 @@ public class QrCodeLoginService {
      * 扫码时把当前 APP 用户的昵称、头像写进上下文，供 PC 端 status 展示
      */
     private void fillUserInfo(QrCodeLoginContext ctx, Long userId) {
-        SecurityUser info = userSocialService.getAuthInfoByUserId(userId);
+        SecurityUser info = userIdentityService.getAuthInfoByUserId(userId);
         if (info == null) {
             throw new TokenInvalidException(ResultCode.ACCOUNT_NOT_FOUND);
         }
@@ -195,10 +202,14 @@ public class QrCodeLoginService {
     }
 
     /**
-     * 重写整个上下文并刷新 TTL
+     * 按期望状态原子替换，保持原有截止时间
      */
-    private void save(QrCodeLoginContext ctx, int ttl) {
-        redisTemplate.opsForValue().set(key(ctx.getTicket()), ctx, ttl, TimeUnit.SECONDS);
+    private void transition(QrCodeLoginContext context, QrCodeLoginStatusEnum expected) {
+        Long changed = redisTemplate.execute(TRANSITION, List.of(key(context.getTicket())),
+                expected.name(), json.writeValueAsString(context));
+        if (!Long.valueOf(1).equals(changed)) {
+            throw new TokenInvalidException(ResultCode.QR_CODE_STATUS_ILLEGAL);
+        }
     }
 
     /**
@@ -207,14 +218,6 @@ public class QrCodeLoginService {
     private int remainingSeconds(String ticket) {
         Long ttl = redisTemplate.getExpire(key(ticket), TimeUnit.SECONDS);
         return ttl == null ? 0 : Math.max(ttl.intValue(), 0);
-    }
-
-    /**
-     * 状态流转时写回的 TTL：维持剩余时间，不足 MIN_REMAIN_SECONDS 则补足
-     */
-    private int refreshTtl(String ticket) {
-        int remain = remainingSeconds(ticket);
-        return remain < MIN_REMAIN_SECONDS ? MIN_REMAIN_SECONDS : remain;
     }
 
     /**
@@ -257,6 +260,6 @@ public class QrCodeLoginService {
      * 拼接票据在 Redis 中的完整 Key
      */
     private String key(String ticket) {
-        return StrUtil.format(RedisConstants.Auth.QR_CODE_LOGIN, ticket);
+        return StrUtil.format(RedisConstants.Auth.QR_CODE_LOGIN, SecureTokenGenerator.digest(ticket));
     }
 }

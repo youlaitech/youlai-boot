@@ -1,11 +1,9 @@
+import type { PageQuery } from "@/api/common";
+
 /**
- * ${entityName} $!{businessName}类型定义
+ * $!{businessName}查询参数
  */
-
-import type { BaseQueryParams } from "@/api/common";
-
-/** $!{businessName}查询参数 */
-export interface ${entityName}QueryParams extends BaseQueryParams {
+export interface ${entityName}Query extends PageQuery {
 #foreach($fieldConfig in $fieldConfigs)
   #if($fieldConfig.isShowInQuery)
     #if("$!fieldConfig.fieldComment" != "")
@@ -24,11 +22,13 @@ export interface ${entityName}QueryParams extends BaseQueryParams {
 #end
 }
 
-/** $!{businessName}表单对象 */
+/**
+ * $!{businessName}表单对象
+ */
 export interface ${entityName}Form {
   id?: string;
 #foreach($fieldConfig in $fieldConfigs)
-  #if($fieldConfig.isShowInForm)
+  #if($fieldConfig.isShowInForm && $fieldConfig.fieldName != "id")
     #if("$!fieldConfig.fieldComment" != "")
   /** ${fieldConfig.fieldComment} */
     #end
@@ -37,13 +37,19 @@ export interface ${entityName}Form {
 #end
 }
 
-/** $!{businessName}详情对象 */
+/**
+ * $!{businessName}详情对象
+ */
 export type ${entityName}Detail = ${entityName}Item & ${entityName}Form;
 
-/** $!{businessName}列表项 */
+/**
+ * $!{businessName}列表项
+ */
 export interface ${entityName}Item {
+  /** 稳定主键，不受列表显示配置影响 */
+  id: string;
 #foreach($fieldConfig in $fieldConfigs)
-  #if($fieldConfig.isShowInList)
+  #if($fieldConfig.isShowInList && $fieldConfig.fieldName != "id")
     #if("$!fieldConfig.fieldComment" != "")
   /** ${fieldConfig.fieldComment} */
     #end

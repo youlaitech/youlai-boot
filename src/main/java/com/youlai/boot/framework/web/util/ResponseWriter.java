@@ -13,6 +13,9 @@ import java.nio.charset.StandardCharsets;
 
 /**
  * 响应写入器
+ *
+ * @author Ray.Hao
+ * @since 4.13.0
  */
 @Slf4j
 public final class ResponseWriter {
@@ -54,6 +57,7 @@ public final class ResponseWriter {
 
     private static int mapHttpStatus(ResultCode resultCode) {
         return switch (resultCode) {
+            case AUTH_SERVICE_UNAVAILABLE -> HttpStatus.SERVICE_UNAVAILABLE.value();
             case ACCESS_UNAUTHORIZED, ACCESS_TOKEN_INVALID, REFRESH_TOKEN_INVALID -> HttpStatus.UNAUTHORIZED.value();
             case ACCESS_PERMISSION_EXCEPTION -> HttpStatus.FORBIDDEN.value();
             case REQUEST_CONCURRENCY_LIMIT_EXCEEDED -> HttpStatus.TOO_MANY_REQUESTS.value();

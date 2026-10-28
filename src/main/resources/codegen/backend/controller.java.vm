@@ -35,7 +35,7 @@ public class ${entityName}Controller  {
     @Operation(summary = "$!{businessName}分页列表")
     @GetMapping
     @PreAuthorize("@ss.hasPerm('${moduleName}:${entityKebab}:list')")
-    public PageResult<${entityName}VO> get${entityName}Page(${entityName}Query queryParams ) {
+    public PageResult<${entityName}VO> get${entityName}Page(@Valid ${entityName}Query queryParams ) {
         IPage<${entityName}VO> result = ${entityLowerCamel}Service.get${entityName}Page(queryParams);
         return PageResult.success(result);
     }

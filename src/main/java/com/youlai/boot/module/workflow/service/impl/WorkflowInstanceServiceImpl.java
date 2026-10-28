@@ -9,7 +9,7 @@ import com.youlai.boot.module.form.model.vo.FormDataVO;
 import com.youlai.boot.module.form.service.FormDataService;
 import com.youlai.boot.module.workflow.enums.InstanceStatusEnum;
 import com.youlai.boot.module.workflow.model.form.StartProcessForm;
-import com.youlai.boot.module.workflow.model.query.WorkflowInstancePageQuery;
+import com.youlai.boot.module.workflow.model.query.WorkflowInstanceQuery;
 import com.youlai.boot.module.workflow.model.vo.InstanceDetailVO;
 import com.youlai.boot.module.workflow.model.vo.InstancePageVO;
 import com.youlai.boot.module.workflow.model.vo.ProcessDiagramVO;
@@ -109,7 +109,7 @@ public class WorkflowInstanceServiceImpl implements WorkflowInstanceService {
      * @param queryParams 查询参数
      */
     @Override
-    public Page<InstancePageVO> getInstancePage(WorkflowInstancePageQuery queryParams) {
+    public Page<InstancePageVO> getInstancePage(WorkflowInstanceQuery queryParams) {
         HistoricProcessInstanceQuery query = historyService.createHistoricProcessInstanceQuery()
                 .startedBy(SecurityUtils.getUsername());
         if (StrUtil.isNotBlank(queryParams.getKeywords())) {

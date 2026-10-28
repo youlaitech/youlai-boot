@@ -24,7 +24,7 @@ import com.youlai.boot.module.form.model.entity.FormDefinition;
 import com.youlai.boot.module.form.model.entity.FormSnapshot;
 import com.youlai.boot.module.form.model.form.FormDefinitionForm;
 import com.youlai.boot.module.form.model.form.FormMenuForm;
-import com.youlai.boot.module.form.model.query.FormDefinitionPageQuery;
+import com.youlai.boot.module.form.model.query.FormDefinitionQuery;
 import com.youlai.boot.module.form.model.vo.FormDefinitionPageVO;
 import com.youlai.boot.module.form.model.vo.FormMenuVO;
 import com.youlai.boot.module.form.model.vo.FormRenderVO;
@@ -82,7 +82,7 @@ public class FormDefinitionServiceImpl extends ServiceImpl<FormDefinitionMapper,
     // 表单管理目录名称（顶级，dynamic-form.sql 预置）："表单中心"默认挂载其下，顶级入口聚合
     private static final String FORM_ADMIN_CATALOG_NAME = "动态表单";
 
-    // 渲染缓存兜底 TTL：事件驱动清缓存外再设过期，防 DB 更新与删缓存间应用重启导致脏缓存永续
+    // 失效通知可能因进程中断丢失，以 TTL 限制旧规则的最长存留时间
     private static final long RENDER_CACHE_TTL_MINUTES = 30;
 
     /**
@@ -91,7 +91,7 @@ public class FormDefinitionServiceImpl extends ServiceImpl<FormDefinitionMapper,
      * @param queryParams 查询参数
      */
     @Override
-    public Page<FormDefinitionPageVO> getFormDefinitionPage(FormDefinitionPageQuery queryParams) {
+    public Page<FormDefinitionPageVO> getFormDefinitionPage(FormDefinitionQuery queryParams) {
         int pageNum = queryParams.getPageNum();
         int pageSize = queryParams.getPageSize();
         return this.baseMapper.getFormDefinitionPage(new Page<>(pageNum, pageSize), queryParams);
@@ -409,7 +409,7 @@ public class FormDefinitionServiceImpl extends ServiceImpl<FormDefinitionMapper,
             }
         }
 
-        // 组装菜单：类型 M，指向通用承载页；已生成过时携带原菜单ID走更新语义（幂等）
+        // 已生成过菜单时更新原记录，重复发布不创建新菜单
         String routeName = "FormRender" + StrUtil.upperFirst(StrUtil.toCamelCase(form.getFormKey(), '_'));
         MenuForm menuFormData = new MenuForm();
         menuFormData.setId(form.getMenuId());
@@ -423,11 +423,13 @@ public class FormDefinitionServiceImpl extends ServiceImpl<FormDefinitionMapper,
         menuFormData.setVisible(1);
         menuFormData.setSort(1);
         // keepAlive 不开启：多个表单菜单共用 render 组件，组件级缓存会导致切换表单时回显错乱
-        boolean result = menuService.saveMenu(menuFormData);
+        boolean result = form.getMenuId() == null
+                ? menuService.saveMenu(menuFormData)
+                : menuService.updateMenu(form.getMenuId(), menuFormData);
         if (!result) {
             return false;
         }
-        // saveMenu 内部 saveOrUpdate 不回写表单对象主键，按全局唯一路由名称反查菜单ID
+        // 保存不回写表单对象主键，按全局唯一路由名称查询菜单ID
         Menu menu = menuService.getOne(new LambdaQueryWrapper<Menu>()
                 .eq(Menu::getRouteName, routeName)
                 .last("LIMIT 1")
@@ -578,9 +580,7 @@ public class FormDefinitionServiceImpl extends ServiceImpl<FormDefinitionMapper,
                 .toList();
     }
 
-    //---------------------------------------------------
-    // AI 辅助：未开启 AI 时调用返回业务异常
-    //---------------------------------------------------
+    // AI 未启用时返回业务异常
 
     /**
      * 用 AI 把需求描述转成 form-create 规则

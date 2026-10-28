@@ -60,18 +60,15 @@ public class DeptServiceImpl extends ServiceImpl<DeptMapper, Dept> implements De
             return Collections.EMPTY_LIST;
         }
 
-        // 获取所有部门ID
         Set<Long> deptIds = deptList.stream()
                 .map(Dept::getId)
                 .collect(Collectors.toSet());
-        // 获取父节点ID
         Set<Long> parentIds = deptList.stream()
                 .map(Dept::getParentId)
                 .collect(Collectors.toSet());
-        // 获取根节点ID（递归的起点），即父节点ID中不包含在部门ID中的节点，注意这里不能拿顶级部门 O 作为根节点，因为部门筛选的时候 O 会被过滤掉
+        // 从结果集以外的父节点开始构树，避免筛选后遗漏子树
         List<Long> rootIds = CollectionUtil.subtractToList(parentIds, deptIds);
 
-        // 递归生成部门树形列表
         return rootIds.stream()
                 .flatMap(rootId -> recurDeptList(rootId, deptList).stream())
                 .toList();

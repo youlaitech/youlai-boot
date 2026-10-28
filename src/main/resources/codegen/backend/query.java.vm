@@ -15,6 +15,9 @@ import lombok.Setter;
 import java.util.List;
     #end
 #end
+#if(${hasLocalDate})
+import java.time.LocalDate;
+#end
 #if(${hasLocalDateTime})
 import java.time.LocalDateTime;
 #end
@@ -23,12 +26,12 @@ import java.math.BigDecimal;
 #end
 
 /**
- * $!{businessName}查询对象
+ * $!{businessName}分页查询对象
  *
  * @author ${author}
  * @since ${date}
  */
-@Schema(description ="$!{businessName}查询对象")
+@Schema(description ="$!{businessName}分页查询对象")
 @Getter
 @Setter
 public class ${entityName}Query extends BaseQuery {

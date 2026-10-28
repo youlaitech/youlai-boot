@@ -1,12 +1,13 @@
 package com.youlai.boot.framework.security.model;
 
 import lombok.Data;
+import lombok.ToString;
 
 import java.util.List;
 import java.util.Set;
 
 /**
- * 安全模块用户数据 POJO。
+ * 安全模块用户数据 POJO
  *
  * @author Ray.Hao
  * @since 2025/12/16
@@ -27,6 +28,7 @@ public class SecurityUser {
     private Long deptId;
 
     // 密码（加密后）
+    @ToString.Exclude
     private String password;
 
     // 状态（1:启用 其它:禁用）

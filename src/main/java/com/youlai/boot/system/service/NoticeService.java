@@ -82,6 +82,11 @@ public interface NoticeService extends IService<Notice> {
     NoticeDetailVO getNoticeDetail(Long id);
 
     /**
+     * 管理员预览，不修改接收人的阅读状态
+     */
+    NoticeDetailVO getNoticePreview(Long id);
+
+    /**
      * 获取我的通知公告分页列表
      *
      * @param queryParams 查询参数

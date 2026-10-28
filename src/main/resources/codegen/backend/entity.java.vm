@@ -2,6 +2,9 @@ package ${packageName}.${moduleName}.${subpackageName};
 
 import lombok.Getter;
 import lombok.Setter;
+#if(${hasLocalDate})
+import java.time.LocalDate;
+#end
 #if(${hasLocalDateTime})
 import java.time.LocalDateTime;
 #end

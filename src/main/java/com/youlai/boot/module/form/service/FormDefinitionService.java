@@ -5,7 +5,7 @@ import com.youlai.boot.common.model.Option;
 import com.youlai.boot.module.form.model.entity.FormDefinition;
 import com.youlai.boot.module.form.model.form.FormDefinitionForm;
 import com.youlai.boot.module.form.model.form.FormMenuForm;
-import com.youlai.boot.module.form.model.query.FormDefinitionPageQuery;
+import com.youlai.boot.module.form.model.query.FormDefinitionQuery;
 import com.youlai.boot.module.form.model.vo.FormDefinitionPageVO;
 import com.youlai.boot.module.form.model.vo.FormMenuVO;
 import com.youlai.boot.module.form.model.vo.FormRenderVO;
@@ -26,7 +26,7 @@ public interface FormDefinitionService {
      * @param queryParams 查询参数
      * @return 表单定义分页列表
      */
-    Page<FormDefinitionPageVO> getFormDefinitionPage(FormDefinitionPageQuery queryParams);
+    Page<FormDefinitionPageVO> getFormDefinitionPage(FormDefinitionQuery queryParams);
 
     /**
      * 按主键查询表单定义（供模块内回退取规则等场景）

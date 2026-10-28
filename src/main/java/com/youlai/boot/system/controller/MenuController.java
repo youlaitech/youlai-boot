@@ -17,6 +17,8 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
+import jakarta.validation.constraints.Max;
+import jakarta.validation.constraints.Min;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -72,6 +74,9 @@ public class MenuController {
         return Result.success(menu);
     }
 
+    /**
+     * 新增菜单，由持久化层生成主键
+     */
     @Operation(summary = "新增菜单")
     @PostMapping
     @PreAuthorize("@ss.hasPerm('sys:menu:create')")
@@ -82,6 +87,9 @@ public class MenuController {
         return Result.judge(result);
     }
 
+    /**
+     * 更新路径指定的菜单，不使用表单主键切换目标
+     */
     @Operation(summary = "修改菜单")
     @PutMapping(value = "/{menuId}")
     @PreAuthorize("@ss.hasPerm('sys:menu:update')")
@@ -90,7 +98,7 @@ public class MenuController {
             @Parameter(description = "菜单ID") @PathVariable Long menuId,
             @RequestBody @Valid MenuForm menuForm
     ) {
-        boolean result = menuService.saveMenu(menuForm);
+        boolean result = menuService.updateMenu(menuId, menuForm);
         return Result.judge(result);
     }
 
@@ -105,14 +113,18 @@ public class MenuController {
         return Result.judge(result);
     }
 
+    /**
+     * 修改菜单显示状态，仅接受0或1
+     */
     @Operation(summary = "修改菜单显示状态")
     @PatchMapping("/{menuId}")
     @PreAuthorize("@ss.hasPerm('sys:menu:update')")
     @Log(module = LogModuleEnum.MENU, value = ActionTypeEnum.UPDATE)
     public Result<Void> updateMenuVisible(
             @Parameter(description = "菜单ID") @PathVariable Long menuId,
-            @Parameter(description = "显示状态(1:显示;0:隐藏)") Integer visible
-
+            @Parameter(description = "显示状态(1:显示;0:隐藏)") @RequestParam
+            @Min(value = 0, message = "菜单显示状态只能为0或1")
+            @Max(value = 1, message = "菜单显示状态只能为0或1") Integer visible
     ) {
         boolean result = menuService.updateMenuVisible(menuId, visible);
         return Result.judge(result);

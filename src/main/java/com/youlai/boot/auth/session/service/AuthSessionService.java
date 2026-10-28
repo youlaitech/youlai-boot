@@ -1,45 +1,45 @@
 package com.youlai.boot.auth.session.service;
 
-import cn.hutool.core.util.StrUtil;
-import com.youlai.boot.framework.security.model.AuthenticationToken;
-import com.youlai.boot.framework.security.token.TokenManager;
-import com.youlai.boot.framework.security.util.SecurityUtils;
+import com.youlai.boot.auth.oidc.service.OidcLogoutService;
+import com.youlai.boot.framework.security.model.TokenPair;
+import com.youlai.boot.framework.security.session.AuthenticatedSession;
+import com.youlai.boot.framework.security.session.SessionService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
 /**
- * 登录态服务
+ * 登录会话的 HTTP 用例入口
  *
  * @author Ray.Hao
- * @since 4.8.0
+ * @since 4.13.0
  */
 @Service
 @RequiredArgsConstructor
 public class AuthSessionService {
 
-    private final TokenManager tokenManager;
+    private final SessionService sessions;
+    private final ObjectProvider<OidcLogoutService> oidcLogout;
 
     /**
-     * 注销登录
+     * 先撤销本地会话，再尝试退出认证中心
      */
-    public void logout() {
-        String token = SecurityUtils.getAccessToken();
-        if (StrUtil.isNotBlank(token)) {
-            tokenManager.invalidateToken(token);
-            // 清除Security上下文
-            SecurityContextHolder.clearContext();
+    public String logout() {
+        var authentication = SecurityContextHolder.getContext().getAuthentication();
+        if (authentication == null || !(authentication.getDetails() instanceof AuthenticatedSession session)) {
+            return null;
         }
+        sessions.revokeSession(session.id());
+        SecurityContextHolder.clearContext();
+        var logout = oidcLogout.getIfAvailable();
+        return logout == null ? null : logout.getLogoutUrl(session.context());
     }
 
     /**
-     * 刷新令牌
-     *
-     * @param refreshToken 刷新令牌
-     * @return 新的访问令牌
+     * 刷新当前登录会话
      */
-    public AuthenticationToken refreshToken(String refreshToken) {
-        return tokenManager.refreshToken(refreshToken);
+    public TokenPair refreshToken(String refreshToken) {
+        return sessions.refresh(refreshToken);
     }
-
 }

@@ -3,7 +3,7 @@ package com.youlai.boot.module.workflow.service;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.youlai.boot.module.workflow.model.form.ModelForm;
 import com.youlai.boot.module.workflow.model.form.ModelXmlForm;
-import com.youlai.boot.module.workflow.model.query.WorkflowModelPageQuery;
+import com.youlai.boot.module.workflow.model.query.WorkflowModelQuery;
 import com.youlai.boot.module.workflow.model.vo.ModelVO;
 import com.youlai.boot.module.workflow.model.vo.ModelXmlVO;
 
@@ -26,7 +26,7 @@ public interface WorkflowModelService {
      * @param queryParams 查询参数
      * @return 分页结果
      */
-    Page<ModelVO> getModelPage(WorkflowModelPageQuery queryParams);
+    Page<ModelVO> getModelPage(WorkflowModelQuery queryParams);
 
     /**
      * 新增流程模型（内置开始-审批-结束模板，设计器开箱即画）

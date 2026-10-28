@@ -1,7 +1,7 @@
 package com.youlai.boot.module.form.service;
 
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
-import com.youlai.boot.module.form.model.query.FormDataPageQuery;
+import com.youlai.boot.module.form.model.query.FormDataQuery;
 import com.youlai.boot.module.form.model.vo.FormDataVO;
 
 import java.util.List;
@@ -50,7 +50,7 @@ public interface FormDataService {
      * @param queryParams 查询参数
      * @return 表单数据分页列表
      */
-    Page<FormDataVO> getFormDataPage(String formKey, FormDataPageQuery queryParams);
+    Page<FormDataVO> getFormDataPage(String formKey, FormDataQuery queryParams);
 
     /**
      * 获取表单数据详情（只读回显）

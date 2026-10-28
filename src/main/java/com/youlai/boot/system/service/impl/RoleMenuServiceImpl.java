@@ -11,6 +11,8 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.support.TransactionSynchronization;
+import org.springframework.transaction.support.TransactionSynchronizationManager;
 
 import java.time.Duration;
 import java.util.*;
@@ -27,88 +29,110 @@ import java.util.stream.Collectors;
 @Slf4j
 public class RoleMenuServiceImpl extends ServiceImpl<RoleMenuMapper, RoleMenu> implements RoleMenuService {
 
-    // 权限缓存 TTL（秒）。
+    // 权限缓存 TTL（秒）
     private static final Duration ROLE_PERMS_TTL = Duration.ofSeconds(600);
 
     private final RedisTemplate<String, Object> redisTemplate;
 
     /**
-     * 刷新权限缓存
+     * 刷新全部角色权限缓存，有事务时在提交后执行
      */
     @Override
     public void refreshRolePermsCache() {
-        String cacheKey = RedisConstants.System.ROLE_PERMS;
+        afterCommit(() -> {
+            String cacheKey = RedisConstants.System.ROLE_PERMS;
 
-        // 清理权限缓存
-        redisTemplate.delete(cacheKey);
+            // 清理权限缓存
+            redisTemplate.delete(cacheKey);
 
-        // 预热权限缓存，避免后续请求触发频繁回源
-        List<RolePermsDTO> list = this.baseMapper.getRolePermsList(null);
-        if (CollectionUtil.isNotEmpty(list)) {
-            list.forEach(item -> {
-                String roleCode = item.getRoleCode();
-                Set<String> perms = item.getPerms();
-                if (CollectionUtil.isNotEmpty(perms)) {
-                    redisTemplate.opsForHash().put(cacheKey, roleCode, perms);
-                }
-            });
-            refreshCacheTtl(cacheKey);
-        }
+            // 预热权限缓存，避免后续请求触发频繁回源
+            List<RolePermsDTO> list = this.baseMapper.getRolePermsList(null);
+            if (CollectionUtil.isNotEmpty(list)) {
+                list.forEach(item -> {
+                    String roleCode = item.getRoleCode();
+                    Set<String> perms = item.getPerms();
+                    if (CollectionUtil.isNotEmpty(perms)) {
+                        redisTemplate.opsForHash().put(cacheKey, roleCode, perms);
+                    }
+                });
+                refreshCacheTtl(cacheKey);
+            }
 
-        log.info("权限缓存刷新完成");
+            log.info("权限缓存刷新完成");
+        });
     }
 
     /**
-     * 刷新单个角色权限缓存
+     * 刷新单个角色权限缓存，有事务时在提交后执行
      */
     @Override
     public void refreshRolePermsCache(String roleCode) {
-        String cacheKey = RedisConstants.System.ROLE_PERMS;
+        afterCommit(() -> {
+            String cacheKey = RedisConstants.System.ROLE_PERMS;
 
-        // 清理指定角色缓存
-        redisTemplate.opsForHash().delete(cacheKey, roleCode);
+            // 清理指定角色缓存
+            redisTemplate.opsForHash().delete(cacheKey, roleCode);
 
-        // 回源 DB 并更新缓存
-        List<RolePermsDTO> list = this.baseMapper.getRolePermsList(roleCode);
-        if (CollectionUtil.isNotEmpty(list)) {
-            RolePermsDTO rolePerms = list.get(0);
-            if (rolePerms != null) {
-                Set<String> perms = rolePerms.getPerms();
-                if (CollectionUtil.isNotEmpty(perms)) {
-                    redisTemplate.opsForHash().put(cacheKey, roleCode, perms);
-                    refreshCacheTtl(cacheKey);
+            // 回源 DB 并更新缓存
+            List<RolePermsDTO> list = this.baseMapper.getRolePermsList(roleCode);
+            if (CollectionUtil.isNotEmpty(list)) {
+                RolePermsDTO rolePerms = list.get(0);
+                if (rolePerms != null) {
+                    Set<String> perms = rolePerms.getPerms();
+                    if (CollectionUtil.isNotEmpty(perms)) {
+                        redisTemplate.opsForHash().put(cacheKey, roleCode, perms);
+                        refreshCacheTtl(cacheKey);
+                    }
                 }
             }
-        }
 
-        log.info("角色[{}]权限缓存刷新完成", roleCode);
+            log.info("角色[{}]权限缓存刷新完成", roleCode);
+        });
     }
 
     /**
-     * 刷新权限缓存（角色编码变更时调用）
+     * 角色编码变更后刷新权限缓存，有事务时在提交后执行
      */
     @Override
     public void refreshRolePermsCache(String oldRoleCode, String newRoleCode) {
-        String cacheKey = RedisConstants.System.ROLE_PERMS;
+        afterCommit(() -> {
+            String cacheKey = RedisConstants.System.ROLE_PERMS;
 
-        // 清理旧角色权限缓存
-        redisTemplate.opsForHash().delete(cacheKey, oldRoleCode);
-        redisTemplate.opsForHash().delete(cacheKey, newRoleCode);
+            // 清理旧角色权限缓存
+            redisTemplate.opsForHash().delete(cacheKey, oldRoleCode);
+            redisTemplate.opsForHash().delete(cacheKey, newRoleCode);
 
-        // 回源 DB 并更新新角色编码缓存
-        List<RolePermsDTO> list = this.baseMapper.getRolePermsList(newRoleCode);
-        if (CollectionUtil.isNotEmpty(list)) {
-            RolePermsDTO rolePerms = list.get(0);
-            if (rolePerms != null) {
-                Set<String> perms = rolePerms.getPerms();
-                if (CollectionUtil.isNotEmpty(perms)) {
-                    redisTemplate.opsForHash().put(cacheKey, newRoleCode, perms);
-                    refreshCacheTtl(cacheKey);
+            // 回源 DB 并更新新角色编码缓存
+            List<RolePermsDTO> list = this.baseMapper.getRolePermsList(newRoleCode);
+            if (CollectionUtil.isNotEmpty(list)) {
+                RolePermsDTO rolePerms = list.get(0);
+                if (rolePerms != null) {
+                    Set<String> perms = rolePerms.getPerms();
+                    if (CollectionUtil.isNotEmpty(perms)) {
+                        redisTemplate.opsForHash().put(cacheKey, newRoleCode, perms);
+                        refreshCacheTtl(cacheKey);
+                    }
                 }
             }
-        }
 
-        log.info("角色编码变更: {} -> {}，相关权限缓存刷新完成", oldRoleCode, newRoleCode);
+            log.info("角色编码变更: {} -> {}，相关权限缓存刷新完成", oldRoleCode, newRoleCode);
+        });
+    }
+
+    /**
+     * 事务提交后执行操作，无事务时立即执行
+     */
+    private static void afterCommit(Runnable operation) {
+        if (!TransactionSynchronizationManager.isActualTransactionActive()) {
+            operation.run();
+            return;
+        }
+        TransactionSynchronizationManager.registerSynchronization(new TransactionSynchronization() {
+            @Override
+            public void afterCommit() {
+                operation.run();
+            }
+        });
     }
 
     /**

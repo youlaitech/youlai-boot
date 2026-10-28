@@ -6,17 +6,17 @@ import cn.binarywang.wx.miniapp.bean.WxMaPhoneNumberInfo;
 import cn.hutool.core.util.IdUtil;
 import cn.hutool.core.util.StrUtil;
 import com.youlai.boot.auth.wxma.exception.MobileNotBoundException;
+import com.youlai.boot.auth.wxma.config.WxMaProperties;
 import com.youlai.boot.auth.wxma.model.vo.WxMaLoginVO;
 import com.youlai.boot.auth.wxma.token.WxMaAuthenticationToken;
 import com.youlai.boot.common.constant.RedisConstants;
-import com.youlai.boot.common.enums.SocialPlatformEnum;
-import com.youlai.boot.framework.security.model.AuthenticationToken;
+import com.youlai.boot.framework.security.model.TokenPair;
 import com.youlai.boot.framework.security.model.SecurityUserDetails;
-import com.youlai.boot.framework.security.token.TokenManager;
+import com.youlai.boot.framework.security.session.SessionService;
 import com.youlai.boot.system.model.entity.SysUser;
+import com.youlai.boot.system.service.UserIdentityService;
 import com.youlai.boot.system.service.UserRoleService;
 import com.youlai.boot.system.service.UserService;
-import com.youlai.boot.system.service.UserSocialService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.redis.core.RedisTemplate;
@@ -29,6 +29,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 import java.util.Collections;
+import java.util.concurrent.TimeUnit;
 
 /**
  * 微信小程序认证服务
@@ -42,10 +43,11 @@ import java.util.Collections;
 public class WxMaAuthService {
 
     private final WxMaService wxMaService;
+    private final WxMaProperties wxMaProperties;
     private final AuthenticationManager authenticationManager;
-    private final TokenManager tokenManager;
+    private final SessionService sessionService;
     private final UserService userService;
-    private final UserSocialService userSocialService;
+    private final UserIdentityService userIdentityService;
     private final UserRoleService userRoleService;
     private final RedisTemplate<String, Object> redisTemplate;
 
@@ -53,28 +55,27 @@ public class WxMaAuthService {
      * 静默登录
      *
      * @param code 微信登录凭证（wx.login 获取）
-     * @return 登录结果（成功返回 token，需绑定返回 openid）
+     * @return 已关联时返回令牌，否则返回需绑定手机号的标记
      */
     public WxMaLoginVO silentLogin(String code) {
         WxMaAuthenticationToken token = new WxMaAuthenticationToken(code);
 
         try {
             Authentication authentication = authenticationManager.authenticate(token);
-            AuthenticationToken authToken = tokenManager.generateToken(authentication);
+            TokenPair authToken = sessionService.create(authentication);
             SecurityContextHolder.getContext().setAuthentication(authentication);
             return WxMaLoginVO.builder()
                     .isNewUser(false)
                     .needBindMobile(false)
-                    .accessToken(authToken.getAccessToken())
-                    .refreshToken(authToken.getRefreshToken())
-                    .tokenType(authToken.getTokenType())
-                    .expiresIn(authToken.getExpiresIn())
+                    .accessToken(authToken.accessToken())
+                    .refreshToken(authToken.refreshToken())
+                    .tokenType(authToken.tokenType())
+                    .expiresIn(authToken.expiresIn())
                     .build();
         } catch (MobileNotBoundException e) {
             return WxMaLoginVO.builder()
                     .isNewUser(true)
                     .needBindMobile(true)
-                    .openid(e.getOpenid())
                     .build();
         }
     }
@@ -87,7 +88,7 @@ public class WxMaAuthService {
      * @return 认证令牌
      */
     @Transactional(rollbackFor = Exception.class)
-    public AuthenticationToken phoneLogin(String loginCode, String phoneCode) {
+    public TokenPair phoneLogin(String loginCode, String phoneCode) {
         // 1. 解析微信登录凭证，获取会话信息
         WxMaJscode2SessionResult session = resolveSession(loginCode);
         String openid = session.getOpenid();
@@ -110,13 +111,15 @@ public class WxMaAuthService {
     /**
      * 绑定手机号
      *
-     * @param openid  微信用户唯一标识
+     * @param loginCode 提交绑定前重新获取的微信一次性登录凭证
      * @param mobile  手机号码
      * @param smsCode 短信验证码
      * @return 认证令牌
      */
     @Transactional(rollbackFor = Exception.class)
-    public AuthenticationToken bindMobile(String openid, String mobile, String smsCode) {
+    public TokenPair bindMobile(String loginCode, String mobile, String smsCode) {
+        // OpenID 只从微信接口取得，不能把前端提交的一串 ID 当成身份确认
+        WxMaJscode2SessionResult session = resolveSession(loginCode);
         // 1. 验证短信验证码
         validateSmsCode(mobile, smsCode);
 
@@ -124,14 +127,9 @@ public class WxMaAuthService {
         SysUser user = findOrCreateUser(mobile);
 
         // 3. 绑定微信 openid
-        userSocialService.bindOrUpdate(
-                user.getId(),
-                SocialPlatformEnum.WECHAT_MINI,
-                openid,
-                null, null, null, null
-        );
+        bindWechatOpenid(user, session);
 
-        log.info("微信小程序绑定手机号成功：mobile={}, openid={}", mobile, openid);
+        log.info("微信小程序绑定手机号成功：userId={}", user.getId());
 
         // 4. 生成认证令牌
         return generateAuthToken(mobile);
@@ -146,7 +144,7 @@ public class WxMaAuthService {
         try {
             return wxMaService.jsCode2SessionInfo(loginCode);
         } catch (Exception e) {
-            log.error("获取微信会话信息失败，loginCode={}", loginCode, e);
+            log.error("获取微信会话信息失败", e);
             throw new IllegalArgumentException("微信登录失败：" + e.getMessage());
         }
     }
@@ -159,7 +157,7 @@ public class WxMaAuthService {
             WxMaPhoneNumberInfo phoneInfo = wxMaService.getUserService().getPhoneNoInfo(phoneCode);
             return phoneInfo.getPhoneNumber();
         } catch (Exception e) {
-            log.error("获取微信手机号失败，phoneCode={}", phoneCode, e);
+            log.error("获取微信手机号失败", e);
             throw new IllegalArgumentException("获取手机号失败：" + e.getMessage());
         }
     }
@@ -195,7 +193,7 @@ public class WxMaAuthService {
         userService.save(user);
 
         // 分配 GUEST 角色（角色ID=3）
-        userRoleService.saveUserRoles(user.getId(), Collections.singletonList(3L));
+        userRoleService.replaceUserRoles(user.getId(), Collections.singletonList(3L));
 
         return user;
     }
@@ -204,20 +202,24 @@ public class WxMaAuthService {
      * 绑定微信 openid
      */
     private void bindWechatOpenid(SysUser user, WxMaJscode2SessionResult session) {
-        try {
-            userSocialService.bindOrUpdate(
-                    user.getId(),
-                    SocialPlatformEnum.WECHAT_MINI,
-                    session.getOpenid(),
-                    session.getUnionid(),
-                    user.getNickname(),
-                    user.getAvatar(),
-                    session.getSessionKey()
-            );
-        } catch (Exception e) {
-            // 绑定失败不影响登录
-            log.warn("绑定微信 openid 失败，userId={}, openid={}", user.getId(), session.getOpenid(), e);
+        // 冲突必须回滚本次用户创建和关联，不能吞掉失败后继续签发令牌
+        userIdentityService.bindIdentity(user.getId(), wxMaProperties.getProvider(), session.getOpenid());
+        cacheSessionKey(session.getOpenid(), session.getSessionKey());
+        userIdentityService.markLogin(wxMaProperties.getProvider(), session.getOpenid());
+    }
+
+    /**
+     * 缓存微信会话密钥，供后续解密类接口使用；数据库不再保存该凭证
+     */
+    private void cacheSessionKey(String openid, String sessionKey) {
+        if (StrUtil.isBlank(openid) || StrUtil.isBlank(sessionKey)) {
+            return;
         }
+        redisTemplate.opsForValue().set(
+                StrUtil.format(RedisConstants.WxMa.SESSION_KEY, wxMaProperties.getProvider(), openid),
+                sessionKey,
+                RedisConstants.WxMa.SESSION_KEY_TTL_DAYS,
+                TimeUnit.DAYS);
     }
 
     /**
@@ -238,12 +240,12 @@ public class WxMaAuthService {
     /**
      * 生成认证令牌
      */
-    private AuthenticationToken generateAuthToken(String mobile) {
+    private TokenPair generateAuthToken(String mobile) {
         SecurityUserDetails userDetails = new SecurityUserDetails(userService.getAuthInfoByMobile(mobile));
         Authentication authentication = new UsernamePasswordAuthenticationToken(
                 userDetails, null, userDetails.getAuthorities()
         );
-        AuthenticationToken authToken = tokenManager.generateToken(authentication);
+        TokenPair authToken = sessionService.create(authentication);
         SecurityContextHolder.getContext().setAuthentication(authentication);
         return authToken;
     }

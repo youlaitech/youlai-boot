@@ -243,9 +243,7 @@ public class GenTableServiceImpl extends ServiceImpl<GenTableMapper, GenTable> i
         }
     }
 
-    //---------------------------------------------------
-    // AI 辅助：未开启 AI 时调用返回业务异常
-    //---------------------------------------------------
+    // AI 未启用时返回业务异常
 
     /**
      * 用 AI 推断代码生成配置

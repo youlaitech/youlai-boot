@@ -3,7 +3,7 @@ package com.youlai.boot.module.form.mapper;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.youlai.boot.module.form.model.entity.FormData;
-import com.youlai.boot.module.form.model.query.FormDataPageQuery;
+import com.youlai.boot.module.form.model.query.FormDataQuery;
 import com.youlai.boot.module.form.model.vo.FormDataVO;
 import org.apache.ibatis.annotations.Mapper;
 
@@ -24,6 +24,6 @@ public interface FormDataMapper extends BaseMapper<FormData> {
      * @param queryParams 查询参数
      * @return 表单数据分页列表
      */
-    Page<FormDataVO> getFormDataPage(Page<FormDataVO> page, Long formId, FormDataPageQuery queryParams);
+    Page<FormDataVO> getFormDataPage(Page<FormDataVO> page, Long formId, FormDataQuery queryParams);
 
 }

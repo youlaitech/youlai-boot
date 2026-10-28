@@ -32,6 +32,8 @@
 
 - 🔐 **安全体系** — Spring Security + JWT/Redis Token 双会话模式、令牌续期、多端互斥
 
+- 🔑 **统一认证（可选，默认关闭）** — [OIDC 登录](../docs/youlai-boot/oidc/implementation.md)，把登录交给外部认证中心，认证成功后关联本地用户并复用角色权限；不启用就不会加载相关组件
+
 - 🛡️ **细粒度权限** — RBAC 五级：数据 → 菜单 → 按钮 → 接口 → 字段
 
 - ⚡ **代码生成器** — 一键生成前后端 CRUD 代码
@@ -42,7 +44,7 @@
 
 - 🌐 **多租户 SaaS** — 数据隔离 + 租户配置，独立 [youlai-boot-tenant](https://gitee.com/youlaiorg/youlai-boot-tenant) 版本
 
-- 🔌 **实时通信** — SSE 推送：在线用户数、字典同步、通知广播
+- 🔌 **实时通信** — [WebSocket 接入](../docs/youlai-boot/realtime.md)：一次性票据鉴权、节点在线人数、字典同步、通知提示
 
 ## 系统预览
 
@@ -93,7 +95,12 @@
    # 可选扩展：不装不影响基础功能，需在基础库之后执行
    sql/extensions/dynamic-form.sql # 动态表单
    sql/extensions/workflow.sql   # 工作流（Flowable 演示流程与演示账号，非引擎表）
+   sql/extensions/oidc.sql        # 统一认证：应用中心菜单与演示身份关联
    ```
+
+   > 扩展脚本全部**可选**。用户、角色、菜单、字典、日志、代码生成等基础能力都在 `sql/youlai-admin.sql` 里，只导入基础库就能把系统跑起来。
+   >
+   > `oidc.sql` 面向"已经有认证中心"的场景，它只写入「应用中心」菜单和一条演示用的身份关联。单点登录本身默认关闭（`security.oidc.enabled` 与前端 `VITE_OIDC_ENABLED`），不填认证中心地址、客户端密钥和前端开关就不会加载 OIDC 组件，对基础功能零影响。暂时没有单点登录需求，跳过它即可。
 
 3. 修改配置（可选，默认已配置线上只读数据源）：
 
@@ -112,7 +119,7 @@
    mvn spring-boot:run
    ```
 
-   启动后访问 <http://localhost:8000/doc.html>，能打开接口文档即说明后端已正常运行。
+   启动后访问 <http://localhost:8000/swagger-ui.html>，能打开接口文档即说明后端已正常运行。
 
 5. 启动前端（可选）：
    如需可视化操作界面，启动配套前端 [vue3-element-admin](https://gitee.com/youlaiorg/vue3-element-admin)，访问 <http://localhost:3000>，使用 `admin` / `123456` 登录。
@@ -156,7 +163,7 @@ youlai-boot/
 │   │   ├── file/              # 文件存储（RustFS/阿里云OSS/本地）
 │   │   ├── mail/              # 邮件服务
 │   │   ├── sms/               # 短信服务
-│   │   └── sse/               # SSE 消息推送
+│   │   └── realtime/          # WebSocket 实时通信
 │   └── system/                # 系统业务（用户/角色/菜单/部门/字典等）
 ├── docker-compose.yml         # 中间件一键编排（MySQL/Redis/RustFS/Xxl-Job）
 └── pom.xml                    # Maven 依赖管理

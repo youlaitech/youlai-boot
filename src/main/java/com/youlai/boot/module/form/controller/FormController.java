@@ -13,8 +13,8 @@ import com.youlai.boot.framework.web.util.IPUtils;
 import com.youlai.boot.module.form.model.form.FormAiGenerateForm;
 import com.youlai.boot.module.form.model.form.FormDefinitionForm;
 import com.youlai.boot.module.form.model.form.FormMenuForm;
-import com.youlai.boot.module.form.model.query.FormDataPageQuery;
-import com.youlai.boot.module.form.model.query.FormDefinitionPageQuery;
+import com.youlai.boot.module.form.model.query.FormDataQuery;
+import com.youlai.boot.module.form.model.query.FormDefinitionQuery;
 import com.youlai.boot.module.form.model.vo.FormDataVO;
 import com.youlai.boot.module.form.model.vo.FormDefinitionPageVO;
 import com.youlai.boot.module.form.model.vo.FormMenuVO;
@@ -28,6 +28,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.Arrays;
@@ -53,7 +54,7 @@ public class FormController {
     @GetMapping
     @Log(module = LogModuleEnum.FORM, value = ActionTypeEnum.LIST)
     public PageResult<FormDefinitionPageVO> getFormDefinitionPage(
-            @Valid FormDefinitionPageQuery queryParams
+            @Valid FormDefinitionQuery queryParams
     ) {
         Page<FormDefinitionPageVO> result = formDefinitionService.getFormDefinitionPage(queryParams);
         return PageResult.success(result);
@@ -79,7 +80,7 @@ public class FormController {
     @PreAuthorize("@ss.hasPerm('form:definition:create')")
     @RepeatSubmit
     @Log(module = LogModuleEnum.FORM, value = ActionTypeEnum.INSERT)
-    public Result<Void> saveFormDefinition(@Valid @RequestBody FormDefinitionForm formData) {
+    public Result<Void> saveFormDefinition(@RequestBody @Validated(FormDefinitionForm.Create.class) FormDefinitionForm formData) {
         boolean result = formDefinitionService.saveFormDefinition(formData);
         return Result.judge(result);
     }
@@ -90,7 +91,7 @@ public class FormController {
     @Log(module = LogModuleEnum.FORM, value = ActionTypeEnum.UPDATE)
     public Result<Void> updateFormDefinition(
             @Parameter(description = "表单ID") @PathVariable Long formId,
-            @RequestBody @Valid FormDefinitionForm formData
+            @RequestBody @Validated(FormDefinitionForm.Update.class) FormDefinitionForm formData
     ) {
         boolean result = formDefinitionService.updateFormDefinition(formId, formData);
         return Result.judge(result);
@@ -138,9 +139,6 @@ public class FormController {
         return Result.success(renderVO);
     }
 
-    //---------------------------------------------------
-    // 表单菜单相关接口（发布向导）
-    //---------------------------------------------------
     @Operation(summary = "获取表单菜单配置（向导回显）")
     @GetMapping("/{formId}/menu")
     public Result<FormMenuVO> getFormMenu(
@@ -163,9 +161,7 @@ public class FormController {
         return Result.judge(result);
     }
 
-    //---------------------------------------------------
-    // 公开表单相关接口（匿名，Security 白名单 + Service 校验 is_public + IP 限流）
-    //---------------------------------------------------
+    // 公开访问须通过表单开关与 IP 限流校验
     @Operation(summary = "获取公开表单渲染规则（匿名）")
     @GetMapping("/public/{formKey}/render")
     public Result<FormRenderVO> getPublicFormRender(
@@ -187,16 +183,13 @@ public class FormController {
         return Result.judge(result);
     }
 
-    //---------------------------------------------------
-    // 表单数据相关接口
-    //---------------------------------------------------
     @Operation(summary = "表单数据分页列表")
     @GetMapping("/{formKey}/data")
     @PreAuthorize("@ss.hasPerm('form:data:list')")
     @Log(module = LogModuleEnum.FORM, value = ActionTypeEnum.LIST)
     public PageResult<FormDataVO> getFormDataPage(
             @Parameter(description = "表单唯一标识") @PathVariable String formKey,
-            @Valid FormDataPageQuery queryParams
+            @Valid FormDataQuery queryParams
     ) {
         Page<FormDataVO> result = formDataService.getFormDataPage(formKey, queryParams);
         return PageResult.success(result);
@@ -241,9 +234,7 @@ public class FormController {
         return Result.success();
     }
 
-    //---------------------------------------------------
-    // AI 辅助接口（未开启 AI 时调用返回业务异常）
-    //---------------------------------------------------
+    // AI 未启用时返回业务异常
 
     @Operation(summary = "AI 生成表单规则")
     @PostMapping("/ai-generate")

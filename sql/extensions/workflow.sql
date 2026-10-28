@@ -13,31 +13,31 @@ SET NAMES utf8mb4;
 SET FOREIGN_KEY_CHECKS = 0;
 
 -- ----------------------------
--- 菜单（顶级 ID=9，顺延动态表单 ID=8）
+-- 菜单（顶级 ID=91，顺延动态表单 ID=90）
 -- ----------------------------
-INSERT IGNORE INTO `sys_menu` (`id`, `parent_id`, `tree_path`, `name`, `type`, `route_name`, `route_path`, `component`, `perm`, `keep_alive`, `visible`, `sort`, `icon`, `redirect`, `create_time`, `update_time`, `params`) VALUES (9, 0, '0', '工作流', 'C', '', '/workflow', 'Layout', NULL, NULL, 1, 9, 'el-icon-Connection', '/workflow/launch', now(), now(), '{\"badge\":\"NEW\"}');
-INSERT IGNORE INTO `sys_menu` (`id`, `parent_id`, `tree_path`, `name`, `type`, `route_name`, `route_path`, `component`, `perm`, `keep_alive`, `visible`, `sort`, `icon`, `redirect`, `create_time`, `update_time`, `params`) VALUES (901, 9, '0,9', '流程设计', 'M', 'WorkflowModel', 'model', 'workflow/model', NULL, NULL, 1, 1, 'el-icon-Coin', NULL, now(), now(), NULL);
-INSERT IGNORE INTO `sys_menu` (`id`, `parent_id`, `tree_path`, `name`, `type`, `route_name`, `route_path`, `component`, `perm`, `keep_alive`, `visible`, `sort`, `icon`, `redirect`, `create_time`, `update_time`, `params`) VALUES (90101, 901, '0,9,901', '流程查询', 'B', NULL, '', NULL, 'workflow:model:list', NULL, 1, 1, '', NULL, now(), now(), NULL);
-INSERT IGNORE INTO `sys_menu` (`id`, `parent_id`, `tree_path`, `name`, `type`, `route_name`, `route_path`, `component`, `perm`, `keep_alive`, `visible`, `sort`, `icon`, `redirect`, `create_time`, `update_time`, `params`) VALUES (90102, 901, '0,9,901', '流程新增', 'B', NULL, '', NULL, 'workflow:model:create', NULL, 1, 2, '', NULL, now(), now(), NULL);
-INSERT IGNORE INTO `sys_menu` (`id`, `parent_id`, `tree_path`, `name`, `type`, `route_name`, `route_path`, `component`, `perm`, `keep_alive`, `visible`, `sort`, `icon`, `redirect`, `create_time`, `update_time`, `params`) VALUES (90103, 901, '0,9,901', '流程修改', 'B', NULL, '', NULL, 'workflow:model:update', NULL, 1, 3, '', NULL, now(), now(), NULL);
-INSERT IGNORE INTO `sys_menu` (`id`, `parent_id`, `tree_path`, `name`, `type`, `route_name`, `route_path`, `component`, `perm`, `keep_alive`, `visible`, `sort`, `icon`, `redirect`, `create_time`, `update_time`, `params`) VALUES (90104, 901, '0,9,901', '流程删除', 'B', NULL, '', NULL, 'workflow:model:delete', NULL, 1, 4, '', NULL, now(), now(), NULL);
-INSERT IGNORE INTO `sys_menu` (`id`, `parent_id`, `tree_path`, `name`, `type`, `route_name`, `route_path`, `component`, `perm`, `keep_alive`, `visible`, `sort`, `icon`, `redirect`, `create_time`, `update_time`, `params`) VALUES (90105, 901, '0,9,901', '流程发布', 'B', NULL, '', NULL, 'workflow:model:deploy', NULL, 1, 5, '', NULL, now(), now(), NULL);
-INSERT IGNORE INTO `sys_menu` (`id`, `parent_id`, `tree_path`, `name`, `type`, `route_name`, `route_path`, `component`, `perm`, `keep_alive`, `visible`, `sort`, `icon`, `redirect`, `create_time`, `update_time`, `params`) VALUES (90106, 901, '0,9,901', '流程重置', 'B', NULL, '', NULL, 'workflow:model:reset', NULL, 1, 6, '', NULL, now(), now(), NULL);
+INSERT IGNORE INTO `sys_menu` (`id`, `parent_id`, `tree_path`, `name`, `type`, `route_name`, `route_path`, `component`, `perm`, `keep_alive`, `visible`, `sort`, `icon`, `redirect`, `create_time`, `update_time`, `params`) VALUES (91, 0, '0', '工作流', 'C', '', '/workflow', 'Layout', NULL, NULL, 1, 9, 'el-icon-Connection', '/workflow/launch', now(), now(), '{\"badge\":\"NEW\"}');
+INSERT IGNORE INTO `sys_menu` (`id`, `parent_id`, `tree_path`, `name`, `type`, `route_name`, `route_path`, `component`, `perm`, `keep_alive`, `visible`, `sort`, `icon`, `redirect`, `create_time`, `update_time`, `params`) VALUES (9101, 91, '0,91', '流程设计', 'M', 'WorkflowModel', 'model', 'workflow/model', NULL, NULL, 1, 1, 'el-icon-Coin', NULL, now(), now(), NULL);
+INSERT IGNORE INTO `sys_menu` (`id`, `parent_id`, `tree_path`, `name`, `type`, `route_name`, `route_path`, `component`, `perm`, `keep_alive`, `visible`, `sort`, `icon`, `redirect`, `create_time`, `update_time`, `params`) VALUES (910101, 9101, '0,91,9101', '流程查询', 'B', NULL, '', NULL, 'workflow:model:list', NULL, 1, 1, '', NULL, now(), now(), NULL);
+INSERT IGNORE INTO `sys_menu` (`id`, `parent_id`, `tree_path`, `name`, `type`, `route_name`, `route_path`, `component`, `perm`, `keep_alive`, `visible`, `sort`, `icon`, `redirect`, `create_time`, `update_time`, `params`) VALUES (910102, 9101, '0,91,9101', '流程新增', 'B', NULL, '', NULL, 'workflow:model:create', NULL, 1, 2, '', NULL, now(), now(), NULL);
+INSERT IGNORE INTO `sys_menu` (`id`, `parent_id`, `tree_path`, `name`, `type`, `route_name`, `route_path`, `component`, `perm`, `keep_alive`, `visible`, `sort`, `icon`, `redirect`, `create_time`, `update_time`, `params`) VALUES (910103, 9101, '0,91,9101', '流程修改', 'B', NULL, '', NULL, 'workflow:model:update', NULL, 1, 3, '', NULL, now(), now(), NULL);
+INSERT IGNORE INTO `sys_menu` (`id`, `parent_id`, `tree_path`, `name`, `type`, `route_name`, `route_path`, `component`, `perm`, `keep_alive`, `visible`, `sort`, `icon`, `redirect`, `create_time`, `update_time`, `params`) VALUES (910104, 9101, '0,91,9101', '流程删除', 'B', NULL, '', NULL, 'workflow:model:delete', NULL, 1, 4, '', NULL, now(), now(), NULL);
+INSERT IGNORE INTO `sys_menu` (`id`, `parent_id`, `tree_path`, `name`, `type`, `route_name`, `route_path`, `component`, `perm`, `keep_alive`, `visible`, `sort`, `icon`, `redirect`, `create_time`, `update_time`, `params`) VALUES (910105, 9101, '0,91,9101', '流程发布', 'B', NULL, '', NULL, 'workflow:model:deploy', NULL, 1, 5, '', NULL, now(), now(), NULL);
+INSERT IGNORE INTO `sys_menu` (`id`, `parent_id`, `tree_path`, `name`, `type`, `route_name`, `route_path`, `component`, `perm`, `keep_alive`, `visible`, `sort`, `icon`, `redirect`, `create_time`, `update_time`, `params`) VALUES (910106, 9101, '0,91,9101', '流程重置', 'B', NULL, '', NULL, 'workflow:model:reset', NULL, 1, 6, '', NULL, now(), now(), NULL);
 -- 流程启停：启用开关走 definition:update，删除复用 model:delete
-INSERT IGNORE INTO `sys_menu` (`id`, `parent_id`, `tree_path`, `name`, `type`, `route_name`, `route_path`, `component`, `perm`, `keep_alive`, `visible`, `sort`, `icon`, `redirect`, `create_time`, `update_time`, `params`) VALUES (90107, 901, '0,9,901', '流程启停', 'B', NULL, '', NULL, 'workflow:definition:update', NULL, 1, 7, '', NULL, now(), now(), NULL);
+INSERT IGNORE INTO `sys_menu` (`id`, `parent_id`, `tree_path`, `name`, `type`, `route_name`, `route_path`, `component`, `perm`, `keep_alive`, `visible`, `sort`, `icon`, `redirect`, `create_time`, `update_time`, `params`) VALUES (910107, 9101, '0,91,9101', '流程启停', 'B', NULL, '', NULL, 'workflow:definition:update', NULL, 1, 7, '', NULL, now(), now(), NULL);
 -- 流程设计器（隐藏菜单，列表"设计"按钮跳转）
-INSERT IGNORE INTO `sys_menu` (`id`, `parent_id`, `tree_path`, `name`, `type`, `route_name`, `route_path`, `component`, `perm`, `keep_alive`, `visible`, `sort`, `icon`, `redirect`, `create_time`, `update_time`, `params`) VALUES (902, 9, '0,9', '流程设计器', 'M', 'WorkflowDesigner', 'designer', 'workflow/designer', NULL, 1, 0, 2, '', NULL, now(), now(), NULL);
+INSERT IGNORE INTO `sys_menu` (`id`, `parent_id`, `tree_path`, `name`, `type`, `route_name`, `route_path`, `component`, `perm`, `keep_alive`, `visible`, `sort`, `icon`, `redirect`, `create_time`, `update_time`, `params`) VALUES (9102, 91, '0,91', '流程设计器', 'M', 'WorkflowDesigner', 'designer', 'workflow/designer', NULL, 1, 0, 2, '', NULL, now(), now(), NULL);
 
 -- 发起/审批中心仅登录校验，不设按钮权限
 -- 审批中心 = 待办/已办/我发起 三个页签
-INSERT IGNORE INTO `sys_menu` (`id`, `parent_id`, `tree_path`, `name`, `type`, `route_name`, `route_path`, `component`, `perm`, `keep_alive`, `visible`, `sort`, `icon`, `redirect`, `create_time`, `update_time`, `params`) VALUES (904, 9, '0,9', '发起流程', 'M', 'WorkflowLaunch', 'launch', 'workflow/launch', NULL, NULL, 1, 4, 'el-icon-Promotion', NULL, now(), now(), NULL);
-INSERT IGNORE INTO `sys_menu` (`id`, `parent_id`, `tree_path`, `name`, `type`, `route_name`, `route_path`, `component`, `perm`, `keep_alive`, `visible`, `sort`, `icon`, `redirect`, `create_time`, `update_time`, `params`) VALUES (905, 9, '0,9', '审批中心', 'M', 'WorkflowTask', 'task', 'workflow/task/index', NULL, NULL, 1, 5, 'el-icon-Stamp', NULL, now(), now(), NULL);
-INSERT IGNORE INTO `sys_menu` (`id`, `parent_id`, `tree_path`, `name`, `type`, `route_name`, `route_path`, `component`, `perm`, `keep_alive`, `visible`, `sort`, `icon`, `redirect`, `create_time`, `update_time`, `params`) VALUES (90501, 905, '0,9,905', '终止流程', 'B', NULL, '', NULL, 'workflow:instance:terminate', NULL, 1, 1, '', NULL, now(), now(), NULL);
+INSERT IGNORE INTO `sys_menu` (`id`, `parent_id`, `tree_path`, `name`, `type`, `route_name`, `route_path`, `component`, `perm`, `keep_alive`, `visible`, `sort`, `icon`, `redirect`, `create_time`, `update_time`, `params`) VALUES (9104, 91, '0,91', '发起流程', 'M', 'WorkflowLaunch', 'launch', 'workflow/launch', NULL, NULL, 1, 4, 'el-icon-Promotion', NULL, now(), now(), NULL);
+INSERT IGNORE INTO `sys_menu` (`id`, `parent_id`, `tree_path`, `name`, `type`, `route_name`, `route_path`, `component`, `perm`, `keep_alive`, `visible`, `sort`, `icon`, `redirect`, `create_time`, `update_time`, `params`) VALUES (9105, 91, '0,91', '审批中心', 'M', 'WorkflowTask', 'task', 'workflow/task/index', NULL, NULL, 1, 5, 'el-icon-Stamp', NULL, now(), now(), NULL);
+INSERT IGNORE INTO `sys_menu` (`id`, `parent_id`, `tree_path`, `name`, `type`, `route_name`, `route_path`, `component`, `perm`, `keep_alive`, `visible`, `sort`, `icon`, `redirect`, `create_time`, `update_time`, `params`) VALUES (910501, 9105, '0,91,9105', '终止流程', 'B', NULL, '', NULL, 'workflow:instance:terminate', NULL, 1, 1, '', NULL, now(), now(), NULL);
 
 -- ----------------------------
 -- 系统管理员角色授权（role_id=2）
 -- ----------------------------
-INSERT IGNORE INTO `sys_role_menu` VALUES (2, 9), (2, 901), (2, 90101), (2, 90102), (2, 90103), (2, 90104), (2, 90105), (2, 90106), (2, 90107), (2, 902), (2, 904), (2, 905), (2, 90501);
+INSERT IGNORE INTO `sys_role_menu` VALUES (2, 91), (2, 9101), (2, 910101), (2, 910102), (2, 910103), (2, 910104), (2, 910105), (2, 910106), (2, 910107), (2, 9102), (2, 9104), (2, 9105), (2, 910501);
 
 -- ----------------------------
 -- 演示角色与用户（ID 段 8-10，顺延 youlai-admin.sql 预置 1-7；密码 123456）
@@ -56,12 +56,12 @@ INSERT IGNORE INTO `sys_user_role` VALUES (8, 8), (9, 9), (10, 10);
 -- ----------------------------
 -- 演示角色的工作流菜单授权（不含流程设计等管理菜单）
 -- ----------------------------
-INSERT IGNORE INTO `sys_role_menu` VALUES (4, 9), (4, 904), (4, 905);
-INSERT IGNORE INTO `sys_role_menu` VALUES (5, 9), (5, 904), (5, 905);
-INSERT IGNORE INTO `sys_role_menu` VALUES (6, 9), (6, 904), (6, 905);
-INSERT IGNORE INTO `sys_role_menu` VALUES (8, 9), (8, 904), (8, 905);
-INSERT IGNORE INTO `sys_role_menu` VALUES (9, 9), (9, 904), (9, 905);
-INSERT IGNORE INTO `sys_role_menu` VALUES (10, 9), (10, 904), (10, 905);
+INSERT IGNORE INTO `sys_role_menu` VALUES (4, 91), (4, 9104), (4, 9105);
+INSERT IGNORE INTO `sys_role_menu` VALUES (5, 91), (5, 9104), (5, 9105);
+INSERT IGNORE INTO `sys_role_menu` VALUES (6, 91), (6, 9104), (6, 9105);
+INSERT IGNORE INTO `sys_role_menu` VALUES (8, 91), (8, 9104), (8, 9105);
+INSERT IGNORE INTO `sys_role_menu` VALUES (9, 91), (9, 9104), (9, 9105);
+INSERT IGNORE INTO `sys_role_menu` VALUES (10, 91), (10, 9104), (10, 9105);
 
 -- ----------------------------
 -- 演示流程的发起表单（依赖动态表单扩展）

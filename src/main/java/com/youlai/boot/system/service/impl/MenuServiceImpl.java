@@ -33,6 +33,7 @@ import lombok.RequiredArgsConstructor;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.*;
 import java.util.stream.Collectors;
@@ -69,22 +70,19 @@ public class MenuServiceImpl extends ServiceImpl<MenuMapper, Menu> implements Me
                 .like(StrUtil.isNotBlank(queryParams.getKeywords()), Menu::getName, queryParams.getKeywords())
                 .orderByAsc(Menu::getSort)
         );
-        // 获取所有菜单ID
         Set<Long> menuIds = menus.stream()
                 .map(Menu::getId)
                 .collect(Collectors.toSet());
 
-        // 获取所有父级ID
         Set<Long> parentIds = menus.stream()
                 .map(Menu::getParentId)
                 .collect(Collectors.toSet());
 
-        // 获取根节点ID（递归的起点），即父节点ID中不包含在部门ID中的节点，注意这里不能拿顶级菜单 O 作为根节点，因为菜单筛选的时候 O 会被过滤掉
+        // 从结果集以外的父节点开始构树，避免筛选后遗漏子树
         List<Long> rootIds = parentIds.stream()
                 .filter(id -> !menuIds.contains(id))
                 .toList();
 
-        // 使用递归函数来构建菜单树
         return rootIds.stream()
                 .flatMap(rootId -> buildMenuTree(rootId, menus).stream())
                 .collect(Collectors.toList());
@@ -196,20 +194,6 @@ public class MenuServiceImpl extends ServiceImpl<MenuMapper, Menu> implements Me
     }
 
     /**
-     * 获取当前用户的菜单路由列表（指定数据源）
-     *
-     * @param datasource 数据源名称
-     *                   - master: 主库菜单数据
-     *                   - naiveui: NaiveUI项目菜单数据
-     *                   - template: 模板项目菜单数据
-     */
-    @Override
-    public List<RouteVO> listCurrentUserRoutes(String datasource) {
-        return listCurrentUserRoutes();
-    }
-
-
-    /**
      * 递归生成菜单路由层级列表
      *
      * @param parentId 父级ID
@@ -234,7 +218,7 @@ public class MenuServiceImpl extends ServiceImpl<MenuMapper, Menu> implements Me
     }
 
     /**
-     * 根据RouteBO创建RouteVo
+     * 将菜单转换为前端路由
      */
     private RouteVO toRouteVo(Menu menu) {
         RouteVO routeVo = new RouteVO();
@@ -293,12 +277,33 @@ public class MenuServiceImpl extends ServiceImpl<MenuMapper, Menu> implements Me
     }
 
     /**
-     * 新增/修改菜单
+     * 新增菜单，主键由持久化层生成
      */
     @Override
+    @Transactional(rollbackFor = Exception.class)
     @CacheEvict(cacheNames = "menu", key = "'routes'")
     public boolean saveMenu(MenuForm menuForm) {
+        menuForm.setId(null);
+        return persistMenu(menuForm);
+    }
 
+    /**
+     * 更新指定菜单，忽略表单中原有的主键
+     */
+    @Override
+    @Transactional(rollbackFor = Exception.class)
+    @CacheEvict(cacheNames = "menu", key = "'routes'")
+    public boolean updateMenu(Long menuId, MenuForm menuForm) {
+        Assert.notNull(menuId, "菜单ID不能为空");
+        Assert.notNull(this.getById(menuId), "菜单不存在");
+        menuForm.setId(menuId);
+        return persistMenu(menuForm);
+    }
+
+    /**
+     * 保存菜单及其按钮、子菜单路径
+     */
+    private boolean persistMenu(MenuForm menuForm) {
         String menuType = menuForm.getType();
         boolean isExternal = MenuTypeEnum.EXTERNAL.getValue().equals(menuType);
         boolean isEmbedded = isExternal && "iframe".equals(menuForm.getComponent());
@@ -345,7 +350,7 @@ public class MenuServiceImpl extends ServiceImpl<MenuMapper, Menu> implements Me
             entity.setRouteName(null);
         }
 
-        boolean result = this.saveOrUpdate(entity);
+        boolean result = menuForm.getId() == null ? this.save(entity) : this.updateById(entity);
         if (result) {
             if (menuForm.getId() != null) {
                 // 编辑刷新角色权限缓存
@@ -355,9 +360,9 @@ public class MenuServiceImpl extends ServiceImpl<MenuMapper, Menu> implements Me
                 // 新增页面菜单时按需生成增删改查按钮
                 saveCrudButtons(entity.getId(), menuForm.getButtonPermPrefix().trim(), treePath);
             }
+            // 修改菜单如果有子菜单，则更新子菜单的树路径
+            updateChildrenTreePath(entity.getId(), treePath);
         }
-        // 修改菜单如果有子菜单，则更新子菜单的树路径
-        updateChildrenTreePath(entity.getId(), treePath);
         return result;
     }
 
@@ -384,7 +389,7 @@ public class MenuServiceImpl extends ServiceImpl<MenuMapper, Menu> implements Me
     }
 
     /**
-     * 部门路径生成
+     * 生成菜单祖先路径
      *
      * @param parentId 父ID
      * @return 父节点路径以英文逗号(, )分割，eg: 1,2,3
@@ -474,7 +479,7 @@ public class MenuServiceImpl extends ServiceImpl<MenuMapper, Menu> implements Me
      * 修改菜单显示状态
      *
      * @param menuId  菜单ID
-     * @param visible 是否显示(1->显示；2->隐藏)
+     * @param visible 是否显示(1->显示；0->隐藏)
      * @return 是否修改成功
      */
     @Override
@@ -572,9 +577,7 @@ public class MenuServiceImpl extends ServiceImpl<MenuMapper, Menu> implements Me
         }
     }
 
-    //---------------------------------------------------
-    // AI 辅助：未开启 AI 时调用返回业务异常
-    //---------------------------------------------------
+    // AI 未启用时返回业务异常
 
     /**
      * 用 AI 推断菜单的访问路径、权限标识与配套按钮

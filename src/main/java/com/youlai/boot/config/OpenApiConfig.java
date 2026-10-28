@@ -24,7 +24,7 @@ import java.util.stream.Stream;
  * OpenAPI 接口文档配置
  *
  * @author Ray.Hao
- * @see <a href="https://doc.xiaominfo.com/docs/quick-start">knife4j 快速开始</a>
+ * @see <a href="https://springdoc.org/">springdoc 文档</a>
  * @since 2023/2/17
  */
 @Configuration

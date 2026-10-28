@@ -45,7 +45,7 @@
                     <bind name="startDate" value="queryParams.createTime[0].length() == 10 ? queryParams.createTime[0] + ' 00:00:00' : queryParams.createTime[0]"/>
                     AND t1.create_time &gt;= #{startDate}
                 </if>
-                <if test="queryParams.createTime[1] != null and queryParams.createTime[1] != ''">
+                <if test="queryParams.createTime.size > 1 and queryParams.createTime[1] != null and queryParams.createTime[1] != ''">
                     <bind name="endDate" value="queryParams.createTime[1].length() == 10 ? queryParams.createTime[1] + ' 23:59:59' : queryParams.createTime[1]"/>
                     AND t1.create_time &lt;= #{endDate}
                 </if>

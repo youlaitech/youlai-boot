@@ -34,23 +34,21 @@ public interface MenuService extends IService<Menu> {
     List<Option<Long>> listMenuOptions(List<String> types);
 
     /**
-     * 新增菜单
+     * 新增菜单，忽略表单中的主键
      *
      * @param menuForm  菜单表单对象
      */
     boolean saveMenu(MenuForm menuForm);
 
     /**
+     * 更新指定菜单；目标不存在时拒绝保存
+     */
+    boolean updateMenu(Long menuId, MenuForm menuForm);
+
+    /**
      * 获取当前用户的菜单路由列表
      */
     List<RouteVO> listCurrentUserRoutes();
-
-    /**
-     * 获取当前用户的菜单路由列表（指定数据源）
-     *
-     * @param datasource 数据源名称，如：master(主库)、naiveui(NaiveUI数据库)、template(模板数据库)
-     */
-    List<RouteVO> listCurrentUserRoutes(String datasource);
 
     /**
      * 修改菜单显示状态

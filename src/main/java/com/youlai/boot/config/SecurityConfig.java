@@ -4,16 +4,16 @@ import cn.binarywang.wx.miniapp.api.WxMaService;
 import cn.hutool.core.util.ArrayUtil;
 import com.youlai.boot.auth.password.service.CaptchaService;
 import com.youlai.boot.framework.security.config.SecurityProperties;
-import com.youlai.boot.framework.security.filter.TokenAuthenticationFilter;
 import com.youlai.boot.framework.security.handler.JsonAccessDeniedHandler;
 import com.youlai.boot.framework.security.handler.JsonAuthenticationEntryPoint;
 import com.youlai.boot.framework.security.port.UserAuthenticationPort;
 import com.youlai.boot.framework.security.service.SecurityUserDetailsService;
-import com.youlai.boot.framework.security.token.TokenManager;
+import com.youlai.boot.framework.security.session.SessionService;
 import com.youlai.boot.auth.password.filter.CaptchaValidationFilter;
 import com.youlai.boot.auth.sms.provider.SmsAuthenticationProvider;
 import com.youlai.boot.auth.wxma.provider.WxMaAuthenticationProvider;
-import com.youlai.boot.system.service.UserSocialService;
+import com.youlai.boot.auth.wxma.config.WxMaProperties;
+import com.youlai.boot.system.service.UserIdentityService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -21,18 +21,22 @@ import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.ProviderManager;
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
+import org.springframework.security.config.ObjectPostProcessor;
+import org.springframework.security.oauth2.server.resource.web.authentication.BearerTokenAuthenticationFilter;
+import org.springframework.security.web.authentication.AuthenticationEntryPointFailureHandler;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.config.annotation.web.configurers.HeadersConfigurer;
 import org.springframework.security.config.http.SessionCreationPolicy;
+import org.springframework.security.oauth2.server.resource.authentication.BearerTokenAuthenticationToken;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
-import org.springframework.security.web.access.intercept.AuthorizationFilter;
 
 import jakarta.servlet.DispatcherType;
+import org.springframework.http.HttpMethod;
 
 /**
  * Spring Security 配置类
@@ -48,17 +52,19 @@ public class SecurityConfig {
 
     private final RedisTemplate<String, Object> redisTemplate;
     private final PasswordEncoder passwordEncoder;
-    private final TokenManager tokenManager;
+    private final SessionService sessionService;
     private final SecurityUserDetailsService userDetailsService;
     private final CaptchaService captchaService;
     private final SecurityProperties securityProperties;
 
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
-        return http
+        http
                 .authorizeHttpRequests(requestMatcherRegistry -> {
-                            // ASYNC 分发（SSE 超时/完成后的异步 dispatch）无 Authorization 头，直接放行
+                            // 异步响应的后续分发复用首次请求认证结果
                             requestMatcherRegistry.dispatcherTypeMatchers(DispatcherType.ASYNC).permitAll();
+                            // 握手使用一次性票据；其余实时接口仍需 Bearer 认证
+                            requestMatcherRegistry.requestMatchers(HttpMethod.GET, "/api/v1/realtime/ws").permitAll();
                             String[] permitAllUrls = securityProperties.getPermitAllUrls();
                             if (ArrayUtil.isNotEmpty(permitAllUrls)) {
                                 requestMatcherRegistry.requestMatchers(permitAllUrls).permitAll();
@@ -78,11 +84,26 @@ public class SecurityConfig {
                 .formLogin(AbstractHttpConfigurer::disable)
                 .httpBasic(AbstractHttpConfigurer::disable)
                 .headers(headers -> headers.frameOptions(HeadersConfigurer.FrameOptionsConfig::disable))
-                // 验证码校验（使用方过滤器，直接写 JSON 响应）
                 .addFilterBefore(new CaptchaValidationFilter(captchaService), UsernamePasswordAuthenticationFilter.class)
-                // Token 认证（Starter 过滤器，抛 AuthenticationException 交给 ExceptionTranslationFilter 处理）
-                .addFilterBefore(new TokenAuthenticationFilter(tokenManager), AuthorizationFilter.class)
-                .build();
+                .oauth2ResourceServer(resource -> resource
+                        .authenticationManagerResolver(request -> authentication -> {
+                            var bearer = (BearerTokenAuthenticationToken) authentication;
+                            return sessionService.authenticate(bearer.getToken()).toAuthentication();
+                        })
+                        .authenticationEntryPoint(new JsonAuthenticationEntryPoint())
+                        .withObjectPostProcessor(new ObjectPostProcessor<BearerTokenAuthenticationFilter>() {
+                            @Override
+                            public <O extends BearerTokenAuthenticationFilter> O postProcess(O filter) {
+                                var failureHandler = new AuthenticationEntryPointFailureHandler(new JsonAuthenticationEntryPoint());
+                                // 存储故障返回 JSON 503，不交给容器生成错误页
+                                failureHandler.setRethrowAuthenticationServiceException(false);
+                                filter.setAuthenticationFailureHandler(failureHandler);
+                                return filter;
+                            }
+                        })
+                        .accessDeniedHandler(new JsonAccessDeniedHandler()));
+
+        return http.build();
     }
 
     @Bean
@@ -100,10 +121,12 @@ public class SecurityConfig {
     @Bean
     public WxMaAuthenticationProvider wechatMiniAuthenticationProvider(
             WxMaService wxMaService,
+            WxMaProperties wxMaProperties,
             UserAuthenticationPort userAuthenticationPort,
-            UserSocialService userSocialService
+            UserIdentityService userIdentityService
     ) {
-        return new WxMaAuthenticationProvider(wxMaService, userAuthenticationPort, userSocialService);
+        return new WxMaAuthenticationProvider(wxMaService, wxMaProperties, userAuthenticationPort,
+                userIdentityService, redisTemplate);
     }
 
     @Bean

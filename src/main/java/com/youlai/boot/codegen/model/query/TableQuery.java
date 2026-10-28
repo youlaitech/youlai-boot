@@ -9,12 +9,12 @@ import lombok.Setter;
 import java.util.List;
 
 /**
- * 数据表查询对象
+ * 数据表分页查询对象
  *
  * @author Ray
  * @since 2.10.0
  */
-@Schema(description = "数据表查询对象")
+@Schema(description = "数据表分页查询对象")
 @Getter
 @Setter
 public class TableQuery extends BaseQuery {

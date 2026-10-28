@@ -5,7 +5,7 @@ import com.youlai.boot.common.annotation.Log;
 import com.youlai.boot.common.enums.ActionTypeEnum;
 import com.youlai.boot.common.enums.LogModuleEnum;
 import com.youlai.boot.common.result.Result;
-import com.youlai.boot.framework.security.model.AuthenticationToken;
+import com.youlai.boot.framework.security.model.TokenPair;
 import com.youlai.boot.framework.web.ratelimit.RateLimit;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -30,6 +30,9 @@ public class SmsAuthController {
 
     private final SmsAuthService smsAuthService;
 
+    /**
+     * 发送手机登录验证码
+     */
     @Operation(summary = "[短信]发送登录短信验证码")
     @PostMapping("/code")
     @RateLimit(limit = 1, window = 60)
@@ -40,14 +43,17 @@ public class SmsAuthController {
         return Result.success();
     }
 
+    /**
+     * 校验手机验证码并创建登录会话
+     */
     @Operation(summary = "[短信]短信验证码登录")
     @PostMapping("/login")
     @Log(module = LogModuleEnum.LOGIN, value = ActionTypeEnum.LOGIN)
-    public Result<AuthenticationToken> login(
+    public Result<TokenPair> login(
             @Parameter(description = "手机号", example = "18888888888") @RequestParam String mobile,
             @Parameter(description = "验证码", example = "123456") @RequestParam String code
     ) {
-        AuthenticationToken loginResult = smsAuthService.loginBySms(mobile, code);
+        TokenPair loginResult = smsAuthService.loginBySms(mobile, code);
         return Result.success(loginResult);
     }
 

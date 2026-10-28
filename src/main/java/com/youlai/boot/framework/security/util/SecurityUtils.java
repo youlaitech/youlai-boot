@@ -3,12 +3,8 @@ package com.youlai.boot.framework.security.util;
 import com.youlai.boot.common.constant.SystemConstants;
 import com.youlai.boot.framework.security.model.RoleDataScope;
 import com.youlai.boot.framework.security.model.SecurityUserDetails;
-import jakarta.servlet.http.HttpServletRequest;
-import org.springframework.http.HttpHeaders;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.web.context.request.RequestContextHolder;
-import org.springframework.web.context.request.ServletRequestAttributes;
 
 import java.util.*;
 
@@ -63,7 +59,7 @@ public class SecurityUtils {
     }
 
     /**
-     * 获取角色编码集合，不带 ROLE_ 前缀。
+     * 获取角色编码集合，不带 ROLE_ 前缀
      */
     public static Set<String> getRoles() {
         return getUser().map(SecurityUserDetails::getRoles).orElse(Set.of());
@@ -74,18 +70,6 @@ public class SecurityUtils {
      */
     public static boolean isRoot() {
         return getRoles().contains(SystemConstants.ROOT_ROLE_CODE);
-    }
-
-    /**
-     * 从请求头获取 Token
-     */
-    public static String getAccessToken() {
-        ServletRequestAttributes attributes = (ServletRequestAttributes) RequestContextHolder.getRequestAttributes();
-        if (attributes == null) {
-            return null;
-        }
-        HttpServletRequest request = attributes.getRequest();
-        return request.getHeader(HttpHeaders.AUTHORIZATION);
     }
 
 }

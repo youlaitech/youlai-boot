@@ -3,7 +3,7 @@ package com.youlai.boot.module.workflow.service;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.youlai.boot.module.workflow.model.form.CompleteTaskForm;
 import com.youlai.boot.module.workflow.model.form.RejectTaskForm;
-import com.youlai.boot.module.workflow.model.query.WorkflowTaskPageQuery;
+import com.youlai.boot.module.workflow.model.query.WorkflowTaskQuery;
 import com.youlai.boot.module.workflow.model.vo.DoneTaskVO;
 import com.youlai.boot.module.workflow.model.vo.RejectTargetVO;
 import com.youlai.boot.module.workflow.model.vo.TaskDetailVO;
@@ -25,7 +25,7 @@ public interface WorkflowTaskService {
      * @param queryParams 查询参数
      * @return 分页结果
      */
-    Page<TodoTaskVO> getTodoTaskPage(WorkflowTaskPageQuery queryParams);
+    Page<TodoTaskVO> getTodoTaskPage(WorkflowTaskQuery queryParams);
 
     /**
      * 已办任务分页列表（当前用户已办理的任务）
@@ -33,7 +33,7 @@ public interface WorkflowTaskService {
      * @param queryParams 查询参数
      * @return 分页结果
      */
-    Page<DoneTaskVO> getDoneTaskPage(WorkflowTaskPageQuery queryParams);
+    Page<DoneTaskVO> getDoneTaskPage(WorkflowTaskQuery queryParams);
 
     /**
      * 获取待办任务详情（发起表单只读回显 + 审批记录）

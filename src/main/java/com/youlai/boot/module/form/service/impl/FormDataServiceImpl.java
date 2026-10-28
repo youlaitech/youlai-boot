@@ -13,7 +13,7 @@ import com.youlai.boot.module.form.mapper.FormSnapshotMapper;
 import com.youlai.boot.module.form.model.entity.FormData;
 import com.youlai.boot.module.form.model.entity.FormDefinition;
 import com.youlai.boot.module.form.model.entity.FormSnapshot;
-import com.youlai.boot.module.form.model.query.FormDataPageQuery;
+import com.youlai.boot.module.form.model.query.FormDataQuery;
 import com.youlai.boot.module.form.model.vo.FormDataVO;
 import com.youlai.boot.module.form.service.FormDataService;
 import com.youlai.boot.module.form.service.FormDefinitionService;
@@ -143,7 +143,7 @@ public class FormDataServiceImpl extends ServiceImpl<FormDataMapper, FormData> i
      * @param queryParams 查询参数
      */
     @Override
-    public Page<FormDataVO> getFormDataPage(String formKey, FormDataPageQuery queryParams) {
+    public Page<FormDataVO> getFormDataPage(String formKey, FormDataQuery queryParams) {
         FormDefinition form = formDefinitionService.getByFormKey(formKey);
         int pageNum = queryParams.getPageNum();
         int pageSize = queryParams.getPageSize();

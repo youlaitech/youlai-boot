@@ -6,6 +6,7 @@ import cn.hutool.core.util.StrUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
+import com.baomidou.mybatisplus.core.metadata.OrderItem;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.youlai.boot.common.constant.RedisConstants;
@@ -13,8 +14,9 @@ import com.youlai.boot.common.constant.SystemConstants;
 import com.youlai.boot.common.exception.BusinessException;
 import com.youlai.boot.common.model.Option;
 import com.youlai.boot.framework.security.model.RoleDataScope;
+import com.youlai.boot.framework.mybatis.QuerySort;
 import com.youlai.boot.framework.security.model.SecurityUser;
-import com.youlai.boot.framework.security.token.TokenManager;
+import com.youlai.boot.framework.security.session.SessionService;
 import com.youlai.boot.framework.security.util.SecurityUtils;
 import com.youlai.boot.support.mail.service.EmailService;
 import com.youlai.boot.support.sms.SmsTypeEnum;
@@ -22,6 +24,7 @@ import com.youlai.boot.support.sms.service.SmsService;
 import com.youlai.boot.system.converter.UserConverter;
 import com.youlai.boot.system.enums.DictCodeEnum;
 import com.youlai.boot.system.mapper.UserMapper;
+import com.youlai.boot.system.mapper.UserIdentityMapper;
 import com.youlai.boot.system.model.form.EmailUpdateForm;
 import com.youlai.boot.system.model.form.MobileUpdateForm;
 import com.youlai.boot.system.model.form.PasswordUpdateForm;
@@ -34,6 +37,7 @@ import com.youlai.boot.system.model.entity.Dept;
 import com.youlai.boot.system.model.entity.DictItem;
 import com.youlai.boot.system.model.entity.Role;
 import com.youlai.boot.system.model.entity.SysUser;
+import com.youlai.boot.system.model.entity.UserIdentity;
 import com.youlai.boot.system.model.query.UserQuery;
 import com.youlai.boot.system.model.vo.UserPageVO;
 import com.youlai.boot.system.model.vo.UserProfileVO;
@@ -66,9 +70,18 @@ import java.util.stream.Collectors;
 @Slf4j
 public class UserServiceImpl extends ServiceImpl<UserMapper, SysUser> implements UserService {
 
+    private static final Map<String, String> SORT_FIELDS = Map.of(
+            "id", "u.id",
+            "username", "u.username",
+            "createTime", "u.create_time",
+            "updateTime", "u.update_time"
+    );
+
     private final PasswordEncoder passwordEncoder;
 
     private final UserRoleService userRoleService;
+
+    private final UserIdentityMapper userIdentityMapper;
 
     private final DeptService deptService;
 
@@ -81,7 +94,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, SysUser> implements
 
     private final StringRedisTemplate redisTemplate;
 
-    private final TokenManager tokenManager;
+    private final SessionService sessionService;
 
     private final DictItemService dictItemService;
 
@@ -96,14 +109,25 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, SysUser> implements
      */
     @Override
     public IPage<UserPageVO> getUserPage(UserQuery queryParams) {
-
-        // 参数构建
-        int pageNum = queryParams.getPageNum();
-        int pageSize = queryParams.getPageSize();
-        Page<UserPageVO> page = new Page<>(pageNum, pageSize);
-
-        // 查询数据
+        Page<UserPageVO> page = createUserPage(queryParams, queryParams.getPageSize());
         return this.baseMapper.getUserPage(page, queryParams);
+    }
+
+    /**
+     * 列表与导出使用相同排序，同值时以用户 ID 确定顺序
+     */
+    private <T> Page<T> createUserPage(UserQuery queryParams, long pageSize) {
+        List<OrderItem> orders = QuerySort.parse(queryParams.getSort(), SORT_FIELDS);
+        if (orders.isEmpty()) {
+            orders.add(OrderItem.desc("u.update_time"));
+            orders.add(OrderItem.desc("u.create_time"));
+        }
+        if (orders.stream().noneMatch(order -> "u.id".equals(order.getColumn()))) {
+            orders.add(OrderItem.desc("u.id"));
+        }
+        Page<T> page = new Page<>(queryParams.getPageNum(), pageSize);
+        page.addOrder(orders);
+        return page;
     }
 
     /**
@@ -132,6 +156,8 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, SysUser> implements
 
         // 实体转换 form->entity
         SysUser entity = userConverter.toEntity(userForm);
+        // 新增不接受客户端主键，主键由数据库生成
+        entity.setId(null);
 
         // 检查用户名是否已存在
         long count = this.count(new LambdaQueryWrapper<SysUser>()
@@ -147,7 +173,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, SysUser> implements
 
         if (result) {
             // 保存用户角色
-            userRoleService.saveUserRoles(entity.getId(), userForm.getRoleIds());
+            userRoleService.replaceUserRoles(entity.getId(), userForm.getRoleIds());
         }
         return result;
     }
@@ -179,13 +205,18 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, SysUser> implements
 
         // form -> entity
         SysUser entity = userConverter.toEntity(userForm);
+        // 更新目标由路径 ID 决定，忽略 Body 传入的 ID
+        entity.setId(userId);
 
         // 修改用户
         boolean result = this.updateById(entity);
 
         if (result) {
-            // 保存用户角色
-            userRoleService.saveUserRoles(entity.getId(), userForm.getRoleIds());
+            boolean rolesChanged = userRoleService.replaceUserRoles(userId, userForm.getRoleIds());
+            boolean identityChanged = entity.getUsername() != null && !Objects.equals(oldUser.getUsername(), entity.getUsername())
+                    || entity.getDeptId() != null && !Objects.equals(oldUser.getDeptId(), entity.getDeptId())
+                    || entity.getStatus() != null && !Objects.equals(oldUser.getStatus(), entity.getStatus());
+            if (rolesChanged || identityChanged) sessionService.revokeUserSessions(userId);
         }
         return result;
     }
@@ -207,6 +238,11 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, SysUser> implements
                 .collect(Collectors.toList());
 
         boolean result = this.removeByIds(ids);
+        if (result) {
+            // 删除用户同时释放外部账号关联，避免唯一键永久占用已删除用户的身份
+            userIdentityMapper.delete(new LambdaQueryWrapper<UserIdentity>().in(UserIdentity::getUserId, ids));
+            ids.forEach(sessionService::revokeUserSessions);
+        }
         return result;
     }
 
@@ -256,7 +292,8 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, SysUser> implements
     @Override
     public List<UserExportVO> listExportUsers(UserQuery queryParams) {
 
-        List<UserExportVO> exportUsers = this.baseMapper.listExportUsers(queryParams);
+        Page<UserExportVO> page = createUserPage(queryParams, -1);
+        List<UserExportVO> exportUsers = this.baseMapper.listExportUsers(page, queryParams);
         if (CollectionUtil.isNotEmpty(exportUsers)) {
             //获取性别的字典项
             Map<String, String> genderMap = dictItemService.list(
@@ -422,7 +459,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, SysUser> implements
 
         if (result) {
             // 密码变更后，使当前用户的所有会话失效，强制重新登录
-            tokenManager.invalidateUserSessions(userId);
+            sessionService.revokeUserSessions(userId);
         }
         return result;
     }
@@ -442,7 +479,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, SysUser> implements
         );
         if (result) {
             // 管理员重置用户密码后，使该用户的所有会话失效
-            tokenManager.invalidateUserSessions(userId);
+            sessionService.revokeUserSessions(userId);
         }
         return result;
     }
@@ -692,11 +729,14 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, SysUser> implements
      * @return 修改成功返回 true
      */
     @Override
+    @Transactional(rollbackFor = Exception.class)
     public boolean updateUserStatus(Long userId, Integer status) {
-        return this.update(new LambdaUpdateWrapper<SysUser>()
+        boolean updated = this.update(new LambdaUpdateWrapper<SysUser>()
                 .eq(SysUser::getId, userId)
                 .set(SysUser::getStatus, status)
         );
+        if (updated && !Integer.valueOf(1).equals(status)) sessionService.revokeUserSessions(userId);
+        return updated;
     }
 
     /**

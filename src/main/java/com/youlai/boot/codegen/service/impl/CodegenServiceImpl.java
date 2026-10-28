@@ -36,7 +36,7 @@ import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
 
 /**
- * 代码生成服务实现类。
+ * 代码生成服务实现类
  *
  * @author Ray
  * @since 2.10.0
@@ -201,7 +201,7 @@ public class CodegenServiceImpl implements CodegenService {
     }
 
     /**
-     * 生成文件名。
+     * 生成文件名
      *
      * @param entityName   实体名（例如 User）
      * @param templateName 模板名（例如 Entity、Controller、API）
@@ -224,7 +224,7 @@ public class CodegenServiceImpl implements CodegenService {
     }
 
     /**
-     * 生成文件路径。
+     * 生成文件路径
      *
      * @param templateName   模板名
      * @param moduleName     模块名（例如 system）
@@ -281,9 +281,10 @@ public class CodegenServiceImpl implements CodegenService {
     }
 
     /**
-     * 渲染模板，生成代码内容。
+     * 渲染模板，生成代码内容
      *
-     * @param templateConfig 模板配置
+     * @param templatePath   模板路径
+     * @param subpackageName 生成模型所属子包
      * @param genTable       表生成配置
      * @param fieldConfigs   字段配置
      * @param pageType       前端页面类型
@@ -316,9 +317,12 @@ public class CodegenServiceImpl implements CodegenService {
         bindMap.put("entityComment", genTable.getBusinessName());
         bindMap.put("fieldConfigs", fieldConfigs);
 
+        boolean hasLocalDate = false;
         boolean hasLocalDateTime = false;
         boolean hasBigDecimal = false;
-        boolean hasRequiredField = false;
+        boolean hasNotBlank = false;
+        boolean hasNotNull = false;
+        boolean hasSize = false;
 
         for (GenTableColumn fieldConfig : fieldConfigs) {
 
@@ -326,21 +330,37 @@ public class CodegenServiceImpl implements CodegenService {
                 fieldConfig.setFieldType(JavaTypeEnum.getJavaTypeByColumnType(fieldConfig.getColumnType()));
             }
 
-            if ("LocalDateTime".equals(fieldConfig.getFieldType()) || "LocalDate".equals(fieldConfig.getFieldType())) {
+            if ("LocalDate".equals(fieldConfig.getFieldType())) {
+                hasLocalDate = true;
+            }
+            if ("LocalDateTime".equals(fieldConfig.getFieldType())) {
                 hasLocalDateTime = true;
             }
             if ("BigDecimal".equals(fieldConfig.getFieldType())) {
                 hasBigDecimal = true;
             }
-            if (ObjectUtil.equals(fieldConfig.getIsRequired(), 1)) {
-                hasRequiredField = true;
+            if (ObjectUtil.equals(fieldConfig.getIsShowInForm(), 1) && !"id".equals(fieldConfig.getFieldName())) {
+                boolean isString = "String".equals(fieldConfig.getFieldType());
+                if (ObjectUtil.equals(fieldConfig.getIsRequired(), 1)) {
+                    if (isString) {
+                        hasNotBlank = true;
+                    } else {
+                        hasNotNull = true;
+                    }
+                }
+                if (isString && fieldConfig.getMaxLength() != null && fieldConfig.getMaxLength() > 0) {
+                    hasSize = true;
+                }
             }
             fieldConfig.setTsType(JavaTypeEnum.getTsTypeByJavaType(fieldConfig.getFieldType()));
         }
 
+        bindMap.put("hasLocalDate", hasLocalDate);
         bindMap.put("hasLocalDateTime", hasLocalDateTime);
         bindMap.put("hasBigDecimal", hasBigDecimal);
-        bindMap.put("hasRequiredField", hasRequiredField);
+        bindMap.put("hasNotBlank", hasNotBlank);
+        bindMap.put("hasNotNull", hasNotNull);
+        bindMap.put("hasSize", hasSize);
 
         TemplateEngine templateEngine = TemplateUtil.createEngine(new TemplateConfig("codegen", TemplateConfig.ResourceMode.CLASSPATH));
         // 根据 ui 选择不同的前端页面模板：默认 index.vue.vm；封装版使用 index.crud.vue.vm
@@ -358,7 +378,7 @@ public class CodegenServiceImpl implements CodegenService {
     }
 
     /**
-     * 下载代码。
+     * 下载代码
      *
      * @param tableNames 表名数组，支持多张表
      * @param ui         页面类型
@@ -384,7 +404,7 @@ public class CodegenServiceImpl implements CodegenService {
     }
 
     /**
-     * 根据表名生成代码并压缩到 zip 文件中。
+     * 根据表名生成代码并压缩到 zip 文件中
      *
      * @param tableName 表名
      * @param zip       压缩文件输出流

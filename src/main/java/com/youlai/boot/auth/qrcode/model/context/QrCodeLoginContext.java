@@ -1,6 +1,7 @@
 package com.youlai.boot.auth.qrcode.model.context;
 
 import lombok.Data;
+import lombok.ToString;
 
 /**
  * 扫码登录票据上下文，序列化为 JSON 存入 Redis
@@ -11,7 +12,8 @@ import lombok.Data;
 @Data
 public class QrCodeLoginContext {
 
-    // 票据，UUID 无连字符
+    // 票据，32 字节随机数的 Base64URL 编码
+    @ToString.Exclude
     private String ticket;
 
     // 状态枚举名，取 {@link com.youlai.boot.auth.qrcode.enums.QrCodeLoginStatusEnum#name()}

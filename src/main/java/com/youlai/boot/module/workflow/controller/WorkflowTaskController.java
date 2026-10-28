@@ -9,7 +9,7 @@ import com.youlai.boot.common.result.PageResult;
 import com.youlai.boot.common.result.Result;
 import com.youlai.boot.module.workflow.model.form.CompleteTaskForm;
 import com.youlai.boot.module.workflow.model.form.RejectTaskForm;
-import com.youlai.boot.module.workflow.model.query.WorkflowTaskPageQuery;
+import com.youlai.boot.module.workflow.model.query.WorkflowTaskQuery;
 import com.youlai.boot.module.workflow.model.vo.DoneTaskVO;
 import com.youlai.boot.module.workflow.model.vo.RejectTargetVO;
 import com.youlai.boot.module.workflow.model.vo.TaskDetailVO;
@@ -43,7 +43,7 @@ public class WorkflowTaskController {
     @Operation(summary = "待办任务分页列表")
     @GetMapping("/todo")
     @Log(module = LogModuleEnum.WORKFLOW, value = ActionTypeEnum.LIST, title = "待办任务")
-    public PageResult<TodoTaskVO> getTodoTaskPage(@Valid WorkflowTaskPageQuery queryParams) {
+    public PageResult<TodoTaskVO> getTodoTaskPage(@Valid WorkflowTaskQuery queryParams) {
         Page<TodoTaskVO> result = workflowTaskService.getTodoTaskPage(queryParams);
         return PageResult.success(result);
     }
@@ -51,7 +51,7 @@ public class WorkflowTaskController {
     @Operation(summary = "已办任务分页列表")
     @GetMapping("/done")
     @Log(module = LogModuleEnum.WORKFLOW, value = ActionTypeEnum.LIST, title = "已办任务")
-    public PageResult<DoneTaskVO> getDoneTaskPage(@Valid WorkflowTaskPageQuery queryParams) {
+    public PageResult<DoneTaskVO> getDoneTaskPage(@Valid WorkflowTaskQuery queryParams) {
         Page<DoneTaskVO> result = workflowTaskService.getDoneTaskPage(queryParams);
         return PageResult.success(result);
     }

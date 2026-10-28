@@ -7,6 +7,12 @@ import org.hibernate.validator.constraints.Range;
 
 import java.util.List;
 
+/**
+ * 新增、编辑和回填共用的角色资料
+ *
+ * @author Ray.Hao
+ * @since 4.13.0
+ */
 @Schema(description = "角色表单对象")
 @Data
 public class RoleForm {

@@ -6,7 +6,6 @@ import com.youlai.boot.common.annotation.Log;
 import com.youlai.boot.framework.web.repeatsubmit.RepeatSubmit;
 import com.youlai.boot.common.enums.ActionTypeEnum;
 import com.youlai.boot.common.enums.LogModuleEnum;
-import com.youlai.boot.common.enums.StatusEnum;
 import com.youlai.boot.common.exception.BusinessException;
 import com.youlai.boot.framework.security.util.SecurityUtils;
 import com.youlai.boot.common.model.Option;
@@ -29,13 +28,14 @@ import com.youlai.boot.system.model.vo.CurrentUserVO;
 import com.youlai.boot.system.model.vo.UserPageVO;
 import com.youlai.boot.system.model.vo.UserProfileVO;
 import com.youlai.boot.system.service.UserService;
-import com.youlai.boot.framework.security.token.TokenManager;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.servlet.ServletOutputStream;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
+import jakarta.validation.constraints.Max;
+import jakarta.validation.constraints.Min;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.annotation.Validated;
@@ -70,7 +70,6 @@ import java.util.List;
 @RequiredArgsConstructor
 public class UserController {
 
-    private final TokenManager tokenManager;
 
     private final UserService userService;
 
@@ -129,19 +128,20 @@ public class UserController {
         return Result.judge(result);
     }
 
+    /**
+     * 修改用户状态，仅接受0或1
+     */
     @Operation(summary = "修改用户状态")
     @PatchMapping(value = "/{userId}/status")
     @PreAuthorize("@ss.hasPerm('sys:user:update')")
     @Log(module = LogModuleEnum.USER, value = ActionTypeEnum.UPDATE)
     public Result<Void> updateUserStatus(
             @Parameter(description = "用户ID") @PathVariable Long userId,
-            @Parameter(description = "用户状态(1:启用;0:禁用)") @RequestParam Integer status
+            @Parameter(description = "用户状态(1:启用;0:禁用)") @RequestParam
+            @Min(value = 0, message = "用户状态只能为0或1")
+            @Max(value = 1, message = "用户状态只能为0或1") Integer status
     ) {
         boolean result = userService.updateUserStatus(userId, status);
-        // 用户禁用时立即失效其会话
-        if (result && StatusEnum.DISABLE.getValue().equals(status)) {
-            tokenManager.invalidateUserSessions(userId);
-        }
         return Result.judge(result);
     }
 
@@ -198,11 +198,11 @@ public class UserController {
     @PreAuthorize("@ss.hasPerm('sys:user:export')")
     @Log(module = LogModuleEnum.USER, value = ActionTypeEnum.EXPORT)
     public void exportUsers(@Valid UserQuery queryParams, HttpServletResponse response) throws IOException {
+        List<UserExportVO> exportUserList = userService.listExportUsers(queryParams);
         String fileName = "用户列表.xlsx";
         response.setContentType("application/vnd.openxmlformats-officedocument.spreadsheetml.sheet");
         response.setHeader("Content-Disposition", "attachment; filename=" + URLEncoder.encode(fileName, StandardCharsets.UTF_8));
 
-        List<UserExportVO> exportUserList = userService.listExportUsers(queryParams);
         EasyExcel.write(response.getOutputStream(), UserExportVO.class).sheet("用户列表")
                 .doWrite(exportUserList);
     }

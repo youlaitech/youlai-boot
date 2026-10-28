@@ -3,8 +3,8 @@ package com.youlai.boot.auth.sms.service;
 import cn.hutool.core.util.StrUtil;
 import com.youlai.boot.auth.sms.token.SmsAuthenticationToken;
 import com.youlai.boot.common.constant.RedisConstants;
-import com.youlai.boot.framework.security.model.AuthenticationToken;
-import com.youlai.boot.framework.security.token.TokenManager;
+import com.youlai.boot.framework.security.model.TokenPair;
+import com.youlai.boot.framework.security.session.SessionService;
 import com.youlai.boot.support.sms.SmsTypeEnum;
 import com.youlai.boot.support.sms.service.SmsService;
 import lombok.RequiredArgsConstructor;
@@ -31,7 +31,7 @@ import java.util.concurrent.TimeUnit;
 public class SmsAuthService {
 
     private final AuthenticationManager authenticationManager;
-    private final TokenManager tokenManager;
+    private final SessionService sessionService;
 
     private final SmsService smsService;
     private final RedisTemplate<String, Object> redisTemplate;
@@ -65,15 +65,13 @@ public class SmsAuthService {
      * @param code   验证码
      * @return 访问令牌
      */
-    public AuthenticationToken loginBySms(String mobile, String code) {
-        // 1. 创建用户短信验证码认证的令牌（未认证）
+    public TokenPair loginBySms(String mobile, String code) {
         SmsAuthenticationToken smsAuthenticationToken = new SmsAuthenticationToken(mobile, code);
 
-        // 2. 执行认证（认证中）
         Authentication authentication = authenticationManager.authenticate(smsAuthenticationToken);
 
-        // 3. 认证成功后生成 JWT 令牌，并存入 Security 上下文，供登录日志 AOP 使用（已认证）
-        AuthenticationToken authenticationToken = tokenManager.generateToken(authentication);
+        // 登录日志从安全上下文读取操作者
+        TokenPair authenticationToken = sessionService.create(authentication);
         SecurityContextHolder.getContext().setAuthentication(authentication);
         return authenticationToken;
     }

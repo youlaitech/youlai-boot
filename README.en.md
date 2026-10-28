@@ -32,6 +32,8 @@
 
 - 🔐 **Security** — Spring Security + JWT/Redis dual-session token model, token renewal, multi-device mutual exclusion
 
+- 🔑 **Unified authentication (optional, disabled by default)** — [OIDC login](../docs/youlai-boot/oidc/implementation.md), delegates sign-in to an external identity provider and binds the authenticated account to a local user; nothing is loaded unless you enable it
+
 - 🛡️ **Fine-grained permissions** — 5-level RBAC: data → menu → button → API → field
 
 - ⚡ **Code generator** — one-click generation of full-stack CRUD code
@@ -42,7 +44,7 @@
 
 - 🌐 **Multi-tenant SaaS** — data isolation + tenant config, with a standalone [youlai-boot-tenant](https://gitee.com/youlaiorg/youlai-boot-tenant) edition
 
-- 🔌 **Real-time communication** — SSE push: online user count, dictionary sync, notification broadcast
+- 🔌 **Real-time communication** — WebSocket: one-time tickets, node presence, dictionary and notice updates
 
 ## System Preview
 
@@ -93,7 +95,12 @@
    # Optional extensions: safe to skip, run after the base schema
    sql/extensions/dynamic-form.sql # Dynamic Form
    sql/extensions/workflow.sql     # Workflow (Flowable demo processes & demo accounts, not engine tables)
+   sql/extensions/oidc.sql         # Unified authentication: app center menu & demo identity binding
    ```
+
+   > Every extension script is **optional**. Users, roles, menus, dictionaries, logs and the code generator all live in `sql/youlai-admin.sql`; importing the base schema alone is enough to run the system.
+   >
+   > `oidc.sql` targets deployments that already run an identity provider: it only writes the "App Center" menu and one demo identity binding. Single sign-on is disabled by default (`security.oidc.enabled` plus the frontend `VITE_OIDC_ENABLED`); without an issuer, client secret and frontend switch no OIDC component is loaded, so the base features are unaffected. Skip it if you do not need single sign-on.
 
 3. Adjust config (optional, a read-only online data source is configured by default):
 
@@ -112,7 +119,7 @@
    mvn spring-boot:run
    ```
 
-   Once started, visit <http://localhost:8000/doc.html>. If the API docs open, the backend is running properly.
+   Once started, visit <http://localhost:8000/swagger-ui.html>. If the API docs open, the backend is running properly.
 
 5. Start the frontend (optional):
    For a visual admin UI, start the companion frontend [vue3-element-admin](https://gitee.com/youlaiorg/vue3-element-admin), visit <http://localhost:3000>, and log in with `admin` / `123456`.
@@ -154,7 +161,7 @@ youlai-boot/
 │   │   ├── file/              # File storage (RustFS/Alibaba Cloud OSS/local)
 │   │   ├── mail/              # Email service
 │   │   ├── sms/               # SMS service
-│   │   └── sse/               # SSE push
+│   │   └── realtime/          # WebSocket communication
 │   └── system/                # System business (user/role/menu/dept/dict etc.)
 ├── docker-compose.yml         # One-click middleware orchestration (MySQL/Redis/RustFS/Xxl-Job)
 └── pom.xml                    # Maven dependency management

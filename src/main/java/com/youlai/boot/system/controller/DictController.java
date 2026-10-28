@@ -8,9 +8,6 @@ import com.youlai.boot.common.model.Option;
 import com.youlai.boot.common.result.PageResult;
 import com.youlai.boot.common.result.Result;
 import com.youlai.boot.framework.web.repeatsubmit.RepeatSubmit;
-import com.youlai.boot.support.sse.SseService;
-import com.youlai.boot.support.sse.constant.SseTopics;
-import com.youlai.boot.system.model.dto.DictChangeDTO;
 import com.youlai.boot.system.model.form.DictForm;
 import com.youlai.boot.system.model.form.DictItemForm;
 import com.youlai.boot.system.model.query.DictQuery;
@@ -45,16 +42,6 @@ public class DictController {
 
     private final DictService dictService;
     private final DictItemService dictItemService;
-    private final SseService sseService;
-
-    /**
-     * 广播字典变更事件到所有 SSE 在线连接
-     *
-     * @param dictCode 字典编码
-     */
-    private void sendDictChange(String dictCode) {
-        sseService.broadcast(SseTopics.DICT, new DictChangeDTO(dictCode));
-    }
 
     @Operation(summary = "字典分页列表")
     @GetMapping
@@ -91,10 +78,6 @@ public class DictController {
     @Log(module = LogModuleEnum.DICT, value = ActionTypeEnum.INSERT)
     public Result<Void> saveDict(@Valid @RequestBody DictForm formData) {
         boolean result = dictService.saveDict(formData);
-        // 发送字典更新通知
-        if (result) {
-            sendDictChange(formData.getDictCode());
-        }
         return Result.judge(result);
     }
 
@@ -107,10 +90,6 @@ public class DictController {
             @RequestBody @Valid DictForm formData
     ) {
         boolean status = dictService.updateDict(dictId, formData);
-        // 发送字典更新通知
-        if (status && formData.getDictCode() != null) {
-            sendDictChange(formData.getDictCode());
-        }
         return Result.judge(status);
     }
 
@@ -121,15 +100,7 @@ public class DictController {
     public Result<Void> deleteDictionaries(
             @Parameter(description = "字典ID，多个以英文逗号(,)拼接") @PathVariable String ids
     ) {
-        // 获取字典编码列表，用于发送删除通知
-        List<String> dictCodes = dictService.getDictCodesByIds(Arrays.stream(ids.split(",")).toList());
-
         dictService.deleteDictByIds(Arrays.stream(ids.split(",")).toList());
-
-        // 发送字典删除通知
-        for (String dictCode : dictCodes) {
-            sendDictChange(dictCode);
-        }
 
         return Result.success();
     }
@@ -177,11 +148,6 @@ public class DictController {
         formData.setDictCode(dictCode);
         boolean result = dictItemService.saveDictItem(formData);
 
-        // 发送字典更新通知
-        if (result) {
-            sendDictChange(dictCode);
-        }
-
         return Result.judge(result);
     }
 
@@ -199,11 +165,6 @@ public class DictController {
         formData.setDictCode(dictCode);
         boolean status = dictItemService.updateDictItem(formData);
 
-        // 发送字典更新通知
-        if (status) {
-            sendDictChange(dictCode);
-        }
-
         return Result.judge(status);
     }
 
@@ -216,8 +177,6 @@ public class DictController {
             @Parameter(description = "字典项ID，多个以英文逗号(,)拼接") @PathVariable String itemIds
     ) {
         dictItemService.deleteDictItemByIds(itemIds);
-        // 发送字典更新通知
-        sendDictChange(dictCode);
         return Result.success();
     }
 

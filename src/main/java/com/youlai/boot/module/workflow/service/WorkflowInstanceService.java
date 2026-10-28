@@ -2,7 +2,7 @@ package com.youlai.boot.module.workflow.service;
 
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.youlai.boot.module.workflow.model.form.StartProcessForm;
-import com.youlai.boot.module.workflow.model.query.WorkflowInstancePageQuery;
+import com.youlai.boot.module.workflow.model.query.WorkflowInstanceQuery;
 import com.youlai.boot.module.workflow.model.vo.InstanceDetailVO;
 import com.youlai.boot.module.workflow.model.vo.InstancePageVO;
 import com.youlai.boot.module.workflow.model.vo.ProcessDiagramVO;
@@ -29,7 +29,7 @@ public interface WorkflowInstanceService {
      * @param queryParams 查询参数
      * @return 分页结果
      */
-    Page<InstancePageVO> getInstancePage(WorkflowInstancePageQuery queryParams);
+    Page<InstancePageVO> getInstancePage(WorkflowInstanceQuery queryParams);
 
     /**
      * 获取流程图数据（BPMN XML + 已办/进行中节点，bpmn-js 高亮渲染）

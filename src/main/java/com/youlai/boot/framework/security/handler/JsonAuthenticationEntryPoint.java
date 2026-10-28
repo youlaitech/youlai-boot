@@ -2,8 +2,8 @@ package com.youlai.boot.framework.security.handler;
 
 import com.youlai.boot.common.result.ResultCode;
 import com.youlai.boot.framework.web.util.ResponseWriter;
-import org.springframework.security.authentication.BadCredentialsException;
-import org.springframework.security.authentication.InsufficientAuthenticationException;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.security.authentication.AuthenticationServiceException;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.web.AuthenticationEntryPoint;
 
@@ -19,17 +19,17 @@ import java.io.IOException;
  * @author Ray.Hao
  * @since 2.0.0
  */
+@Slf4j
 public class JsonAuthenticationEntryPoint implements AuthenticationEntryPoint {
 
     @Override
     public void commence(HttpServletRequest request, HttpServletResponse response,
                          AuthenticationException authException) throws IOException, ServletException {
-        if (authException instanceof BadCredentialsException) {
-            ResponseWriter.writeError(response, ResultCode.USER_PASSWORD_ERROR);
-        } else if (authException instanceof InsufficientAuthenticationException) {
-            ResponseWriter.writeError(response, ResultCode.ACCESS_TOKEN_INVALID);
+        if (authException instanceof AuthenticationServiceException) {
+            log.error("认证服务不可用", authException);
+            ResponseWriter.writeError(response, ResultCode.AUTH_SERVICE_UNAVAILABLE);
         } else {
-            ResponseWriter.writeError(response, ResultCode.USER_LOGIN_EXCEPTION, authException.getMessage());
+            ResponseWriter.writeError(response, ResultCode.ACCESS_TOKEN_INVALID);
         }
     }
 }

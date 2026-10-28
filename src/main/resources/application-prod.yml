@@ -1,5 +1,6 @@
 server:
   port: 8000
+  forward-headers-strategy: framework
 
 spring:
   datasource:
@@ -110,12 +111,11 @@ rate-limit:
 security:
   token:
     type: jwt # 令牌策略 [jwt|redis-token]
-    access-token-time-to-live: 7200 # 访问令牌 有效期(单位：秒)，默认 2 小时，-1 表示永不过期
-    refresh-token-time-to-live: 604800 # 刷新令牌有效期(单位：秒)，默认 7 天，-1 表示永不过期
+    access-token-time-to-live: 2h # 访问令牌有效期
+    refresh-token-time-to-live: 7d # 会话最长有效期，刷新不延长
     jwt:
-      secret-key: SecretKey012345678901234567890123456789012345678901234567890123456789 # JWT密钥(HS256算法至少32字符)
-    redis-token:
-      allow-multi-login: true # 是否允许多设备登录
+      secret-key: SecretKey012345678901234567890123456789012345678901234567890123456789 # HS256，至少 32 字节 UTF-8
+    allow-multi-login: true # 两种模式共用的多设备登录策略
   # 匿名放行路径，仅跳过认证与授权判断，仍走过滤器链（保留安全响应头）
   permit-all-urls:
     - /api/v1/auth/login # 登录接口(账号密码登录)
@@ -123,16 +123,26 @@ security:
     - /api/v1/auth/sms/** # 短信验证码接口(发送验证码、短信登录)
     - /api/v1/auth/refresh-token # 刷新令牌接口
     - /api/v1/auth/wxma/** # 微信小程序认证接口(静默登录/手机号快捷登录/绑定手机号)
-    - /api/v1/auth/qr-code/** # 扫码登录接口(生成票据/查询状态/换取令牌)
+    - /api/v1/auth/qr-code/generate # 扫码登录-生成票据
+    - /api/v1/auth/qr-code/status   # 扫码登录-查询状态
+    - /api/v1/auth/qr-code/login    # 扫码登录-换取会话令牌
     - /api/v1/forms/public/** # 公开表单接口(匿名渲染/提交，Service 校验 is_public 总闸 + IP 限流)
     - /api/v1/health # 健康检查接口(供探针与限流测试)
     - ${springdoc.swagger-ui.path} # Swagger UI 路径
-    - /doc.html
     - /swagger-ui/**
     - /v3/api-docs/**
     - /webjars/**
     - /favicon.ico
     - /error
+
+  # OIDC 登录
+  oidc:
+    enabled: ${OIDC_ENABLED:false}
+    issuer: ${OIDC_ISSUER:}
+    client-id: ${OIDC_CLIENT_ID:}
+    client-secret: ${OIDC_CLIENT_SECRET:}
+    # 认证成功后的前端回调地址
+    frontend-callback-uri: "${OIDC_FRONTEND_CALLBACK_URI:}"
 
 # 文件存储
 storage:
@@ -189,13 +199,6 @@ springdoc:
         - com.youlai.boot.module.form.controller
         - com.youlai.boot.module.workflow.controller
   default-flat-param-object: true # 将对象参数扁平化显示在文档中
-
-# knife4j 配置
-knife4j:
-  enable: true # 是否启用 Knife4j 增强功能
-  production: false # 是否启用生产环境保护（true=生产环境隐藏文档，false=开发环境可访问）
-  setting:
-    language: zh_cn
 
 # 验证码配置
 captcha:
@@ -263,6 +266,7 @@ xxl:
 # 微信小程序配置
 wx:
   miniapp:
+    provider: ${WX_MINIAPP_PROVIDER:wechat-mini-main}
     appid: your-app-id
     secret: your-app-secret
 

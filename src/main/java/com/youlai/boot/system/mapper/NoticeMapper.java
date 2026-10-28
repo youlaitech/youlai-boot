@@ -33,5 +33,7 @@ public interface NoticeMapper extends BaseMapper<Notice> {
      * @param id 通知公告ID
      * @return 通知公告详情
      */
-    NoticeDetailVO getNoticeDetail(@Param("id") Long id);
+    NoticeDetailVO getNoticeDetail(@Param("id") Long id, @Param("userId") Long userId);
+
+    NoticeDetailVO getNoticePreview(@Param("id") Long id);
 }

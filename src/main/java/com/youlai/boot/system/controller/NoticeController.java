@@ -75,6 +75,13 @@ public class NoticeController {
         return Result.success(detailVo);
     }
 
+    @Operation(summary = "管理端预览通知")
+    @GetMapping("/{noticeId}/preview")
+    @PreAuthorize("@ss.hasPerm('sys:notice:list')")
+    public Result<NoticeDetailVO> getNoticePreview(@PathVariable Long noticeId) {
+        return Result.success(noticeService.getNoticePreview(noticeId));
+    }
+
     @Operation(summary = "修改通知公告")
     @PutMapping(value = "/{noticeId}")
     @PreAuthorize("@ss.hasPerm('sys:notice:update')")
