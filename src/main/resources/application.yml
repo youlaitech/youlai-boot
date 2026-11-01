@@ -1,8 +1,68 @@
+# 公共配置；连接信息与功能开关在 application-{profile}.yml 中调整
 spring:
   application:
     name: youlai-boot
   profiles:
     active: dev
   config:
-    # 引入代码生成模块的配置（数据源、表前缀等），由 codegen.yml 提供
-    import: classpath:codegen.yml
+    # 代码生成的内部默认配置
+    import:
+      - classpath:codegen.yml
+  datasource:
+    type: com.alibaba.druid.pool.DruidDataSource
+  cache:
+    # 默认关闭应用缓存；环境配置可选择 redis 或 caffeine
+    type: none
+    redis:
+      time-to-live: 1h
+    caffeine:
+      spec: initialCapacity=50,maximumSize=1000,expireAfterWrite=600s
+  servlet:
+    multipart:
+      max-file-size: 50MB # 单个文件上限
+      max-request-size: 50MB # 整个 multipart 请求上限
+  ai:
+    model:
+      # 未启用的模型类型默认关闭，环境配置按需开启
+      chat: none
+      embedding: none
+      image: none
+      moderation: none
+      audio:
+        speech: none
+        transcription: none
+
+# 数据访问
+mybatis-plus:
+  mapper-locations: classpath*:/mapper/**/*.xml
+  global-config:
+    db-config:
+      id-type: none
+      # 逻辑删除字段写实体属性名（isDeleted），不是表字段名
+      logic-delete-field: isDeleted
+      logic-delete-value: 1
+      logic-not-delete-value: 0
+  configuration:
+    map-underscore-to-camel-case: true
+
+# 认证过滤器使用的公开接口
+security:
+  # 免登录路径，仍经过安全过滤器链
+  permit-all-urls:
+    - /api/v1/auth/login # 账号密码登录
+    - /api/v1/auth/captcha # 获取验证码
+    - /api/v1/auth/sms/** # 短信验证码与短信登录
+    - /api/v1/auth/refresh-token # 刷新令牌
+    - /api/v1/auth/wxma/** # 微信小程序登录 / 绑定手机号
+    - /api/v1/auth/qr-code/generate # 扫码登录：生成票据
+    - /api/v1/auth/qr-code/status   # 扫码登录：查询状态
+    - /api/v1/auth/qr-code/login    # 扫码登录：换取令牌
+    - /api/v1/forms/public/** # 公开表单接口(匿名渲染/提交，Service 校验 is_public 总闸 + IP 限流)
+    - /api/v1/health # 健康检查
+    - /api/v1/realtime/ws # 实时连接握手，票据在拦截器校验
+    - ${springdoc.swagger-ui.path:/swagger-ui.html} # Swagger UI 路径
+    - /swagger-ui/**
+    - /v3/api-docs/**
+    - /webjars/**
+    - /favicon.ico
+    - /error

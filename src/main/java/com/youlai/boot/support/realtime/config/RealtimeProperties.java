@@ -15,6 +15,8 @@ import java.util.List;
 @Setter
 @ConfigurationProperties("realtime")
 public class RealtimeProperties {
+    /** 是否启用实时通信接口 */
     private boolean enabled = true;
+    /** 额外允许的浏览器来源，如 https://admin.example.com */
     private List<String> allowedOrigins = List.of();
 }

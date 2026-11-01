@@ -1,7 +1,6 @@
 package com.youlai.boot.system.controller;
 
 import cn.idev.excel.EasyExcel;
-import cn.idev.excel.ExcelWriter;
 import com.youlai.boot.common.annotation.Log;
 import com.youlai.boot.framework.web.repeatsubmit.RepeatSubmit;
 import com.youlai.boot.common.enums.ActionTypeEnum;
@@ -51,11 +50,10 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.io.File;
 import java.io.IOException;
-import java.io.InputStream;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
+import java.util.Collections;
 import java.util.List;
 
 /**
@@ -166,18 +164,16 @@ public class UserController {
 
     @Operation(summary = "用户导入模板下载")
     @GetMapping("/template")
-    public void downloadTemplate(HttpServletResponse response)  {
+    public void downloadTemplate(HttpServletResponse response) {
         String fileName = "用户导入模板.xlsx";
         response.setContentType("application/vnd.openxmlformats-officedocument.spreadsheetml.sheet");
         response.setHeader("Content-Disposition", "attachment; filename=" + URLEncoder.encode(fileName, StandardCharsets.UTF_8));
 
-        // ClassLoader 只认 / 分隔，用 File.separator 打 jar 后（Linux）会取不到资源
-        String fileClassPath = "excel/" + fileName;
-        InputStream inputStream = this.getClass().getClassLoader().getResourceAsStream(fileClassPath);
-
-        try (ServletOutputStream outputStream = response.getOutputStream();
-             ExcelWriter excelWriter = EasyExcel.write(outputStream).withTemplate(inputStream).build()) {
-            excelWriter.finish();
+        // 表头取自 UserImportForm 的 @ExcelProperty，写入空列表即只产出表头
+        try (ServletOutputStream outputStream = response.getOutputStream()) {
+            EasyExcel.write(outputStream, UserImportForm.class)
+                    .sheet("用户导入")
+                    .doWrite(Collections.emptyList());
         } catch (IOException e) {
             throw new BusinessException("用户导入模板下载失败", e);
         }

@@ -27,7 +27,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 /**
- * 用户导入读取器。
+ * 用户导入读取器
  *
  * @author Ray
  * @since 2022/4/10

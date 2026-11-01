@@ -1,13 +1,18 @@
+# 开发环境配置
+
+# 基础服务
 server:
   port: 8000
-  forward-headers-strategy: framework
+  # 经 Nginx 等代理访问且开启 OIDC 时取消注释
+  # forward-headers-strategy: framework
 
 spring:
+  # MySQL 数据库
   datasource:
-    type: com.alibaba.druid.pool.DruidDataSource
     url: jdbc:mysql://www.youlai.tech:3306/youlai_admin?zeroDateTimeBehavior=convertToNull&useUnicode=true&characterEncoding=UTF-8&serverTimezone=Asia/Shanghai&autoReconnect=true&allowMultiQueries=true
     username: youlai
     password: 123456
+  # Redis（登录会话、验证码、限流等）
   data:
     redis:
       database: 0
@@ -15,127 +20,23 @@ spring:
       port: 6379
       password: 123456
       timeout: 10s
-      lettuce:
-        pool:
-          # 连接池最大连接数 默认8 ，负数表示没有限制
-          max-active: 8
-          # 连接池最大阻塞等待时间（使用负值表示没有限制） 默认-1
-          max-wait: -1
-          # 连接池中的最大空闲连接 默认8
-          max-idle: 8
-          # 连接池中的最小空闲连接 默认0
-          min-idle: 0
-  cache:
-    enabled: false
-    # 缓存类型 redis、none(不使用缓存)
-    type: redis
-    # 缓存时间(单位：ms)
-    redis:
-      time-to-live: 3600000
-      # 缓存null值，防止缓存穿透
-      cache-null-values: true
-    caffeine:
-      spec: initialCapacity=50,maximumSize=1000,expireAfterWrite=600s
-  # 邮件配置
-  mail:
-    host: smtp.youlai.tech
-    port: 587
-    username: your-email@example.com
-    password: 123456
-    properties:
-      smtp:
-        auth: true
-        starttls:
-          enable: true
-        from: youlaitech@163.com
-  # AI 对话（本环境无默认密钥，默认关闭；演示环境配置见 application-youlai.yml）
-  ai:
-    # 装配开关：none 关闭，openai 启用
-    model:
-      chat: none
-      embedding: none
-      image: none
-      moderation: none
-      audio:
-        speech: none
-        transcription: none
-    # 启用后在此填写模型凭据与名称
-    openai:
-      # 厂商接口地址（OpenAI 兼容根地址）
-      base-url: https://dashscope.aliyuncs.com/compatible-mode/v1
-      # 厂商 API 密钥（本文件入版本库，用环境变量 AI_API_KEY 提供）
-      api-key: ${AI_API_KEY:}
-      chat:
-        options:
-          model: qwen3.7-flash
-          # 采样温度，取值 0~1，越小输出越稳定
-          temperature: 0.3
-          # 百炼私有参数：推理模型的思考内容耗时可占整次调用的大头，false 关闭
-          extra-body:
-            enable_thinking: false
-  servlet:
-    multipart:
-      # 单文件大小上限，单一来源绑定 storage.upload.max-file-size
-      max-file-size: ${storage.upload.max-file-size:50MB}
-      max-request-size: ${storage.upload.max-file-size:50MB}
+
+# SQL 日志
 mybatis-plus:
-  mapper-locations: classpath*:/mapper/**/*.xml
-  global-config:
-    db-config:
-      id-type: none
-      # 逻辑删除对应的全局属性名（注意：须是对象属性名，不能是表字段名，如 isDeleted 而非 is_deleted，否则逻辑删除失效）
-      logic-delete-field: isDeleted
-      logic-delete-value: 1
-      logic-not-delete-value: 0
   configuration:
-    map-underscore-to-camel-case: true
     log-impl: org.apache.ibatis.logging.stdout.StdOutImpl
 
-# 接口限流
-rate-limit:
-  default-limit: 60
-  default-window: 60s
-  ip:
-    enabled: true     # 开发环境开启 IP 全局限流（供限流测试）
-    limit: 1000
-    window: 60s
-
-# 安全配置
+# 安全与访问
 security:
   token:
-    type: jwt # 令牌策略 [jwt|redis-token]
-    access-token-time-to-live: 2h # 访问令牌有效期
-    refresh-token-time-to-live: 7d # 会话最长有效期，刷新不延长
+    type: jwt # 令牌策略：jwt / redis-token
     jwt:
-      secret-key: SecretKey012345678901234567890123456789012345678901234567890123456789 # HS256，至少 32 字节 UTF-8
-    allow-multi-login: true # 两种模式共用的多设备登录策略
-  # 匿名放行路径，仅跳过认证与授权判断，仍走过滤器链（保留安全响应头）
-  permit-all-urls:
-    - /api/v1/auth/login # 登录接口(账号密码登录)
-    - /api/v1/auth/captcha # 验证码获取接口
-    - /api/v1/auth/sms/** # 短信验证码接口(发送验证码、短信登录)
-    - /api/v1/auth/refresh-token # 刷新令牌接口
-    - /api/v1/auth/wxma/** # 微信小程序认证接口(静默登录/手机号快捷登录/绑定手机号)
-    - /api/v1/auth/qr-code/generate # 扫码登录-生成票据
-    - /api/v1/auth/qr-code/status   # 扫码登录-查询状态
-    - /api/v1/auth/qr-code/login    # 扫码登录-换取会话令牌
-    - /api/v1/forms/public/** # 公开表单接口(匿名渲染/提交，Service 校验 is_public 总闸 + IP 限流)
-    - /api/v1/health # 健康检查接口(供探针与限流测试)
-    - ${springdoc.swagger-ui.path} # Swagger UI 路径
-    - /swagger-ui/**
-    - /v3/api-docs/**
-    - /webjars/**
-    - /favicon.ico
-    - /error
+      secret-key: SecretKey012345678901234567890123456789012345678901234567890123456789 # HS256 密钥，至少 32 字节
 
-  # OIDC 登录
-  oidc:
-    enabled: false
-    issuer: http://localhost:8080/realms/youlai
-    client-id: youlai-admin
-    client-secret: ""
-    # 认证成功后的前端回调地址
-    frontend-callback-uri: "http://localhost:3000/#/oidc/callback"
+# 请求限流
+rate-limit:
+  # @RateLimit 未指定参数时使用的接口限流规则
+  default-limit: 60
 
 # 文件存储
 storage:
@@ -143,34 +44,32 @@ storage:
   type: s3
   # 上传限制
   upload:
-    # 单文件大小上限（同时作为 spring.servlet.multipart 的上限，单一来源）
-    max-file-size: 50MB
-    # 允许的文件扩展名白名单（置空表示不限制）
+    # 扩展名白名单，留空不限制
     allowed-extensions:
       - jpg
       - jpeg
       - png
       - gif
-  # S3 对象存储（S3 协议兼容服务，默认部署 RustFS）
+  # S3 存储（兼容 S3 协议，默认 RustFS）
   s3:
     endpoint: http://111.229.83.153:9000
     access-key: bybaddp7zyARpgNbEGKf
     secret-key: p9rBdQZPBIJcMH23iyFkZkXmmawbmwPlk3JLlaaj
     bucket: public
-    # 自定义域名：配置后文件 URL 走域名，留空则用 endpoint（IP）格式
+    # 文件访问域名；留空时使用对象存储端点生成访问地址
     domain:
   # 阿里云 OSS
   aliyun:
     endpoint: oss-cn-hangzhou.aliyuncs.com
-    access-key-id: your-access-key-id
-    access-key-secret: your-access-key-secret
-    bucket: default
+    access-key-id: ""
+    access-key-secret: ""
+    bucket: ""
   # 本地存储
   local:
-    # 存储根目录（相对路径基于工作目录；生产建议挂载独立卷）
+    # 存储目录，生产建议挂载独立磁盘
     path: ./uploads/
 
-# springdoc 配置文档: https://springdoc.org/properties.html
+# 接口文档：/swagger-ui.html
 springdoc:
   swagger-ui:
     path: /swagger-ui.html
@@ -180,8 +79,9 @@ springdoc:
     path: /v3/api-docs
   group-configs:
     - group: "系统管理"
-      paths-to-match: "/**"
-      # 只生成这些包下的接口文档
+      paths-to-match:
+        - "/**"
+      # 只扫描这些包
       packages-to-scan:
         - com.youlai.boot.auth.password.controller
         - com.youlai.boot.auth.sms.controller
@@ -195,85 +95,90 @@ springdoc:
         - com.youlai.boot.module.workflow.controller
   default-flat-param-object: true
 
-# 验证码配置
-captcha:
-  # 验证码类型 circle-圆圈干扰验证码|gif-Gif验证码|line-干扰线验证码|shear-扭曲干扰验证码
-  type: circle
-  width: 120
-  height: 40
-  interfere-count: 2
-  # 文本透明度(0.0-1.0)
-  text-alpha: 0.8
-  # 验证码字符配置
-  code:
-    # 验证码字符类型 math-算术|random-随机字符
-    type: math
-    # 验证码字符长度，type=算术时，表示运算位数(1:个位数运算 2:十位数运算)；type=随机字符时，表示字符个数
-    length: 1
-  # 验证码字体
-  font:
-    # 字体名称 Dialog|DialogInput|Monospaced|Serif|SansSerif
-    name: SansSerif
-    # 字体样式 0-普通|1-粗体|2-斜体
-    weight: 1
-    size: 24
-  # 验证码有效期(秒)
-  expire-seconds: 120
+---
 
-# 短信配置
+# 邮件、短信、小程序与定时任务（可选）
+
+spring:
+  # 邮件（可选）
+  mail:
+    host: "" # SMTP 地址，如 smtp.example.com
+    username: "" # SMTP 登录账号，如 noreply@example.com
+    password: "" # SMTP 密码或邮箱授权码，由邮件服务商提供
+    from: "" # 发件人地址，如 noreply@example.com，通常与 username 一致
+
+# 阿里云短信（可选）
 sms:
-  # 阿里云短信
   aliyun:
-    accessKeyId: LTAI5tSMgfxxxxxxdiBJLyR
-    accessKeySecret: SoOWRqpjtS7xxxxxxZ2PZiMTJOVC
-    domain: dysmsapi.aliyuncs.com
-    regionId: cn-shanghai
-    signName: 有来技术
+    access-key-id: "" # 在阿里云 RAM 控制台创建的 AccessKey ID
+    access-key-secret: "" # 与 AccessKey ID 配套的密钥
+    sign-name: "" # 短信控制台审核通过的签名名称，如 示例科技
+    # 模板 CODE 从短信控制台获取，格式如 SMS_123456789
     templates:
-      register: SMS_22xxx771
-      login: SMS_22xxx772
-      change-mobile: SMS_22xxx773
+      register: "" # 注册验证码模板（预留）
+      login: "" # 登录验证码模板，模板变量使用 ${code}
+      change-mobile: "" # 修改手机号验证码模板，模板变量使用 ${code}
 
-# xxl-job 定时任务配置
+# 微信小程序（可选）
+wx:
+  miniapp:
+    appid: ""
+    secret: ""
+
+# 定时任务（可选）
 xxl:
   job:
     enabled: false
     admin:
-      # 调度中心地址，多个地址用逗号分割；3.4.1 起调度中心 context-path 为 /，地址不带 /xxl-job-admin 后缀
-      addresses: http://127.0.0.1:8080
-    accessToken: default_token
+      # 调度中心地址，多个用逗号分隔
+      addresses: ""
+    accessToken: ""
     executor:
       appname: xxl-job-executor-${spring.application.name}
-      address:
-      ip:
-      port: 9999
-      logpath: /data/applogs/xxl-job/jobhandler
-      logretentiondays: 30
 
-# 微信小程序配置
-wx:
-  miniapp:
-    # 不同 AppID 使用不同认证源标识。
-    provider: wechat-mini-main
-    appid: your-app-id
-    secret: your-app-secret
+---
 
-# 工作流（可选扩展，开启只需将 enabled 改为 true，引擎开关自动跟随）
-workflow:
-  enabled: false
-  demo:
-    # 演示流程自动部署开关
-    enabled: true
+# OIDC 统一认证（可选）
 
-# 工作流引擎
+security:
+  oidc:
+    enabled: false
+    # 认证中心地址，如 https://sso.example.com/realms/youlai
+    issuer: ""
+    client-id: ""
+    client-secret: ""
+    # 认证成功后的前端回跳地址，如 http://localhost:3000/#/oidc/callback
+    frontend-callback-uri: ""
+
+---
+
+# AI 对话（可选）
+
+spring:
+  ai:
+    openai:
+      # 百炼 OpenAI 兼容地址；切换服务商时修改
+      base-url: https://dashscope.aliyuncs.com/compatible-mode/v1
+      api-key: "" # 填写服务商 API 密钥
+      chat:
+        model: qwen3.7-flash
+        temperature: 0.3
+        # 百炼扩展参数，切换服务商时按需调整
+        extra-body:
+          "[enable_thinking]": false
+
+---
+
+# 工作流（可选）
+
 flowable:
-  # 流程引擎跟随业务开关 workflow.enabled
+  # 总开关，同时控制业务组件和引擎
   process:
-    enabled: ${workflow.enabled:false}
-  # 用户与角色走系统自有体系（sys_user/sys_role），不启用 Flowable IDM 与事件注册表
+    enabled: false
+  # 使用系统账号体系，不启用 IDM 和事件注册表
   idm:
     enabled: false
   eventregistry:
     enabled: false
-  # 引擎表初始化策略，true 启动时检查并自动建/更新 ACT_* 表；可选 true/false/create/create-drop
+  # 开发环境启动时自动建/更新 ACT_* 表
   database-schema-update: true

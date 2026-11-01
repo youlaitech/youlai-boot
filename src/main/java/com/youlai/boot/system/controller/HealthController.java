@@ -9,8 +9,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 /**
- * 系统健康检查接口，返回 ok。
- * 不标注 @RateLimit，仅受 IP 全局限流层约束，用作该层的验证端点。
+ * 系统健康检查接口，返回 ok
+ * 不标注 @RateLimit，仅受 IP 全局限流层约束，用作该层的验证端点
  */
 @Tag(name = "00.系统健康检查")
 @RestController

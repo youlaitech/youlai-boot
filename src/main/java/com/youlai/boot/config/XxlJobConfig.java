@@ -8,11 +8,12 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
 /**
+ * XXL-JOB 执行器配置；地址和 IP 默认自动获取，端口和日志策略可按需覆盖
  *
  * @author xuxueli 2017-04-28
  */
 @Configuration
-@ConditionalOnProperty(name = "xxl.job.enabled") // xxl.job.enabled = true 才会自动装配
+@ConditionalOnProperty(name = "xxl.job.enabled", havingValue = "true")
 @Slf4j
 public class XxlJobConfig {
 
@@ -25,19 +26,19 @@ public class XxlJobConfig {
     @Value("${xxl.job.executor.appname}")
     private String appname;
 
-    @Value("${xxl.job.executor.address}")
+    @Value("${xxl.job.executor.address:}")
     private String address;
 
-    @Value("${xxl.job.executor.ip}")
+    @Value("${xxl.job.executor.ip:}")
     private String ip;
 
-    @Value("${xxl.job.executor.port}")
+    @Value("${xxl.job.executor.port:9999}")
     private int port;
 
-    @Value("${xxl.job.executor.logpath}")
+    @Value("${xxl.job.executor.logpath:/data/applogs/xxl-job/jobhandler}")
     private String logPath;
 
-    @Value("${xxl.job.executor.logretentiondays}")
+    @Value("${xxl.job.executor.logretentiondays:30}")
     private int logRetentionDays;
 
 

@@ -12,7 +12,7 @@ import org.springframework.util.PatternMatchUtils;
 import java.util.Set;
 
 /**
- * Spring Security 权限校验组件。
+ * Spring Security 权限校验组件
  *
  * @author Ray.Hao
  * @since 0.0.1
@@ -25,7 +25,7 @@ public class PermissionService {
     private final PermissionPort permissionPort;
 
     /**
-     * 判断当前用户是否拥有操作权限，支持通配符匹配。
+     * 判断当前用户是否拥有操作权限，支持通配符匹配
      */
     public boolean hasPerm(String requiredPerm) {
         if (StrUtil.isBlank(requiredPerm)) {

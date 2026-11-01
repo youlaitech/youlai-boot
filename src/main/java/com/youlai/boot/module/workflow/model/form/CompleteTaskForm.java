@@ -23,4 +23,7 @@ public class CompleteTaskForm {
     @Schema(description = "流程变量（驱动后续网关条件）")
     private Map<String, Object> variables;
 
+    @Schema(description = "发起表单数据（发起人节点重新提交时填写）")
+    private Map<String, Object> formData;
+
 }

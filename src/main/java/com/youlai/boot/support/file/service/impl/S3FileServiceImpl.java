@@ -10,9 +10,11 @@ import com.youlai.boot.common.result.ResultCode;
 import com.youlai.boot.support.file.model.FileInfo;
 import com.youlai.boot.support.file.service.FileService;
 import jakarta.annotation.PostConstruct;
+import lombok.AccessLevel;
 import lombok.Data;
 import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
+import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.boot.context.properties.ConfigurationProperties;
@@ -52,18 +54,20 @@ import java.time.LocalDateTime;
 @Slf4j
 public class S3FileServiceImpl implements FileService {
 
-    // S3 对象存储服务端点，如 {@code http://localhost:9000}
+    /** S3 对象存储服务端点，如 http://localhost:9000 */
     private String endpoint;
-    // 访问密钥
+    /** 访问密钥 */
     private String accessKey;
-    // 秘密密钥
+    /** 秘密密钥 */
     private String secretKey;
-    // 存储桶名称
+    /** 存储桶名称 */
     private String bucket;
-    // 自定义域名（可选），配置后不再使用预签名 URL
+    /** 文件访问域名，留空时使用对象存储端点生成访问地址 */
     private String domain;
 
+    @Setter(AccessLevel.NONE)
     private S3Client s3Client;
+    @Setter(AccessLevel.NONE)
     private S3Presigner presigner;
 
     @PostConstruct
@@ -90,7 +94,7 @@ public class S3FileServiceImpl implements FileService {
     }
 
     /**
-     * 上传文件到 S3（RustFS），按日期分目录，自动创建存储桶，返回文件访问 URL。
+     * 上传文件到 S3（RustFS），按日期分目录，自动创建存储桶，返回文件访问 URL
      */
     @Override
     @SneakyThrows
@@ -129,8 +133,8 @@ public class S3FileServiceImpl implements FileService {
     }
 
     /**
-     * 生成预签名 GET URL 并去掉 query 参数，路径直达对象。
-     * 依赖桶已开匿名只读（详见 createBucketIfAbsent 的策略），签名参数在 URL 中无实际作用。
+     * 生成预签名 GET URL 并去掉 query 参数，路径直达对象
+     * 依赖桶已开匿名只读（详见 createBucketIfAbsent 的策略），签名参数在 URL 中无实际作用
      */
     private String presignedUrl(String dateFolder, String fileName) {
         GetObjectRequest getObjectRequest = GetObjectRequest.builder()
@@ -146,7 +150,7 @@ public class S3FileServiceImpl implements FileService {
     }
 
     /**
-     * 删除文件。
+     * 删除文件
      *
      * @param filePath 文件完整 URL
      * @return 删除成功返回 true
@@ -182,7 +186,7 @@ public class S3FileServiceImpl implements FileService {
     }
 
     /**
-     * 存储桶不存在时自动创建，并设置为公开只读策略。
+     * 存储桶不存在时自动创建，并设置为公开只读策略
      */
     @SneakyThrows
     private void createBucketIfAbsent(String bucket) {

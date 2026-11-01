@@ -30,7 +30,7 @@
 
 ## 核心特性
 
-- 🔐 **安全体系** — Spring Security + JWT/Redis Token 双会话模式、令牌续期、多端互斥
+- 🔐 **安全体系** — Spring Security + JWT/Redis Token 两种令牌格式、统一会话管理、令牌续期、多端互斥
 
 - 🔑 **统一认证（可选，默认关闭）** — [OIDC 登录](../docs/youlai-boot/oidc/implementation.md)，把登录交给外部认证中心，认证成功后关联本地用户并复用角色权限；不启用就不会加载相关组件
 
@@ -100,13 +100,25 @@
 
    > 扩展脚本全部**可选**。用户、角色、菜单、字典、日志、代码生成等基础能力都在 `sql/youlai-admin.sql` 里，只导入基础库就能把系统跑起来。
    >
-   > `oidc.sql` 面向"已经有认证中心"的场景，它只写入「应用中心」菜单和一条演示用的身份关联。单点登录本身默认关闭（`security.oidc.enabled` 与前端 `VITE_OIDC_ENABLED`），不填认证中心地址、客户端密钥和前端开关就不会加载 OIDC 组件，对基础功能零影响。暂时没有单点登录需求，跳过它即可。
+   > `oidc.sql` 面向已有认证中心的场景，只写入「应用中心」菜单和一条演示身份关联。后端通过 `security.oidc.enabled` 控制 OIDC，默认关闭；开启时必须填写认证中心、客户端 ID、客户端密钥和前端回跳地址。前端登录入口通过 `VITE_OIDC_ENABLED` 单独控制。暂时没有单点登录需求，跳过即可。
 
-3. 修改配置（可选，默认已配置线上只读数据源）：
+3. 检查开发配置，按实际环境填写 MySQL、Redis 连接信息：
 
    ```bash
    src/main/resources/application-dev.yml
    ```
+
+   配置按「基础服务 → 安全与访问 → 文件与接口 → 可选扩展」排列。首次运行先看前半部分；邮件、短信、小程序、定时任务、OIDC、AI、工作流集中在后半部分，按需接入。`---` 分隔的各组都属于同一个环境，会一起加载。
+
+   `application.yml` 维护公共规则，`application-dev.yml` 和 `application-prod.yml` 只展开常用参数与接入信息。验证码外观、登录期限、连接池等沿用默认值，需要调整时再添加对应属性，IDE 可提示配置说明与默认值。文件上传的存储方式与凭据在 `storage` 段配置。
+
+   可选服务中的 `""` 表示尚未接入，使用时填写自己的凭据；没有相关需求可以跳过。邮件默认使用端口 587、SMTP 认证和 STARTTLS，其他邮件服务按需覆盖。微信认证源默认 `wechat-mini-main`，首次接入无需填写 `provider`；更换 AppID 时需改用新的 `wx.miniapp.provider`，避免复用已有身份关联。
+
+   本地接入可以直接填写 YAML，生产部署也可用外部配置文件或 Spring Boot 原生环境变量覆盖，例如 `WX_MINIAPP_APPID`、`SECURITY_OIDC_ENABLED`。无需在 YAML 中重复声明 `${变量名:默认值}`；[变量名转换规则](https://docs.spring.io/spring-boot/reference/features/external-config.html#features.external-config.typesafe-configuration-properties.relaxed-binding.environment-variables)为点改下划线、去掉连字符、转大写。实际密钥不要提交到版本库。
+
+   上传大小在 `spring.servlet.multipart` 中配置，单文件和整个请求默认均为 50MB。升级时请把原 `storage.upload.max-file-size` 的自定义值分别迁移到 `max-file-size` 和 `max-request-size`。
+
+   生产环境的 SQL 日志通过 SLF4J 接入 Logback。排查 SQL 时可临时将对应 Mapper 包的日志级别设为 `DEBUG`，默认 `INFO` 不输出 SQL 调试日志。
 
 4. 启动服务：
 
@@ -207,30 +219,46 @@ youlai-boot/
 
 ## 可选扩展
 
-**工作流（默认关闭）**
+以下功能默认关闭，需要时再开启。
 
-两步开启：
+**AI 辅助**：在当前环境配置中填写密钥，并加上 `spring.ai.model.chat: openai`。
 
-1. 导入演示数据（演示流程与演示账号）：
+```yaml
+spring:
+  ai:
+    model:
+      chat: openai
+    openai:
+      base-url: https://dashscope.aliyuncs.com/compatible-mode/v1
+      api-key: ""
+      chat:
+        model: qwen3.7-flash
+        temperature: 0.3
+        extra-body:
+          "[enable_thinking]": false
+```
 
-   ```bash
-   sql/extensions/workflow.sql
-   ```
+**工作流**：先执行扩展脚本导入菜单、演示角色与发起表单（不含 `ACT_*` 引擎表），再在环境配置中打开开关。
 
-   ACT_* 引擎表无需导入，启动时由 Flowable 自动创建（已存在则不重复处理）。
+```bash
+sql/extensions/workflow.sql
+```
 
-2. 在 `application-{profile}.yml` 中开启：
+```yaml
+flowable:
+  process:
+    enabled: true   # 唯一开关，同时控制业务模块和引擎
+  idm:
+    enabled: false
+  eventregistry:
+    enabled: false
+```
 
-   ```yaml
-   workflow:
-     enabled: true
-   ```
+开发环境启动时自动建表，生产需先建表；演示流程在「流程模型」页点「重置工作流数据」后生成。
 
-   Flowable 引擎开关（process / idm / eventregistry）在 `application.yml` 中以占位符跟随 `workflow.enabled`，无需单独维护；只改上面一处即可。
+**统一认证**：经 Nginx 接入时，取消环境配置 `server` 块中 `forward-headers-strategy: framework` 的注释，并让代理覆盖客户端的 `Forwarded` / `X-Forwarded-*`。
 
-**多租户**
-
-需要租户隔离与租户配置，使用独立仓库 [youlai-boot-tenant](https://gitee.com/youlaiorg/youlai-boot-tenant)。
+**多租户**：见 [youlai-boot-tenant](https://gitee.com/youlaiorg/youlai-boot-tenant)。
 
 ## 技术合作
 

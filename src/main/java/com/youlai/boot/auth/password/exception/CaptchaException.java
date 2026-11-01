@@ -4,7 +4,7 @@ import com.youlai.boot.common.result.ResultCode;
 import lombok.Getter;
 
 /**
- * 图形验证码校验失败时抛出的异常。
+ * 图形验证码校验失败时抛出的异常
  *
  * @author Ray.Hao
  * @since 3.1.0

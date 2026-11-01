@@ -71,14 +71,20 @@ public class WorkflowModelServiceImpl implements WorkflowModelService {
                 <bpmn:startEvent id="startEvent" name="开始">
                   <bpmn:outgoing>flow1</bpmn:outgoing>
                 </bpmn:startEvent>
-                <bpmn:userTask id="activity1" name="审批">
+                <bpmn:userTask id="initiator" name="发起申请" flowable:assignee="${initiator}"
+                               flowable:skipExpression="${_SKIP_INITIATOR == true}">
                   <bpmn:incoming>flow1</bpmn:incoming>
+                  <bpmn:outgoing>flowInitiator</bpmn:outgoing>
+                </bpmn:userTask>
+                <bpmn:userTask id="activity1" name="审批">
+                  <bpmn:incoming>flowInitiator</bpmn:incoming>
                   <bpmn:outgoing>flow2</bpmn:outgoing>
                 </bpmn:userTask>
                 <bpmn:endEvent id="endEvent" name="结束">
                   <bpmn:incoming>flow2</bpmn:incoming>
                 </bpmn:endEvent>
-                <bpmn:sequenceFlow id="flow1" sourceRef="startEvent" targetRef="activity1"/>
+                <bpmn:sequenceFlow id="flow1" sourceRef="startEvent" targetRef="initiator"/>
+                <bpmn:sequenceFlow id="flowInitiator" sourceRef="initiator" targetRef="activity1"/>
                 <bpmn:sequenceFlow id="flow2" sourceRef="activity1" targetRef="endEvent"/>
               </bpmn:process>
               <bpmndi:BPMNDiagram id="BPMNDiagram_%1$s">
@@ -86,19 +92,26 @@ public class WorkflowModelServiceImpl implements WorkflowModelService {
                   <bpmndi:BPMNShape id="startEvent_di" bpmnElement="startEvent">
                     <dc:Bounds x="152" y="102" width="36" height="36"/>
                   </bpmndi:BPMNShape>
-                  <bpmndi:BPMNShape id="activity1_di" bpmnElement="activity1">
+                  <bpmndi:BPMNShape id="initiator_di" bpmnElement="initiator">
                     <dc:Bounds x="240" y="80" width="100" height="80"/>
                   </bpmndi:BPMNShape>
+                  <bpmndi:BPMNShape id="activity1_di" bpmnElement="activity1">
+                    <dc:Bounds x="350" y="80" width="100" height="80"/>
+                  </bpmndi:BPMNShape>
                   <bpmndi:BPMNShape id="endEvent_di" bpmnElement="endEvent">
-                    <dc:Bounds x="392" y="102" width="36" height="36"/>
+                    <dc:Bounds x="502" y="102" width="36" height="36"/>
                   </bpmndi:BPMNShape>
                   <bpmndi:BPMNEdge id="flow1_di" bpmnElement="flow1">
                     <di:waypoint x="188" y="120"/>
                     <di:waypoint x="240" y="120"/>
                   </bpmndi:BPMNEdge>
-                  <bpmndi:BPMNEdge id="flow2_di" bpmnElement="flow2">
+                  <bpmndi:BPMNEdge id="flowInitiator_di" bpmnElement="flowInitiator">
                     <di:waypoint x="340" y="120"/>
-                    <di:waypoint x="392" y="120"/>
+                    <di:waypoint x="350" y="120"/>
+                  </bpmndi:BPMNEdge>
+                  <bpmndi:BPMNEdge id="flow2_di" bpmnElement="flow2">
+                    <di:waypoint x="450" y="120"/>
+                    <di:waypoint x="502" y="120"/>
                   </bpmndi:BPMNEdge>
                 </bpmndi:BPMNPlane>
               </bpmndi:BPMNDiagram>

@@ -241,7 +241,19 @@ public class WorkflowTaskServiceImpl implements WorkflowTaskService {
         Task task = getCurrentUserTask(taskId);
         this.addComment(task, formData.getComment());
         this.claimIfCandidate(task);
-        taskService.complete(taskId, formData.getVariables() == null ? Map.of() : formData.getVariables());
+        Map<String, Object> variables = formData.getVariables() == null
+                ? new HashMap<>() : new HashMap<>(formData.getVariables());
+        if (formData.getFormData() != null && !formData.getFormData().isEmpty()) {
+            // 发起人节点重新提交：更新发起表单数据，字段同时作为流程变量驱动网关
+            ProcessInstance instance = runtimeService.createProcessInstanceQuery()
+                    .processInstanceId(task.getProcessInstanceId())
+                    .singleResult();
+            Assert.isTrue(instance != null && StrUtil.isNotBlank(instance.getBusinessKey()),
+                    "当前任务无关联的发起表单数据");
+            formDataService.updateFormData(Long.valueOf(instance.getBusinessKey()), formData.getFormData());
+            variables.putAll(formData.getFormData());
+        }
+        taskService.complete(taskId, variables);
     }
 
     /**

@@ -1,74 +1,10 @@
 {
   "properties": [
     {
-      "name": "storage.type",
-      "type": "java.lang.String",
-      "description": "文件存储类型：s3 | aliyun | local"
-    },
-    {
-      "name": "storage.upload.max-file-size",
-      "type": "java.lang.String",
-      "description": "单文件大小上限（如 50MB），同时作为 spring.servlet.multipart 的上限"
-    },
-    {
-      "name": "storage.upload.allowed-extensions",
-      "type": "java.util.List<java.lang.String>",
-      "description": "允许的文件扩展名白名单（置空表示不限制）"
-    },
-    {
-      "name": "storage.s3.endpoint",
-      "type": "java.lang.String",
-      "description": "S3 服务 Endpoint（S3 协议兼容存储，默认部署 RustFS）"
-    },
-    {
-      "name": "storage.s3.access-key",
-      "type": "java.lang.String",
-      "description": "S3 访问凭据"
-    },
-    {
-      "name": "storage.s3.secret-key",
-      "type": "java.lang.String",
-      "description": "S3 凭据密钥"
-    },
-    {
-      "name": "storage.s3.bucket",
-      "type": "java.lang.String",
-      "description": "S3 存储桶名称"
-    },
-    {
-      "name": "storage.s3.domain",
-      "type": "java.lang.String",
-      "description": "S3 自定义域名（文件 URL 域名）"
-    },
-    {
-      "name": "storage.aliyun.endpoint",
-      "type": "java.lang.String",
-      "description": "阿里云 OSS 服务 Endpoint"
-    },
-    {
-      "name": "storage.aliyun.access-key-id",
-      "type": "java.lang.String",
-      "description": "阿里云 OSS 访问凭据 ID"
-    },
-    {
-      "name": "storage.aliyun.access-key-secret",
-      "type": "java.lang.String",
-      "description": "阿里云 OSS 凭据密钥"
-    },
-    {
-      "name": "storage.aliyun.bucket",
-      "type": "java.lang.String",
-      "description": "阿里云 OSS 存储桶名称"
-    },
-    {
-      "name": "storage.local.path",
-      "type": "java.lang.String",
-      "description": "本地存储根目录（相对路径基于工作目录）"
-    },
-    {
       "name": "xxl.job.enabled",
       "type": "java.lang.Boolean",
-      "description": "定时任务开关"
+      "description": "定时任务开关",
+      "defaultValue": false
     },
     {
       "name": "xxl.job.admin.addresses",
@@ -88,47 +24,74 @@
     {
       "name": "xxl.job.executor.address",
       "type": "java.lang.String",
-      "description": "执行器地址"
+      "description": "执行器地址",
+      "defaultValue": ""
     },
     {
       "name": "xxl.job.executor.ip",
       "type": "java.lang.String",
-      "description": "执行器IP"
+      "description": "执行器IP",
+      "defaultValue": ""
     },
     {
       "name": "xxl.job.executor.port",
       "type": "java.lang.Integer",
-      "description": "执行器端口"
+      "description": "执行器端口",
+      "defaultValue": 9999
     },
     {
       "name": "xxl.job.executor.logpath",
       "type": "java.lang.String",
-      "description": "日志路径"
+      "description": "日志路径",
+      "defaultValue": "/data/applogs/xxl-job/jobhandler"
     },
     {
       "name": "xxl.job.executor.logretentiondays",
       "type": "java.lang.Integer",
-      "description": "日志保留天数"
+      "description": "日志保留天数",
+      "defaultValue": 30
     },
     {
-      "name": "spring.cache.enabled",
-      "type": "java.lang.Boolean",
-      "description": "缓存开关"
+      "name": "security.token.access-token-time-to-live",
+      "defaultValue": "2h"
     },
     {
-      "name": "security.redis-token.multi-login",
-      "type": "java.lang.String",
-      "description": "是否允许多点登录"
+      "name": "security.token.refresh-token-time-to-live",
+      "defaultValue": "7d"
+    }
+  ],
+  "ignored": {
+    "properties": [
+      {
+        "name": "storage.allowed-extensions"
+      }
+    ]
+  },
+  "hints": [
+    {
+      "name": "storage.type",
+      "values": [
+        {
+          "value": "s3"
+        },
+        {
+          "value": "aliyun"
+        },
+        {
+          "value": "local"
+        }
+      ]
     },
     {
-      "name": "security.redis-token.access-token-time-to-live",
-      "type": "java.lang.String",
-      "description": "访问令牌有效期"
-    },
-    {
-      "name": "security.redis-token.refresh-token-time-to-live",
-      "type": "java.lang.String",
-      "description": "刷新令牌有效期"
+      "name": "security.token.type",
+      "values": [
+        {
+          "value": "jwt"
+        },
+        {
+          "value": "redis-token"
+        }
+      ]
     }
   ]
 }

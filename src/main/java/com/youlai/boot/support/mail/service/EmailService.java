@@ -1,7 +1,7 @@
 package com.youlai.boot.support.mail.service;
 
 /**
- * 邮件发送服务接口。
+ * 邮件发送服务接口
  *
  * @author Ray.Hao
  * @since 3.1.0
@@ -9,7 +9,7 @@ package com.youlai.boot.support.mail.service;
 public interface EmailService {
 
     /**
-     * 发送纯文本邮件。
+     * 发送纯文本邮件
      *
      * @param to      收件人邮箱
      * @param subject 邮件主题
@@ -18,7 +18,7 @@ public interface EmailService {
     void send(String to, String subject, String text);
 
     /**
-     * 发送HTML格式的邮件。
+     * 发送HTML格式的邮件
      *
      * @param to      收件人邮箱
      * @param subject 邮件主题
@@ -27,7 +27,7 @@ public interface EmailService {
     void sendHtmlMail(String to, String subject, String html);
 
     /**
-     * 发送带附件的邮件。
+     * 发送带附件的邮件
      *
      * @param to       收件人邮箱
      * @param subject  邮件主题

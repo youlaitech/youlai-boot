@@ -63,7 +63,7 @@ public class FileController {
     }
 
     /**
-     * 文件扩展名白名单校验：{@code allowed-extensions} 为空时不限制。
+     * 文件扩展名白名单校验：{@code allowed-extensions} 为空时不限制
      */
     private void validateFileExtension(MultipartFile file) {
         Set<String> allowedExtensions = storageProperties.getAllowedExtensions();

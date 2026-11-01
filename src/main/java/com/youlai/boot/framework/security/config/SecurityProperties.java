@@ -25,11 +25,12 @@ import java.time.Duration;
 @ConfigurationProperties(prefix = "security")
 public class SecurityProperties {
 
+    /** 访问令牌格式与登录会话配置 */
     @Valid
     @NotNull
     private TokenConfig token = new TokenConfig();
 
-    // 匿名路径仍经过安全过滤器链
+    /** 免登录路径，仍经过安全过滤器链 */
     @NotEmpty
     private String[] permitAllUrls;
 
@@ -39,18 +40,23 @@ public class SecurityProperties {
     @Data
     public static class TokenConfig {
 
+        /** 访问令牌格式：jwt 或 redis-token，两种格式共用 Redis 登录会话 */
         @NotNull
         @Pattern(regexp = "jwt|redis-token", message = "令牌类型只能是 jwt 或 redis-token")
         private String type = "jwt";
 
+        /** 访问令牌有效期，须为正整数秒且不超过会话最长有效期，如 2h */
         @NotNull
         private Duration accessTokenTimeToLive = Duration.ofHours(2);
 
+        /** 登录会话最长有效期，刷新令牌不延长该期限，如 7d */
         @NotNull
         private Duration refreshTokenTimeToLive = Duration.ofDays(7);
 
+        /** 是否允许多设备同时登录，false 时新登录会撤销已有会话 */
         private boolean allowMultiLogin = true;
 
+        /** JWT 签名配置，仅 jwt 模式需要 */
         private JwtConfig jwt;
 
         /**
@@ -79,6 +85,7 @@ public class SecurityProperties {
      */
     @Data
     public static class JwtConfig {
+        /** JWT 签名密钥，jwt 模式必填，至少 32 字节 UTF-8 */
         private String secretKey;
     }
 }

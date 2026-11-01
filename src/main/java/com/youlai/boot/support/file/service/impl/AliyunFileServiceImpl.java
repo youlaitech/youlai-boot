@@ -13,9 +13,11 @@ import com.youlai.boot.common.exception.BusinessException;
 import com.youlai.boot.support.file.model.FileInfo;
 import com.youlai.boot.support.file.service.FileService;
 import jakarta.annotation.PostConstruct;
+import lombok.AccessLevel;
 import lombok.Data;
 import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
+import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.boot.context.properties.ConfigurationProperties;
@@ -26,7 +28,7 @@ import java.io.InputStream;
 import java.time.LocalDateTime;
 
 /**
- * 阿里云 OSS 文件存储服务。
+ * 阿里云 OSS 文件存储服务
  */
 @Component
 @Slf4j
@@ -36,15 +38,16 @@ import java.time.LocalDateTime;
 @Data
 public class AliyunFileServiceImpl implements FileService {
 
-    // OSS 地域节点，如 {@code oss-cn-hangzhou.aliyuncs.com}，兼容带 {@code http(s)://} 前缀写法
+    /** OSS 地域节点，如 oss-cn-hangzhou.aliyuncs.com，兼容带 http(s):// 前缀写法 */
     private String endpoint;
-    // 访问密钥 ID
+    /** 访问密钥 ID */
     private String accessKeyId;
-    // 访问密钥 Secret
+    /** 访问密钥 Secret */
     private String accessKeySecret;
-    // 存储空间名称
+    /** 存储空间名称 */
     private String bucket;
 
+    @Setter(AccessLevel.NONE)
     private OSS aliyunOssClient;
 
     @PostConstruct
@@ -53,7 +56,7 @@ public class AliyunFileServiceImpl implements FileService {
     }
 
     /**
-     * 上传文件到阿里云 OSS，按日期分目录，返回 {@code 协议://bucket.endpoint/path} 格式的 URL。
+     * 上传文件到阿里云 OSS，按日期分目录，返回 {@code 协议://bucket.endpoint/path} 格式的 URL
      */
     @Override
     @SneakyThrows
@@ -79,7 +82,7 @@ public class AliyunFileServiceImpl implements FileService {
     }
 
     /**
-     * 从完整 URL 中提取文件名后调用 OSS 删除。
+     * 从完整 URL 中提取文件名后调用 OSS 删除
      *
      * @param filePath 文件完整 URL
      * @return 删除成功返回 true
@@ -94,7 +97,7 @@ public class AliyunFileServiceImpl implements FileService {
 
     /**
      * 补全 endpoint 协议前缀：已带 {@code http://} 或 {@code https://} 的仅去除尾部 {@code /}，
-     * 纯域名写法默认补 {@code https://}，避免 OSS 客户端对无协议 endpoint 默认走 http 明文传输。
+     * 纯域名写法默认补 {@code https://}，避免 OSS 客户端对无协议 endpoint 默认走 http 明文传输
      */
     private String endpointWithProtocol() {
         String trimmed = StrUtil.trim(endpoint);
@@ -105,7 +108,7 @@ public class AliyunFileServiceImpl implements FileService {
     }
 
     /**
-     * 获取文件访问主机地址（含协议），如 {@code https://bucket.oss-cn-hangzhou.aliyuncs.com}。
+     * 获取文件访问主机地址（含协议），如 {@code https://bucket.oss-cn-hangzhou.aliyuncs.com}
      */
     private String getFileHost() {
         String endpointWithProtocol = endpointWithProtocol();

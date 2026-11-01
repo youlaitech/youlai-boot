@@ -74,9 +74,19 @@ public class BpmnModelHelper {
         if (process == null) {
             return null;
         }
-        return process.findFlowElementsOfType(StartEvent.class).stream()
+        String startFormKey = process.findFlowElementsOfType(StartEvent.class).stream()
                 .findFirst()
                 .map(StartEvent::getFormKey)
+                .filter(StrUtil::isNotBlank)
+                .orElse(null);
+        if (startFormKey != null) {
+            return startFormKey;
+        }
+        // 发起表单挂在发起人节点时，回退取首个用户任务的表单
+        return process.findFlowElementsOfType(UserTask.class).stream()
+                .map(UserTask::getFormKey)
+                .filter(StrUtil::isNotBlank)
+                .findFirst()
                 .orElse(null);
     }
 

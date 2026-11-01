@@ -1,372 +1,174 @@
 <template>
-  <div class="page-container h-full flex flex-1 flex-col">
-    <!-- 搜索 -->
-    <CrudSearch
-      ref="searchRef"
-      :search-config="searchConfig"
-      @query-click="handleQueryClick"
-      @reset-click="handleResetClick"
-    >
-#foreach($fieldConfig in $fieldConfigs)
-#if($fieldConfig.isShowInQuery == 1 && $fieldConfig.dictType && $fieldConfig.dictType.trim() != "")
-      <template #$fieldConfig.fieldName="scope">
-        <DictSelect v-model="scope.formData[scope.prop]" code="$fieldConfig.dictType" v-bind="scope.attrs" />
-      </template>
+  <CrudPage
+    :search-config="searchConfig"
+    :table-config="tableConfig"
+    :form-config="formConfig"
+    :load-form-data="loadFormData"
+  >
+#foreach($field in $fieldConfigs)
+#if($field.isShowInQuery == 1 && $field.dictType && $field.dictType.trim() != "")
+    <template #search-${field.fieldName}="{ formData, prop, attrs }">
+      <DictSelect v-model="formData[prop]" code="$field.dictType" v-bind="attrs" />
+    </template>
 #end
 #end
-    </CrudSearch>
-
-    <!-- 列表 -->
-    <CrudTable
-      ref="contentRef"
-      :content-config="contentConfig"
-      @add-click="handleAddClick"
-      @export-click="handleExportClick"
-      @search-click="handleSearchClick"
-      @toolbar-click="handleToolbarClick"
-      @operate-click="handleOperateClick"
-      @filter-change="handleFilterChange"
-    >
-#foreach($fieldConfig in $fieldConfigs)
-#if($fieldConfig.isShowInList == 1 && $fieldConfig.dictType && $fieldConfig.dictType.trim() != "")
-      <template #$fieldConfig.fieldName="scope">
-        <DictTag v-model="scope.row[scope.prop]" code="$fieldConfig.dictType" />
-      </template>
+#foreach($field in $fieldConfigs)
+#if($field.isShowInList == 1 && $field.dictType && $field.dictType.trim() != "")
+    <template #table-cell-${field.fieldName}="{ row }">
+      <DictTag :model-value="row.${field.fieldName}" code="$field.dictType" />
+    </template>
 #end
 #end
-    </CrudTable>
-
-    <!-- 新增 -->
-    <CrudModal ref="addModalRef" :modal-config="addModalConfig" @submit-click="handleSubmitClick">
-#foreach($fieldConfig in $fieldConfigs)
-#if($fieldConfig.isShowInForm == 1 && $fieldConfig.formType.name() != "HIDDEN" && $fieldConfig.dictType && $fieldConfig.dictType.trim() != "")
-      <template #$fieldConfig.fieldName="scope">
-        <DictSelect v-model="scope.formData[scope.prop]" code="$fieldConfig.dictType" v-bind="scope.attrs" />
-      </template>
+#foreach($field in $fieldConfigs)
+#if($field.isShowInForm == 1 && $field.formType.name() != "HIDDEN" && $field.dictType && $field.dictType.trim() != "")
+    <template #form-${field.fieldName}="{ formData, prop, attrs }">
+      <DictSelect v-model="formData[prop]" code="$field.dictType" v-bind="attrs" />
+    </template>
 #end
 #end
-    </CrudModal>
-
-    <!-- 编辑 -->
-    <CrudModal ref="editModalRef" :modal-config="editModalConfig" @submit-click="handleSubmitClick">
-#foreach($fieldConfig in $fieldConfigs)
-#if($fieldConfig.isShowInForm == 1 && $fieldConfig.formType.name() != "HIDDEN" && $fieldConfig.dictType && $fieldConfig.dictType.trim() != "")
-      <template #$fieldConfig.fieldName="scope">
-        <DictSelect v-model="scope.formData[scope.prop]" code="$fieldConfig.dictType" v-bind="scope.attrs" />
-      </template>
-#end
-#end
-    </CrudModal>
-  </div>
+  </CrudPage>
 </template>
 
 <script setup>
-defineOptions({
-  name: "$entityName",
-  inheritAttrs: false,
-});
-
 import ${entityName}API from "@/api/${moduleName}/${entityKebab}";
-import useCrudPage from "@/components/Crud/useCrudPage";
 
-// 组合式 CRUD
-const {
-  searchRef,
-  contentRef,
-  addModalRef,
-  editModalRef,
-  handleQueryClick,
-  handleResetClick,
-  handleAddClick,
-  handleEditClick,
-  handleSubmitClick,
-  handleExportClick,
-  handleSearchClick,
-  handleFilterChange,
-} = useCrudPage();
+defineOptions({ name: "$entityName", inheritAttrs: false });
 
-// 搜索配置
-const searchConfig = reactive({
-  permPrefix: "${moduleName}:${entityKebab}",
-  formItems: [
-#foreach($fieldConfig in $fieldConfigs)
-#if($fieldConfig.isShowInQuery == 1)
-#if($fieldConfig.dictType && $fieldConfig.dictType.trim() != "")
+const searchConfig = {
+  fields: [
+#foreach($field in $fieldConfigs)
+#if($field.isShowInQuery == 1)
     {
+      prop: "$field.fieldName",
+      label: "$field.fieldComment",
+#if($field.dictType && $field.dictType.trim() != "")
       type: "custom",
-      slotName: "$fieldConfig.fieldName",
-      label: "$fieldConfig.fieldComment",
-      prop: "$fieldConfig.fieldName",
-      attrs: {
-        placeholder: "$fieldConfig.fieldComment",
-        clearable: true,
-        style: { width: "200px" },
-      },
-    },
-#else
-    {
-#if($fieldConfig.fieldType == "String")
-      type: "input",
-#elseif($fieldConfig.fieldType == "Integer" || $fieldConfig.fieldType == "Long")
-      type: "input-number",
-#elseif($fieldConfig.fieldType == "LocalDate" || $fieldConfig.fieldType == "LocalDateTime")
+      attrs: { clearable: true },
+#elseif($field.formType.name() == "DATE" || $field.formType.name() == "DATE_TIME")
       type: "date-picker",
-#else
-      type: "input",
-#end
-      label: "$fieldConfig.fieldComment",
-      prop: "$fieldConfig.fieldName",
+#if($field.queryType.name() == "BETWEEN")
+      initialValue: [],
       attrs: {
-        placeholder: "$fieldConfig.fieldComment",
-#if($fieldConfig.fieldType == "LocalDate" || $fieldConfig.fieldType == "LocalDateTime")
         type: "daterange",
-        "range-separator": "~",
-        "start-placeholder": "开始时间",
-        "end-placeholder": "截止时间",
-        "value-format": "YYYY-MM-DD",
-#end
-        clearable: true,
-        style: { width: "200px" },
+        valueFormat: "YYYY-MM-DD",
+        startPlaceholder: "开始日期",
+        endPlaceholder: "结束日期",
       },
-    },
+#else
+      attrs: { type: "date", valueFormat: "YYYY-MM-DD", clearable: true },
 #end
+#elseif($field.fieldType == "Integer" || $field.fieldType == "Long" || $field.fieldType == "BigDecimal")
+      type: "input-number",
+      attrs: { clearable: true },
+#else
+      type: "input",
+      attrs: { clearable: true },
+#end
+    },
 #end
 #end
   ],
-});
+};
 
-// 列表配置
-const contentConfig = reactive({
-  // 权限前缀
-  permPrefix: "${moduleName}:${entityKebab}",
-  table: {
-    border: true,
-    highlightCurrentRow: true,
-  },
-  // 主键
-  pk: "id",
-  // 列表查询接口
-  indexAction: ${entityName}API.getPage,
-  // 删除接口
-  deleteAction: ${entityName}API.deleteByIds,
-  // 数据解析函数
-  parseData(res) {
-    return {
-      total: res?.total ?? 0,
-      list: res?.list ?? [],
-    };
-  },
-  // 分页配置
-  pagination: {
-    background: true,
-    layout: "total, sizes, prev, pager, next, jumper",
-    pageSize: 20,
-    pageSizes: [10, 20, 30, 50],
-  },
-  // 工具栏配置
-  toolbar: ["add", "delete"],
-  defaultToolbar: ["refresh", "filter"],
-  // 表格列配置
-  cols: [
-    { type: "selection", width: 55, align: "center" },
-#foreach($fieldConfig in $fieldConfigs)
-#if($fieldConfig.isShowInList == 1)
-#if($fieldConfig.dictType && $fieldConfig.dictType.trim() != "")
-    {
-      label: "$fieldConfig.fieldComment",
-      prop: "$fieldConfig.fieldName",
-      templet: "custom",
-      slotName: "$fieldConfig.fieldName"
-    },
-#else
-    { label: "$fieldConfig.fieldComment", prop: "$fieldConfig.fieldName" },
-#end
+const tableConfig = {
+  permissionPrefix: "${moduleName}:${entityKebab}",
+  table: { border: true },
+  fetchData: ${entityName}API.getPage,
+  deleteByIds: ${entityName}API.deleteByIds,
+  toolbarActions: ["create", "delete"],
+  tableTools: ["refresh", "columns", "search"],
+  columns: [
+    { type: "selection", width: 50 },
+#foreach($field in $fieldConfigs)
+#if($field.isShowInList == 1)
+    { prop: "$field.fieldName", label: "$field.fieldComment", minWidth: 120 },
 #end
 #end
     {
+      prop: "actions",
       label: "操作",
-      prop: "operation",
-      width: 180,
-      templet: "tool",
-      operat: ["edit", "delete"],
+      cellType: "actions",
+      actions: ["view", "edit", "delete"],
+      fixed: "right",
+      width: 200,
     },
   ],
-});
+};
 
-// 新增配置
-const addModalConfig = reactive({
-  // 权限前缀
-  permPrefix: "${moduleName}:${entityKebab}",
-  // 主键
-  pk: "id",
-  // 弹窗配置
-  dialog: {
-    title: "新增$!{entityComment}",
-    width: 800,
-    draggable: true,
+const formConfig = {
+  title: ({ mode }) => ({
+    create: "新增$!{entityComment}",
+    edit: "编辑$!{entityComment}",
+    view: "查看$!{entityComment}",
+  })[mode],
+  dialog: { width: 560 },
+  /**
+   * 保存记录，更新目标使用打开表单时的主键。
+   */
+  submitForm(data, { mode, id }) {
+    if (mode === "create") return ${entityName}API.create(data);
+    if (id === undefined) throw new Error("缺少记录 ID");
+    return ${entityName}API.update(String(id), data);
   },
-  form: {
-    labelWidth: 100,
-  },
-  // 表单项配置
-  formItems: [
-#foreach($fieldConfig in $fieldConfigs)
-#if($fieldConfig.isShowInForm == 1 && $fieldConfig.formType.name() != "HIDDEN")
-#if($fieldConfig.dictType && $fieldConfig.dictType.trim() != "")
+  fields: [
+#foreach($field in $fieldConfigs)
+#if($field.isShowInForm == 1 && $field.formType.name() != "HIDDEN")
     {
+      prop: "$field.fieldName",
+      label: "$field.fieldComment",
+#if($field.isRequired == 1)
+      required: true,
+#end
+#if($field.dictType && $field.dictType.trim() != "")
       type: "custom",
-      label: "$fieldConfig.fieldComment",
-      prop: "$fieldConfig.fieldName",
-      slotName: "$fieldConfig.fieldName",
-      attrs: {
-        placeholder: "$fieldConfig.fieldComment",
-        style: { width: "100%" }
-      },
-#if($fieldConfig.isRequired == 1)
-      rules: [{ required: true, message: "$fieldConfig.fieldComment不能为空", trigger: "change" }],
-#end
-    },
-#else
-    {
-#if($fieldConfig.fieldType == "String")
-#if($fieldConfig.fieldName.contains("password") || $fieldConfig.fieldName.contains("pwd"))
-      type: "input",
-      attrs: {
-        type: "password",
-        placeholder: "$fieldConfig.fieldComment",
-        showPassword: true
-      },
-#if($fieldConfig.isRequired == 1)
-      rules: [{ required: true, message: "$fieldConfig.fieldComment不能为空", trigger: "blur" }],
-#end
-#elseif($fieldConfig.fieldName.contains("email"))
-      type: "input",
-      attrs: {
-        placeholder: "$fieldConfig.fieldComment",
-        maxlength: 50
-      },
-      rules: [
-#if($fieldConfig.isRequired == 1)
-        { required: true, message: "$fieldConfig.fieldComment不能为空", trigger: "blur" },
-#end
-        { pattern: /\w[-\w.+]*@([A-Za-z0-9][-A-Za-z0-9]+\.)+[A-Za-z]{2,14}/, message: "请输入正确的邮箱地址", trigger: "blur" }
-      ],
-#elseif($fieldConfig.fieldName.contains("mobile") || $fieldConfig.fieldName.contains("phone"))
-      type: "input",
-      attrs: {
-        placeholder: "$fieldConfig.fieldComment",
-        maxlength: 11
-      },
-      rules: [
-#if($fieldConfig.isRequired == 1)
-        { required: true, message: "$fieldConfig.fieldComment不能为空", trigger: "blur" },
-#end
-        { pattern: /^1[3|4|5|6|7|8|9][0-9]\d{8}$/, message: "请输入正确的手机号码", trigger: "blur" }
-      ],
-#else
-      type: "input",
-      attrs: {
-        placeholder: "$fieldConfig.fieldComment"
-      },
-#if($fieldConfig.isRequired == 1)
-      rules: [{ required: true, message: "$fieldConfig.fieldComment不能为空", trigger: "blur" }],
-#end
-#end
-#elseif($fieldConfig.fieldType == "Integer" || $fieldConfig.fieldType == "Long")
-      type: "input-number",
-      attrs: {
-        placeholder: "$fieldConfig.fieldComment",
-        style: { width: "100%" }
-      },
-#if($fieldConfig.isRequired == 1)
-      rules: [{ required: true, message: "$fieldConfig.fieldComment不能为空", trigger: "blur" }],
-#end
-#elseif($fieldConfig.fieldType == "BigDecimal" || $fieldConfig.fieldType == "Double")
-      type: "input-number",
-      attrs: {
-        placeholder: "$fieldConfig.fieldComment",
-        precision: 2,
-        style: { width: "100%" }
-      },
-#if($fieldConfig.isRequired == 1)
-      rules: [{ required: true, message: "$fieldConfig.fieldComment不能为空", trigger: "blur" }],
-#end
-#elseif($fieldConfig.fieldType == "LocalDate" || $fieldConfig.fieldType == "LocalDateTime")
-      type: "date-picker",
-      attrs: {
-        type: "datetime",
-        placeholder: "$fieldConfig.fieldComment",
-        format: "YYYY-MM-DD HH:mm:ss",
-        "value-format": "YYYY-MM-DD HH:mm:ss",
-        style: { width: "100%" }
-      },
-#if($fieldConfig.isRequired == 1)
-      rules: [{ required: true, message: "$fieldConfig.fieldComment不能为空", trigger: "change" }],
-#end
-#elseif($fieldConfig.fieldType == "Boolean" || $fieldConfig.fieldName.contains("status"))
+#elseif($field.formType.name() == "SWITCH")
       type: "switch",
-      attrs: {
-        activeText: "启用",
-        inactiveText: "禁用",
-        activeValue: 1,
-        inactiveValue: 0
-      },
+#if($field.fieldType == "Boolean")
+      initialValue: true,
+      attrs: { activeValue: true, inactiveValue: false },
+#else
       initialValue: 1,
+      attrs: { activeValue: 1, inactiveValue: 0 },
+#end
+#elseif($field.formType.name() == "DATE" || $field.formType.name() == "DATE_TIME")
+      type: "date-picker",
+#if($field.formType.name() == "DATE_TIME")
+      attrs: { type: "datetime", valueFormat: "YYYY-MM-DD HH:mm:ss" },
+#else
+      attrs: { type: "date", valueFormat: "YYYY-MM-DD" },
+#end
+#elseif($field.formType.name() == "INPUT_NUMBER")
+      type: "input-number",
+#if($field.fieldType == "BigDecimal" || $field.fieldType == "Double")
+      attrs: { precision: 2 },
+#end
+#elseif($field.formType.name() == "SELECT")
+      type: "select",
+      options: [],
+#elseif($field.formType.name() == "RADIO")
+      type: "radio",
+      options: [],
+#elseif($field.formType.name() == "CHECK_BOX")
+      type: "checkbox",
+      initialValue: [],
+      options: [],
 #else
       type: "input",
-      attrs: {
-        placeholder: "$fieldConfig.fieldComment"
-      },
-#if($fieldConfig.isRequired == 1)
-      rules: [{ required: true, message: "$fieldConfig.fieldComment不能为空", trigger: "blur" }],
+#if($field.formType.name() == "TEXT_AREA")
+      attrs: { type: "textarea", rows: 3 },
 #end
 #end
-      label: "$fieldConfig.fieldComment",
-      prop: "$fieldConfig.fieldName",
     },
-#end
 #end
 #end
   ],
-  // 提交函数
-  formAction(data) {
-    if (data.id) {
-      // 编辑
-      return ${entityName}API.update(data.id, data);
-    } else {
-      // 新增
-      return ${entityName}API.create(data);
-    }
-  },
-});
-
-// 编辑配置
-const editModalConfig = reactive({
-  permPrefix: "${moduleName}:${entityKebab}",
-  component: "drawer",
-  drawer: {
-    title: "编辑$!{entityComment}",
-    size: 500,
-  },
-  pk: "id",
-  formAction(data) {
-    return ${entityName}API.update(data.id, data);
-  },
-  formItems: addModalConfig.formItems, // 复用新增的表单项
-});
-
-// 处理操作按钮点击
-const handleOperateClick = (data) => {
-  if (data.name === "edit") {
-    handleEditClick(data.row, async () => {
-      return await ${entityName}API.getFormData(String(data.row.id));
-    });
-  }
 };
 
-// 处理工具栏按钮点击（删除等）
-const handleToolbarClick = (name) => {
-  console.log(name);
-};
-
+/**
+ * 加载编辑和查看所需的详情。
+ */
+function loadFormData(row) {
+  const rowKey = tableConfig.rowKey ?? "id";
+  return ${entityName}API.getFormData(String(row[rowKey]));
+}
 </script>

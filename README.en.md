@@ -30,7 +30,7 @@
 
 ## Core Features
 
-- 🔐 **Security** — Spring Security + JWT/Redis dual-session token model, token renewal, multi-device mutual exclusion
+- 🔐 **Security** — Spring Security + JWT/Redis Token formats, unified session management, token renewal, multi-device mutual exclusion
 
 - 🔑 **Unified authentication (optional, disabled by default)** — [OIDC login](../docs/youlai-boot/oidc/implementation.md), delegates sign-in to an external identity provider and binds the authenticated account to a local user; nothing is loaded unless you enable it
 
@@ -100,13 +100,25 @@
 
    > Every extension script is **optional**. Users, roles, menus, dictionaries, logs and the code generator all live in `sql/youlai-admin.sql`; importing the base schema alone is enough to run the system.
    >
-   > `oidc.sql` targets deployments that already run an identity provider: it only writes the "App Center" menu and one demo identity binding. Single sign-on is disabled by default (`security.oidc.enabled` plus the frontend `VITE_OIDC_ENABLED`); without an issuer, client secret and frontend switch no OIDC component is loaded, so the base features are unaffected. Skip it if you do not need single sign-on.
+   > `oidc.sql` targets deployments with an existing identity provider. It adds the "App Center" menu and one demo identity binding. The backend switch `security.oidc.enabled` defaults to false. Enabling it requires an issuer, client ID, client secret, and frontend callback URI. The frontend login entry is controlled separately by `VITE_OIDC_ENABLED`. Skip this extension if you do not need single sign-on.
 
-3. Adjust config (optional, a read-only online data source is configured by default):
+3. Check the development configuration and set the MySQL and Redis connections for your environment:
 
    ```bash
    src/main/resources/application-dev.yml
    ```
+
+   Configuration is ordered by basic services, security and access, files and API documentation, then optional integrations. Start with the first half; email, SMS, mini programs, scheduled jobs, OIDC, AI, and workflow are grouped at the end. Sections separated by `---` belong to the same environment and load together.
+
+   `application.yml` holds shared rules. `application-dev.yml` and `application-prod.yml` expose common settings and integration credentials. CAPTCHA appearance, session lifetimes, and connection pools use defaults; add properties only when you need to override them. The IDE provides descriptions and default values. Configure file upload storage and credentials in the `storage` section.
+
+   Empty strings (`""`) in optional integrations mean not configured. Fill in your credentials when using the service, or leave the section alone. Email defaults to port 587 with SMTP authentication and STARTTLS; override these for other SMTP servers. The mini program provider defaults to `wechat-mini-main`. Set a new `wx.miniapp.provider` when replacing the AppID to avoid reusing existing identity bindings.
+
+   For local use, fill in YAML directly. Deployments can override it with external configuration files or native Spring Boot environment variables, such as `WX_MINIAPP_APPID` and `SECURITY_OIDC_ENABLED`, without adding placeholders to YAML. [Variable naming rules](https://docs.spring.io/spring-boot/reference/features/external-config.html#features.external-config.typesafe-configuration-properties.relaxed-binding.environment-variables): replace dots with underscores, remove hyphens, and uppercase the name. Do not commit real credentials.
+
+   Configure upload limits under `spring.servlet.multipart`; both the per-file and total request limits default to 50MB. When upgrading, migrate a custom `storage.upload.max-file-size` value to both `max-file-size` and `max-request-size`.
+
+   Production SQL logging uses SLF4J and Logback. Temporarily set the relevant Mapper package to `DEBUG` when investigating SQL; the default `INFO` level does not print SQL debug logs.
 
 4. Start the service:
 
@@ -205,30 +217,46 @@ youlai-boot/
 
 ## Optional Extensions
 
-**Workflow (disabled by default)**
+These are off by default.
 
-Two steps to enable:
+**AI**: fill the key in the active profile and add `spring.ai.model.chat: openai`.
 
-1. Import the demo data (demo processes & demo accounts):
+```yaml
+spring:
+  ai:
+    model:
+      chat: openai
+    openai:
+      base-url: https://dashscope.aliyuncs.com/compatible-mode/v1
+      api-key: ""
+      chat:
+        model: qwen3.7-flash
+        temperature: 0.3
+        extra-body:
+          "[enable_thinking]": false
+```
 
-   ```bash
-   sql/extensions/workflow.sql
-   ```
+**Workflow**: run the extension script to import menus, demo roles and forms (no `ACT_*` tables), then enable the switch in the active profile.
 
-   The ACT_* engine tables do not need to be imported — Flowable creates them automatically on startup (existing tables are left untouched).
+```bash
+sql/extensions/workflow.sql
+```
 
-2. Enable it in `application-{profile}.yml`:
+```yaml
+flowable:
+  process:
+    enabled: true   # single switch for the module and the engine
+  idm:
+    enabled: false
+  eventregistry:
+    enabled: false
+```
 
-   ```yaml
-   workflow:
-     enabled: true
-   ```
+Development creates engine tables on startup; production needs them created first. Demo processes come from the reset action on the process model page.
 
-   The Flowable engine switches (process / idm / eventregistry) follow `workflow.enabled` via placeholders in the same `application-{profile}.yml`, no extra maintenance needed.
+**Single sign-on**: behind Nginx, uncomment `forward-headers-strategy: framework` in the profile's `server` block and make the proxy overwrite client `Forwarded` / `X-Forwarded-*` headers.
 
-**Multi-tenant**
-
-For tenant isolation and tenant configuration, use the standalone repo [youlai-boot-tenant](https://gitee.com/youlaiorg/youlai-boot-tenant).
+**Multi-tenant**: see [youlai-boot-tenant](https://gitee.com/youlaiorg/youlai-boot-tenant).
 
 ## License & Support
 

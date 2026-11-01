@@ -26,9 +26,9 @@ public class WxMaProperties {
     @Pattern(regexp = "[a-z][a-z0-9-]{0,63}")
     private String provider = "wechat-mini-main";
 
-    // 小程序 appid
+    /** 小程序 appid */
     private String appid;
 
-    // 小程序 appsecret
+    /** 小程序 appsecret */
     private String secret;
 }

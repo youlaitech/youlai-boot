@@ -3,41 +3,22 @@ package com.youlai.boot.config;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.boot.cache.autoconfigure.CacheProperties;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
-import org.springframework.cache.annotation.EnableCaching;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.data.redis.cache.RedisCacheConfiguration;
-import org.springframework.data.redis.cache.RedisCacheManager;
-import org.springframework.data.redis.cache.RedisCacheWriter;
-import org.springframework.data.redis.connection.RedisConnectionFactory;
 import org.springframework.data.redis.serializer.RedisSerializationContext;
 import org.springframework.data.redis.serializer.RedisSerializer;
 
 /**
- * Redis 缓存配置
+ * Redis 缓存的序列化与过期策略，缓存管理器由 Spring Boot 自动装配
  *
  * @author Ray.Hao
  * @since 2023/12/4
  */
-@EnableCaching
 @EnableConfigurationProperties(CacheProperties.class)
-@Configuration
-@ConditionalOnProperty(name = "spring.cache.enabled") // 未配置视为关闭
+@Configuration(proxyBeanMethods = false)
+@ConditionalOnProperty(prefix = "spring.cache", name = "type", havingValue = "redis")
 public class RedisCacheConfig {
-
-    /**
-     * 自定义 RedisCacheManager
-     *
-     * @param redisConnectionFactory {@link RedisConnectionFactory}
-     * @param cacheProperties        {@link CacheProperties}
-     * @return {@link RedisCacheManager}
-     */
-    @Bean
-    public RedisCacheManager redisCacheManager(RedisConnectionFactory redisConnectionFactory, CacheProperties cacheProperties){
-        return RedisCacheManager.builder(RedisCacheWriter.nonLockingRedisCacheWriter(redisConnectionFactory))
-                .cacheDefaults(redisCacheConfiguration(cacheProperties))
-                .build();
-    }
 
     /**
      * 自定义 RedisCacheConfiguration
@@ -61,11 +42,12 @@ public class RedisCacheConfig {
         if (!redisProperties.isCacheNullValues()) {
             config = config.disableCachingNullValues();
         }
+        // 保留现有 cacheName: 前缀格式，并支持 spring.cache.redis.key-prefix
+        String keyPrefix = redisProperties.getKeyPrefix();
+        config = config.computePrefixWith(name -> (keyPrefix != null ? keyPrefix : "") + name + ":");
         if (!redisProperties.isUseKeyPrefix()) {
             config = config.disableKeyPrefix();
         }
-        // 覆盖默认key双冒号  CacheKeyPrefix#prefixed
-        config = config.computePrefixWith(name -> name + ":");
         return config;
     }
 

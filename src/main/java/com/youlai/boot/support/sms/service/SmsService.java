@@ -5,7 +5,7 @@ import com.youlai.boot.support.sms.SmsTypeEnum;
 import java.util.Map;
 
 /**
- * 短信发送服务接口。
+ * 短信发送服务接口
  *
  * @author Ray.Hao
  * @since 2024/8/17
@@ -13,7 +13,7 @@ import java.util.Map;
 public interface SmsService {
 
     /**
-     * 发送短信。
+     * 发送短信
      *
      * @param mobile         手机号
      * @param smsType        短信类型，对应 {@code sms.templates.*} 配置中的模板

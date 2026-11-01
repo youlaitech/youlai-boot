@@ -23,7 +23,8 @@ public enum JavaTypeEnum {
     TINYINT("tinyint", "Integer", "number"),
     SMALLINT("smallint", "Integer", "number"),
     MEDIUMINT("mediumint", "Integer", "number"),
-    BIGINT("bigint", "Long", "number"),
+    // Long 与 BigInteger 由 Jackson 全局配置序列化为字符串，前端类型保持一致
+    BIGINT("bigint", "Long", "string"),
     FLOAT("float", "Float", "number"),
     DOUBLE("double", "Double", "number"),
     DECIMAL("decimal", "BigDecimal", "number"),

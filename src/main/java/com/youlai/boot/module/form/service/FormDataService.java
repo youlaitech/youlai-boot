@@ -61,6 +61,14 @@ public interface FormDataService {
     FormDataVO getFormDataDetail(Long dataId);
 
     /**
+     * 更新已提交的表单数据（发起人节点重新提交）
+     *
+     * @param dataId 数据ID
+     * @param data   表单数据（field -> value 映射）
+     */
+    void updateFormData(Long dataId, Map<String, Object> data);
+
+    /**
      * 按表单标识删除全部提交数据（演示数据重置用）
      *
      * @param formKey 表单唯一标识

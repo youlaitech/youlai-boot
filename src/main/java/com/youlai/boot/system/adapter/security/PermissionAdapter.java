@@ -8,7 +8,7 @@ import org.springframework.stereotype.Component;
 import java.util.Set;
 
 /**
- * 权限查询适配器。
+ * 权限查询适配器
  *
  * @author Ray.Hao
  * @since 3.1.0

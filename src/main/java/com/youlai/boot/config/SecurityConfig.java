@@ -36,7 +36,6 @@ import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
 import jakarta.servlet.DispatcherType;
-import org.springframework.http.HttpMethod;
 
 /**
  * Spring Security 配置类
@@ -63,8 +62,6 @@ public class SecurityConfig {
                 .authorizeHttpRequests(requestMatcherRegistry -> {
                             // 异步响应的后续分发复用首次请求认证结果
                             requestMatcherRegistry.dispatcherTypeMatchers(DispatcherType.ASYNC).permitAll();
-                            // 握手使用一次性票据；其余实时接口仍需 Bearer 认证
-                            requestMatcherRegistry.requestMatchers(HttpMethod.GET, "/api/v1/realtime/ws").permitAll();
                             String[] permitAllUrls = securityProperties.getPermitAllUrls();
                             if (ArrayUtil.isNotEmpty(permitAllUrls)) {
                                 requestMatcherRegistry.requestMatchers(permitAllUrls).permitAll();

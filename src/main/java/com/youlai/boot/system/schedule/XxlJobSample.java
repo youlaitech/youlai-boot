@@ -5,7 +5,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 
 /**
- * XXL-JOB 示例任务。
+ * XXL-JOB 示例任务
  *
  * @author Ray.Hao
  * @since 3.1.0

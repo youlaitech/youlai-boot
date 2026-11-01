@@ -71,6 +71,10 @@ public class WorkflowInstanceServiceImpl implements WorkflowInstanceService {
         Assert.isTrue(!definition.isSuspended(), "流程定义已挂起，无法发起");
 
         Map<String, Object> variables = new HashMap<>();
+        // 发起人节点按发起人办理；首次发起用跳过表达式直达审批，驳回时才停在发起人
+        variables.put("initiator", SecurityUtils.getUsername());
+        variables.put("_FLOWABLE_SKIP_EXPRESSION_ENABLED", true);
+        variables.put("_SKIP_INITIATOR", true);
         String businessKey = null;
         String formKey = bpmnModelHelper.getStartFormKey(definition.getId());
         if (StrUtil.isNotBlank(formKey)) {
@@ -97,6 +101,8 @@ public class WorkflowInstanceServiceImpl implements WorkflowInstanceService {
                     .name(instanceName)
                     .variables(variables)
                     .start();
+            // 首轮已跳过发起人，关闭跳过标记，后续驳回到发起人才会生成待办
+            runtimeService.setVariable(instance.getId(), "_SKIP_INITIATOR", false);
             return instance.getId();
         } finally {
             Authentication.setAuthenticatedUserId(null);

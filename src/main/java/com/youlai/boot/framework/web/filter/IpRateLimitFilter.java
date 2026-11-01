@@ -70,8 +70,8 @@ public class IpRateLimitFilter extends OncePerRequestFilter {
     }
 
     /**
-     * 设置渐进式限流响应头（X-RateLimit-Limit / Remaining / Reset）。
-     * 超限时额外返回 Retry-After。
+     * 设置渐进式限流响应头（X-RateLimit-Limit / Remaining / Reset）
+     * 超限时额外返回 Retry-After
      */
     private void setRateLimitHeaders(HttpServletResponse response,
                                      int limit,

@@ -17,6 +17,6 @@ import org.springframework.boot.autoconfigure.condition.ConditionalOnBooleanProp
 @Target({ElementType.TYPE, ElementType.METHOD})
 @Retention(RetentionPolicy.RUNTIME)
 @Documented
-@ConditionalOnBooleanProperty(prefix = "workflow", name = "enabled")
+@ConditionalOnBooleanProperty(prefix = "flowable.process", name = "enabled")
 public @interface ConditionalOnWorkflowEnabled {
 }

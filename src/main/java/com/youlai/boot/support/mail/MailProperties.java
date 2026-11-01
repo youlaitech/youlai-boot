@@ -5,7 +5,7 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.stereotype.Component;
 
 /**
- * 邮件配置属性
+ * 邮件配置属性；默认使用 587 端口、SMTP 认证和 STARTTLS
  *
  * @author Ray
  * @since 2024/8/17
@@ -15,22 +15,22 @@ import org.springframework.stereotype.Component;
 @Data
 public class MailProperties {
 
-    // SMTP 服务器地址
+    /** SMTP 服务器地址 */
     private String host;
 
-    // SMTP 端口
-    private int port;
+    /** SMTP 端口 */
+    private int port = 587;
 
-    // 发件人账号
+    /** 发件人账号 */
     private String username;
 
-    // 发件人密码
+    /** 发件人密码 */
     private String password;
 
-    // 发件人地址
+    /** 发件人地址 */
     private String from;
 
-    // SMTP 扩展属性
+    /** SMTP 扩展属性 */
     private Properties properties = new Properties();
 
     @Data
@@ -39,15 +39,15 @@ public class MailProperties {
 
         @Data
         public static class Smtp {
-            // 启用 SMTP 认证
-            private boolean auth;
+            /** 启用 SMTP 认证 */
+            private boolean auth = true;
 
             private StartTls starttls = new StartTls();
 
             @Data
             public static class StartTls {
-                // 启用 STARTTLS
-                private boolean enable;
+                /** 启用 STARTTLS */
+                private boolean enable = true;
             }
         }
     }

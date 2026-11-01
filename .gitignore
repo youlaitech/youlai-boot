@@ -11,3 +11,5 @@ logs
 .history
 
 application-youlai.yml
+/boot-run*.log
+/boot-run*.err

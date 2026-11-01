@@ -19,7 +19,7 @@ import java.io.File;
 import java.nio.charset.StandardCharsets;
 
 /**
- * SMTP 邮件服务。
+ * SMTP 邮件服务
  *
  * @author Ray.Hao
  * @since 3.1.0
@@ -31,11 +31,11 @@ import java.nio.charset.StandardCharsets;
 public class SmtpEmailServiceImpl implements EmailService {
 
     private final JavaMailSender mailSender;
-    // 发件人地址等邮件配置，来自 {@code mail.*}
+    // 发件人地址等邮件配置，绑定 spring.mail.*
     private final MailProperties mailProperties;
 
     /**
-     * 发送纯文本邮件，发件人取自 {@code mail.from} 配置。
+     * 发送纯文本邮件，发件人取自 {@code spring.mail.from} 配置
      */
     @Override
     public void send(String to, String subject, String text) {
@@ -57,7 +57,6 @@ public class SmtpEmailServiceImpl implements EmailService {
      * @param to      收件人地址
      * @param subject 邮件主题
      * @param html    html格式的内容
-     * @return 是否发送成功
      */
     @Override
     public void sendHtmlMail(String to, String subject, String html) {
@@ -82,7 +81,7 @@ public class SmtpEmailServiceImpl implements EmailService {
     }
 
     /**
-     * 发送带附件的 HTML 邮件。
+     * 发送带附件的 HTML 邮件
      */
     @Override
     public void sendWithAttachment(String to, String subject, String text, String filePath) {

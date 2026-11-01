@@ -20,10 +20,10 @@ import java.util.stream.Collectors;
 @ConfigurationProperties(prefix = "storage")
 public class StorageProperties {
 
-    // 存储类型，决定激活哪个 FileService 实现类
+    /** 文件存储类型：s3、aliyun 或 local */
     private String type;
 
-    // 上传限制
+    /** 上传限制 */
     private Upload upload = new Upload();
 
     /**
@@ -32,15 +32,12 @@ public class StorageProperties {
     @Data
     public static class Upload {
 
-        // 单文件大小上限，如 50MB
-        private String maxFileSize;
-
-        // 允许上传的文件扩展名白名单
+        /** 允许上传的文件扩展名白名单，留空不限制 */
         private List<String> allowedExtensions;
     }
 
     /**
-     * 获取规范化后的扩展名白名单
+     * 从 upload.allowed-extensions 计算规范化后的扩展名白名单，不是独立配置项
      *
      * @return 小写、不含点的扩展名集合；空集合表示不限制
      */

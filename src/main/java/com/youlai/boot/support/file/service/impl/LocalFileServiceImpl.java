@@ -20,7 +20,7 @@ import java.io.InputStream;
 import java.time.LocalDateTime;
 
 /**
- * 本地文件存储服务。
+ * 本地文件存储服务
  */
 @Data
 @Slf4j
@@ -30,11 +30,11 @@ import java.time.LocalDateTime;
 @RequiredArgsConstructor
 public class LocalFileServiceImpl implements FileService {
 
-    // 本地存储根目录，来自 {@code storage.local.path}
+    /** 本地存储根目录，来自 storage.local.path */
     private String path;
 
     /**
-     * 上传文件到本地磁盘，按日期分目录，返回相对于存储根目录的路径。
+     * 上传文件到本地磁盘，按日期分目录，返回相对于存储根目录的路径
      */
     @Override
     public FileInfo uploadFile(MultipartFile file) {
@@ -57,7 +57,7 @@ public class LocalFileServiceImpl implements FileService {
     }
 
     /**
-     * 删除本地文件。路径是目录或不存在时返回 false。
+     * 删除本地文件。路径是目录或不存在时返回 false
      *
      * @param filePath 相对于存储根目录的文件路径
      * @return 删除成功返回 true

@@ -8,7 +8,7 @@ import java.io.Serial;
 import java.util.Collection;
 
 /**
- * 短信验证码认证 Token。
+ * 短信验证码认证 Token
  *
  * @author Ray.Hao
  * @since 2.20.0

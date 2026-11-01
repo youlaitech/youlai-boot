@@ -23,7 +23,7 @@ public class PageResult<T> implements Serializable {
     private PageData<T> data;
 
     /**
-     * 构建分页结果（MyBatis-Plus {@link IPage}）。
+     * 构建分页结果（MyBatis-Plus {@link IPage}）
      */
     public static <T> PageResult<T> success(IPage<T> page) {
         PageResult<T> result = new PageResult<>();
@@ -43,7 +43,7 @@ public class PageResult<T> implements Serializable {
     }
 
     /**
-     * 构建列表结果（无分页）。
+     * 构建列表结果（无分页）
      */
     public static <T> PageResult<T> success(List<T> list) {
         PageResult<T> result = new PageResult<>();

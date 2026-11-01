@@ -8,7 +8,7 @@ import java.io.Serial;
 import java.util.Collection;
 
 /**
- * 微信小程序认证 Token。
+ * 微信小程序认证 Token
  *
  * @author Ray.Hao
  * @since 4.0.0

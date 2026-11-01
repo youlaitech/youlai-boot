@@ -1,4 +1,4 @@
-package com.youlai.boot.config;
+package com.youlai.boot.framework.web.log;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;

@@ -65,7 +65,7 @@ INSERT IGNORE INTO `sys_role_menu` VALUES (10, 91), (10, 9104), (10, 9105);
 
 -- ----------------------------
 -- 演示流程的发起表单（依赖动态表单扩展）
--- form_key 与 BPMN 开始节点 flowable:formKey 一一对应
+-- form_key 与 BPMN 发起人节点 flowable:formKey 一一对应
 -- ID 段 1004-1007 顺延 dynamic-form.sql 预置的 1001-1003
 -- ----------------------------
 INSERT IGNORE INTO `form_definition` (`id`, `form_key`, `form_name`, `description`, `form_json`, `options_json`, `status`, `is_public`, `category`, `menu_id`, `version`, `create_time`, `update_time`, `create_by`, `update_by`, `is_deleted`) VALUES

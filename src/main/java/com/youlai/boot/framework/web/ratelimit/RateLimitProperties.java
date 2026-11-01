@@ -17,25 +17,25 @@ import java.time.Duration;
 @ConfigurationProperties(prefix = "rate-limit")
 public class RateLimitProperties {
 
-    // /
+    /** 接口限流注解未指定 limit 时，窗口内允许的最大请求数 */
     private int defaultLimit = 5;
 
-    // /
+    /** 接口限流注解未指定 window 时使用的滑动窗口时长 */
     private Duration defaultWindow = Duration.ofSeconds(60);
 
-    // IP 全局限流配置
+    /** IP 全局限流配置 */
     private Ip ip = new Ip();
 
     @Data
     public static class Ip {
 
-        // 是否启用 IP 全局限流。
+        /** 是否启用 IP 全局限流 */
         private boolean enabled = true;
 
-        // 窗口内最大请求数（默认 1000）
+        /** 窗口内最大请求数（默认 1000） */
         private int limit = 1000;
 
-        // 滑动窗口大小，支持 60s / 1m / 500ms 等 Duration 写法（默认 60s）
+        /** 滑动窗口大小，支持 60s / 1m / 500ms 等 Duration 写法（默认 60s） */
         private Duration window = Duration.ofSeconds(60);
 
     }

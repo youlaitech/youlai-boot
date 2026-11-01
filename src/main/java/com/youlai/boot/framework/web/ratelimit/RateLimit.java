@@ -18,12 +18,12 @@ import java.lang.annotation.Target;
 public @interface RateLimit {
 
     /**
-     * 窗口内允许的最大请求数。
+     * 窗口内允许的最大请求数
      */
     int limit() default 0;
 
     /**
-     * 滑动窗口大小（秒）。
+     * 滑动窗口大小（秒）
      */
     int window() default 0;
 }

@@ -19,7 +19,7 @@ import java.lang.annotation.*;
 public @interface ValidField {
 
     /**
-     * 验证失败时的错误信息。
+     * 验证失败时的错误信息
      */
     String message() default "非法字段";
 
@@ -28,7 +28,7 @@ public @interface ValidField {
     Class<? extends Payload>[] payload() default {};
 
     /**
-     * 允许的合法值列表。
+     * 允许的合法值列表
      */
     String[] allowedValues();
 
