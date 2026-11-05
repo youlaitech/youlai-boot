@@ -1,8 +1,8 @@
 <div align="center">
 
-# <img alt="youlai-boot" height="32" valign="middle" src="./docs/images/logo/logo.png"> youlai-boot
+# <img alt="youlai-boot" width="40" height="40" src="./docs/images/logo/logo.png" align="center"> youlai-boot
 
-**Spring Boot 企业级权限管理系统后端**
+**Java 17 + Spring Boot 4.0.5 企业级权限管理系统后端**
 
 [![Spring Boot](https://img.shields.io/badge/Spring%20Boot-4.0.5-6DB33F?logo=spring-boot)](https://spring.io/projects/spring-boot)
 [![JDK](https://img.shields.io/badge/JDK-17%2B-007396?logo=openjdk)](https://openjdk.org/)
@@ -17,7 +17,7 @@
 
 <div align="center">
 
-[![在线预览](https://img.shields.io/badge/在线预览-2D8CF0?style=for-the-badge\&logo=google-chrome\&logoColor=white)](https://vue.youlai.tech)
+[![在线预览](https://img.shields.io/badge/在线预览-2D8CF0?style=for-the-badge\&logo=google-chrome\&logoColor=white)](https://admin.youlai.tech)
 [![移动端预览](https://img.shields.io/badge/移动端预览-19BE6B?style=for-the-badge\&logo=android\&logoColor=white)](https://app.youlai.tech)
 [![阅读文档](https://img.shields.io/badge/阅读文档-8B5CF6?style=for-the-badge\&logo=gitbook\&logoColor=white)](https://www.youlai.tech/docs/server/spring-boot/)
 [![English](https://img.shields.io/badge/English-00B4D8?style=for-the-badge\&logo=google-translate\&logoColor=white)](./README.en.md)
@@ -98,27 +98,11 @@
    sql/extensions/oidc.sql        # 统一认证：应用中心菜单与演示身份关联
    ```
 
-   > 扩展脚本全部**可选**。用户、角色、菜单、字典、日志、代码生成等基础能力都在 `sql/youlai-admin.sql` 里，只导入基础库就能把系统跑起来。
-   >
-   > `oidc.sql` 面向已有认证中心的场景，只写入「应用中心」菜单和一条演示身份关联。后端通过 `security.oidc.enabled` 控制 OIDC，默认关闭；开启时必须填写认证中心、客户端 ID、客户端密钥和前端回跳地址。前端登录入口通过 `VITE_OIDC_ENABLED` 单独控制。暂时没有单点登录需求，跳过即可。
-
 3. 检查开发配置，按实际环境填写 MySQL、Redis 连接信息：
 
    ```bash
    src/main/resources/application-dev.yml
    ```
-
-   配置按「基础服务 → 安全与访问 → 文件与接口 → 可选扩展」排列。首次运行先看前半部分；邮件、短信、小程序、定时任务、OIDC、AI、工作流集中在后半部分，按需接入。`---` 分隔的各组都属于同一个环境，会一起加载。
-
-   `application.yml` 维护公共规则，`application-dev.yml` 和 `application-prod.yml` 只展开常用参数与接入信息。验证码外观、登录期限、连接池等沿用默认值，需要调整时再添加对应属性，IDE 可提示配置说明与默认值。文件上传的存储方式与凭据在 `storage` 段配置。
-
-   可选服务中的 `""` 表示尚未接入，使用时填写自己的凭据；没有相关需求可以跳过。邮件默认使用端口 587、SMTP 认证和 STARTTLS，其他邮件服务按需覆盖。微信认证源默认 `wechat-mini-main`，首次接入无需填写 `provider`；更换 AppID 时需改用新的 `wx.miniapp.provider`，避免复用已有身份关联。
-
-   本地接入可以直接填写 YAML，生产部署也可用外部配置文件或 Spring Boot 原生环境变量覆盖，例如 `WX_MINIAPP_APPID`、`SECURITY_OIDC_ENABLED`。无需在 YAML 中重复声明 `${变量名:默认值}`；[变量名转换规则](https://docs.spring.io/spring-boot/reference/features/external-config.html#features.external-config.typesafe-configuration-properties.relaxed-binding.environment-variables)为点改下划线、去掉连字符、转大写。实际密钥不要提交到版本库。
-
-   上传大小在 `spring.servlet.multipart` 中配置，单文件和整个请求默认均为 50MB。升级时请把原 `storage.upload.max-file-size` 的自定义值分别迁移到 `max-file-size` 和 `max-request-size`。
-
-   生产环境的 SQL 日志通过 SLF4J 接入 Logback。排查 SQL 时可临时将对应 Mapper 包的日志级别设为 `DEBUG`，默认 `INFO` 不输出 SQL 调试日志。
 
 4. 启动服务：
 
@@ -202,7 +186,7 @@ youlai-boot/
 | [youlai-think](https://gitee.com/youlaiorg/youlai-think)     | ThinkPHP + ThinkORM        | PHP      | ✅️   |
 | [youlai-aspnet](https://gitee.com/youlaiorg/youlai-aspnet)   | ASP.NET Core + EF Core     | C#       | ✅️   |
 | [youlai-axum](https://gitee.com/youlaiorg/youlai-axum)       | Axum + SeaORM              | Rust     | ✅️   |
-| [youlai-laravel](https://gitee.com/youlaiorg/youlai-laravel) | Laravel + Eloquent         | PHP      | ❌️   |
+| [youlai-laravel](https://gitee.com/youlaiorg/youlai-laravel) | Laravel + Eloquent         | PHP      | ✅️   |
 
 > 九种后端共享同一套 **RESTful API 规范** 和 **数据库结构**，前端可无缝切换。
 
@@ -215,7 +199,7 @@ youlai-boot/
 | [youlai-boot (db-pg)](https://gitee.com/youlaiorg/youlai-boot/tree/db-pg)                 | youlai-boot | 分支   | PostgreSQL 数据库分支   | ✅️   |
 | [youlai-boot (multi-module)](https://gitee.com/youlaiorg/youlai-boot/tree/multi-module)   | youlai-boot | 分支   | 多模块工程拆分            | ✅️   |
 | [youlai-nest (multi-tenant)](https://gitee.com/youlaiorg/youlai-nest/tree/multi-tenant)   | youlai-nest | 分支   | 多租户 SaaS，租户隔离与租户配置 | ✅️   |
-| [youlai-boot (spring-boot-3)](https://gitee.com/youlaiorg/youlai-boot/tree/spring-boot-3) | youlai-boot | 分支   | Spring Boot 3 兼容分支 | ❌️   |
+| [youlai-boot (spring-boot-3)](https://gitee.com/youlaiorg/youlai-boot/tree/spring-boot-3) | youlai-boot | 分支   | Spring Boot 3 兼容分支 | ✅️   |
 
 ## 可选扩展
 

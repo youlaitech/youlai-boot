@@ -2,7 +2,7 @@
 
 # <img alt="youlai-boot" height="32" valign="middle" src="./docs/images/logo/logo.png"> youlai-boot
 
-**Enterprise-grade permission management backend based on Spring Boot**
+**Java 17 + Spring Boot 4.0.5 Enterprise-Grade Permission Management Backend**
 
 [![Spring Boot](https://img.shields.io/badge/Spring%20Boot-4.0.5-6DB33F?logo=spring-boot)](https://spring.io/projects/spring-boot)
 [![JDK](https://img.shields.io/badge/JDK-17%2B-007396?logo=openjdk)](https://openjdk.org/)
@@ -17,7 +17,7 @@
 
 <div align="center">
 
-[![Live Preview](https://img.shields.io/badge/Live%20Preview-2D8CF0?style=for-the-badge\&logo=google-chrome\&logoColor=white)](https://vue.youlai.tech)
+[![Live Preview](https://img.shields.io/badge/Live%20Preview-2D8CF0?style=for-the-badge\&logo=google-chrome\&logoColor=white)](https://admin.youlai.tech)
 [![Mobile Preview](https://img.shields.io/badge/Mobile%20Preview-19BE6B?style=for-the-badge\&logo=android\&logoColor=white)](https://app.youlai.tech)
 [![Documentation](https://img.shields.io/badge/Documentation-8B5CF6?style=for-the-badge\&logo=gitbook\&logoColor=white)](https://www.youlai.tech/docs/server/spring-boot/)
 [![简体中文](https://img.shields.io/badge/简体中文-00B4D8?style=for-the-badge\&logo=google-translate\&logoColor=white)](./README.md)
