@@ -17,7 +17,7 @@ public record MenuCreateDTO(
         /** 前端组件所属模块名，如 system */
         String moduleName,
 
-        /** 按钮权限前缀使用的表名，如 sys_user */
-        String tableName
+        /** 按钮权限标识前缀，如 sys:user */
+        String permissionPrefix
 ) {
 }

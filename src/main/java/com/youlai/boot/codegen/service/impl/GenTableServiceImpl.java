@@ -198,16 +198,21 @@ public class GenTableServiceImpl extends ServiceImpl<GenTableMapper, GenTable> i
     @Override
     public void saveGenConfig(GenConfigForm formData) {
         GenTable genTable = codegenConverter.toGenTable(formData);
+        if (StrUtil.isBlank(genTable.getPageType())) {
+            genTable.setPageType("crud");
+        }
         this.saveOrUpdate(genTable);
 
         // 如果选择上级菜单且当前环境不是生产环境，则保存菜单
         Long parentMenuId = formData.getParentMenuId();
         if (parentMenuId != null && !EnvEnum.PROD.getValue().equals(springProfilesActive)) {
+            String permissionPrefix = codegenProperties.resolvePermissionPrefix(
+                    genTable.getModuleName(), genTable.getEntityName());
             MenuCreateDTO dto = new MenuCreateDTO(
                     genTable.getBusinessName(),
                     genTable.getEntityName(),
                     genTable.getModuleName(),
-                    genTable.getTableName()
+                    permissionPrefix
             );
             menuService.addMenuForCodegen(parentMenuId, dto);
         }

@@ -573,7 +573,7 @@ public class MenuServiceImpl extends ServiceImpl<MenuMapper, Menu> implements Me
             this.updateById(menu);
 
             // 生成 CRUD 按钮权限
-            saveCrudButtons(menu.getId(), dto.moduleName() + ":" + dto.tableName().replace("_", "-"), treePath);
+            saveCrudButtons(menu.getId(), dto.permissionPrefix(), treePath);
         }
     }
 

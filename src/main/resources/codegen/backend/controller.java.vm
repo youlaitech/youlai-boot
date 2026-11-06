@@ -8,8 +8,12 @@ import ${packageName}.${moduleName}.model.form.${entityName}Form;
 import ${packageName}.${moduleName}.model.query.${entityName}Query;
 import ${packageName}.${moduleName}.model.vo.${entityName}VO;
 import com.baomidou.mybatisplus.core.metadata.IPage;
+import ${packageName}.common.annotation.Log;
+import ${packageName}.common.enums.ActionTypeEnum;
+import ${packageName}.common.enums.LogModuleEnum;
 import ${packageName}.common.result.PageResult;
 import ${packageName}.common.result.Result;
+import ${packageName}.framework.web.repeatsubmit.RepeatSubmit;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import io.swagger.v3.oas.annotations.Operation;
@@ -26,7 +30,7 @@ import jakarta.validation.Valid;
  */
 @Tag(name = "${businessName}接口")
 @RestController
-@RequestMapping("/api/v1/${entityKebab}")
+@RequestMapping("/api/v1/${entityKebabPlural}")
 @RequiredArgsConstructor
 public class ${entityName}Controller  {
 
@@ -34,7 +38,8 @@ public class ${entityName}Controller  {
 
     @Operation(summary = "$!{businessName}分页列表")
     @GetMapping
-    @PreAuthorize("@ss.hasPerm('${moduleName}:${entityKebab}:list')")
+    @PreAuthorize("@ss.hasPerm('${permissionPrefix}:list')")
+    @Log(module = LogModuleEnum.OTHER, value = ActionTypeEnum.LIST)
     public PageResult<${entityName}VO> get${entityName}Page(@Valid ${entityName}Query queryParams ) {
         IPage<${entityName}VO> result = ${entityLowerCamel}Service.get${entityName}Page(queryParams);
         return PageResult.success(result);
@@ -42,7 +47,9 @@ public class ${entityName}Controller  {
 
     @Operation(summary = "新增${businessName}")
     @PostMapping
-    @PreAuthorize("@ss.hasPerm('${moduleName}:${entityKebab}:create')")
+    @PreAuthorize("@ss.hasPerm('${permissionPrefix}:create')")
+    @RepeatSubmit
+    @Log(module = LogModuleEnum.OTHER, value = ActionTypeEnum.INSERT)
     public Result<Void> save${entityName}(@RequestBody @Valid ${entityName}Form formData ) {
         boolean result = ${entityLowerCamel}Service.save${entityName}(formData);
         return Result.judge(result);
@@ -50,7 +57,7 @@ public class ${entityName}Controller  {
 
     @Operation(summary = "获取${businessName}表单数据")
     @GetMapping("/{id}/form")
-    @PreAuthorize("@ss.hasPerm('${moduleName}:${entityKebab}:update')")
+    @PreAuthorize("@ss.hasPerm('${permissionPrefix}:update')")
     public Result<${entityName}Form> get${entityName}Form(
         @Parameter(description = "$!{businessName}ID") @PathVariable Long id
     ) {
@@ -60,7 +67,8 @@ public class ${entityName}Controller  {
 
     @Operation(summary = "修改${businessName}")
     @PutMapping(value = "/{id}")
-    @PreAuthorize("@ss.hasPerm('${moduleName}:${entityKebab}:update')")
+    @PreAuthorize("@ss.hasPerm('${permissionPrefix}:update')")
+    @Log(module = LogModuleEnum.OTHER, value = ActionTypeEnum.UPDATE)
     public Result<Void> update${entityName}(
             @Parameter(description = "$!{businessName}ID") @PathVariable Long id,
             @RequestBody @Validated ${entityName}Form formData
@@ -71,7 +79,8 @@ public class ${entityName}Controller  {
 
     @Operation(summary = "删除${businessName}")
     @DeleteMapping("/{ids}")
-    @PreAuthorize("@ss.hasPerm('${moduleName}:${entityKebab}:delete')")
+    @PreAuthorize("@ss.hasPerm('${permissionPrefix}:delete')")
+    @Log(module = LogModuleEnum.OTHER, value = ActionTypeEnum.DELETE)
     public Result<Void> delete${entityName}s(
         @Parameter(description = "$!{businessName}ID，多个以英文逗号(,)分割") @PathVariable String ids
     ) {

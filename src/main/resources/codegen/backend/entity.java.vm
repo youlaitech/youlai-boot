@@ -1,7 +1,10 @@
 package ${packageName}.${moduleName}.${subpackageName};
 
-import lombok.Getter;
-import lombok.Setter;
+import com.baomidou.mybatisplus.annotation.FieldFill;
+import com.baomidou.mybatisplus.annotation.TableField;
+import com.baomidou.mybatisplus.annotation.TableName;
+import lombok.Data;
+import lombok.EqualsAndHashCode;
 #if(${hasLocalDate})
 import java.time.LocalDate;
 #end
@@ -11,7 +14,6 @@ import java.time.LocalDateTime;
 #if(${hasBigDecimal})
 import java.math.BigDecimal;
 #end
-import com.baomidou.mybatisplus.annotation.TableName;
 import ${packageName}.common.base.BaseEntity;
 
 /**
@@ -20,8 +22,8 @@ import ${packageName}.common.base.BaseEntity;
  * @author ${author}
  * @since ${date}
  */
-@Getter
-@Setter
+@Data
+@EqualsAndHashCode(callSuper = true)
 @TableName("${tableName}")
 public class ${entityName} extends BaseEntity {
 
@@ -33,6 +35,11 @@ public class ${entityName} extends BaseEntity {
     /**
      * ${fieldConfig.fieldComment}
      */
+        #end
+        #if($fieldConfig.fieldName == "createBy")
+    @TableField(fill = FieldFill.INSERT)
+        #elseif($fieldConfig.fieldName == "updateBy")
+    @TableField(fill = FieldFill.INSERT_UPDATE)
         #end
     private ${fieldConfig.fieldType} ${fieldConfig.fieldName};
     #end

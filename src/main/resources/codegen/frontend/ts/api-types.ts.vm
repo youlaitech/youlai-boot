@@ -12,11 +12,19 @@ export interface ${entityName}Query extends PageQuery {
     #if($fieldConfig.formType.name() == "DATE" || $fieldConfig.formType.name() == "DATE_TIME")
       #if($fieldConfig.queryType.name() == "BETWEEN")
   ${fieldConfig.fieldName}?: [string, string];
+      #elseif($fieldConfig.queryType.name() == "IN")
+  ${fieldConfig.fieldName}?: string[];
       #else
   ${fieldConfig.fieldName}?: ${fieldConfig.tsType};
       #end
     #else
+      #if($fieldConfig.queryType.name() == "IN")
+  ${fieldConfig.fieldName}?: string[];
+      #elseif($fieldConfig.queryType.name() == "BETWEEN")
+  ${fieldConfig.fieldName}: [${fieldConfig.tsType} | null, ${fieldConfig.tsType} | null];
+      #else
   ${fieldConfig.fieldName}?: ${fieldConfig.tsType};
+      #end
     #end
   #end
 #end

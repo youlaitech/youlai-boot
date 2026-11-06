@@ -6,7 +6,29 @@
         #foreach($fieldConfig in $fieldConfigs)
           #if($fieldConfig.isShowInQuery == 1)
             <el-form-item label="$fieldConfig.fieldComment" prop="$fieldConfig.fieldName">
-                    #if($fieldConfig.formType.name() == "INPUT")
+                    #if($fieldConfig.queryType.name() == "IN")
+                        #if($fieldConfig.dictType && $fieldConfig.dictType.trim() != "")
+                          <DictSelect v-model="params.$fieldConfig.fieldName" type="checkbox" code="$fieldConfig.dictType" />
+                        #else
+                          <el-input-tag
+                              v-model="params.$fieldConfig.fieldName"
+                              placeholder="输入后回车"
+                              clearable
+                          />
+                        #end
+                    #elseif($fieldConfig.queryType.name() == "BETWEEN" && $fieldConfig.formType.name() != "DATE" && $fieldConfig.formType.name() != "DATE_TIME")
+                      <div class="flex items-center gap-2">
+                        #if($fieldConfig.tsType == "number")
+                          <el-input-number v-model="params.${fieldConfig.fieldName}[0]" placeholder="最小值" class="!w-[120px]" />
+                          <span>~</span>
+                          <el-input-number v-model="params.${fieldConfig.fieldName}[1]" placeholder="最大值" class="!w-[120px]" />
+                        #else
+                          <el-input v-model="params.${fieldConfig.fieldName}[0]" placeholder="开始值" clearable class="!w-[120px]" />
+                          <span>~</span>
+                          <el-input v-model="params.${fieldConfig.fieldName}[1]" placeholder="结束值" clearable class="!w-[120px]" />
+                        #end
+                      </div>
+                    #elseif($fieldConfig.formType.name() == "INPUT")
                       <el-input
                           v-model="params.$fieldConfig.fieldName"
                           placeholder="$fieldConfig.fieldComment"
@@ -60,7 +82,7 @@
                       <el-date-picker
                           v-model="params.$fieldConfig.fieldName"
                           #if($fieldConfig.queryType.name() == "BETWEEN")
-                          type="daterange"
+                          type="datetimerange"
                           range-separator="~"
                           start-placeholder="开始时间"
                           end-placeholder="结束时间"
@@ -77,8 +99,8 @@
                           #if($fieldConfig.queryType.name() == "BETWEEN")
                           type="daterange"
                           range-separator="~"
-                          start-placeholder="开始时间"
-                          end-placeholder="结束时间"
+                          start-placeholder="开始日期"
+                          end-placeholder="结束日期"
                           #else
                           type="date"
                           placeholder="$fieldConfig.fieldComment"
@@ -101,12 +123,12 @@
       <div class="page-toolbar">
         <div class="page-toolbar__left">
           <el-button
-              v-hasPerm="['${moduleName}:${entityKebab}:create']"
+              v-hasPerm="['${permissionPrefix}:create']"
               type="primary"
               @click="handleCreateClick()"
           >新增</el-button>
           <el-button
-              v-hasPerm="['${moduleName}:${entityKebab}:delete']"
+              v-hasPerm="['${permissionPrefix}:delete']"
               type="danger"
               :disabled="!hasSelection"
               @click="handleBatchDelete()"
@@ -160,7 +182,7 @@
         <el-table-column fixed="right" label="操作" width="180">
           <template #default="scope">
             <el-button
-                v-hasPerm="['${moduleName}:${entityKebab}:update']"
+                v-hasPerm="['${permissionPrefix}:update']"
                 type="primary"
                 size="small"
                 link
@@ -169,7 +191,7 @@
               编辑
             </el-button>
             <el-button
-                v-hasPerm="['${moduleName}:${entityKebab}:delete']"
+                v-hasPerm="['${permissionPrefix}:delete']"
                 type="danger"
                 size="small"
                 link
@@ -308,6 +330,13 @@
     initialParams: {
       pageNum: 1,
       pageSize: 10,
+#foreach($fieldConfig in $fieldConfigs)
+#if($fieldConfig.isShowInQuery == 1 && $fieldConfig.queryType.name() == "IN")
+      ${fieldConfig.fieldName}: [],
+#elseif($fieldConfig.isShowInQuery == 1 && $fieldConfig.queryType.name() == "BETWEEN" && $fieldConfig.formType.name() != "DATE" && $fieldConfig.formType.name() != "DATE_TIME")
+      ${fieldConfig.fieldName}: [null, null],
+#end
+#end
     },
     request: ${entityName}API.getPage,
     onBeforeReset: () => queryFormRef.value?.resetFields(),

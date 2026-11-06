@@ -5,24 +5,44 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Getter;
 import lombok.Setter;
 #if($fieldConfigs)
-    #set ($hasDateBetween = false)
+    #set ($needList = false)
+    #set ($needLocalDate = false)
+    #set ($needLocalDateTime = false)
+    #set ($needBigDecimal = false)
     #foreach($fieldConfig in ${fieldConfigs})
-        #if(($fieldConfig.formType.name() == "DATE" || $fieldConfig.formType.name() == "DATE_TIME") && $fieldConfig.queryType.name() == "BETWEEN")
-            #set ($hasDateBetween = true)
+        #if($fieldConfig.isShowInQuery == 1)
+            #set ($queryTypeName = $fieldConfig.queryType.name())
+            #if($queryTypeName == "IN" || $queryTypeName == "BETWEEN")
+                #set ($needList = true)
+            #end
+            #if($fieldConfig.fieldType == "LocalDate")
+                #if(($fieldConfig.formType.name() == "DATE" || $fieldConfig.formType.name() == "DATE_TIME") && ($queryTypeName == "IN" || $queryTypeName == "BETWEEN"))
+                #else
+                    #set ($needLocalDate = true)
+                #end
+            #elseif($fieldConfig.fieldType == "LocalDateTime")
+                #if(($fieldConfig.formType.name() == "DATE" || $fieldConfig.formType.name() == "DATE_TIME") && ($queryTypeName == "IN" || $queryTypeName == "BETWEEN"))
+                #else
+                    #set ($needLocalDateTime = true)
+                #end
+            #end
+            #if($fieldConfig.fieldType == "BigDecimal")
+                #set ($needBigDecimal = true)
+            #end
         #end
     #end
-    #if($hasDateBetween)
+    #if($needList)
 import java.util.List;
     #end
-#end
-#if(${hasLocalDate})
+    #if($needLocalDate)
 import java.time.LocalDate;
-#end
-#if(${hasLocalDateTime})
+    #end
+    #if($needLocalDateTime)
 import java.time.LocalDateTime;
-#end
-#if(${hasBigDecimal})
+    #end
+    #if($needBigDecimal)
 import java.math.BigDecimal;
+    #end
 #end
 
 /**
@@ -43,13 +63,17 @@ public class ${entityName}Query extends BaseQuery {
     @Schema(description = "${fieldConfig.fieldComment}")
             #end
             #if($fieldConfig.formType.name() == "DATE" || $fieldConfig.formType.name() == "DATE_TIME")
-                #if($fieldConfig.queryType.name() == "BETWEEN")
+                #if($fieldConfig.queryType.name() == "BETWEEN" || $fieldConfig.queryType.name() == "IN")
     private List<String> ${fieldConfig.fieldName};
                 #else
     private ${fieldConfig.fieldType} ${fieldConfig.fieldName};
                 #end
             #else
+                #if($fieldConfig.queryType.name() == "BETWEEN" || $fieldConfig.queryType.name() == "IN")
+    private List<${fieldConfig.fieldType}> ${fieldConfig.fieldName};
+                #else
     private ${fieldConfig.fieldType} ${fieldConfig.fieldName};
+                #end
             #end
          #end
     #end

@@ -60,7 +60,7 @@ public class GenConfigForm {
     @Schema(description = "前端应用名")
     private String frontendAppName;
 
-    @Schema(description = "页面类型 classic|crud", example = "classic")
+    @Schema(description = "页面类型 classic|crud", example = "crud")
     private String pageType;
 
     @Schema(description = "要移除的表前缀，如: sys_", example = "sys_")

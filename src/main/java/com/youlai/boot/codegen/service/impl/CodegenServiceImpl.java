@@ -16,6 +16,7 @@ import com.youlai.boot.codegen.property.CodegenProperties;
 import com.youlai.boot.codegen.service.GenTableService;
 import com.youlai.boot.codegen.service.GenTableColumnService;
 import com.youlai.boot.codegen.service.CodegenService;
+import com.youlai.boot.codegen.util.NamingUtils;
 import com.youlai.boot.common.exception.BusinessException;
 import com.youlai.boot.codegen.mapper.DatabaseMapper;
 import com.youlai.boot.codegen.model.entity.GenTable;
@@ -45,6 +46,9 @@ import java.util.zip.ZipOutputStream;
 @RequiredArgsConstructor
 @Slf4j
 public class CodegenServiceImpl implements CodegenService {
+
+    private static final List<String> FEATURES = List.of(
+            "LocalDate", "LocalDateTime", "BigDecimal", "NotBlank", "NotNull", "Size");
 
     private final DatabaseMapper databaseMapper;
     private final CodegenProperties codegenProperties;
@@ -247,14 +251,14 @@ public class CodegenServiceImpl implements CodegenService {
                     + File.separator + "src"
                     + File.separator + "api"
                     + File.separator + moduleName
-                    + File.separator + StrUtil.toSymbolCase(entityName, '-')
+                    + File.separator + NamingUtils.kebab(entityName)
             );
         } else if ("API_TYPES".equals(templateName)) {
             path = (codegenProperties.getFrontendAppName()
                     + File.separator + "src"
                     + File.separator + "api"
                     + File.separator + moduleName
-                    + File.separator + StrUtil.toSymbolCase(entityName, '-')
+                    + File.separator + NamingUtils.kebab(entityName)
             );
         } else if ("VIEW".equals(templateName)) {
             // path = "src/views/system/user";
@@ -262,7 +266,7 @@ public class CodegenServiceImpl implements CodegenService {
                     + File.separator + "src"
                     + File.separator + subPackageName
                     + File.separator + moduleName
-                    + File.separator + StrUtil.toSymbolCase(entityName, '-')
+                    + File.separator + NamingUtils.kebab(entityName)
             );
         } else {
             path = (codegenProperties.getBackendAppName()
@@ -297,8 +301,8 @@ public class CodegenServiceImpl implements CodegenService {
                                   String pageType) {
 
         Map<String, Object> bindMap = new HashMap<>();
-
         String entityName = genTable.getEntityName();
+        String entityKebab = NamingUtils.kebab(entityName);
 
         bindMap.put("packageName", genTable.getPackageName());
         bindMap.put("moduleName", genTable.getModuleName());
@@ -307,65 +311,41 @@ public class CodegenServiceImpl implements CodegenService {
         bindMap.put("entityName", entityName);
         bindMap.put("tableName", genTable.getTableName());
         bindMap.put("author", genTable.getAuthor());
-        String entityLowerCamel = StrUtil.lowerFirst(entityName);
-        String entityKebab = StrUtil.toSymbolCase(entityName, '-');
-        String entityUpperSnake = StrUtil.toSymbolCase(entityName, '_').toUpperCase();
-        bindMap.put("entityLowerCamel", entityLowerCamel);
+        bindMap.put("entityLowerCamel", StrUtil.lowerFirst(entityName));
         bindMap.put("entityKebab", entityKebab);
-        bindMap.put("entityUpperSnake", entityUpperSnake);
+        bindMap.put("entityKebabPlural", NamingUtils.pluralKebab(entityKebab));
+        bindMap.put("entityUpperSnake", NamingUtils.upperSnake(entityName));
+        bindMap.put("permissionPrefix",
+                codegenProperties.resolvePermissionPrefix(genTable.getModuleName(), entityName));
         bindMap.put("businessName", genTable.getBusinessName());
-        bindMap.put("entityComment", genTable.getBusinessName());
         bindMap.put("fieldConfigs", fieldConfigs);
 
-        boolean hasLocalDate = false;
-        boolean hasLocalDateTime = false;
-        boolean hasBigDecimal = false;
-        boolean hasNotBlank = false;
-        boolean hasNotNull = false;
-        boolean hasSize = false;
-
+        Set<String> features = new HashSet<>();
         for (GenTableColumn fieldConfig : fieldConfigs) {
-
             if (StrUtil.isBlank(fieldConfig.getFieldType())) {
                 fieldConfig.setFieldType(JavaTypeEnum.getJavaTypeByColumnType(fieldConfig.getColumnType()));
             }
-
-            if ("LocalDate".equals(fieldConfig.getFieldType())) {
-                hasLocalDate = true;
-            }
-            if ("LocalDateTime".equals(fieldConfig.getFieldType())) {
-                hasLocalDateTime = true;
-            }
-            if ("BigDecimal".equals(fieldConfig.getFieldType())) {
-                hasBigDecimal = true;
-            }
+            String fieldType = fieldConfig.getFieldType();
+            features.add(fieldType);
             if (ObjectUtil.equals(fieldConfig.getIsShowInForm(), 1) && !"id".equals(fieldConfig.getFieldName())) {
-                boolean isString = "String".equals(fieldConfig.getFieldType());
+                boolean isString = "String".equals(fieldType);
                 if (ObjectUtil.equals(fieldConfig.getIsRequired(), 1)) {
-                    if (isString) {
-                        hasNotBlank = true;
-                    } else {
-                        hasNotNull = true;
-                    }
+                    features.add(isString ? "NotBlank" : "NotNull");
                 }
                 if (isString && fieldConfig.getMaxLength() != null && fieldConfig.getMaxLength() > 0) {
-                    hasSize = true;
+                    features.add("Size");
                 }
             }
-            fieldConfig.setTsType(JavaTypeEnum.getTsTypeByJavaType(fieldConfig.getFieldType()));
+            fieldConfig.setTsType(JavaTypeEnum.getTsTypeByJavaType(fieldType));
+        }
+        for (String feature : FEATURES) {
+            bindMap.put("has" + feature, features.contains(feature));
         }
 
-        bindMap.put("hasLocalDate", hasLocalDate);
-        bindMap.put("hasLocalDateTime", hasLocalDateTime);
-        bindMap.put("hasBigDecimal", hasBigDecimal);
-        bindMap.put("hasNotBlank", hasNotBlank);
-        bindMap.put("hasNotNull", hasNotNull);
-        bindMap.put("hasSize", hasSize);
-
         TemplateEngine templateEngine = TemplateUtil.createEngine(new TemplateConfig("codegen", TemplateConfig.ResourceMode.CLASSPATH));
-        // 根据 ui 选择不同的前端页面模板：默认 index.vue.vm；封装版使用 index.crud.vue.vm
+        // classic 为兼容模板，其余情况统一使用 CrudPage 页面
         String path = templatePath;
-        if ("crud".equalsIgnoreCase(pageType)) {
+        if (!"classic".equalsIgnoreCase(pageType)) {
             if (path.endsWith("index.js.vue.vm")) {
                 path = path.replace("index.js.vue.vm", "index.crud.js.vue.vm");
             } else if (path.endsWith("index.vue.vm")) {

@@ -85,7 +85,7 @@ public class CodegenController {
     @Operation(summary = "获取预览生成代码")
     @GetMapping("/{tableName}/preview")
     public Result<List<CodegenPreviewVO>> getTablePreviewData(@PathVariable String tableName,
-                                                              @RequestParam(value = "pageType", required = false, defaultValue = "classic") String pageType,
+                                                              @RequestParam(value = "pageType", required = false, defaultValue = "crud") String pageType,
                                                               @RequestParam(value = "type", required = false, defaultValue = "ts") String type) {
         List<CodegenPreviewVO> list = codegenService.getCodegenPreviewData(tableName, pageType, type);
         return Result.success(list);
@@ -95,7 +95,7 @@ public class CodegenController {
     @GetMapping("/{tableName}/download")
     @Log(module = LogModuleEnum.CODEGEN, value = ActionTypeEnum.DOWNLOAD)
     public void downloadZip(HttpServletResponse response, @PathVariable String tableName,
-                            @RequestParam(value = "pageType", required = false, defaultValue = "classic") String pageType,
+                            @RequestParam(value = "pageType", required = false, defaultValue = "crud") String pageType,
                             @RequestParam(value = "type", required = false, defaultValue = "ts") String type) {
         String[] tableNames = tableName.split(",");
         byte[] data = codegenService.downloadCode(tableNames, pageType, type);

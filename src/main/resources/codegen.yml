@@ -10,6 +10,9 @@ codegen:
   defaultConfig:
     author: youlaitech
     moduleName: system
+  # 模块名 → 权限前缀，未配置时用模块名
+  permissionNamespaces:
+    system: sys
   # 排除数据表
   excludeTables:
     - gen_table

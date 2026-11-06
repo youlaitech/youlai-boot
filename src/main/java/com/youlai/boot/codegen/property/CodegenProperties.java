@@ -2,6 +2,7 @@ package com.youlai.boot.codegen.property;
 
 import cn.hutool.core.io.file.FileNameUtil;
 import cn.hutool.core.map.MapUtil;
+import cn.hutool.core.util.StrUtil;
 import lombok.Data;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.stereotype.Component;
@@ -22,10 +23,25 @@ public class CodegenProperties {
 
 
     /** 默认配置 */
-    private DefaultConfig defaultConfig ;
+    private DefaultConfig defaultConfig;
 
     /** 模板配置 */
     private Map<String, TemplateConfig> templateConfigs = MapUtil.newHashMap(true);
+
+    /** 模块名 → 权限前缀，未配置时用模块名 */
+    private Map<String, String> permissionNamespaces = MapUtil.newHashMap(true);
+
+    /**
+     * 解析权限标识前缀
+     *
+     * @param moduleName 模块名
+     * @param entityName 实体名
+     * @return 权限标识前缀，如 sys:user
+     */
+    public String resolvePermissionPrefix(String moduleName, String entityName) {
+        String namespace = permissionNamespaces.getOrDefault(moduleName, moduleName);
+        return namespace + ":" + StrUtil.toSymbolCase(entityName, '-');
+    }
 
     /** 后端应用名 */
     private String backendAppName;

@@ -2,7 +2,7 @@ import request from "@/utils/request";
 import type { ${entityName}Form, ${entityName}Query, ${entityName}Item } from "./types";
 import type { PageResult } from "@/api/common";
 
-const ${entityUpperSnake}_BASE_URL = "/api/v1/${entityKebab}";
+const ${entityUpperSnake}_BASE_URL = "/api/v1/${entityKebabPlural}";
 
 const ${entityName}API = {
   /**

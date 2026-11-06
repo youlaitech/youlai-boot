@@ -19,15 +19,28 @@
         FROM
             ${tableName}
         <where>
+        #if($fieldConfigs)
+            #set ($hasDeleted = false)
+            #foreach($fieldConfig in ${fieldConfigs})
+                #if($fieldConfig.fieldName == "isDeleted" || $fieldConfig.columnName == "is_deleted")
+                    #set ($hasDeleted = true)
+                #end
+            #end
+            #if($hasDeleted)
+                is_deleted = 0
+            #end
+        #end
             #if($fieldConfigs)
                 #foreach($fieldConfig in ${fieldConfigs})
                     #if($fieldConfig.isShowInQuery)
-                #if($fieldConfig.fieldType == "String")
+                            #set ($queryType = $fieldConfig.queryType.name())
+                #if($queryType == "IN" || $queryType == "BETWEEN")
+            <if test="queryParams.${fieldConfig.fieldName} != null">
+                #elseif($fieldConfig.fieldType == "String")
             <if test="queryParams.${fieldConfig.fieldName} != null and queryParams.${fieldConfig.fieldName} != ''">
                 #else
             <if test="queryParams.${fieldConfig.fieldName} != null">
                 #end
-                            #set ($queryType = $fieldConfig.queryType.name())
                             #if($queryType == "EQ")
                 AND ${fieldConfig.columnName} = #{queryParams.${fieldConfig.fieldName}}
                             #elseif($queryType == "LIKE")
@@ -38,7 +51,7 @@
                 </if>
                 #elseif($queryType == "BETWEEN")
                     #if($fieldConfig.formType.name() == "DATE" || $fieldConfig.formType.name() == "DATE_TIME")
-                <if test="queryParams.${fieldConfig.fieldName}[0] != null and queryParams.${fieldConfig.fieldName}[0] != ''">
+                <if test="queryParams.${fieldConfig.fieldName}.size() > 0 and queryParams.${fieldConfig.fieldName}[0] != null and queryParams.${fieldConfig.fieldName}[0] != ''">
                     <bind name="startDate" value="queryParams.${fieldConfig.fieldName}[0].length() == 10 ? queryParams.${fieldConfig.fieldName}[0] + ' 00:00:00' : queryParams.${fieldConfig.fieldName}[0]"/>
                     AND ${fieldConfig.columnName} &gt;= #{startDate}
                 </if>
@@ -46,11 +59,18 @@
                     <bind name="endDate" value="queryParams.${fieldConfig.fieldName}[1].length() == 10 ? queryParams.${fieldConfig.fieldName}[1] + ' 23:59:59' : queryParams.${fieldConfig.fieldName}[1]"/>
                     AND ${fieldConfig.columnName} &lt;= #{endDate}
                 </if>
-                    #else
-                <if test="queryParams.${fieldConfig.fieldName}[0] != null and queryParams.${fieldConfig.fieldName}[0] != ''">
+                    #elseif($fieldConfig.fieldType == "String")
+                <if test="queryParams.${fieldConfig.fieldName}.size() > 0 and queryParams.${fieldConfig.fieldName}[0] != null and queryParams.${fieldConfig.fieldName}[0] != ''">
                     AND ${fieldConfig.columnName} &gt;= #{queryParams.${fieldConfig.fieldName}[0]}
                 </if>
                 <if test="queryParams.${fieldConfig.fieldName}.size() > 1 and queryParams.${fieldConfig.fieldName}[1] != null and queryParams.${fieldConfig.fieldName}[1] != ''">
+                    AND ${fieldConfig.columnName} &lt;= #{queryParams.${fieldConfig.fieldName}[1]}
+                </if>
+                    #else
+                <if test="queryParams.${fieldConfig.fieldName}.size() > 0 and queryParams.${fieldConfig.fieldName}[0] != null">
+                    AND ${fieldConfig.columnName} &gt;= #{queryParams.${fieldConfig.fieldName}[0]}
+                </if>
+                <if test="queryParams.${fieldConfig.fieldName}.size() > 1 and queryParams.${fieldConfig.fieldName}[1] != null">
                     AND ${fieldConfig.columnName} &lt;= #{queryParams.${fieldConfig.fieldName}[1]}
                 </if>
                     #end
@@ -74,6 +94,7 @@
                 #end
             #end
         </where>
+        ORDER BY id DESC
     </select>
 
 </mapper>
