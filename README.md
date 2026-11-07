@@ -1,6 +1,6 @@
 <div align="center">
 
-# <img alt="youlai-boot" width="40" height="40" src="./docs/images/logo/logo.png" align="center"> youlai-boot
+# <img alt="youlai-boot" width="40" height="40" src="./docs/images/logo/logo.png" valign="middle"> youlai-boot
 
 **Java 17 + Spring Boot 4.0.5 企业级权限管理系统后端**
 

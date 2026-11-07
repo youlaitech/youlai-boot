@@ -1,6 +1,6 @@
 <div align="center">
 
-# <img alt="youlai-boot" height="32" valign="middle" src="./docs/images/logo/logo.png"> youlai-boot
+# <img alt="youlai-boot" width="40" height="40" valign="middle" src="./docs/images/logo/logo.png"> youlai-boot
 
 **Java 17 + Spring Boot 4.0.5 Enterprise-Grade Permission Management Backend**
 
