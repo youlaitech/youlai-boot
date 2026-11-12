@@ -205,7 +205,9 @@ youlai-boot/
 
 以下功能默认关闭，需要时再开启。
 
-**AI 辅助**：在当前环境配置中填写密钥，并加上 `spring.ai.model.chat: openai`。
+### AI 辅助
+
+在当前环境配置中填写密钥，并加上 `spring.ai.model.chat: openai`。
 
 ```yaml
 spring:
@@ -217,32 +219,25 @@ spring:
       api-key: ""
       chat:
         model: qwen3.7-flash
-        temperature: 0.3
-        extra-body:
-          "[enable_thinking]": false
 ```
 
-**工作流**：先执行扩展脚本导入菜单、演示角色与发起表单（不含 `ACT_*` 引擎表），再在环境配置中打开开关。
+### 工作流
 
-```bash
-sql/extensions/workflow.sql
-```
+执行 `sql/extensions/workflow.sql` 导入菜单、演示角色与发起表单（不含 `ACT_*` 引擎表），再在环境配置中打开开关：
 
 ```yaml
 flowable:
   process:
     enabled: true   # 唯一开关，同时控制业务模块和引擎
-  idm:
-    enabled: false
-  eventregistry:
-    enabled: false
 ```
 
-开发环境启动时自动建表，生产需先建表；演示流程在「流程模型」页点「重置工作流数据」后生成。
+### 统一认证
 
-**统一认证**：经 Nginx 接入时，取消环境配置 `server` 块中 `forward-headers-strategy: framework` 的注释，并让代理覆盖客户端的 `Forwarded` / `X-Forwarded-*`。
+OIDC 登录接入外部认证中心，见[统一认证](https://www.youlai.tech/docs/server/spring-boot/modules-oidc.html)。
 
-**多租户**：见 [youlai-boot-tenant](https://gitee.com/youlaiorg/youlai-boot-tenant)。
+### 多租户
+
+见[多租户](https://www.youlai.tech/docs/server/spring-boot/modules-multi-tenant.html)。
 
 ## 技术合作
 
