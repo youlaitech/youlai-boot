@@ -70,6 +70,9 @@
 
         <spring-ai.version>2.0.2</spring-ai.version>
 
+        <!-- springdoc 3.x 调用 Schema.$dynamicRef()，旧版本注解包没有该方法 -->
+        <swagger.version>2.2.55</swagger.version>
+
     </properties>
 
     <dependencyManagement>
@@ -80,6 +83,17 @@
                 <version>${spring-ai.version}</version>
                 <type>pom</type>
                 <scope>import</scope>
+            </dependency>
+            <!-- openai-java 传递的是 2.2.31，与 springdoc 3.1.1 的 2.2.55 冲突 -->
+            <dependency>
+                <groupId>io.swagger.core.v3</groupId>
+                <artifactId>swagger-annotations</artifactId>
+                <version>${swagger.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>io.swagger.core.v3</groupId>
+                <artifactId>swagger-annotations-jakarta</artifactId>
+                <version>${swagger.version}</version>
             </dependency>
         </dependencies>
     </dependencyManagement>
