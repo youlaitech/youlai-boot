@@ -213,6 +213,8 @@ const formConfig: CrudFormConfig<${entityName}Form> = {
       type: "input",
 #if($field.formType.name() == "TEXT_AREA")
       attrs: { type: "textarea", rows: 3 },
+#elseif($field.fieldName.indexOf("password") >= 0 || $field.fieldName.indexOf("pwd") >= 0)
+      attrs: { type: "password", showPassword: true },
 #end
 #end
     },
