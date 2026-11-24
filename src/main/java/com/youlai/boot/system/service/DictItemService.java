@@ -1,7 +1,7 @@
 package com.youlai.boot.system.service;
 
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
-import com.baomidou.mybatisplus.extension.service.IService;
+import com.baomidou.mybatisplus.spring.service.IService;
 import com.youlai.boot.system.model.entity.DictItem;
 import com.youlai.boot.system.model.form.DictItemForm;
 import com.youlai.boot.system.model.query.DictItemQuery;

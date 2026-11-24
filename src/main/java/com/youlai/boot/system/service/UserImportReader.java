@@ -43,6 +43,7 @@ public class UserImportReader extends AnalysisEventListener<UserImportForm> {
     private final PasswordEncoder passwordEncoder;
     private final UserConverter userConverter;
     private final UserRoleService userRoleService;
+    private final ConfigService configService;
 
     private final List<Role> roleList;
     private final List<Dept> deptList;
@@ -59,6 +60,7 @@ public class UserImportReader extends AnalysisEventListener<UserImportForm> {
         this.passwordEncoder = SpringUtil.getBean(PasswordEncoder.class);
         this.userRoleService = SpringUtil.getBean(UserRoleService.class);
         this.userConverter = SpringUtil.getBean(UserConverter.class);
+        this.configService = SpringUtil.getBean(ConfigService.class);
         this.roleList = SpringUtil.getBean(RoleService.class)
                 .list(new LambdaQueryWrapper<Role>().eq(Role::getStatus, StatusEnum.ENABLE.getValue())
                         .select(Role::getId, Role::getCode, Role::getName));
@@ -112,7 +114,9 @@ public class UserImportReader extends AnalysisEventListener<UserImportForm> {
         if (validation) {
             // 校验通过，持久化至数据库
             SysUser entity = userConverter.toEntity(userImportDto);
-            entity.setPassword(passwordEncoder.encode(SystemConstants.DEFAULT_PASSWORD));   // 默认密码
+            String defaultPassword = configService.getValue(
+                    SystemConstants.CONFIG_KEY_USER_INIT_PASSWORD, SystemConstants.DEFAULT_PASSWORD);
+            entity.setPassword(passwordEncoder.encode(defaultPassword));   // 默认密码
             // 性别逆向翻译 根据字典标签得到字典值
             String genderLabel = userImportDto.getGenderLabel();
             entity.setGender(getGenderValue(genderLabel));

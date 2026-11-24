@@ -3,7 +3,7 @@ package com.youlai.boot.system.service.impl;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
-import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import com.baomidou.mybatisplus.spring.service.impl.ServiceImpl;
 import com.youlai.boot.common.constant.RedisConstants;
 import com.youlai.boot.system.converter.ConfigConverter;
 import com.youlai.boot.system.mapper.ConfigMapper;
@@ -77,7 +77,11 @@ public class ConfigServiceImpl extends ServiceImpl<ConfigMapper, Config> impleme
                 super.count(new LambdaQueryWrapper<Config>().eq(Config::getConfigKey, configForm.getConfigKey())) == 0,
                 "配置键已存在");
         Config config = configConverter.toEntity(configForm);
-        return this.save(config);
+        boolean result = this.save(config);
+        if (result) {
+            refreshCache();
+        }
+        return result;
     }
 
     /**
@@ -105,7 +109,11 @@ public class ConfigServiceImpl extends ServiceImpl<ConfigMapper, Config> impleme
                 super.count(new LambdaQueryWrapper<Config>().eq(Config::getConfigKey, configForm.getConfigKey()).ne(Config::getId, id)) == 0,
                 "配置键已存在");
         Config config = configConverter.toEntity(configForm);
-        return this.updateById(config);
+        boolean result = this.updateById(config);
+        if (result) {
+            refreshCache();
+        }
+        return result;
     }
 
     /**
@@ -117,7 +125,11 @@ public class ConfigServiceImpl extends ServiceImpl<ConfigMapper, Config> impleme
     @Override
     public boolean delete(Long id) {
         if (id != null) {
-            return super.removeById(id);
+            boolean result = super.removeById(id);
+            if (result) {
+                refreshCache();
+            }
+            return result;
         }
         return false;
     }
@@ -137,6 +149,26 @@ public class ConfigServiceImpl extends ServiceImpl<ConfigMapper, Config> impleme
             return true;
         }
         return false;
+    }
+
+    /**
+     * 获取配置值；缓存缺失时回源数据库并回填缓存。
+     */
+    @Override
+    public String getValue(String key, String defaultValue) {
+        if (StringUtils.isBlank(key)) {
+            return defaultValue;
+        }
+        Object cached = redisTemplate.opsForHash().get(RedisConstants.System.CONFIG, key);
+        if (cached != null && StringUtils.isNotBlank(cached.toString())) {
+            return cached.toString();
+        }
+        Config config = this.getOne(new LambdaQueryWrapper<Config>().eq(Config::getConfigKey, key), false);
+        if (config != null && StringUtils.isNotBlank(config.getConfigValue())) {
+            redisTemplate.opsForHash().put(RedisConstants.System.CONFIG, key, config.getConfigValue());
+            return config.getConfigValue();
+        }
+        return defaultValue;
     }
 
 }

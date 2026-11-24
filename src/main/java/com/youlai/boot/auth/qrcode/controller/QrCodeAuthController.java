@@ -10,6 +10,8 @@ import com.youlai.boot.framework.security.util.SecurityUtils;
 import com.youlai.boot.framework.web.ratelimit.RateLimit;
 import com.youlai.boot.framework.web.util.IPUtils;
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.extensions.Extension;
+import io.swagger.v3.oas.annotations.extensions.ExtensionProperty;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
@@ -33,12 +35,17 @@ import org.springframework.web.bind.annotation.RestController;
 @RequiredArgsConstructor
 public class QrCodeAuthController {
 
+    private static final String API_GROUP = "扫码登录";
+
     private final QrCodeLoginService qrCodeLoginService;
 
     /**
      * 生成扫码登录票据
      */
-    @Operation(summary = "[扫码]生成扫码登录票据")
+    @Operation(
+            summary = "生成扫码登录票据",
+            extensions = @Extension(name = "x-group", properties = @ExtensionProperty(name = "name", value = API_GROUP))
+    )
     @PostMapping("/generate")
     @RateLimit(limit = 30, window = 60)
     public Result<QrCodeGenerateVO> generate(HttpServletRequest request) {
@@ -48,7 +55,10 @@ public class QrCodeAuthController {
     /**
      * 查询扫码状态
      */
-    @Operation(summary = "[扫码]查询扫码状态")
+    @Operation(
+            summary = "查询扫码状态",
+            extensions = @Extension(name = "x-group", properties = @ExtensionProperty(name = "name", value = API_GROUP))
+    )
     @GetMapping("/status")
     @RateLimit(limit = 60, window = 60)
     public Result<QrCodeStatusVO> status(@RequestParam String ticket) {
@@ -58,7 +68,10 @@ public class QrCodeAuthController {
     /**
      * APP 标记已扫码
      */
-    @Operation(summary = "[扫码]APP 标记已扫码")
+    @Operation(
+            summary = "APP 标记已扫码",
+            extensions = @Extension(name = "x-group", properties = @ExtensionProperty(name = "name", value = API_GROUP))
+    )
     @PostMapping("/scan")
     public Result<QrCodeStatusVO> scan(@RequestBody @Valid QrCodeTicketForm form) {
         return Result.success(qrCodeLoginService.scan(form.getTicket(), SecurityUtils.getUserId()));
@@ -67,7 +80,10 @@ public class QrCodeAuthController {
     /**
      * APP 确认登录
      */
-    @Operation(summary = "[扫码]APP 确认登录")
+    @Operation(
+            summary = "APP 确认登录",
+            extensions = @Extension(name = "x-group", properties = @ExtensionProperty(name = "name", value = API_GROUP))
+    )
     @PostMapping("/confirm")
     public Result<QrCodeStatusVO> confirm(@RequestBody @Valid QrCodeTicketForm form) {
         return Result.success(qrCodeLoginService.confirm(form.getTicket(), SecurityUtils.getUserId()));
@@ -76,7 +92,10 @@ public class QrCodeAuthController {
     /**
      * APP 取消登录
      */
-    @Operation(summary = "[扫码]APP 取消登录")
+    @Operation(
+            summary = "APP 取消登录",
+            extensions = @Extension(name = "x-group", properties = @ExtensionProperty(name = "name", value = API_GROUP))
+    )
     @PostMapping("/cancel")
     public Result<QrCodeStatusVO> cancel(@RequestBody @Valid QrCodeTicketForm form) {
         return Result.success(qrCodeLoginService.cancel(form.getTicket(), SecurityUtils.getUserId()));
@@ -85,7 +104,10 @@ public class QrCodeAuthController {
     /**
      * PC 端用票据换取会话令牌
      */
-    @Operation(summary = "[扫码]PC 端换取会话令牌")
+    @Operation(
+            summary = "PC 端换取会话令牌",
+            extensions = @Extension(name = "x-group", properties = @ExtensionProperty(name = "name", value = API_GROUP))
+    )
     @PostMapping("/login")
     public Result<TokenPair> login(@RequestBody @Valid QrCodeTicketForm form) {
         return Result.success(qrCodeLoginService.login(form.getTicket()));

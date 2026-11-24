@@ -2,9 +2,9 @@
 
 # <img alt="youlai-boot" width="40" height="40" src="./docs/images/logo/logo.png" valign="middle"> youlai-boot
 
-**Java 17 + Spring Boot 4.0.5 企业级权限管理系统后端**
+**Java 17 + Spring Boot 4.1.2 企业级权限管理系统后端**
 
-[![Spring Boot](https://img.shields.io/badge/Spring%20Boot-4.0.5-6DB33F?logo=spring-boot)](https://spring.io/projects/spring-boot)
+[![Spring Boot](https://img.shields.io/badge/Spring%20Boot-4.1.2-6DB33F?logo=spring-boot)](https://spring.io/projects/spring-boot)
 [![JDK](https://img.shields.io/badge/JDK-17%2B-007396?logo=openjdk)](https://openjdk.org/)
 [![License](https://img.shields.io/badge/License-Apache%202.0-blue?logo=apache)](LICENSE)
 [![Gitee Star](https://gitee.com/youlaiorg/youlai-boot/badge/star.svg)](https://gitee.com/youlaiorg/youlai-boot/stargazers)
@@ -94,7 +94,7 @@
 
    # 可选扩展：不装不影响基础功能，需在基础库之后执行
    sql/extensions/dynamic-form.sql # 动态表单
-   sql/extensions/workflow.sql   # 工作流（Flowable 演示流程与演示账号，非引擎表）
+   sql/extensions/workflow.sql   # 工作流（依赖动态表单）
    sql/extensions/oidc.sql        # 统一认证：应用中心菜单与演示身份关联
    ```
 
@@ -115,7 +115,7 @@
    mvn spring-boot:run
    ```
 
-   启动后访问 <http://localhost:8000/swagger-ui.html>，能打开接口文档即说明后端已正常运行。
+   启动后访问 <http://localhost:8000/doc.html>（apidoc）或 <http://localhost:8000/swagger-ui.html>（Swagger UI），能打开接口文档即说明后端已正常运行。
 
 5. 启动前端（可选）：
    如需可视化操作界面，启动配套前端 [vue3-element-admin](https://gitee.com/youlaiorg/vue3-element-admin)，访问 <http://localhost:3000>，使用 `admin` / `123456` 登录。
@@ -223,7 +223,7 @@ spring:
 
 ### 工作流
 
-执行 `sql/extensions/workflow.sql` 导入菜单、演示角色与发起表单（不含 `ACT_*` 引擎表），再在环境配置中打开开关：
+执行 `sql/extensions/workflow.sql` 初始化工作流，再在环境配置中打开开关：
 
 ```yaml
 flowable:

@@ -1,6 +1,6 @@
 package com.youlai.boot.codegen.service;
 
-import com.baomidou.mybatisplus.extension.service.IService;
+import com.baomidou.mybatisplus.spring.service.IService;
 import com.youlai.boot.codegen.model.entity.GenTableColumn;
 
 /**

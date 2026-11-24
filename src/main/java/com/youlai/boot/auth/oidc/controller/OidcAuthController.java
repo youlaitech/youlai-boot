@@ -7,6 +7,8 @@ import com.youlai.boot.common.result.Result;
 import com.youlai.boot.framework.security.model.TokenPair;
 import com.youlai.boot.framework.web.ratelimit.RateLimit;
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.extensions.Extension;
+import io.swagger.v3.oas.annotations.extensions.ExtensionProperty;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
@@ -29,12 +31,17 @@ import org.springframework.web.bind.annotation.RestController;
 @RequiredArgsConstructor
 public class OidcAuthController {
 
+    private static final String API_GROUP = "OIDC 登录";
+
     private final OidcLoginService oidcLoginService;
 
     /**
      * 消费一次性认证票据并创建本地会话
      */
-    @Operation(summary = "[OIDC] 票据兑换登录令牌")
+    @Operation(
+            summary = "票据兑换登录令牌",
+            extensions = @Extension(name = "x-group", properties = @ExtensionProperty(name = "name", value = API_GROUP))
+    )
     @PostMapping("/tickets/exchange")
     @RateLimit
     public Result<TokenPair> exchangeTicket(@RequestBody @Valid OidcTicketExchangeForm form,

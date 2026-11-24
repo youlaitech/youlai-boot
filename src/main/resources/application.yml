@@ -63,6 +63,8 @@ security:
     - ${springdoc.swagger-ui.path:/swagger-ui.html} # Swagger UI 路径
     - /swagger-ui/**
     - /v3/api-docs/**
+    - ${apidoc.path:/doc.html} # apidoc 文档入口
+    - /apidoc/** # apidoc 静态资源
     - /webjars/**
     - /favicon.ico
     - /error

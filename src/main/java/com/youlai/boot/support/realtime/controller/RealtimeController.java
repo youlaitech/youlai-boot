@@ -10,6 +10,7 @@ import com.youlai.boot.support.realtime.model.CreateRealtimeTicketRequest;
 import com.youlai.boot.support.realtime.model.PresenceSnapshot;
 import com.youlai.boot.support.realtime.model.RealtimeTicketResponse;
 import com.youlai.boot.support.realtime.security.RealtimeTicketService;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.dao.DataAccessException;
@@ -34,6 +35,7 @@ import org.springframework.web.bind.annotation.RestController;
  * @author Ray.Hao
  * @since 4.13.0
  */
+@Tag(name = "11.实时通信")
 @RestController
 @RequestMapping("/api/v1/realtime")
 @RequiredArgsConstructor

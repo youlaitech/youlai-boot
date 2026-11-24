@@ -1,6 +1,6 @@
 package com.youlai.boot.codegen.service.impl;
 
-import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import com.baomidou.mybatisplus.spring.service.impl.ServiceImpl;
 import com.youlai.boot.codegen.mapper.GenTableColumnMapper;
 import com.youlai.boot.codegen.model.entity.GenTableColumn;
 import com.youlai.boot.codegen.service.GenTableColumnService;

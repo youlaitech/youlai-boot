@@ -2,7 +2,7 @@ package com.youlai.boot.system.service.impl;
 
 import cn.hutool.core.collection.CollectionUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
-import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import com.baomidou.mybatisplus.spring.service.impl.ServiceImpl;
 import com.youlai.boot.system.mapper.RoleDeptMapper;
 import com.youlai.boot.system.model.entity.RoleDept;
 import com.youlai.boot.system.service.RoleDeptService;

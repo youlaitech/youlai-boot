@@ -1,7 +1,7 @@
 package com.youlai.boot.system.service;
 
 import com.baomidou.mybatisplus.core.metadata.IPage;
-import com.baomidou.mybatisplus.extension.service.IService;
+import com.baomidou.mybatisplus.spring.service.IService;
 import com.youlai.boot.common.model.Option;
 import com.youlai.boot.framework.security.model.SecurityUser;
 import com.youlai.boot.system.model.vo.CurrentUserVO;

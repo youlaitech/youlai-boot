@@ -2,9 +2,9 @@
 
 # <img alt="youlai-boot" width="40" height="40" valign="middle" src="./docs/images/logo/logo.png"> youlai-boot
 
-**Java 17 + Spring Boot 4.0.5 Enterprise-Grade Permission Management Backend**
+**Java 17 + Spring Boot 4.1.2 Enterprise-Grade Permission Management Backend**
 
-[![Spring Boot](https://img.shields.io/badge/Spring%20Boot-4.0.5-6DB33F?logo=spring-boot)](https://spring.io/projects/spring-boot)
+[![Spring Boot](https://img.shields.io/badge/Spring%20Boot-4.1.2-6DB33F?logo=spring-boot)](https://spring.io/projects/spring-boot)
 [![JDK](https://img.shields.io/badge/JDK-17%2B-007396?logo=openjdk)](https://openjdk.org/)
 [![License](https://img.shields.io/badge/License-Apache%202.0-blue?logo=apache)](LICENSE)
 [![Gitee Star](https://gitee.com/youlaiorg/youlai-boot/badge/star.svg)](https://gitee.com/youlaiorg/youlai-boot/stargazers)
@@ -131,7 +131,7 @@
    mvn spring-boot:run
    ```
 
-   Once started, visit <http://localhost:8000/swagger-ui.html>. If the API docs open, the backend is running properly.
+   Once started, visit <http://localhost:8000/doc.html> (apidoc) or <http://localhost:8000/swagger-ui.html> (Swagger UI). If the API docs open, the backend is running properly.
 
 5. Start the frontend (optional):
    For a visual admin UI, start the companion frontend [vue3-element-admin](https://gitee.com/youlaiorg/vue3-element-admin), visit <http://localhost:3000>, and log in with `admin` / `123456`.

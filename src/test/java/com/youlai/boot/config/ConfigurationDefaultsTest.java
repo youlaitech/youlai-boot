@@ -80,15 +80,12 @@ class ConfigurationDefaultsTest {
             var binder = Binder.get(context.getEnvironment());
 
             var rateLimit = binder.bindOrCreate("rate-limit", RateLimitProperties.class);
-            assertThat(rateLimit.getDefaultLimit()).isEqualTo(switch (profile) {
+            assertThat(rateLimit.getLimit()).isEqualTo(switch (profile) {
                 case "dev" -> 60;
                 case "prod" -> 10;
-                default -> 5;
+                default -> 60;
             });
-            assertThat(rateLimit.getDefaultWindow()).isEqualTo(Duration.ofSeconds(60));
-            assertThat(rateLimit.getIp().isEnabled()).isTrue();
-            assertThat(rateLimit.getIp().getLimit()).isEqualTo(1000);
-            assertThat(rateLimit.getIp().getWindow()).isEqualTo(Duration.ofSeconds(60));
+            assertThat(rateLimit.getWindow()).isEqualTo(Duration.ofSeconds(60));
 
             var security = binder.bindOrCreate("security", SecurityProperties.class);
             assertThat(security.getToken().getAccessTokenTimeToLive()).isEqualTo(Duration.ofHours(2));
@@ -116,6 +113,26 @@ class ConfigurationDefaultsTest {
             assertThat(localCache.policy().eviction().orElseThrow().getMaximum()).isEqualTo(1000);
             assertThat(localCache.policy().expireAfterWrite().orElseThrow().getExpiresAfter())
                     .isEqualTo(Duration.ofMinutes(10));
+        });
+    }
+
+    /**
+     * 文档 UI 的开关与免登录路径按环境配置：开发与演示环境启用，生产环境关闭。
+     */
+    @ParameterizedTest
+    @ValueSource(strings = {"dev", "prod", "youlai"})
+    void documentUiIsEnabledOutsideProduction(String profile) {
+        contextRunner(profile).run(context -> {
+            assertThat(context).hasNotFailed();
+            assertThat(context.getEnvironment().getProperty("apidoc.enabled", Boolean.class, true))
+                    .as("文档 UI 应在生产环境关闭")
+                    .isEqualTo(!profile.equals("prod"));
+
+            var permitAllUrls = Binder.get(context.getEnvironment())
+                    .bindOrCreate("security", SecurityProperties.class).getPermitAllUrls();
+            assertThat(permitAllUrls)
+                    .contains("/doc.html", "/apidoc/**")
+                    .allSatisfy(url -> assertThat(url).doesNotContain("${"));
         });
     }
 

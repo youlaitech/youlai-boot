@@ -2,7 +2,7 @@ package com.youlai.boot.system.service.impl;
 
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
-import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import com.baomidou.mybatisplus.spring.service.impl.ServiceImpl;
 import com.youlai.boot.common.enums.StatusEnum;
 import com.youlai.boot.common.exception.BusinessException;
 import com.youlai.boot.framework.security.model.SecurityUser;

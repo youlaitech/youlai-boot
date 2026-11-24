@@ -31,7 +31,7 @@ import java.util.List;
  * @author Ray.Hao
  * @since 4.9.0
  */
-@Tag(name = "13.工作流任务接口")
+@Tag(name = "14.工作流接口 / 任务")
 @ConditionalOnWorkflowEnabled
 @RestController
 @RequestMapping("/api/v1/workflow/tasks")

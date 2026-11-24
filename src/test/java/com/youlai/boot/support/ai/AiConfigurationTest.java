@@ -2,6 +2,7 @@ package com.youlai.boot.support.ai;
 
 import com.sun.net.httpserver.HttpServer;
 import com.youlai.boot.common.exception.BusinessException;
+import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
 import org.springframework.ai.chat.model.ChatModel;
@@ -113,6 +114,35 @@ class AiConfigurationTest {
                         assertThat(body.get("model").asText()).isEqualTo(context.getEnvironment()
                                 .getRequiredProperty("spring.ai.openai.chat.model"));
                     });
+        } finally {
+            server.stop(0);
+        }
+    }
+
+    @Test
+    void quotaExhaustedErrorIsTranslatedIntoReadableMessage() throws Exception {
+        var server = HttpServer.create(new InetSocketAddress("127.0.0.1", 0), 0);
+        server.createContext("/", exchange -> {
+            byte[] response = """
+                    {"error":{"code":"AllocationQuota.FreeTierOnly",
+                     "message":"The free tier of the model has been exhausted.","type":"invalid_request_error"}}
+                    """.getBytes(StandardCharsets.UTF_8);
+            exchange.getResponseHeaders().set("Content-Type", "application/json");
+            exchange.sendResponseHeaders(403, response.length);
+            try (var output = exchange.getResponseBody()) {
+                output.write(response);
+            }
+        });
+        server.start();
+        try {
+            runner.withPropertyValues("spring.profiles.active=dev",
+                            "spring.ai.model.chat=openai", "spring.ai.openai.api-key=test-key",
+                            "spring.ai.openai.base-url=http://127.0.0.1:" + server.getAddress().getPort()
+                                    + "/compatible-mode/v1")
+                    .run(context -> assertThatThrownBy(
+                                    () -> context.getBean(AiChatService.class).chat("system", "test"))
+                            .isInstanceOf(BusinessException.class)
+                            .hasMessageContaining("额度"));
         } finally {
             server.stop(0);
         }

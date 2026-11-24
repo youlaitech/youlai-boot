@@ -36,7 +36,7 @@ import java.util.List;
  * @author Ray
  * @since 2.10.0
  */
-@Tag(name = "11.代码生成")
+@Tag(name = "12.代码生成")
 @RestController
 @RequestMapping("/api/v1/codegen")
 @RequiredArgsConstructor

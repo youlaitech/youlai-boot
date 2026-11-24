@@ -3,7 +3,7 @@ package com.youlai.boot.system.service.impl;
 import cn.hutool.core.lang.Assert;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
-import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import com.baomidou.mybatisplus.spring.service.impl.ServiceImpl;
 import com.youlai.boot.system.converter.DictItemConverter;
 import com.youlai.boot.system.mapper.DictItemMapper;
 import com.youlai.boot.system.model.entity.DictItem;

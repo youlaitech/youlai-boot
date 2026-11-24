@@ -9,6 +9,8 @@ import com.youlai.boot.framework.security.model.TokenPair;
 import com.youlai.boot.framework.web.ratelimit.RateLimit;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.extensions.Extension;
+import io.swagger.v3.oas.annotations.extensions.ExtensionProperty;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -28,12 +30,17 @@ import org.springframework.web.bind.annotation.RestController;
 @RequiredArgsConstructor
 public class SmsAuthController {
 
+    private static final String API_GROUP = "短信登录";
+
     private final SmsAuthService smsAuthService;
 
     /**
      * 发送手机登录验证码
      */
-    @Operation(summary = "[短信]发送登录短信验证码")
+    @Operation(
+            summary = "发送登录短信验证码",
+            extensions = @Extension(name = "x-group", properties = @ExtensionProperty(name = "name", value = API_GROUP))
+    )
     @PostMapping("/code")
     @RateLimit(limit = 1, window = 60)
     public Result<Void> sendCode(
@@ -46,7 +53,10 @@ public class SmsAuthController {
     /**
      * 校验手机验证码并创建登录会话
      */
-    @Operation(summary = "[短信]短信验证码登录")
+    @Operation(
+            summary = "短信验证码登录",
+            extensions = @Extension(name = "x-group", properties = @ExtensionProperty(name = "name", value = API_GROUP))
+    )
     @PostMapping("/login")
     @Log(module = LogModuleEnum.LOGIN, value = ActionTypeEnum.LOGIN)
     public Result<TokenPair> login(

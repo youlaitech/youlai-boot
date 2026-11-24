@@ -28,7 +28,7 @@ import org.springframework.web.bind.annotation.*;
  * @author Ray.Hao
  * @since 4.9.0
  */
-@Tag(name = "13.工作流实例接口")
+@Tag(name = "14.工作流接口 / 实例")
 @ConditionalOnWorkflowEnabled
 @RestController
 @RequestMapping("/api/v1/workflow/instances")

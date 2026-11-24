@@ -8,7 +8,7 @@ import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.core.metadata.OrderItem;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
-import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import com.baomidou.mybatisplus.spring.service.impl.ServiceImpl;
 import com.youlai.boot.common.constant.RedisConstants;
 import com.youlai.boot.common.constant.SystemConstants;
 import com.youlai.boot.common.exception.BusinessException;
@@ -100,6 +100,8 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, SysUser> implements
 
     private final UserConverter userConverter;
 
+    private final ConfigService configService;
+
 
     /**
      * 获取用户分页列表.
@@ -165,7 +167,9 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, SysUser> implements
         Assert.isTrue(count == 0, "用户名已存在");
 
         // 设置默认加密密码
-        String defaultEncryptPwd = passwordEncoder.encode(SystemConstants.DEFAULT_PASSWORD);
+        String defaultPassword = configService.getValue(
+                SystemConstants.CONFIG_KEY_USER_INIT_PASSWORD, SystemConstants.DEFAULT_PASSWORD);
+        String defaultEncryptPwd = passwordEncoder.encode(defaultPassword);
         entity.setPassword(defaultEncryptPwd);
 
         // 新增用户

@@ -4,7 +4,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
-import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import com.baomidou.mybatisplus.spring.service.impl.ServiceImpl;
 import ${packageName}.${moduleName}.mapper.${entityName}Mapper;
 import ${packageName}.${moduleName}.service.${entityName}Service;
 import ${packageName}.${moduleName}.model.entity.${entityName};

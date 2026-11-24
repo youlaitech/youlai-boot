@@ -1,7 +1,7 @@
 package com.youlai.boot.system.service.impl;
 
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
-import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import com.baomidou.mybatisplus.spring.service.impl.ServiceImpl;
 import com.youlai.boot.system.mapper.UserRoleMapper;
 import com.youlai.boot.system.model.entity.UserRole;
 import com.youlai.boot.system.service.UserRoleService;

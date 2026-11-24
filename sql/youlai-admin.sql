@@ -505,6 +505,8 @@ CREATE TABLE `sys_config` (
                               PRIMARY KEY (`id`)
 ) ENGINE=InnoDB COMMENT='系统配置表';
 
+INSERT INTO `sys_config` VALUES (1, '用户管理-账号初始密码', 'sys.user.initPassword', '123456', '新增用户、导入用户时的默认密码', now(), 1, NULL, NULL, 0);
+
 -- 限流阈值由 yml 的 rate-limit.* 维护，不在 sys_config 中配置
 
 -- ----------------------------

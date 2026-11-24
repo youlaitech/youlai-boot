@@ -12,6 +12,8 @@ import com.youlai.boot.framework.security.model.TokenPair;
 import com.youlai.boot.framework.web.ratelimit.RateLimit;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.extensions.Extension;
+import io.swagger.v3.oas.annotations.extensions.ExtensionProperty;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -33,12 +35,18 @@ import org.springframework.web.bind.annotation.RestController;
 @RequiredArgsConstructor
 public class WxMaAuthController {
 
+    private static final String API_GROUP = "小程序登录";
+
     private final WxMaAuthService wxMaAuthService;
 
     /**
      * 校验微信登录凭证，返回会话或待绑定状态
      */
-    @Operation(summary = "[小程序]静默登录", description = "通过微信 code 登录，未关联用户返回绑定手机号标记")
+    @Operation(
+            summary = "静默登录",
+            description = "通过微信 code 登录，未关联用户返回绑定手机号标记",
+            extensions = @Extension(name = "x-group", properties = @ExtensionProperty(name = "name", value = API_GROUP))
+    )
     @PostMapping("/silent-login")
     @Log(module = LogModuleEnum.LOGIN, value = ActionTypeEnum.LOGIN)
     @RateLimit
@@ -53,7 +61,11 @@ public class WxMaAuthController {
     /**
      * 通过微信手机号授权完成登录
      */
-    @Operation(summary = "[小程序]手机号快捷登录", description = "同时使用微信 code 和手机号授权 code 登录，适用于企业认证小程序")
+    @Operation(
+            summary = "手机号快捷登录",
+            description = "同时使用微信 code 和手机号授权 code 登录，适用于企业认证小程序",
+            extensions = @Extension(name = "x-group", properties = @ExtensionProperty(name = "name", value = API_GROUP))
+    )
     @PostMapping("/phone-login")
     @Log(module = LogModuleEnum.LOGIN, value = ActionTypeEnum.LOGIN)
     @RateLimit
@@ -65,7 +77,11 @@ public class WxMaAuthController {
     /**
      * 校验微信身份和手机验证码后关联本地账号
      */
-    @Operation(summary = "[小程序]绑定手机号", description = "为静默登录用户绑定手机号，绑定成功后自动登录")
+    @Operation(
+            summary = "绑定手机号",
+            description = "为静默登录用户绑定手机号，绑定成功后自动登录",
+            extensions = @Extension(name = "x-group", properties = @ExtensionProperty(name = "name", value = API_GROUP))
+    )
     @PostMapping("/bind-mobile")
     @Log(module = LogModuleEnum.LOGIN, value = ActionTypeEnum.LOGIN)
     @RateLimit
