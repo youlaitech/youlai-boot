@@ -2,10 +2,10 @@ package com.youlai.boot.system.service;
 
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.youlai.boot.system.model.entity.SysLog;
-import com.baomidou.mybatisplus.extension.service.IService;
+import com.baomidou.mybatisplus.spring.service.IService;
 import com.youlai.boot.system.model.query.LogQuery;
 import com.youlai.boot.system.model.vo.LogPageVO;
-import com.youlai.boot.system.model.vo.VisitOverviewVO;
+import com.youlai.boot.system.model.vo.VisitSummaryVO;
 import com.youlai.boot.system.model.vo.VisitTrendVO;
 
 import java.time.LocalDate;
@@ -23,18 +23,16 @@ public interface LogService extends IService<SysLog> {
      */
     Page<LogPageVO> getLogPage(LogQuery queryParams);
 
-
     /**
      * 获取访问趋势
      *
-     * @param startDate 开始时间
-     * @param endDate   结束时间
+     * @param startDate 开始日期
+     * @param endDate   结束日期
      */
     VisitTrendVO getVisitTrend(LocalDate startDate, LocalDate endDate);
 
     /**
-     * 获取访问统计
+     * 获取访问汇总
      */
-    VisitOverviewVO getVisitStats();
-
+    VisitSummaryVO getVisitSummary();
 }

@@ -3,7 +3,7 @@ package com.youlai.boot.system.mapper;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.youlai.boot.system.model.dto.VisitCountDTO;
-import com.youlai.boot.system.model.vo.VisitOverviewVO;
+import com.youlai.boot.system.model.vo.VisitSummaryVO;
 import com.youlai.boot.system.model.entity.SysLog;
 import com.youlai.boot.system.model.query.LogQuery;
 import com.youlai.boot.system.model.vo.LogPageVO;
@@ -46,12 +46,12 @@ public interface LogMapper extends BaseMapper<SysLog> {
     /**
      * 获取浏览量(PV)统计
      */
-    VisitOverviewVO getPvStats();
+    VisitSummaryVO getPvStats();
 
     /**
      * 获取访问IP统计
      */
-    VisitOverviewVO getUvStats();
+    VisitSummaryVO getUvStats();
 }
 
 

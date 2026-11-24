@@ -7,24 +7,22 @@ import lombok.Setter;
 import java.util.List;
 
 /**
- * 访问趋势Vo
+ * 访问趋势视图对象
  *
  * @author Ray.Hao
  * @since 2.3.0
  */
-@Schema(description = "访问趋势Vo")
+@Schema(description = "访问趋势视图对象")
 @Getter
 @Setter
 public class VisitTrendVO {
 
-    @Schema(description = "日期列表")
-    private List<String> dates;
+    @Schema(description = "查询开始日期 yyyy-MM-dd")
+    private String startDate;
 
-    @Schema(description = "浏览量(PV)")
-    private List<Integer> pvList;
+    @Schema(description = "查询结束日期 yyyy-MM-dd")
+    private String endDate;
 
-    @Schema(description = "访客数(UV)")
-    private List<Integer> uvList;
+    @Schema(description = "逐日访问量")
+    private List<VisitTrendPointVO> points;
 }
-
- 

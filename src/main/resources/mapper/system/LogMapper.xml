@@ -82,39 +82,47 @@
     </select>
 
     <!-- 获取访问量(PV)统计数据 -->
-    <select id="getPvStats" resultType="com.youlai.boot.system.model.vo.VisitOverviewVO">
+    <select id="getPvStats" resultType="com.youlai.boot.system.model.vo.VisitSummaryVO">
         SELECT
-            COUNT(CASE WHEN DATE(create_time) = CURDATE() THEN 1 END) AS todayPvCount,
-            COUNT(*) AS totalPvCount,
-            ROUND(
-                    CASE
-                        WHEN COUNT(CASE WHEN DATE(create_time) = CURDATE() - INTERVAL 1 DAY AND TIME(create_time) &lt;= TIME(NOW()) THEN 1 END) = 0 THEN 0
-                        ELSE
-                            (COUNT(CASE WHEN DATE(create_time) = CURDATE() THEN 1 END) -
-                             COUNT(CASE WHEN DATE(create_time) = CURDATE() - INTERVAL 1 DAY AND TIME(create_time)  &lt;= TIME(NOW()) THEN 1 END)) /
-                            COUNT(CASE WHEN DATE(create_time) = CURDATE() - INTERVAL 1 DAY AND TIME(create_time)  &lt;= TIME(NOW()) THEN 1 END)
-                        END,
-                    2) AS pvGrowthRate
-        FROM
-            sys_log
+            today_count AS todayPv,
+            yesterday_count AS yesterdayPv,
+            total_count AS totalPv,
+            CASE
+                WHEN yesterday_count = 0 THEN NULL
+                ELSE ROUND((today_count - yesterday_count) * 1.0 / yesterday_count, 4)
+            END AS pvGrowthRate
+        FROM (
+            SELECT
+                (SELECT COUNT(*) FROM sys_log) AS total_count,
+                (SELECT COUNT(*) FROM sys_log
+                 WHERE create_time &gt;= CURDATE()
+                   AND create_time &lt;= NOW()) AS today_count,
+                (SELECT COUNT(*) FROM sys_log
+                 WHERE create_time &gt;= CURDATE() - INTERVAL 1 DAY
+                   AND create_time &lt; CURDATE()) AS yesterday_count
+        ) stats
     </select>
 
-    <!-- 获取IP统计数据 -->
-    <select id="getUvStats" resultType="com.youlai.boot.system.model.vo.VisitOverviewVO">
+    <!-- 获取访客(UV)统计数据 -->
+    <select id="getUvStats" resultType="com.youlai.boot.system.model.vo.VisitSummaryVO">
+        SELECT
+            today_count AS todayUv,
+            yesterday_count AS yesterdayUv,
+            total_count AS totalUv,
+            CASE
+                WHEN yesterday_count = 0 THEN NULL
+                ELSE ROUND((today_count - yesterday_count) * 1.0 / yesterday_count, 4)
+            END AS uvGrowthRate
+        FROM (
             SELECT
-                COUNT(DISTINCT CASE WHEN DATE(create_time) = CURDATE() THEN ip END) AS todayUvCount,
-                COUNT(DISTINCT ip) AS totalUvCount,
-                ROUND(
-                    CASE
-                        WHEN COUNT(DISTINCT CASE WHEN DATE(create_time) = CURDATE() - INTERVAL 1 DAY AND TIME(create_time) &lt;= TIME(NOW()) THEN ip END) = 0 THEN 0
-                    ELSE
-                        (COUNT(DISTINCT CASE WHEN DATE(create_time) = CURDATE() THEN ip END) -
-                        COUNT(DISTINCT CASE WHEN DATE(create_time) = CURDATE() - INTERVAL 1 DAY AND TIME(create_time) &lt;= TIME(NOW()) THEN ip END)) /
-                        COUNT(DISTINCT CASE WHEN DATE(create_time) = CURDATE() - INTERVAL 1 DAY AND TIME(create_time) &lt;= TIME(NOW()) THEN ip END)
-                    END,
-                2) AS uvGrowthRate
-            FROM
-                sys_log
+                (SELECT COUNT(DISTINCT ip) FROM sys_log) AS total_count,
+                (SELECT COUNT(DISTINCT ip) FROM sys_log
+                 WHERE create_time &gt;= CURDATE()
+                   AND create_time &lt;= NOW()) AS today_count,
+                (SELECT COUNT(DISTINCT ip) FROM sys_log
+                 WHERE create_time &gt;= CURDATE() - INTERVAL 1 DAY
+                   AND create_time &lt; CURDATE()) AS yesterday_count
+        ) stats
     </select>
 
 

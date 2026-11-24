@@ -6,13 +6,13 @@
 
     <groupId>com.youlai</groupId>
     <artifactId>youlai-boot</artifactId>
-    <version>4.14.2</version>
+    <version>4.15.0</version>
     <description>基于 Java 17 + SpringBoot 4 + Spring Security 构建的权限管理系统。</description>
 
     <parent>
         <groupId>org.springframework.boot</groupId>
         <artifactId>spring-boot-starter-parent</artifactId>
-        <version>4.0.5</version> <!-- lookup parent from repository -->
+        <version>4.1.2</version> <!-- lookup parent from repository -->
         <relativePath/>
     </parent>
 
@@ -27,9 +27,9 @@
 
         <mysql-connector-j.version>9.1.0</mysql-connector-j.version>
         <druid.version>1.2.24</druid.version>
-        <mybatis-plus.version>3.5.15</mybatis-plus.version>
+        <mybatis-plus.version>3.5.18</mybatis-plus.version>
 
-        <springdoc.version>3.1.1</springdoc.version>
+        <springdoc.version>3.2.0</springdoc.version>
 
         <mapstruct.version>1.6.3</mapstruct.version>
         <lombok-mapstruct-binding.version>0.2.0</lombok-mapstruct-binding.version>
@@ -45,10 +45,10 @@
         <aliyun-sdk-oss.version>3.16.3</aliyun-sdk-oss.version>
 
         <!-- redisson 分布式锁 -->
-        <redisson.version>4.1.0</redisson.version>
+        <redisson.version>4.8.0</redisson.version>
 
         <!-- 自动代码生成 -->
-        <mybatis-plus-generator.version>3.5.15</mybatis-plus-generator.version>
+        <mybatis-plus-generator.version>3.5.18</mybatis-plus-generator.version>
         <velocity.version>2.3</velocity.version>
 
         <!-- IP 地区转换 -->
@@ -72,6 +72,9 @@
 
         <!-- springdoc 3.x 调用 Schema.$dynamicRef()，旧版本注解包没有该方法 -->
         <swagger.version>2.2.55</swagger.version>
+
+        <!-- apidoc 接口文档 UI -->
+        <apidoc.version>0.3.1</apidoc.version>
 
     </properties>
 
@@ -246,6 +249,13 @@
             <groupId>org.springdoc</groupId>
             <artifactId>springdoc-openapi-starter-webmvc-ui</artifactId>
             <version>${springdoc.version}</version>
+        </dependency>
+
+        <!-- apidoc 接口文档 UI，读取 /v3/api-docs 渲染文档页面 -->
+        <dependency>
+            <groupId>tech.youlai</groupId>
+            <artifactId>apidoc-spring-boot-starter</artifactId>
+            <version>${apidoc.version}</version>
         </dependency>
 
         <!-- MapStruct 对象映射 -->
