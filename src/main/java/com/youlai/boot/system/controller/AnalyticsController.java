@@ -23,7 +23,7 @@ import org.springframework.web.bind.annotation.RestController;
  * @author Ray.Hao
  * @since 4.15.0
  */
-@Tag(name = "10.统计接口")
+@Tag(name = "15.统计接口")
 @RestController
 @RequestMapping("/api/v1/analytics")
 @RequiredArgsConstructor

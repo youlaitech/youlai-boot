@@ -99,9 +99,10 @@ springdoc:
         - com.youlai.boot.module.workflow.controller
   default-flat-param-object: true
 
+# 接口文档 UI
 apidoc:
-  enabled: true
-  path: /doc.html
+  enabled: true # 启用文档页面与静态资源
+  path: /doc.html # 文档入口路径，页面资源固定在 /apidoc/
 
 ---
 
