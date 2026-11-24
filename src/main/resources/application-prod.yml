@@ -34,10 +34,14 @@ security:
     jwt:
       secret-key: SecretKey012345678901234567890123456789012345678901234567890123456789 # HS256，至少 32 字节 UTF-8
 
-# 请求限流
+# 接口限流
 rate-limit:
-  # @RateLimit 未指定参数时使用的接口限流规则
-  default-limit: 10
+  # 是否启用 @RateLimit 接口限流
+  enabled: true
+  # 每个用户（未登录按 IP）、每个接口的默认请求次数上限
+  limit: 10
+  # 上述次数对应的滑动窗口
+  window: 60s
 
 # 文件存储
 storage:
@@ -74,7 +78,7 @@ storage:
 springdoc:
   swagger-ui:
     path: /swagger-ui.html # Swagger UI 访问路径
-    operationsSorter: alpha # 接口按方法名排序
+    operations-sorter: alpha # 接口按字母排序
     tags-sorter: alpha # 标签按字母排序
   api-docs:
     path: /v3/api-docs # OpenAPI JSON 地址
@@ -93,6 +97,9 @@ springdoc:
         - com.youlai.boot.module.form.controller
         - com.youlai.boot.module.workflow.controller
   default-flat-param-object: true # 将对象参数扁平化显示在文档中
+
+apidoc:
+  enabled: false # 不注册文档入口与静态资源
 
 ---
 
@@ -131,7 +138,7 @@ xxl:
     admin:
       # 调度中心地址，多个用逗号分隔
       addresses: ""
-    accessToken: ""
+    access-token: ""
     executor:
       appname: xxl-job-executor-${spring.application.name}
 

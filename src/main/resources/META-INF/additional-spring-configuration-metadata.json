@@ -12,7 +12,7 @@
       "description": "多个地址使用,分割"
     },
     {
-      "name": "xxl.job.accessToken",
+      "name": "xxl.job.access-token",
       "type": "java.lang.String",
       "description": "访问令牌"
     },

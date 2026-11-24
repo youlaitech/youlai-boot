@@ -42,7 +42,7 @@ public class RedisSlidingWindowRateLimiter {
     /**
      * 记录一次请求并返回窗口内计数
      *
-     * @param key      限流 Key（如 {@code rate_limit:ip:192.168.1.1}）
+     * @param key      限流 Key（如 {@code rate_limit:api:{user}:{uri}}）
      * @param windowMs 窗口大小（毫秒）
      * @return 当前窗口内请求数（包含本次）；Redis 异常时返回 null，调用方按 Fail-Open 放行
      */

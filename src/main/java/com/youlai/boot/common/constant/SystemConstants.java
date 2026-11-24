@@ -14,6 +14,9 @@ public interface SystemConstants {
     // 系统默认密码
     String DEFAULT_PASSWORD = "123456";
 
+    // 初始密码配置键
+    String CONFIG_KEY_USER_INIT_PASSWORD = "sys.user.initPassword";
+
     // 超级管理员角色编码
     String ROOT_ROLE_CODE = "ROOT";
 

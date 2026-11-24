@@ -14,6 +14,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.annotation.Around;
 import org.aspectj.lang.annotation.Aspect;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.http.HttpHeaders;
 import org.springframework.stereotype.Component;
 import org.springframework.web.context.request.RequestContextHolder;
@@ -27,6 +28,7 @@ import org.springframework.web.context.request.ServletRequestAttributes;
  */
 @Aspect
 @Component
+@ConditionalOnProperty(prefix = "rate-limit", name = "enabled", havingValue = "true", matchIfMissing = true)
 @RequiredArgsConstructor
 @Slf4j
 public class RateLimitAspect {
@@ -40,10 +42,10 @@ public class RateLimitAspect {
                 ((ServletRequestAttributes) RequestContextHolder.getRequestAttributes()).getRequest();
 
         String key = buildKey(request, rateLimit);
-        int limit = rateLimit.limit() > 0 ? rateLimit.limit() : rateLimitProperties.getDefaultLimit();
+        int limit = rateLimit.limit() > 0 ? rateLimit.limit() : rateLimitProperties.getLimit();
         long windowMs = rateLimit.window() > 0
                 ? rateLimit.window() * 1000L
-                : rateLimitProperties.getDefaultWindow().toMillis();
+                : rateLimitProperties.getWindow().toMillis();
 
         // limiter 内部已统一 Fail-Open：Redis 异常返回 null，按未计数放行
         Long count = rateLimiter.count(key, windowMs);

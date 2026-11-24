@@ -20,7 +20,7 @@ public class XxlJobConfig {
     @Value("${xxl.job.admin.addresses}")
     private String adminAddresses;
 
-    @Value("${xxl.job.accessToken}")
+    @Value("${xxl.job.access-token}")
     private String accessToken;
 
     @Value("${xxl.job.executor.appname}")
