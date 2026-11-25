@@ -2,9 +2,9 @@
 
 # <img alt="youlai-boot" width="40" height="40" src="./docs/images/logo/logo.png" valign="middle"> youlai-boot
 
-**Java 17 + Spring Boot 4.1.2 企业级权限管理系统后端**
+**Java 17 + Spring Boot 4.2.0 企业级权限管理系统后端**
 
-[![Spring Boot](https://img.shields.io/badge/Spring%20Boot-4.1.2-6DB33F?logo=spring-boot)](https://spring.io/projects/spring-boot)
+[![Spring Boot](https://img.shields.io/badge/Spring%20Boot-4.2.0-6DB33F?logo=spring-boot)](https://spring.io/projects/spring-boot)
 [![JDK](https://img.shields.io/badge/JDK-17%2B-007396?logo=openjdk)](https://openjdk.org/)
 [![License](https://img.shields.io/badge/License-Apache%202.0-blue?logo=apache)](LICENSE)
 [![Gitee Star](https://gitee.com/youlaiorg/youlai-boot/badge/star.svg)](https://gitee.com/youlaiorg/youlai-boot/stargazers)
@@ -78,7 +78,7 @@
 
 ## 快速开始
 
-**环境要求**：JDK 17+ · MySQL 8.0+ · Redis 6.0+
+**环境要求**：JDK 17+ · MySQL 8.0+ · Redis 6.0+。中间件可用[部署运维](https://www.youlai.tech/docs/server/spring-boot/deploy.html)里的 compose 编排一键启动。
 
 1. 克隆项目：
 
@@ -161,7 +161,6 @@ youlai-boot/
 │   │   ├── sms/               # 短信服务
 │   │   └── realtime/          # WebSocket 实时通信
 │   └── system/                # 系统业务（用户/角色/菜单/部门/字典等）
-├── docker-compose.yml         # 中间件一键编排（MySQL/Redis/RustFS/Xxl-Job）
 └── pom.xml                    # Maven 依赖管理
 ```
 

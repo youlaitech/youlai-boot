@@ -6,13 +6,13 @@
 
     <groupId>com.youlai</groupId>
     <artifactId>youlai-boot</artifactId>
-    <version>4.15.0</version>
+    <version>4.15.1</version>
     <description>基于 Java 17 + SpringBoot 4 + Spring Security 构建的权限管理系统。</description>
 
     <parent>
         <groupId>org.springframework.boot</groupId>
         <artifactId>spring-boot-starter-parent</artifactId>
-        <version>4.1.2</version> <!-- lookup parent from repository -->
+        <version>4.2.0</version> <!-- lookup parent from repository -->
         <relativePath/>
     </parent>
 
@@ -66,15 +66,18 @@
         <!-- 架构约束测试 -->
         <archunit.version>1.3.0</archunit.version>
 
-        <weixin-java-miniapp.version>4.8.1.B</weixin-java-miniapp.version>
+        <weixin-java-miniapp.version>4.8.6.B</weixin-java-miniapp.version>
 
-        <spring-ai.version>2.0.2</spring-ai.version>
+        <!-- 加密库统一版本：微信 SDK 与阿里云 SDK 要求的版本不同，混用会在运行时报错 -->
+        <bouncycastle.version>1.84</bouncycastle.version>
 
-        <!-- springdoc 3.x 调用 Schema.$dynamicRef()，旧版本注解包没有该方法 -->
+        <spring-ai.version>2.1.0</spring-ai.version>
+
+        <!-- 接口文档页依赖该版本，低于它时页面会加载失败 -->
         <swagger.version>2.2.55</swagger.version>
 
         <!-- apidoc 接口文档 UI -->
-        <apidoc.version>0.4.0</apidoc.version>
+        <apidoc.version>0.3.3</apidoc.version>
 
     </properties>
 
@@ -87,7 +90,7 @@
                 <type>pom</type>
                 <scope>import</scope>
             </dependency>
-            <!-- openai-java 传递的是 2.2.31，与 springdoc 3.1.1 的 2.2.55 冲突 -->
+            <!-- Spring AI 会带进更低版本，这里统一压回上面指定的版本，否则文档页加载失败 -->
             <dependency>
                 <groupId>io.swagger.core.v3</groupId>
                 <artifactId>swagger-annotations</artifactId>
@@ -97,6 +100,12 @@
                 <groupId>io.swagger.core.v3</groupId>
                 <artifactId>swagger-annotations-jakarta</artifactId>
                 <version>${swagger.version}</version>
+            </dependency>
+            <!-- 固定用上面的版本，避免被其它依赖替换成不兼容的版本 -->
+            <dependency>
+                <groupId>org.bouncycastle</groupId>
+                <artifactId>bcprov-jdk18on</artifactId>
+                <version>${bouncycastle.version}</version>
             </dependency>
         </dependencies>
     </dependencyManagement>

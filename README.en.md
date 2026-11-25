@@ -2,9 +2,9 @@
 
 # <img alt="youlai-boot" width="40" height="40" valign="middle" src="./docs/images/logo/logo.png"> youlai-boot
 
-**Java 17 + Spring Boot 4.1.2 Enterprise-Grade Permission Management Backend**
+**Java 17 + Spring Boot 4.2.0 Enterprise-Grade Permission Management Backend**
 
-[![Spring Boot](https://img.shields.io/badge/Spring%20Boot-4.1.2-6DB33F?logo=spring-boot)](https://spring.io/projects/spring-boot)
+[![Spring Boot](https://img.shields.io/badge/Spring%20Boot-4.2.0-6DB33F?logo=spring-boot)](https://spring.io/projects/spring-boot)
 [![JDK](https://img.shields.io/badge/JDK-17%2B-007396?logo=openjdk)](https://openjdk.org/)
 [![License](https://img.shields.io/badge/License-Apache%202.0-blue?logo=apache)](LICENSE)
 [![Gitee Star](https://gitee.com/youlaiorg/youlai-boot/badge/star.svg)](https://gitee.com/youlaiorg/youlai-boot/stargazers)
@@ -78,7 +78,7 @@
 
 ## Quick Start
 
-**Requirements**: JDK 17+ · MySQL 8.0+ · Redis 6.0+
+**Requirements**: JDK 17+ · MySQL 8.0+ · Redis 6.0+. Middleware can be started with the Compose file from the deployment guide.
 
 1. Clone the project:
 
@@ -175,7 +175,6 @@ youlai-boot/
 │   │   ├── sms/               # SMS service
 │   │   └── realtime/          # WebSocket communication
 │   └── system/                # System business (user/role/menu/dept/dict etc.)
-├── docker-compose.yml         # One-click middleware orchestration (MySQL/Redis/RustFS/Xxl-Job)
 └── pom.xml                    # Maven dependency management
 ```
 
