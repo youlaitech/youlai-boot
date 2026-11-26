@@ -76,8 +76,8 @@
         <!-- 接口文档页依赖该版本，低于它时页面会加载失败 -->
         <swagger.version>2.2.55</swagger.version>
 
-        <!-- apidoc 接口文档 UI -->
-        <apidoc.version>0.3.3</apidoc.version>
+        <!-- apishow 接口文档 UI -->
+        <apishow.version>0.4.0</apishow.version>
 
     </properties>
 
@@ -260,11 +260,11 @@
             <version>${springdoc.version}</version>
         </dependency>
 
-        <!-- apidoc 接口文档 UI，读取 /v3/api-docs 渲染文档页面 -->
+        <!-- apishow 接口文档 UI，读取 /v3/api-docs 渲染文档页面 -->
         <dependency>
             <groupId>tech.youlai</groupId>
-            <artifactId>apidoc-spring-boot-starter</artifactId>
-            <version>${apidoc.version}</version>
+            <artifactId>apishow-spring-boot-starter</artifactId>
+            <version>${apishow.version}</version>
         </dependency>
 
         <!-- MapStruct 对象映射 -->

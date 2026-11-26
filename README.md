@@ -115,7 +115,7 @@
    mvn spring-boot:run
    ```
 
-   启动后访问 <http://localhost:8000/doc.html>（apidoc）或 <http://localhost:8000/swagger-ui.html>（Swagger UI），能打开接口文档即说明后端已正常运行。
+   启动后访问 <http://localhost:8000/doc.html>（apishow）或 <http://localhost:8000/swagger-ui.html>（Swagger UI），能打开接口文档即说明后端已正常运行。
 
 5. 启动前端（可选）：
    如需可视化操作界面，启动配套前端 [vue3-element-admin](https://gitee.com/youlaiorg/vue3-element-admin)，访问 <http://localhost:3000>，使用 `admin` / `123456` 登录。

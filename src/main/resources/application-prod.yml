@@ -98,7 +98,7 @@ springdoc:
         - com.youlai.boot.module.workflow.controller
   default-flat-param-object: true # 将对象参数扁平化显示在文档中
 
-apidoc:
+apishow:
   enabled: false # 不注册文档入口与静态资源
 
 ---

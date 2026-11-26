@@ -131,7 +131,7 @@
    mvn spring-boot:run
    ```
 
-   Once started, visit <http://localhost:8000/doc.html> (apidoc) or <http://localhost:8000/swagger-ui.html> (Swagger UI). If the API docs open, the backend is running properly.
+   Once started, visit <http://localhost:8000/doc.html> (apishow) or <http://localhost:8000/swagger-ui.html> (Swagger UI). If the API docs open, the backend is running properly.
 
 5. Start the frontend (optional):
    For a visual admin UI, start the companion frontend [vue3-element-admin](https://gitee.com/youlaiorg/vue3-element-admin), visit <http://localhost:3000>, and log in with `admin` / `123456`.

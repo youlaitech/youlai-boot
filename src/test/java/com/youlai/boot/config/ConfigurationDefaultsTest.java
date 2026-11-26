@@ -124,14 +124,14 @@ class ConfigurationDefaultsTest {
     void documentUiIsEnabledOutsideProduction(String profile) {
         contextRunner(profile).run(context -> {
             assertThat(context).hasNotFailed();
-            assertThat(context.getEnvironment().getProperty("apidoc.enabled", Boolean.class, true))
+            assertThat(context.getEnvironment().getProperty("apishow.enabled", Boolean.class, true))
                     .as("文档 UI 应在生产环境关闭")
                     .isEqualTo(!profile.equals("prod"));
 
             var permitAllUrls = Binder.get(context.getEnvironment())
                     .bindOrCreate("security", SecurityProperties.class).getPermitAllUrls();
             assertThat(permitAllUrls)
-                    .contains("/doc.html", "/apidoc/**")
+                    .contains("/doc.html", "/apishow/**")
                     .allSatisfy(url -> assertThat(url).doesNotContain("${"));
         });
     }
