@@ -20,6 +20,7 @@
 [![在线预览](https://img.shields.io/badge/在线预览-2D8CF0?style=for-the-badge\&logo=google-chrome\&logoColor=white)](https://admin.youlai.tech)
 [![移动端预览](https://img.shields.io/badge/移动端预览-19BE6B?style=for-the-badge\&logo=android\&logoColor=white)](https://app.youlai.tech)
 [![阅读文档](https://img.shields.io/badge/阅读文档-8B5CF6?style=for-the-badge\&logo=gitbook\&logoColor=white)](https://www.youlai.tech/docs/server/spring-boot/)
+[![在线接口文档](https://img.shields.io/badge/在线接口文档-13C2C2?style=for-the-badge\&logo=swagger\&logoColor=white)](https://api.youlai.tech/doc.html)
 [![English](https://img.shields.io/badge/English-00B4D8?style=for-the-badge\&logo=google-translate\&logoColor=white)](./README.en.md)
 
 </div>
